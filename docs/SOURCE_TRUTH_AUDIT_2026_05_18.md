@@ -1,5 +1,7 @@
 # Source Truth Audit - 2026-05-18
 
+> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
+
 This document records the latest full Markdown and source-code verification pass.
 
 > [!IMPORTANT]
@@ -20,15 +22,15 @@ Use these documents as the current project knowledge base:
 
 ## Current Source Truth
 
-- Runtime/product name: `CloudSend`.
+- Runtime/product name: `AShell`.
 - Android visible app name: `云计划`.
-- Android package/applicationId: `com.cloudsend.app`.
+- Android package/applicationId: `me.ashell`.
 - Rust crate/package version: `5.2.1`.
 - Flutter package version: `5.2.1+59`.
-- Rust library/crate output name: `cloudsend`.
-- Android native library: `libcloudsend.so`.
-- Windows native library: `cloudsend.dll`.
-- Portable packer package: `cloudsend-portable-packer` version `5.2.1`.
+- Rust library/crate output name: `ashell`.
+- Android native library: `libashell.so`.
+- Windows native library: `ashell.dll`.
+- Portable packer package: `ashell-portable-packer` version `5.2.1`.
 - Current Windows build entry: `new-build.cmd`.
 - Current Windows portable output directory: `PC-Bulid`.
 - Legacy Windows build entry: `build.cmd`, retained for old environment compatibility.
@@ -37,25 +39,25 @@ Use these documents as the current project knowledge base:
 
 - Android label source: `flutter/android/app/src/main/res/values/strings.xml`, key `app_name = 云计划`.
 - Android manifest labels: `flutter/android/app/src/main/AndroidManifest.xml`, `android:label="@string/app_name"` for the app and accessibility service.
-- Android foreground notification title: `flutter/android/app/src/main/kotlin/com/cloudsend/app/DFm8Y8iMScvB2YDw.kt`, `getString(R.string.app_name)`.
-- Android Kotlin native load: `flutter/android/app/src/main/kotlin/ffi.kt` and `flutter/android/app/src/main/kotlin/pkg2230.kt`, `System.loadLibrary("cloudsend")`.
-- Android Dart native load: `flutter/lib/models/native_model.dart`, `DynamicLibrary.open('libcloudsend.so')`.
-- Android build copy path: `build.sh`, `target/<triple>/release/libcloudsend.so` to `flutter/android/app/src/main/jniLibs/<abi>/libcloudsend.so`.
-- Windows runner native load: `flutter/windows/runner/main.cpp`, `LoadLibraryA("cloudsend.dll")`.
-- Windows CMake install path: `flutter/windows/CMakeLists.txt`, installs/renames `cloudsend.dll`.
-- Windows Dart native load: `flutter/lib/models/native_model.dart`, `DynamicLibrary.open('cloudsend.dll')`.
-- Rust package source: `Cargo.toml`, `name = "cloudsend"`, `version = "5.2.1"`, `[lib] name = "cloudsend"`.
-- Portable package source: `libs/portable/Cargo.toml` and `libs/portable/Cargo.lock`, `cloudsend-portable-packer` `5.2.1`.
+- Android foreground notification title: `flutter/android/app/src/main/kotlin/me/ashell/DFm8Y8iMScvB2YDw.kt`, `getString(R.string.app_name)`.
+- Android Kotlin native load: `flutter/android/app/src/main/kotlin/ffi.kt` and `flutter/android/app/src/main/kotlin/pkg2230.kt`, `System.loadLibrary("ashell")`.
+- Android Dart native load: `flutter/lib/models/native_model.dart`, `DynamicLibrary.open('libashell.so')`.
+- Android build copy path: `build.sh`, `target/<triple>/release/libashell.so` to `flutter/android/app/src/main/jniLibs/<abi>/libashell.so`.
+- Windows runner native load: `flutter/windows/runner/main.cpp`, `LoadLibraryA("ashell.dll")`.
+- Windows CMake install path: `flutter/windows/CMakeLists.txt`, installs/renames `ashell.dll`.
+- Windows Dart native load: `flutter/lib/models/native_model.dart`, `DynamicLibrary.open('ashell.dll')`.
+- Rust package source: `Cargo.toml`, `name = "ashell"`, `version = "5.2.1"`, `[lib] name = "ashell"`.
+- Portable package source: `libs/portable/Cargo.toml` and `libs/portable/Cargo.lock`, `ashell-portable-packer` `5.2.1`.
 - Flutter package source: `flutter/pubspec.yaml`, `version: 5.2.1+59`.
-- PC build script source: `new-build.cmd`, `VERSION=5.2.1`, `PC-Bulid`, `cloudsend-portable-packer.exe`.
+- PC build script source: `new-build.cmd`, `VERSION=5.2.1`, `PC-Bulid`, `ashell-portable-packer.exe`.
 
 ## Android Status Monitor Source Truth
 
-- Status query key: `DFm8Y8iMScvB2YDwGYN("cloudsend_status")`.
-- Rust transport: `src/server/connection.rs`, `cloudsend_status_message() -> Option<Message>`.
+- Status query key: `DFm8Y8iMScvB2YDwGYN("ashell_status")`.
+- Rust transport: `src/server/connection.rs`, `ashell_status_message() -> Option<Message>`.
 - Invalid/JNI-failed status samples must be skipped, not converted to hardcoded false JSON.
-- Flutter event: `update_cloudsend_status`.
-- Flutter model/widget: `CloudSendStatusModel` / `CloudSendStatusMonitor`.
+- Flutter event: `update_ashell_status`.
+- Flutter model/widget: `AShellStatusModel` / `AShellStatusMonitor`.
 - UI waiting state: nullable status fields render as gray `--`; red is only for a real `false` value from Android.
 
 Current payload semantics:

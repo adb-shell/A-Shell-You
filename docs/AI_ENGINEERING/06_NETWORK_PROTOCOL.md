@@ -1,4 +1,4 @@
-# CloudSend 网络与协议 / Network Protocol
+# AShell 网络与协议 / Network Protocol
 
 接管基线：2026-07-12  
 状态：`verified` + `verification-required`
@@ -7,7 +7,7 @@
 
 ## 1. 网络角色与边界
 
-CloudSend 同一二进制同时包含两类角色：
+AShell 同一二进制同时包含两类角色：
 
 - 控制端 client：发起远程桌面、文件、终端、端口转发、语音邀请等会话。
 - 受控端 server：注册 ID、接受登录、采集屏幕、注入输入并提供能力服务。
@@ -51,7 +51,7 @@ Flutter / legacy UI
 
 ### 3.1 控制端当前策略
 
-`src/client.rs::LoginConfigHandler::initialize(...)` 当前把 `force_relay` 固定为 true。其结果是 CloudSend 控制端会话：
+`src/client.rs::LoginConfigHandler::initialize(...)` 当前把 `force_relay` 固定为 true。其结果是 AShell 控制端会话：
 
 - 不启动 UDP punch、IPv6 punch 或直接连接候选。
 - 显式 IP/domain:port 的直接连接入口被拒绝。
@@ -70,7 +70,7 @@ Flutter / legacy UI
 
 因此准确结论是：
 
-> 当前 CloudSend 控制端强制 relay；受控端和兼容协议仍包含 direct/NAT 能力。
+> 当前 AShell 控制端强制 relay；受控端和兼容协议仍包含 direct/NAT 能力。
 
 未来若要做到全局 relay-only，必须单独审计受控端、LAN discovery、direct server、NAT/STUN 探测和兼容客户端影响，不能只依赖控制端常量。
 
@@ -133,7 +133,7 @@ Flutter InputModel
   -> platform input service or Android JNI
 ```
 
-CloudSend 在 `MouseEvent.url` 上复用了若干 Android command 字符串。修改这些命令必须同时检查 Dart、Rust FFI、client、protobuf usage、server、JNI 与 Kotlin，且需要验证旧端点收到未知命令时的行为。
+AShell 在 `MouseEvent.url` 上复用了若干 Android command 字符串。修改这些命令必须同时检查 Dart、Rust FFI、client、protobuf usage、server、JNI 与 Kotlin，且需要验证旧端点收到未知命令时的行为。
 
 ## 7. 文件、终端与隧道
 
@@ -194,8 +194,8 @@ Token 由外部 HTTP service 获取，音频经 ZEGO SDK 传输。原 RustDesk `
 
 ## 12. 待正式验证
 
-- CloudSend controller 与当前生产 hbbs/hbbr 的完整 handshake/relay 兼容矩阵。
-- 受控端是否仍可被非 CloudSend 兼容客户端请求 direct/punch hole。
+- AShell controller 与当前生产 hbbs/hbbr 的完整 handshake/relay 兼容矩阵。
+- 受控端是否仍可被非 AShell 兼容客户端请求 direct/punch hole。
 - signed key 异常时的真实 wire behavior。
 - secretbox 双向 nonce 是否会在同一 key 下重复。
 - Android input permission 关闭后的 server enforcement。

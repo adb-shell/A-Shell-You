@@ -1,4 +1,4 @@
-# CloudSend Project Memory
+# AShell Project Memory
 
 最后更新：2026-10-12
 
@@ -6,9 +6,13 @@
 
 ## 0. Latest Recovery Snapshot
 
+最新任务：`T-2026-10-12-003` 补齐全部品牌文字/字段/文档命名，承接T002迁移。源 `test / a036f31f80baeb6cd68bcf169f9e9fa8db39fe76`，变更仍未提交；基线 `AS-BL-2026-10-12-a036f31-worktree` 加T003增量。产品 A Shell You，内部 AShell/ashell，Android me.ashell，后台 A Shell You、launcher 一个壳子。**Flutter内部package必须保留flutter_hbb及其导入。** 两处公共服务匹配也改为ashell.；构建变量ASHELL_*，ZEGO字段ashellSessionId。包括历史文档在内的品牌术语和路径按用户要求统一，原文字/源仓地址从Git a036f31恢复，不能虚构新源仓链接。详见 [迁移报告](../docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。仅V0，未编译/测试/codegen/部署；实际构建机和服务未操作。下段接管记录保留历史日期与验证结论，名称已规范化，不表示当前HEAD或运行验证。
+
+### 迁移前接管证据（历史）
+
 最新复核：[2026-10-12 接管认知](../docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)。Baseline：`CS-BL-2026-10-12-6fb0aa6`；本地 `test / 6fb0aa6e147901243d4cb14a5dc68ae75a13b890`，非 shallow，仅一次初始化提交。原审查工作树 clean；随后 `T-2026-10-12-001` 只保存记忆文档，未提交/推送。新对话必须重新核对 HEAD/status，不能假定工作树永远 clean。
 
-- **来源**：本地 HEAD 的975个 tracked blob 路径/hash与历史源 `Super-Build/Cloudsend@cbce0ba36c5c` 一致。源仓60提交、最早2026-04-13无父导入；准确 RustDesk fork point 未知。RustDesk1.4.0对照有615同路径同blob文件，仅证明部分继承。
+- **来源**：本地 HEAD 的975个 tracked blob 路径/hash与历史源 `历史源仓@cbce0ba36c5c` 一致。源仓60提交、最早2026-04-13无父导入；准确 RustDesk fork point 未知。RustDesk1.4.0对照有615同路径同blob文件，仅证明部分继承。
 - **四个关键边界**：Android core/share/frame/waiting 分离；controller relay-only 不删除 endpoint direct/NAT兼容；产品账号不是 endpoint密码认证；ZEGO邀请/Token/录音同意分离，媒体走SDK。
 - **容易遗漏的当前行为**：永久密码 getter固定常量、setter不更新；Android已认证输入分支缺desktop对应keyboard gate；terminal有进程内persistent但重连回放TODO；record_upload dormant；ADB为本地子系统。
 - **风险解释**：JNI正常帧保存Image buffer裸地址后延迟读取；握手有non-secure fallback；双向nonce无方向标识；Android来电3秒自动接受；默认API/token HTTP与本地token保护有边界缺口。均为源码事实/静态风险，未证明已利用漏洞或凭据当前有效。
@@ -33,17 +37,17 @@
 3. `docs/ENGINEERING_*` 与 `docs/TASK_ENTRYPOINTS.md`，作为旧主套件和历史细节。
 4. 本目录、`AGENTS.md`、`CLAUDE.md` 只作为规则、摘要和入口，不覆盖源码。
 
-开发任务执行 `DEVELOPMENT_WORKFLOW.md`；仓外服务、database、driver 或 binary 查询 `EXTERNAL_ASSET_REGISTRY.md`。安全 Superpowers 只通过 `cloudsend-superpowers-safe` 的五项只读 allowlist 使用，外部包未安装。冲突时以源码为准；构建/运行行为只有正式环境验证后才能从 `verification-required` 提升为已验证。
+开发任务执行 `DEVELOPMENT_WORKFLOW.md`；仓外服务、database、driver 或 binary 查询 `EXTERNAL_ASSET_REGISTRY.md`。安全 Superpowers 只通过 `ashell-superpowers-safe` 的五项只读 allowlist 使用，外部包未安装。冲突时以源码为准；构建/运行行为只有正式环境验证后才能从 `verification-required` 提升为已验证。
 
 ## 2. Stable Identity
 
-- 产品/runtime：`CloudSend`。
-- Android 显示名：`云计划`。
-- 来源：RustDesk 深度二次开发；当前本地只有2026-10-12初始化历史，2026-04-13一次性导入来自上节映射的历史源仓；导入前 upstream commit 未确认。
-- Rust crate/library：`cloudsend`。
-- Flutter package：`flutter_hbb`。
-- Android applicationId：`com.cloudsend.app`。
-- Android deep link scheme：`cloudsend`。
+- 产品显示名：`A Shell You`；内部runtime：`AShell`；ORG：`me`。
+- Android application/后台：`A Shell You`；launcher：`一个壳子`。
+- 来源：RustDesk 深度二次开发；本地初始化与后续记忆提交，2026-04-13一次性导入来自上节映射的历史源仓；准确 upstream fork commit 未确认。
+- Rust crate/library：`ashell`。
+- Flutter package：`flutter_hbb`。用户明确要求保留此内部包名及 `package:flutter_hbb/` 导入，与产品品牌无绑定关系。
+- Android applicationId：`me.ashell`。
+- Android deep link scheme：`ashell`。
 - 当前源码版本：Rust `5.2.1`，Flutter `5.2.1+59`；不得由 AI 自动修改。
 - 根 license：AGPL-3.0；第三方 license/provenance 尚需完整审计。
 
@@ -53,7 +57,7 @@
 - shared config/protocol：`libs/hbb_common/`。
 - capture：`libs/scrap/`。
 - Flutter：`flutter/lib/`。
-- Android runtime：`flutter/android/app/src/main/kotlin/com/cloudsend/app/`。
+- Android runtime：`flutter/android/app/src/main/kotlin/me/ashell/`。
 - Android active JNI：`libs/scrap/src/android/pkg2230.rs`；`ffi.rs` 是未导出的兼容层。
 - Windows privacy/display：`src/privacy_mode.rs`、`src/privacy_mode/`、`src/virtual_display_manager.rs`。
 - account/API/sync/download：`src/hbbs_http/` 与 Flutter models。

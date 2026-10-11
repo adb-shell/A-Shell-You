@@ -1,4 +1,4 @@
-# CloudSend External Asset Registry
+# AShell External Asset Registry
 
 最后更新：2026-10-12
 
@@ -61,7 +61,7 @@ Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织�
 
 | ID | 资产 | 当前存在性 | 仓内消费/证据锚点 | Owner | 主要缺口 | 影响 |
 |---|---|---|---|---|---|---|
-| `EXT-BIN-ADB-001` | `libadb.so` for arm64-v8a / armeabi-v7a / x86_64 | `MISSING`：2026-10-12 当前检出没有 `flutter/android/app/src/main/jniLibs/`；7月 LOCAL-ONLY 为历史观察 | `CloudSendAdbRunner.kt`, Android packaging | `OWNER-REQUIRED` | upstream/source commit、reproducible build recipe、per-ABI hash、signature、version、license mapping、artifact registry | clean clone 不能复现 ADB packaging；Android release `BLOCKING` |
+| `EXT-BIN-ADB-001` | `libadb.so` for arm64-v8a / armeabi-v7a / x86_64 | `MISSING`：2026-10-12 当前检出没有 `flutter/android/app/src/main/jniLibs/`；7月 LOCAL-ONLY 为历史观察 | `AShellAdbRunner.kt`, Android packaging | `OWNER-REQUIRED` | upstream/source commit、reproducible build recipe、per-ABI hash、signature、version、license mapping、artifact registry | clean clone 不能复现 ADB packaging；Android release `BLOCKING` |
 | `EXT-REF-ADB-002` | `ADB-CODE/` research/decompiled materials | `LOCAL-ONLY`：ignored | `docs/ADB_LADB_INTEGRATION_MEMORY.md` 的研究背景 | `OWNER-REQUIRED` | origin、revision、legal/provenance、是否仅研究使用、保留策略 | 研究不可复现；不得直接进入 release source |
 | `EXT-REF-ADB-003` | `LADB/` reference source | `LOCAL-ONLY`：ignored | ADB integration memory 与实现设计背景 | `OWNER-REQUIRED` | upstream URL/commit、license obligations、Play Store restriction mapping、修改清单 | license/distribution 风险；不得等同 bundled binary source |
 
@@ -85,8 +85,8 @@ Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织�
 | `EXT-WIN-004` | Printer driver package | `EXTERNAL/UNVERIFIED` | `libs/remote_printer/`, `new-build.cmd` | `OWNER-REQUIRED` | driver source/version、INF/CAT/SYS hashes、signature/publisher、license、OS matrix | remote printer install/release `BLOCKING` |
 | `EXT-WIN-005` | `printer_driver_adapter.dll` | `EXTERNAL/UNVERIFIED` | `src/server/printer_service.rs`, `new-build.cmd` | `OWNER-REQUIRED` | source/ABI/version/hash/signature/license | runtime DLL loading and printer service `BLOCKING` |
 | `EXT-WIN-006` | `dylib_virtual_display.dll` | `GENERATED`：source tracked in `libs/virtual_display/`，artifact not tracked | Windows packaging and virtual display FFI | Release owner required | formal toolchain result、artifact hash、Authenticode、ABI test | source provenance较好；仍需正式 build/sign evidence |
-| `EXT-WIN-007` | `RuntimeBroker_cloudsend.exe` helper | `OS-DERIVED/UNVERIFIED`：运行时复制 Windows `RuntimeBroker.exe` 后改名；仓内不存在独立 helper source/binary 是预期状态 | `src/privacy_mode/win_topmost_window.rs`, Windows runtime copy path | Windows/Security owner required | supported Windows build matrix、源文件 Microsoft signature 校验、复制/注入/清理 contract、EDR compatibility | 行为随 OS build 漂移；privacy helper 路径必须按目标 OS 验证 |
-| `EXT-WIN-008` | Windows `XpsPrint.dll` OS prerequisite | `OS-DERIVED`：`PrintXPSRawData` implementation 已 tracked，仓外依赖仅为 Windows OS API/DLL | `src/platform/windows.cc`, `src/platform/windows.rs` | Windows owner required | supported OS/API matrix、resource/error contract | 不是缺失的 CloudSend function；仍需 Win10/11 print compatibility 验证 |
+| `EXT-WIN-007` | `RuntimeBroker_ashell.exe` helper | `OS-DERIVED/UNVERIFIED`：运行时复制 Windows `RuntimeBroker.exe` 后改名；仓内不存在独立 helper source/binary 是预期状态 | `src/privacy_mode/win_topmost_window.rs`, Windows runtime copy path | Windows/Security owner required | supported Windows build matrix、源文件 Microsoft signature 校验、复制/注入/清理 contract、EDR compatibility | 行为随 OS build 漂移；privacy helper 路径必须按目标 OS 验证 |
+| `EXT-WIN-008` | Windows `XpsPrint.dll` OS prerequisite | `OS-DERIVED`：`PrintXPSRawData` implementation 已 tracked，仓外依赖仅为 Windows OS API/DLL | `src/platform/windows.cc`, `src/platform/windows.rs` | Windows owner required | supported OS/API matrix、resource/error contract | 不是缺失的 AShell function；仍需 Win10/11 print compatibility 验证 |
 | `EXT-WIN-009` | Dormant RustDesk IDD driver package | `DORMANT/MISSING`：user-mode dylib source tracked，driver INF/SYS/CAT 不在仓库；current active backend 为 Amyuni | `libs/virtual_display/dylib/src/win10/`, `src/virtual_display_manager.rs` | Architecture/Release owner required | 保留/淘汰决定；若启用则需 source/version/hash/signature/license/rollback | 不得误标为 active 或混入当前 release；启用前为 `BLOCKING` |
 
 ## 6. Signing, Build and Release Infrastructure

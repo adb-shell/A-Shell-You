@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> Current project identity (source-verified 2026-07-12): this repository builds the CloudSend runtime, with Android visible app name `云计划`, Android package `com.cloudsend.app`, version `5.2.1` (`flutter` package `5.2.1+59`), Android SO `libcloudsend.so`, Windows DLL `cloudsend.dll`, and Windows build entry `new-build.cmd`.
+> Current product: **A Shell You**. Internal identity/crate is `AShell` / `ashell`; Android applicationId is `me.ashell`, application name is `A Shell You`, launcher name is `一个壳子`. Native artifacts are `libashell.so` / `ashell.dll` / `ashell.exe`. Version remains `5.2.1` (`5.2.1+59` for Flutter). See [identity migration and static verification](docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md). No product build was executed for this migration.
 >
 > The upstream RustDesk README below is retained as inherited background only. Every AI or maintainer must start with `PROJECT_START_HERE.md`, then follow `.codex/AI_RULES.md` and `docs/AI_ENGINEERING/AI_TASK_EXECUTION_PROTOCOL.md`. Current domain truth lives in `docs/AI_ENGINEERING/`; the former `ENGINEERING_*` suite remains historical detail.
 

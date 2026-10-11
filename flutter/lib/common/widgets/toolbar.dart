@@ -646,16 +646,16 @@ Future<List<TToggleMenu>> toolbarDisplayToggle(
       },
       child: Text(translate('Show quality monitor'))));
   // show Android controlled-end status monitor
-  final cloudSendOption = 'show-cloudsend-status-monitor';
+  final ashellOption = 'show-ashell-status-monitor';
   v.add(TToggleMenu(
       value: bind.sessionGetToggleOptionSync(
-          sessionId: sessionId, arg: cloudSendOption),
+          sessionId: sessionId, arg: ashellOption),
       onChanged: (value) async {
         if (value == null) return;
-        await bind.sessionToggleOption(sessionId: sessionId, value: cloudSendOption);
-        ffi.cloudSendStatusModel.checkShowCloudSendStatusMonitor(sessionId);
+        await bind.sessionToggleOption(sessionId: sessionId, value: ashellOption);
+        ffi.ashellStatusModel.checkShowAShellStatusMonitor(sessionId);
       },
-      child: Text(translate('Show CloudSend status monitor'))));
+      child: Text(translate('Show A Shell You status monitor'))));
   // mute
   if (isDefaultConn && perms['audio'] != false) {
     final option = 'disable-audio';
@@ -943,7 +943,7 @@ bool showVirtualDisplayMenu(FFI ffi) {
   if (!ffi.ffiModel.pi.isInstalled) {
     return false;
   }
-  if (ffi.ffiModel.pi.isCloudSendIdd || ffi.ffiModel.pi.isAmyuniIdd) {
+  if (ffi.ffiModel.pi.isAShellIdd || ffi.ffiModel.pi.isAmyuniIdd) {
     return true;
   }
   return false;
@@ -956,8 +956,8 @@ List<Widget> getVirtualDisplayMenuChildren(
   }
   final pi = ffi.ffiModel.pi;
   final privacyModeState = PrivacyModeState.find(id);
-  if (pi.isCloudSendIdd) {
-    final virtualDisplays = ffi.ffiModel.pi.CloudSendVirtualDisplays;
+  if (pi.isAShellIdd) {
+    final virtualDisplays = ffi.ffiModel.pi.AShellVirtualDisplays;
     final children = <Widget>[];
     for (var i = 0; i < kMaxVirtualDisplayCount; i++) {
       children.add(Obx(() => CkbMenuButton(

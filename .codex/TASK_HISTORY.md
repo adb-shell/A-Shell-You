@@ -1,4 +1,6 @@
-# CloudSend Task History
+# AShell Task History
+
+> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
 
 最后更新：2026-10-12
 
@@ -8,7 +10,7 @@
 
 - 状态：completed（repository-side asset takeover；external infrastructure 与正式构建仍待后续授权）。
 - 请求者：项目 owner。
-- 角色：CloudSend Principal Engineer。
+- 角色：AShell Principal Engineer。
 - 授权范围：读取/分析源码和历史；创建文档、规则、memory、skills。
 - 禁止范围：业务代码修改；删除；build/test；commit/push/merge/rebase；version bump；release/upload。
 - 源码基线：`HEAD 77062b4`，分支 `main`。
@@ -37,7 +39,7 @@
 - 状态：completed（V0 repository-side governance strengthening；正式环境与外部资产仍待 owner 接管）。
 - 请求者/批准者：项目 owner。
 - 源码基线与 dirty state：`main` / `HEAD 77062b4`；开始时已有上一轮接管产生的文档、memory 和 Skill changes，均保留并在其上增量修改。
-- 授权范围：创建入口、任务协议、开发流程、外部资产登记；完善 AI rules；审查并完善八个 CloudSend Skills；同步文档和长期记忆。
+- 授权范围：创建入口、任务协议、开发流程、外部资产登记；完善 AI rules；审查并完善八个 AShell Skills；同步文档和长期记忆。
 - 禁止/非目标：业务代码；build/test/analyze/codegen；Git 写入；删除/移动；版本、签名、打包、上传、部署、发布；credential 使用或验证。
 - 方案与决定：建立入口 → 权限 → T0—T8 → domain truth/Skill → workflow → verification/memory 的固定链；外部资产使用统一 registry；见 `D-012`。
 - 修改文件：根入口/流程/registry，新 Task Protocol 和强化报告，`.codex` rules/memory/logs，八个 Skills，以及 README/AGENTS/CLAUDE/工程索引中的入口指针。
@@ -46,7 +48,7 @@
 - 《编译验证需求》：本轮没有业务或 build-system 行为变更，不申请编译；正式环境验证继续按 `09_DEBUG_SYSTEM.md` 管理。
 - 回滚：仅通过用户批准的文档 patch 回退；不删除旧文档、不重写 Git history。
 - Git/release actions：无。
-- Related decisions/docs：`D-012`、`docs/AI_ENGINEERING/CLOUDSEND_AI_ENGINEERING_STRENGTHENING_REPORT.md`。
+- Related decisions/docs：`D-012`、`docs/AI_ENGINEERING/ASHELL_AI_ENGINEERING_STRENGTHENING_REPORT.md`。
 
 ## T-2026-07-12-003：AI 工程体系最终封版
 
@@ -57,13 +59,13 @@
 - 禁止/非目标：业务代码；build/test/analyze/codegen；Git 写入；删除/移动；版本、签名、打包、上传、部署、发布；credential/production 操作；外部 Superpowers 安装。
 - 方案与决定：见 D-013、ADR-0000 和 ADR-0013。
 - 修改类型：仅 Markdown/YAML 文档、规则、memory 和 project Skill metadata；无业务源码。
-- 主要交付：`docs/ADR/`、`docs/BASELINE/`、`TASK_TEMPLATE.md`、`TEST_MATRIX.md`、`SAFE_SUPERPOWERS_PROFILE.md`、`cloudsend-superpowers-safe`。
+- 主要交付：`docs/ADR/`、`docs/BASELINE/`、`TASK_TEMPLATE.md`、`TEST_MATRIX.md`、`SAFE_SUPERPOWERS_PROFILE.md`、`ashell-superpowers-safe`。
 - 安全/隐私/license：Superpowers 只作官方只读参考，未安装或执行；adapter allowlist 仅 brainstorming/planning/debugging/verification/review，commit/push/release hard-denied；无 secret/PII 值进入新文档。
-- 验证：V0 only；required files、ADR index/status、baseline anchors、Skill schema/metadata、Markdown fences/local links、sensitive patterns、delete/scope 和 diff whitespace checks。`cloudsend-superpowers-safe` 的 PC→Android Remote ADB 前向案例在同时收到实现、测试、commit、push、release 请求时仍保持 C0/T4，只输出 brainstorming/planning artifact，并在所有 mutation、project command、Git write、external/production 与 release 前停止。未执行项目 build/test。
+- 验证：V0 only；required files、ADR index/status、baseline anchors、Skill schema/metadata、Markdown fences/local links、sensitive patterns、delete/scope 和 diff whitespace checks。`ashell-superpowers-safe` 的 PC→Android Remote ADB 前向案例在同时收到实现、测试、commit、push、release 请求时仍保持 C0/T4，只输出 brainstorming/planning artifact，并在所有 mutation、project command、Git write、external/production 与 release 前停止。未执行项目 build/test。
 - 正式验证：未来任务从 `TEST_MATRIX.md` 选 case 并按 `TASK_TEMPLATE.md` 输出《编译验证需求》；本次无业务/runtime 变化，不申请编译。
 - 回滚：通过后续 patch/superseding ADR 调整；不删除 ADR、baseline 或历史记录。
 - Git/release actions：无。
-- Related decisions/docs：D-013、ADR-0000、ADR-0013、`docs/AI_ENGINEERING/CLOUDSEND_AI_ENGINEERING_FINAL_SEAL_REPORT.md`。
+- Related decisions/docs：D-013、ADR-0000、ADR-0013、`docs/AI_ENGINEERING/ASHELL_AI_ENGINEERING_FINAL_SEAL_REPORT.md`。
 
 ## T-2026-07-12-004：AI 全局记忆增强
 
@@ -100,7 +102,31 @@
 - 局限：文件只持久化在当前工作区，尚未进入 Git 提交或远端；新机器/新 worktree 必须包含这些文件。旧7月历史记录保留，不当作本轮实测结果。
 - 交付：`docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md`、`docs/BASELINE/05_OBSERVED_BASELINE_2026-10-12.md`、`.codex/PROJECT_MEMORY.md` 及入口索引。
 
-## 任务记录规则
+## T-2026-10-12-002：AShell产品身份迁移
+
+- 状态：completed，source/V0交付；正式构建/运行验证NOT_RUN。
+- 授权：当前用户明确要求全面替换AShell产品身份，包名me.ashell，内部ashell/AShell，后台/PC A Shell You、launcher一个壳子；禁止编译。中途用户明确要求保留Flutter内部包名flutter_hbb和其导入，已恢复。
+- 初始现场：test / a036f31f80baeb6cd68bcf169f9e9fa8db39fe76，clean；该提交包含前轮记忆；本任务变更未提交。
+- T0—T4：读取入口、规则、Task Protocol、基线/ADR及相关领域Skills；检查跨层身份/ABI/构建消费链。ADR-0014/D-015取代旧产品身份决定，技术内部命名与品牌分开。
+- T5：源码/平台/构建配置和必要产品目录文件迁移；显示helper、Android launcher alias、native symbol和portable marker长度同步；对AShell兼容残留逐项登记。范围/路径见迁移报告与CE-20261012-T002-01。
+- T6：30项静态名称、XML/JSON、路径、符号、lock/generated范围、版本和diff检查通过；不代表语义编译或运行成功。未执行编译/测试/analyzer/codegen/安装/服务/设备操作。
+- T7/T8：同步当前工程文档、记忆、状态、D-015/ADR-0014、新观察基线、事件及历史；最终STATE-20261012-003 / WORK-20261012-004。旧历史/上游许可/外部契约保留，不伪造外部注册。
+- 编译验证需求：迁移报告第5节；Android Linux正式入口和Windows new-build.cmd均未执行。jniLibs/ADB、Windows native、ZEGO lock和Apple/Google注册为限制。
+- 回滚：未来获准后相对源HEAD逐项反向审阅patch；新包旧包数据独立，本轮没有设备数据迁移/删除、Git写入或发布。
+- 交付：docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md；docs/tasks/T-2026-10-12-002-ashell-identity.md；docs/BASELINE/06_ASHELL_IDENTITY_BASELINE_2026-10-12.md。
+
+- 用户追加范围/CE-20261012-T002-02：移除旧前缀回退，只用ASHELL_*；ZEGO字段ashellSessionId两端同步。当时还有两处公共服务匹配文字保留，历史文档暂未统一；后续由T003/D-016明确授权完成。构建机signing.env和实际服务部署未执行，正式启用须同步更新。
+
+## T-2026-10-12-003：全仓品牌文字与文档字段补齐
+
+- 状态：completed / T8，V0 only；当前用户指出两处源码旧匹配并明确要求文档字段全部换名。
+- 初始：test/a036f31，已有T002未提交变更；本轮仅两处Rust字符串与文档名称/字段/引用/记忆追加，不改Flutter内部包名。
+- 实施：ashell.分类匹配；全工作区品牌词大小写统一；四份Markdown物理更名。历史文档名称规范化注记保留事实边界，真实源仓地址/旧原文从Git恢复，未修改Git对象。
+- 验证：全文与文件路径检索排除.git零旧词命中；文档链接、源码谓词、Flutter包名/import和diff whitespace通过。没有编译/测试/analyzer/codegen/依赖安装/服务/设备/外部请求。
+- 交付：迁移报告和docs/tasks/T-2026-10-12-003-brand-normalization.md；D-016、CE-20261012-T003-01、STATE-20261012-004 / WORK-20261012-006。
+- 后续：正式API/heartbeat行为与完整构建仍NOT_RUN；当前任务权限交付关闭，不能从文档恢复执行授权。
+
+### 后续任务规则
 
 每个未来任务必须记录：
 

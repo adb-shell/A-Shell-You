@@ -1,8 +1,10 @@
-# CloudSend Change Event Log
+# AShell Change Event Log
+
+> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-12T04:53:24+09:00
+Last Updated：2026-10-12T05:39:32+09:00
 
 Mode：`append-only logical persisted-change events`
 
@@ -42,7 +44,7 @@ Mode：`append-only logical persisted-change events`
 
 - Timestamp：2026-07-12T06:31:52+08:00
 - Task ID：`T-2026-07-12-004`
-- Actor / Primary Skill：CloudSend Principal Engineer / `cloudsend-master`
+- Actor / Primary Skill：AShell Principal Engineer / `ashell-master`
 - Permission：`C1`，来自项目 owner 当前明确请求。
 - Event Type：create。
 - Files：`.codex/PROJECT_STATE.md`、`.codex/CURRENT_WORK.md`、`.codex/CHANGELOG_AI.md`、`.codex/CHANGE_EVENT_LOG.md`、`.codex/SESSION_START_PROTOCOL.md`。
@@ -56,7 +58,7 @@ Mode：`append-only logical persisted-change events`
 
 - Timestamp：2026-07-12T06:31:52+08:00
 - Task ID：`T-2026-07-12-004`
-- Actor / Primary Skill：CloudSend Principal Engineer / `cloudsend-master`
+- Actor / Primary Skill：AShell Principal Engineer / `ashell-master`
 - Permission：`C1`，来自项目 owner 当前明确请求。
 - Event Type：update。
 - Files：`PROJECT_START_HERE.md`、`docs/AI_ENGINEERING/AI_TASK_EXECUTION_PROTOCOL.md`、`TASK_TEMPLATE.md`、`.codex/DECISION_LOG.md`、`.codex/CHANGE_EVENT_LOG.md`。
@@ -70,7 +72,7 @@ Mode：`append-only logical persisted-change events`
 
 - Timestamp：2026-07-12T06:40:28+08:00
 - Task ID：`T-2026-07-12-004`
-- Actor / Primary Skill：CloudSend Principal Engineer / `cloudsend-master`
+- Actor / Primary Skill：AShell Principal Engineer / `ashell-master`
 - Permission：`C1`，来自项目 owner 当前明确请求。
 - Event Type：update。
 - Files：`PROJECT_START_HERE.md`、`.codex/AI_RULES.md`、`.codex/SESSION_START_PROTOCOL.md`、`docs/AI_ENGINEERING/AI_TASK_EXECUTION_PROTOCOL.md`、`.codex/PROJECT_STATE.md`、`.codex/CURRENT_WORK.md`、`.codex/CHANGE_EVENT_LOG.md`。
@@ -84,7 +86,7 @@ Mode：`append-only logical persisted-change events`
 
 - Timestamp：2026-07-12T06:42:13+08:00
 - Task ID：`T-2026-07-12-004`
-- Actor / Primary Skill：CloudSend Principal Engineer / `cloudsend-master`
+- Actor / Primary Skill：AShell Principal Engineer / `ashell-master`
 - Permission：`C1`，来自项目 owner 当前明确请求。
 - Event Type：update / task closure。
 - Files：`.codex/SESSION_START_PROTOCOL.md`、`.codex/TASK_HISTORY.md`、`.codex/CHANGELOG_AI.md`、`.codex/CHANGE_EVENT_LOG.md`、`.codex/PROJECT_STATE.md`、`.codex/CURRENT_WORK.md`。
@@ -98,7 +100,7 @@ Mode：`append-only logical persisted-change events`
 
 - Timestamp：2026-07-12T06:43:50+08:00
 - Task ID：`T-2026-07-12-004`
-- Actor / Primary Skill：CloudSend Principal Engineer / `cloudsend-master`
+- Actor / Primary Skill：AShell Principal Engineer / `ashell-master`
 - Permission：`C1`，来自项目 owner 当前明确请求。
 - Event Type：corrective update。
 - Files：`.codex/AI_RULES.md`、`.codex/PROJECT_STATE.md`、`.codex/CURRENT_WORK.md`、`.codex/CHANGELOG_AI.md`、`.codex/TASK_HISTORY.md`、`.codex/CHANGE_EVENT_LOG.md`。
@@ -113,7 +115,7 @@ Mode：`append-only logical persisted-change events`
 
 - Timestamp：2026-07-12T06:45:42+08:00
 - Task ID：`T-2026-07-12-004`
-- Actor / Primary Skill：CloudSend Principal Engineer / `cloudsend-master`
+- Actor / Primary Skill：AShell Principal Engineer / `ashell-master`
 - Permission：`C1`，来自项目 owner 当前明确请求。
 - Event Type：corrective metadata update。
 - Files：`.codex/AI_RULES.md`、`.codex/PROJECT_STATE.md`、`.codex/CURRENT_WORK.md`、`.codex/CHANGELOG_AI.md`、`.codex/TASK_HISTORY.md`、`.codex/CHANGE_EVENT_LOG.md`。
@@ -128,7 +130,7 @@ Mode：`append-only logical persisted-change events`
 
 - Timestamp：2026-10-12T04:53:24+09:00
 - Task ID：`T-2026-10-12-001`
-- Actor / Primary Skill：Codex / `cloudsend-master`
+- Actor / Primary Skill：Codex / `ashell-master`
 - Permission：`C1`；当前用户明确要求保存本轮记忆供工作区新对话恢复；不扩大为业务修改或远端上传。
 - Event Type：create / update / task closure；一个逻辑文档事务，包含其状态与日志同步。
 - Files（13）：`AGENTS.md`、`PROJECT_START_HERE.md`、`EXTERNAL_ASSET_REGISTRY.md`、`.codex/PROJECT_MEMORY.md`、`.codex/PROJECT_STATE.md`、`.codex/CURRENT_WORK.md`、`.codex/CHANGELOG_AI.md`、`.codex/CHANGE_EVENT_LOG.md`、`.codex/TASK_HISTORY.md`、`docs/AI_ENGINEERING/00_PROJECT_OVERVIEW.md`、`docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md`、`docs/BASELINE/BASELINE_INDEX.md`、`docs/BASELINE/05_OBSERVED_BASELINE_2026-10-12.md`。
@@ -140,7 +142,43 @@ Mode：`append-only logical persisted-change events`
 - Git Write / Build / Delete / Move / Version / External Write / Release：none。
 - Corrects / Supersedes：只纠正旧快照被误用为当前事实的风险，不重写历史基线、旧事件或原聊天结论；没有保存敏感值。
 
-## Event Schema
+## CE-20261012-T002-01：AShell身份迁移及用户要求的Flutter包名保留
+
+- Timestamp：2026-10-12T05:24:38+09:00；Task：T-2026-10-12-002。
+- Actor/Skills：Codex；master、Rust、Flutter、Android、Release、Security领域规则（开始时ashell-*，现迁ashell-*）；未委派子代理。
+- Authority：当前用户明确授权产品信息、包名、源码/目录/文件/构建脚本迁移；补充要求恢复flutter_hbb和关联导入；不执行构建。
+- Type：一个逻辑身份迁移事务，含更新、新增、物理重命名、生成声明标识同步和记忆关闭。
+- Files/areas：Cargo.toml及两份Cargo.lock；src与libs/hbb_common身份/状态引用；libs/portable；flutter平台配置/加载器/UI；build.sh/env.sh/build.py/build.cmd/new-build.cmd、CI/FDroid、res/Linux/MSI、flatpak/appimage；docs/AI_ENGINEERING、ADR-0014、baseline06、task、根入口、.codex和Skills。详细路径/行为见迁移报告；逐文件diff可相对a036f31只读查看。
+- Moves：Android me/ashell目录18文件→me/ashell（四个ADB类文件更名）；九个Skills ashell-*→ashell-*；res/rustdesk.service、两份desktop、pam.d两份profile→ashell对应名；flatpak/rustdesk.json→ashell.json、com.rustdesk.RustDesk.metainfo.xml→me.ashell.metainfo.xml。只移项目文件，旧空父目录按检查移除，没有删除用户数据。
+- Generated：flutter/lib/generated_bridge.dart只同步C产品符号，类型/codec不变；未运行生成器。protobuf源field39改名，编号/类型不变；lock只改workspace包名。
+- Delta：产品/安装/配置/URI/原生库身份变化；显示与内部身份分离。外部JSON契约/公共服务guard/构建机环境回退保留。Flutter package及导入撤回无关改名。
+- Verification：V0静态核验；9个XML/plist解析等30项断言通过，diff whitespace通过。正式build/test/analyze/codegen及运行验证均NOT_RUN。
+- Decision/State：D-015 / ADR-0014；STATE-20261012-003 / WORK-20261012-004；旧基线/事件保持历史含义。
+- Git write / Build / Dependency install / Version bump / Sign / External write / Release：none。
+
+## CE-20261012-T002-02：按用户追加授权去除旧环境及ZEGO字段兼容名
+
+- Timestamp：2026-10-12T05:29:57+09:00；Task：T-2026-10-12-002。
+- Actor：Codex；Permission：当前用户明确表示ASHELL_*回退和ashellSessionId字段可以更改。
+- Files：build.sh、env.sh、src/client/helper.rs、scripts/deploy_zego_token_service.sh；三份docs/ZEGO_*当前文档；迁移报告、ADR-0014、baseline06、task、PROJECT_MEMORY/STATE、Decision/Changelog/Task/Event和Current Work关闭指针。
+- Change：构建脚本只使用ASHELL_*，移除旧前缀回退；客户端JSON、内嵌Go DTO/读取与示例改为ashellSessionId；现有证书/密码/工具链路径不变，未操作构建机或实际服务。
+- Corrects/Supersedes：取代CE-20261012-T002-01中暂保留这两个兼容项的方案；Flutter内部flutter_hbb保留决定不变；公共服务guard和历史来源保留。
+- Verification：静态全文检索无旧环境变量/JSON键；新JSON键两端与三份文档一致；diff whitespace通过。真实API联调、build/test/analyze/codegen均NOT_RUN。
+- State：STATE-20261012-003 / WORK-20261012-004；最终交付关闭当前任务，后续构建机变量和服务部署须在正式环境另行安排。
+- Git write / Build / Dependency install / Version bump / Sign / External write / Release：none。
+
+## CE-20261012-T003-01：源码两处匹配与全部文档名称规范化
+
+- Timestamp：2026-10-12T05:37:54+09:00；Task：T-2026-10-12-003；Actor：Codex / ashell-master、API静态审查。
+- Authority：当前用户明确要求截图中两处及文档字段全部换名；包括既有历史文档措辞规范化和相应文件改名；保留flutter_hbb。
+- Files/Delta：src/common.rs::is_public、src/hbbs_http/sync.rs::heartbeat_url的分类字符串改为ashell.；41份初始含旧词Markdown及其当前引用/记忆同步。原始文本在a036f31，提交hash/日期/验证结论不变，不将名称规范化冒充历史源码变化。
+- Rename destinations：docs/ADR/0002-ashell-product-identity.md；docs/AI_ENGINEERING/ASHELL_AI_PRINCIPAL_ENGINEER_HANDOVER_REPORT.md、ASHELL_AI_ENGINEERING_STRENGTHENING_REPORT.md、ASHELL_AI_ENGINEERING_FINAL_SEAL_REPORT.md。原文件只做移动更名，不删除正文；旧名称按用户要求不在当前日志重复，源HEAD可追溯。
+- Source references：真实历史源仓地址从a036f31接管报告恢复；移除含旧名的直接链接展示，没有替换成不存在的新仓链接。
+- Verification：文本/路径大小写不敏感扫描零命中（排除.git），Markdown本地链接无缺失，Flutter包名/import保留，diff whitespace通过；无编译或运行证据。
+- Decision/State：D-016 / ADR-0014补充；STATE-20261012-004 / WORK-20261012-006；取代T002对两处旧匹配及历史品牌措辞的保留方案。
+- Git write / build/test/analyze/codegen / dependency install / credentials / external / release：none。
+
+### 后续事件模板
 
 ```text
 ## CE-YYYYMMDD-TNNN-NN：标题

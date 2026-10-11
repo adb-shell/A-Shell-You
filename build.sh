@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# ===== CloudSend Android 本地构建脚本 =====
+# ===== AShell Android 本地构建脚本 =====
 # 最终成品输出:
-# - flutter/build/app/outputs/flutter-apk/app-aarch64-release.apk
-# - flutter/build/app/outputs/flutter-apk/app-universal-release.apk
+# - flutter/build/app/outputs/flutter-apk/ashell-aarch64-release.apk
+# - flutter/build/app/outputs/flutter-apk/ashell-universal-release.apk
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR"
 cd "$REPO_ROOT"
 
 # ===== 全局工具链路径 =====
-: "${CLOUDSEND_TOOLCHAIN_ROOT:=/opt/rustdesk-toolchain}"
-: "${FLUTTER_HOME:=$CLOUDSEND_TOOLCHAIN_ROOT/flutter}"
-: "${ANDROID_SDK_ROOT:=$CLOUDSEND_TOOLCHAIN_ROOT/android-sdk}"
+: "${ASHELL_TOOLCHAIN_ROOT:=/opt/rustdesk-toolchain}"
+: "${FLUTTER_HOME:=$ASHELL_TOOLCHAIN_ROOT/flutter}"
+: "${ANDROID_SDK_ROOT:=$ASHELL_TOOLCHAIN_ROOT/android-sdk}"
 : "${ANDROID_HOME:=$ANDROID_SDK_ROOT}"
 : "${ANDROID_NDK_HOME:=$ANDROID_SDK_ROOT/ndk/27.2.12479018}"
 : "${ANDROID_NDK_ROOT:=$ANDROID_NDK_HOME}"
-: "${VCPKG_ROOT:=$CLOUDSEND_TOOLCHAIN_ROOT/vcpkg}"
-: "${VCPKG_DEFAULT_BINARY_CACHE:=$CLOUDSEND_TOOLCHAIN_ROOT/cache/vcpkg}"
+: "${VCPKG_ROOT:=$ASHELL_TOOLCHAIN_ROOT/vcpkg}"
+: "${VCPKG_DEFAULT_BINARY_CACHE:=$ASHELL_TOOLCHAIN_ROOT/cache/vcpkg}"
 : "${JAVA_HOME:=/usr/lib/jvm/java-17-openjdk-amd64}"
 
 detect_android_build_tools_dir() {
@@ -42,8 +42,8 @@ export ANDROID_SDK_ROOT ANDROID_HOME ANDROID_NDK_HOME ANDROID_NDK_ROOT
 export VCPKG_ROOT VCPKG_DEFAULT_BINARY_CACHE JAVA_HOME
 
 # ===== 签名配置 =====
-SIGN_ENV_DEFAULT="/opt/rustdesk-toolchain/signing/android/signing.env"
-SIGN_ENV="${CLOUDSEND_SIGN_ENV:-$SIGN_ENV_DEFAULT}"
+SIGN_ENV_DEFAULT="$ASHELL_TOOLCHAIN_ROOT/signing/android/signing.env"
+SIGN_ENV="${ASHELL_SIGN_ENV:-$SIGN_ENV_DEFAULT}"
 
 # ===== 构建参数 =====
 RELTYPE="release"
@@ -299,19 +299,19 @@ check_signing() {
   # shellcheck disable=SC1090
   source "$SIGN_ENV"
 
-  [[ "${CLOUDSEND_ANDROID_SIGN_ENABLED:-0}" == "1" ]] || die "签名未启用: CLOUDSEND_ANDROID_SIGN_ENABLED != 1"
-  require_file "${CLOUDSEND_ANDROID_KEYSTORE_PATH:-}"
-  [[ -n "${CLOUDSEND_ANDROID_KEY_ALIAS:-}" ]] || die "CLOUDSEND_ANDROID_KEY_ALIAS 未设置"
-  [[ -n "${CLOUDSEND_ANDROID_STORE_PASSWORD:-}" ]] || die "CLOUDSEND_ANDROID_STORE_PASSWORD 未设置"
-  [[ -n "${CLOUDSEND_ANDROID_KEY_PASSWORD:-}" ]] || die "CLOUDSEND_ANDROID_KEY_PASSWORD 未设置"
+  [[ "${ASHELL_ANDROID_SIGN_ENABLED:-0}" == "1" ]] || die "签名未启用: ASHELL_ANDROID_SIGN_ENABLED != 1"
+  require_file "${ASHELL_ANDROID_KEYSTORE_PATH:-}"
+  [[ -n "${ASHELL_ANDROID_KEY_ALIAS:-}" ]] || die "ASHELL_ANDROID_KEY_ALIAS 未设置"
+  [[ -n "${ASHELL_ANDROID_STORE_PASSWORD:-}" ]] || die "ASHELL_ANDROID_STORE_PASSWORD 未设置"
+  [[ -n "${ASHELL_ANDROID_KEY_PASSWORD:-}" ]] || die "ASHELL_ANDROID_KEY_PASSWORD 未设置"
 
   keytool -list \
-    -keystore "${CLOUDSEND_ANDROID_KEYSTORE_PATH}" \
-    -alias "${CLOUDSEND_ANDROID_KEY_ALIAS}" \
-    -storepass "${CLOUDSEND_ANDROID_STORE_PASSWORD}" >/dev/null
+    -keystore "${ASHELL_ANDROID_KEYSTORE_PATH}" \
+    -alias "${ASHELL_ANDROID_KEY_ALIAS}" \
+    -storepass "${ASHELL_ANDROID_STORE_PASSWORD}" >/dev/null
 
-  export CLOUDSEND_ANDROID_KEYSTORE_PATH CLOUDSEND_ANDROID_KEY_ALIAS
-  export CLOUDSEND_ANDROID_STORE_PASSWORD CLOUDSEND_ANDROID_KEY_PASSWORD
+  export ASHELL_ANDROID_KEYSTORE_PATH ASHELL_ANDROID_KEY_ALIAS
+  export ASHELL_ANDROID_STORE_PASSWORD ASHELL_ANDROID_KEY_PASSWORD
 
   ok "签名配置有效"
 }
@@ -321,10 +321,10 @@ prepare_key_properties() {
   section "写入 key.properties"
 
   cat > "$key_props" <<EOF2
-storeFile=${CLOUDSEND_ANDROID_KEYSTORE_PATH}
-storePassword=${CLOUDSEND_ANDROID_STORE_PASSWORD}
-keyAlias=${CLOUDSEND_ANDROID_KEY_ALIAS}
-keyPassword=${CLOUDSEND_ANDROID_KEY_PASSWORD}
+storeFile=${ASHELL_ANDROID_KEYSTORE_PATH}
+storePassword=${ASHELL_ANDROID_STORE_PASSWORD}
+keyAlias=${ASHELL_ANDROID_KEY_ALIAS}
+keyPassword=${ASHELL_ANDROID_KEY_PASSWORD}
 EOF2
 
   chmod 600 "$key_props" || true
@@ -609,12 +609,12 @@ build_rust_lib_for_target() {
     return 1
   fi
 
-  src_so="$REPO_ROOT/target/$target/release/libcloudsend.so"
+  src_so="$REPO_ROOT/target/$target/release/libashell.so"
   require_file "$src_so"
 
   dst_dir="$REPO_ROOT/flutter/android/app/src/main/jniLibs/$jni_dir"
   mkdir -p "$dst_dir"
-  cp "$src_so" "$dst_dir/libcloudsend.so"
+  cp "$src_so" "$dst_dir/libashell.so"
   cp "$libcpp" "$dst_dir/libc++_shared.so"
 
   ok "JNI 库已放置: $dst_dir"
@@ -723,10 +723,10 @@ sign_apk_manual() {
 
   section "签名 APK"
   run apksigner sign \
-    --ks "$CLOUDSEND_ANDROID_KEYSTORE_PATH" \
-    --ks-key-alias "$CLOUDSEND_ANDROID_KEY_ALIAS" \
-    --ks-pass "pass:$CLOUDSEND_ANDROID_STORE_PASSWORD" \
-    --key-pass "pass:$CLOUDSEND_ANDROID_KEY_PASSWORD" \
+    --ks "$ASHELL_ANDROID_KEYSTORE_PATH" \
+    --ks-key-alias "$ASHELL_ANDROID_KEY_ALIAS" \
+    --ks-pass "pass:$ASHELL_ANDROID_STORE_PASSWORD" \
+    --key-pass "pass:$ASHELL_ANDROID_KEY_PASSWORD" \
     --out "$output_apk" \
     "$work_aligned"
 
@@ -762,25 +762,25 @@ finalize_named_apk_to_flutter_dir() {
 build_mode_aarch64() {
   local target="aarch64-linux-android"
   local apk_in
-  local signed_tmp_apk="$TMP_DIR/app-aarch64-release.signed.tmp.apk"
+  local signed_tmp_apk="$TMP_DIR/ashell-aarch64-release.signed.tmp.apk"
 
   section "开始构建: aarch64"
   install_android_deps_for_target "$target"
   build_rust_lib_for_target "$target"
   apk_in="$(flutter_build_split_abi_apk "$target")"
   sign_apk_manual "$apk_in" "$signed_tmp_apk"
-  finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "app-aarch64-release.apk"
+  finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "ashell-aarch64-release.apk"
 
   echo
   echo "${C_BOLD}${C_GREEN}✅ 构建完成 (aarch64)${C_RESET}"
-  echo "${C_BOLD}目标目录:${C_RESET} $FLUTTER_APK_DIR/app-aarch64-release.apk"
+  echo "${C_BOLD}目标目录:${C_RESET} $FLUTTER_APK_DIR/ashell-aarch64-release.apk"
 }
 
 build_mode_universal() {
   local targets=(aarch64-linux-android armv7-linux-androideabi x86_64-linux-android)
   local t
   local apk_in
-  local signed_tmp_apk="$TMP_DIR/app-universal-release.signed.tmp.apk"
+  local signed_tmp_apk="$TMP_DIR/ashell-universal-release.signed.tmp.apk"
 
   section "开始构建: universal"
   for t in "${targets[@]}"; do
@@ -790,11 +790,11 @@ build_mode_universal() {
 
   apk_in="$(flutter_build_universal_apk)"
   sign_apk_manual "$apk_in" "$signed_tmp_apk"
-  finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "app-universal-release.apk"
+  finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "ashell-universal-release.apk"
 
   echo
   echo "${C_BOLD}${C_GREEN}✅ 构建完成 (universal)${C_RESET}"
-  echo "${C_BOLD}目标目录:${C_RESET} $FLUTTER_APK_DIR/app-universal-release.apk"
+  echo "${C_BOLD}目标目录:${C_RESET} $FLUTTER_APK_DIR/ashell-universal-release.apk"
 }
 
 main() {

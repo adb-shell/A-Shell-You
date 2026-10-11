@@ -1,6 +1,8 @@
 # A-Shell-You 项目接管认知 2026-10-12
 
-本项目当前承载 CloudSend 远控产品，主链为 Flutter UI、Rust controller/endpoint 与 Android Kotlin/JNI；Windows 还有独立 capture/input/privacy/virtual-display 维护面。保留大量 RustDesk 实现，同时定制 Android 控制、relay 策略、账号准入、ADB 与 ZEGO。
+> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
+
+本项目当前承载 AShell 远控产品，主链为 Flutter UI、Rust controller/endpoint 与 Android Kotlin/JNI；Windows 还有独立 capture/input/privacy/virtual-display 维护面。保留大量 RustDesk 实现，同时定制 Android 控制、relay 策略、账号准入、ADB 与 ZEGO。
 
 Evidence date：2026-10-12（Asia/Tokyo）。Source：`test / 6fb0aa6e147901243d4cb14a5dc68ae75a13b890`。Baseline：`CS-BL-2026-10-12-6fb0aa6`。
 
@@ -8,15 +10,15 @@ Evidence date：2026-10-12（Asia/Tokyo）。Source：`test / 6fb0aa6e147901243d
 
 ## 1. 项目概况与来源
 
-- Rust crate/library `cloudsend`，版本 `5.2.1`，edition 2021，MSRV 1.75；Flutter package `flutter_hbb`，版本 `5.2.1+59`。证据：`Cargo.toml:1`、`flutter/pubspec.yaml:19`。
-- Android applicationId `com.cloudsend.app`，可见名云计划；library `libcloudsend.so`，Windows `cloudsend.dll`。证据：`flutter/android/app/build.gradle:69`、`flutter/lib/models/native_model.dart:129`。
+- Rust crate/library `ashell`，版本 `5.2.1`，edition 2021，MSRV 1.75；Flutter package `flutter_hbb`，版本 `5.2.1+59`。证据：`Cargo.toml:1`、`flutter/pubspec.yaml:19`。
+- Android applicationId `me.ashell`，可见名云计划；library `libashell.so`，Windows `ashell.dll`。证据：`flutter/android/app/build.gradle:69`、`flutter/lib/models/native_model.dart:129`。
 - 本地 `main`、`test` 及对应 origin refs 同指上述 HEAD；无本地 tag，非 shallow，当前分支只有一次初始化提交。审查开始/结束均 clean；之后记忆文档落盘会产生未提交文档变更。
-- 当前 origin 是 `adb-shell/A-Shell-You`；用户指定的历史源为 `Super-Build/Cloudsend`，两者不要混称同一个 remote。
+- 当前 origin 是 `adb-shell/A-Shell-You`；用户指定的历史源为 `历史源仓`，两者不要混称同一个 remote。
 - 只读 GitHub API tree 与 `git ls-tree -r HEAD` 对比：本地 HEAD 和源仓 `cbce0ba36c5c` 的 975 个 blob 路径/内容哈希完全一致，无单边文件。范围是 Git tracked 内容，不包含 ignored/local artifacts，也不证明构建产物一致。
 - 源仓可读历史 60 条；最早 `96a9c7cee2cd8e42dda4d8c868e4e609b15e40ae` 为 2026-04-13 无父提交整仓导入。准确 RustDesk fork 点、导入前历史和作者归属未知。
 - 与 RustDesk 1.3.9/1.4.0 tree 分别有 581/615 个同路径同 blob 文件。数量不代表开发量或确切 fork 版本。`src/server/video_service.rs`、`src/server/service.rs`、`libs/enigo/src/win/win_impl.rs`、`src/hbbs_http/account.rs` 与 1.4.0 相同；`libs/hbb_common/src/fs.rs` 与 1.4.0 引用的 hbb_common commit 相同。
 
-可追溯链接：[源仓快照](https://github.com/Super-Build/Cloudsend/tree/cbce0ba36c5c)、[源仓初始导入](https://github.com/Super-Build/Cloudsend/commit/96a9c7cee2cd8e42dda4d8c868e4e609b15e40ae)、[RustDesk 1.4.0](https://github.com/rustdesk/rustdesk/tree/1.4.0)、[hbb_common 对照](https://github.com/rustdesk/hbb_common/tree/6e556f7e1751a3a709cd5cca0df7268ba3cb1c48)。这些是当次观察，远端后续变化需重新读取；未 fetch/pull。
+可追溯链接：源仓快照（提交 cbce0ba36c5c；原始链接见 a036f31 中本文件）、源仓初始导入（提交 96a9c7cee2cd8e42dda4d8c868e4e609b15e40ae；原始链接见 a036f31 中本文件）、[RustDesk 1.4.0](https://github.com/rustdesk/rustdesk/tree/1.4.0)、[hbb_common 对照](https://github.com/rustdesk/hbb_common/tree/6e556f7e1751a3a709cd5cca0df7268ba3cb1c48)。这些是当次观察，远端后续变化需重新读取；未 fetch/pull。
 
 ## 2. 架构与资源边界
 
@@ -40,7 +42,7 @@ Evidence date：2026-10-12（Asia/Tokyo）。Source：`test / 6fb0aa6e147901243d
 
 ### 3.1 启动与状态
 
-Windows：`runner/main.cpp:21 wWinMain → cloudsend.dll → flutter.rs:125 cloudsend_core_main_args → core_main → main.dart:40 → initEnv/native bridge/models`。Rust main 不等于 Flutter 产品唯一入口。
+Windows：`runner/main.cpp:21 wWinMain → ashell.dll → flutter.rs:125 ashell_core_main_args → core_main → main.dart:40 → initEnv/native bridge/models`。Rust main 不等于 Flutter 产品唯一入口。
 
 Android：`main.dart:178 runMobileApp → native_model.dart:294 同步配置目录 → server_model.dart:418 ensureCoreService → mChannel ensure_core_service → Activity/MainService → JNI context + Rust server → flutter_ffi.rs:1823 main_start_service → 清 stop-service + rendezvous restart`。
 
@@ -83,7 +85,7 @@ Windows：`libs/scrap/src/dxgi/mod.rs:74` DXGI 失败可 GDI fallback；`portabl
 | Port forward | 本地监听0.0.0.0端口，远端会话双向转发，EOF/错误结束；endpoint enable-tunnel 检查，目标 connect 位于后续密码校验前。`port_forward.rs:45/197`、`connection.rs:2095` |
 | 原生声音 | 平台采样→Opus→AudioFrame→audio decoder；不是 ZEGO 双向媒体。`audio_service.rs:29/468`、`client.rs:2836` |
 | ZEGO | Rust 请求 token/邀请/接受/关闭，Flutter SDK loginRoom/publish/play；失败/关闭 leave 清媒体/timer。`client/io_loop.rs:945/981`、`zego_voice_call_model.dart:265/297`、`model.dart:549` |
-| Android ADB | AdbPage→mChannel→Manager/Runner/DNS→nativeLibraryDir/libadb.so process；pair/connect/serial/shell，含授予自身 WRITE_SECURE_SETTINGS 命令。`adb/CloudSendAdbRunner.kt:91/273/298/367`；不是 PC remote ADB 协议 |
+| Android ADB | AdbPage→mChannel→Manager/Runner/DNS→nativeLibraryDir/libadb.so process；pair/connect/serial/shell，含授予自身 WRITE_SECURE_SETTINGS 命令。`adb/AShellAdbRunner.kt:91/273/298/367`；不是 PC remote ADB 协议 |
 | Windows privacy | connection-owned，exclude/Magnifier/virtual-display；IDD_IMPL=Amyuni，turn-on guard/turn-off 恢复 topology/registry。`privacy_mode.rs:53`、`virtual_display_manager.rs:8`、`win_virtual_display.rs:67/459/518` |
 | Windows printing | adapter→PRN data→文件协议→controller Windows XPS；adapter 初始化失败不注册。`server.rs:137`、`printer_service.rs:147`、`platform/windows.cc:924` |
 
@@ -110,7 +112,7 @@ Windows：`libs/scrap/src/dxgi/mod.rs:74` DXGI 失败可 GDI fallback；`portabl
 | Windows 新环境入口 | `6ff35b3c54b3` | new-build.cmd 与 PC-Build.md |
 | workflows 手动触发 | `56367a206cc7` | CI 验证/发布入口 |
 
-当前 schema 还有 `Misc.cloudsend_status=39`、terminal messages/persistent option、ZEGO metadata（`message.proto:680/845/849/911/938/977`）。与参考标签不同不等于所有差异均由某位作者新增。品牌/SO/DLL/package 改名只计身份/打包变更；Terminal/privacy/port-forward 的完整原创归属仍不明。
+当前 schema 还有 `Misc.ashell_status=39`、terminal messages/persistent option、ZEGO metadata（`message.proto:680/845/849/911/938/977`）。与参考标签不同不等于所有差异均由某位作者新增。品牌/SO/DLL/package 改名只计身份/打包变更；Terminal/privacy/port-forward 的完整原创归属仍不明。
 
 ## 5. 工程运行条件
 
@@ -119,7 +121,7 @@ Windows：`libs/scrap/src/dxgi/mod.rs:74` DXGI 失败可 GDI fallback；`portabl
 - Windows `new-build.cmd` 期望配置好的 DevEnv/DevTool，使用 Rust1.75 MSVC、Flutter、LLVM、vcpkg；调用 build.py portable/hwcodec/flutter/vram，输出 PC-Bulid。脚本会切工具链/解析依赖/打包，不是只读检查。
 - Cargo/pub/Gradle/vcpkg/CocoaPods 多套依赖；FRB1.80.1、vcpkg baseline 位于 `vcpkg.json:86`。build.sh 包含安装/codegen/SDK patch/外仓 fetch-checkout/签名等副作用，未经单独授权不执行。
 - 当前 jniLibs 目录不存在；pubspec 声明 ZEGO，但 lock 无其 entry；native ADB、WindowInjection/driver/printer adapter 来源、版本/hash/签名未闭环。
-- `RuntimeBroker_cloudsend.exe` 由目标系统 RuntimeBroker 派生（`platform/windows.rs:1198`），不是缺少独立 helper 工程。XPS 调用由仓内 C++ 实现，依赖目标 Windows XpsPrint.dll。
+- `RuntimeBroker_ashell.exe` 由目标系统 RuntimeBroker 派生（`platform/windows.rs:1198`），不是缺少独立 helper 工程。XPS 调用由仓内 C++ 实现，依赖目标 Windows XpsPrint.dll。
 - Android 权限相互独立：MediaProjection、Accessibility、RECORD_AUDIO、overlay、前台服务、wireless debugging；仓库声明不能代替真机批准状态。
 - hbbs/hbbr、产品 API/DB 均 external；token broker 为 `scripts/deploy_zego_token_service.sh:193` 内嵌 Go 的 PARTIAL 资产，实际部署版本/治理未知。相邻 API/WEB/SERVER 工作区未纳入本审查。
 

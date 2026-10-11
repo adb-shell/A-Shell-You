@@ -1,4 +1,4 @@
-# CloudSend 构建系统 / Build System
+# AShell 构建系统 / Build System
 
 接管基线：2026-07-12  
 状态：`verified` + `verification-required`
@@ -11,16 +11,16 @@
 
 | 项目 | 当前源码值 |
 |---|---|
-| Rust package/crate | `cloudsend` |
+| Rust package/crate | `ashell` |
 | Rust version | `5.2.1` |
 | Rust edition | `2021` |
 | Rust MSRV | `1.75` |
-| Flutter package | `flutter_hbb` |
+| Flutter package | `flutter_hbb`（内部包名保留） |
 | Flutter version | `5.2.1+59` |
-| Android applicationId | `com.cloudsend.app` |
+| Android applicationId | `me.ashell` |
 | Android compile/target/min SDK | `34 / 33 / 21` |
-| Android native library | `libcloudsend.so` |
-| Windows native library | `cloudsend.dll` |
+| Android native library | `libashell.so` |
+| Windows native library | `ashell.dll` |
 
 版本号是发布资产。本轮和后续 AI 工作都不得自动修改。
 
@@ -71,8 +71,8 @@ FRB 文件带 1.80.1 生成标记，且 Git 历史显示 Rust FFI 后续仍有�
 
 - Rust Android targets。
 - Android SDK/NDK、vcpkg 与 native dependencies。
-- 构建 `libcloudsend.so`。
-- 复制到 `flutter/android/app/src/main/jniLibs/<abi>/libcloudsend.so`。
+- 构建 `libashell.so`。
+- 复制到 `flutter/android/app/src/main/jniLibs/<abi>/libashell.so`。
 - Flutter/Gradle packaging、zipalign/signing 和产物命名。
 
 签名环境是发布机机密，不得复制到仓库或诊断输出。
@@ -120,7 +120,7 @@ cd flutter && flutter build apk --release
 cargo build --release --features flutter
 ```
 
-但 `build.py` 的 macOS/Linux 分支仍有 `librustdesk` 等上游命名残留，未在本轮验证。iOS、Linux、macOS、Web 的源码存在不等于 CloudSend 当前发布矩阵已经覆盖这些平台。
+但 `build.py` 的 macOS/Linux 分支仍有 `librustdesk` 等上游命名残留，未在本轮验证。iOS、Linux、macOS、Web 的源码存在不等于 AShell 当前发布矩阵已经覆盖这些平台。
 
 发布支持矩阵必须由产品 owner 明确：
 
@@ -135,7 +135,7 @@ cargo build --release --features flutter
 - 普通提交可能未经过格式、lint、unit test 或 platform build。
 - generated bridge 与 FFI drift 无自动检测。
 - dependency/supply-chain 检查无持续证据。
-- 发布 workflow 可见不等于已适配 CloudSend secrets、names 和 artifacts。
+- 发布 workflow 可见不等于已适配 AShell secrets、names 和 artifacts。
 
 恢复自动 CI 前要先最小化权限、固定 action revision、隔离 untrusted PR、清理上游发布目标，并由仓库所有者批准。
 
@@ -188,3 +188,7 @@ cargo build --release --features flutter
 - release notes、known issues、owner/on-call。
 
 本轮不具备也未执行上述发布动作。
+
+## 12. 2026-10-12 AShell身份迁移补充
+
+当前命名和静态证据见 [迁移报告](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。Rust crate/native artifact迁为ashell，Flutter内部package保留flutter_hbb。Android与Windows正式脚本、portable marker长度、加载端和C符号已同步；未执行任何脚本/编译。FRB generated_bridge.dart仅做C符号的机械同步，与手写导出对应，未改API类型；正式环境仍需重生成核对，不能把V0检查当成codegen或构建通过。jniLibs缺失、ZEGO lock drift、外部签名/驱动及Apple/Google注册仍待验证。

@@ -1,4 +1,4 @@
-# CloudSend Android 完整链路 / Android Pipeline
+# AShell Android 完整链路 / Android Pipeline
 
 基线：2026-07-12，`HEAD 77062b4`
 
@@ -28,7 +28,7 @@ Android 不是“Flutter 应用加一个 Service”，而是四层共同组成�
 | Accessibility/Input | `nZW99cdXQ0COhB2o.kt` |
 | Bitmap/frame helper | `EqljohYazB0qrhnj.kt` |
 | Android JNI | `libs/scrap/src/android/pkg2230.rs` |
-| ADB/LADB | `flutter/lib/mobile/pages/adb_page.dart`，`flutter/android/app/src/main/kotlin/com/cloudsend/app/adb/*.kt` |
+| ADB/LADB | `flutter/lib/mobile/pages/adb_page.dart`，`flutter/android/app/src/main/kotlin/me/ashell/adb/*.kt` |
 | ZEGO | `flutter/lib/models/zego_voice_call_model.dart`，`flutter/lib/models/server_model.dart`，`src/client/helper.rs` |
 
 当前移动主页只直接装载 `ServerPage` 与 `AdbPage`。Remote、file、terminal、camera、settings 等移动页面仍有源码，但不是当前主页的直接导航入口。
@@ -70,7 +70,7 @@ Android 端 core service、screen share、frame source 和 PC waiting 是四个�
 
 - `ServerModel._connectStatus` 直接来自 Rust `mainGetConnectStatus()`，代表真实 rendezvous 注册状态，不是 core service 存活证明。
 - `ServerModel._coreServiceStarted` 与 `ServerModel._isStart` 分别表示 core 和 screen share。
-- `CloudSendStatusModel` 显示 Android 状态快照；超过 8 秒无更新时字段清回 unknown，不伪造 ready/failure。
+- `AShellStatusModel` 显示 Android 状态快照；超过 8 秒无更新时字段清回 unknown，不伪造 ready/failure。
 - 源码中 `_isReady // media permission ready status` 的注释已经过时；当前语义是 core ready。
 
 ### 3.1 必须保持的不变量
@@ -287,7 +287,7 @@ waiting/reconnect 不得自动开启这条链。
 
 ## 9. 状态包
 
-`MainService.DFm8Y8iMScvB2YDwGYN("cloudsend_status")` 返回真实快照：
+`MainService.DFm8Y8iMScvB2YDwGYN("ashell_status")` 返回真实快照：
 
 | 字段 | 源码含义 |
 |---|---|
@@ -302,7 +302,7 @@ waiting/reconnect 不得自动开启这条链。
 
 构建快照失败时返回空字符串，让 Rust 跳过推送，不能返回一组伪造 false。
 
-授权成功后应立即推一次真实状态，之后回到 2 秒节流推送。Flutter `CloudSendStatusModel` 保留 missing key 的旧/unknown 值，8 秒 stale 后清 unknown。
+授权成功后应立即推一次真实状态，之后回到 2 秒节流推送。Flutter `AShellStatusModel` 保留 missing key 的旧/unknown 值，8 秒 stale 后清 unknown。
 
 ## 10. 命令与输入链
 
@@ -390,8 +390,8 @@ AdbPage
   -> AndroidAdbManager Dart wrapper
   -> MethodChannel mChannel
   -> FlutterActivity
-  -> CloudSendAdbManager
-  -> CloudSendAdbRunner / CloudSendAdbDnsDiscover
+  -> AShellAdbManager
+  -> AShellAdbRunner / AShellAdbDnsDiscover
   -> packaged libadb.so
 ```
 

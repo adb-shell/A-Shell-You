@@ -41,7 +41,7 @@ class _AdbPageState extends State<AdbPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _appendLocalLine("CloudSend ADB module ready.");
+    _appendLocalLine("AShell ADB module ready.");
     _appendLocalLine("Tap Start service to begin wireless-debugging setup.");
     _refreshWirelessDebugStatus();
   }

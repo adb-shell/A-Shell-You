@@ -1,9 +1,11 @@
-# CloudSend Architecture Memory
+# AShell Architecture Memory
 
-最后更新：2026-07-12  
+最后更新：2026-10-12（身份索引更新；运行链未重新验证）
 用途：跨会话架构速记；详细设计只在 `docs/AI_ENGINEERING/` 维护。
 
 ## 1. Runtime Topology
+
+当前产品显示A Shell You、内部AShell/ashell、Android me.ashell；Flutter内部package保留flutter_hbb。身份变更详见 `docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md`，V0 only。
 
 ```text
 Flutter UI / legacy UI
@@ -11,7 +13,7 @@ Flutter UI / legacy UI
   <-> Rust controller/server core
   <-> protobuf peer protocol
   <-> hbbs/hbbr external infrastructure
-  <-> remote CloudSend endpoint
+  <-> remote AShell endpoint
 
 Android Rust core
   <-> pkg2230 JNI
@@ -103,7 +105,7 @@ peer invitation authorization != ZEGO token authorization != microphone user con
 Network:
 
 ```text
-CloudSend controller relay-only != controlled endpoint has no direct/NAT compatibility
+AShell controller relay-only != controlled endpoint has no direct/NAT compatibility
 ```
 
 ## 5. Detailed References

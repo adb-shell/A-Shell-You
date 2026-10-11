@@ -1,15 +1,15 @@
 [package]
-name = "cloudsend"
+name = "ashell"
 version = "5.2.1"
-authors = ["cloudsend <dev@cloudsend.app>"]
+authors = ["A Shell You contributors"]
 edition = "2021"
 build= "build.rs"
-description = "CloudSend Remote Desktop Service"
-default-run = "cloudsend"
+description = "A Shell You Remote Desktop Service"
+default-run = "ashell"
 rust-version = "1.75"
 
 [lib]
-name = "cloudsend"
+name = "ashell"
 crate-type = ["cdylib", "staticlib", "rlib"]
 
 [[bin]]
@@ -192,10 +192,10 @@ members = ["libs/scrap", "libs/hbb_common", "libs/enigo", "libs/clipboard", "lib
 exclude = ["vdi/host", "examples/custom_plugin"]
 
 [package.metadata.winres]
-LegalCopyright = "Copyright © 2025 CloudSend Ltd. All rights reserved."
-ProductName = "CloudSend"
-FileDescription = "CloudSend Remote Desktop Service"
-OriginalFilename = "cloudsend.exe"
+LegalCopyright = "Copyright © 2025 A Shell You contributors. All rights reserved."
+ProductName = "A Shell You"
+FileDescription = "A Shell You Remote Desktop Service"
+OriginalFilename = "ashell.exe"
 
 [target.'cfg(target_os="windows")'.build-dependencies]
 winres = "0.1"
@@ -211,8 +211,8 @@ hound = "3.5"
 docopt = "1.1"
 
 [package.metadata.bundle]
-name = "CloudSend"
-identifier = "com.cloudsend.app"
+name = "AShell"
+identifier = "me.ashell"
 icon = ["res/32x32.png", "res/128x128.png", "res/128x128@2x.png"]
 osx_minimum_system_version = "10.14"
 

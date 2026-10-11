@@ -1,0 +1,5 @@
+interface:
+  display_name: "AShell Safe Superpowers"
+  short_description: "Safely brainstorm, plan, debug, verify, and review AShell"
+  default_prompt: "Use $ashell-superpowers-safe to review this AShell task read-only and stop before any edit, build, Git write, or release action."
+

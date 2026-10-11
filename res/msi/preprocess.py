@@ -27,15 +27,15 @@ g_arpsystemcomponent = {
     },
     "Contact": {
         "msi": "ARPCONTACT",
-        "v": "https://github.com/rustdesk/rustdesk",
+        "v": "https://github.com/adb-shell/A-Shell-You",
     },
     "HelpLink": {
         "msi": "ARPHELPLINK",
-        "v": "https://github.com/rustdesk/rustdesk/issues/",
+        "v": "https://github.com/adb-shell/A-Shell-You/issues/",
     },
     "ReadMe": {
         "msi": "ARPREADME",
-        "v": "https://github.com/rustdesk/rustdesk",
+        "v": "https://github.com/adb-shell/A-Shell-You",
     },
 }
 
@@ -48,7 +48,7 @@ def make_parser():
         "-d",
         "--dist-dir",
         type=str,
-        default="../../rustdesk",
+        default="../../ashell",
         help="The dist directory to install.",
     )
     parser.add_argument(
@@ -73,7 +73,7 @@ def make_parser():
         help='Connection type, e.g. "incoming", "outgoing". Default is empty, means incoming-outgoing',
     )
     parser.add_argument(
-        "--app-name", type=str, default="RustDesk", help="The app name."
+        "--app-name", type=str, default="AShell", help="The internal app name (no spaces)."
     )
     parser.add_argument(
         "-v", "--version", type=str, default="", help="The app version."
@@ -85,7 +85,7 @@ def make_parser():
         "-m",
         "--manufacturer",
         type=str,
-        default="PURSLANE",
+        default="A Shell You",
         help="The app manufacturer.",
     )
     return parser
@@ -150,6 +150,10 @@ def gen_auto_component(app_name, dist_dir):
     )
 
 
+def display_app_name(app_name):
+    return "A Shell You" if app_name == "AShell" else app_name
+
+
 def gen_pre_vars(args, dist_dir):
     def func(lines, index_start):
         upgrade_code = uuid.uuid5(uuid.NAMESPACE_OID, app_name + ".exe")
@@ -159,7 +163,8 @@ def gen_pre_vars(args, dist_dir):
             f'{indent}<?define Version="{g_version}" ?>\n',
             f'{indent}<?define Manufacturer="{args.manufacturer}" ?>\n',
             f'{indent}<?define Product="{args.app_name}" ?>\n',
-            f'{indent}<?define Description="{args.app_name} Installer" ?>\n',
+            f'{indent}<?define ProductDisplay="{display_app_name(args.app_name)}" ?>\n',
+            f'{indent}<?define Description="{display_app_name(args.app_name)} Installer" ?>\n',
             f'{indent}<?define ProductLower="{args.app_name.lower()}" ?>\n',
             f'{indent}<?define RegKeyRoot=".$(var.ProductLower)" ?>\n',
             f'{indent}<?define RegKeyInstall="$(var.RegKeyRoot)\\Install" ?>\n',
@@ -185,7 +190,7 @@ def replace_app_name_in_langs(app_name):
         with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
         for i, line in enumerate(lines):
-            lines[i] = line.replace("RustDesk", app_name)
+            lines[i] = line.replace("RustDesk", display_app_name(app_name))
         with open(file_path, "w", encoding="utf-8") as f:
             f.writelines(lines)
 
@@ -311,7 +316,7 @@ def gen_custom_ARPSYSTEMCOMPONENT_True(args, dist_dir):
             f"{indent}<!--https://learn.microsoft.com/en-us/windows/win32/msi/property-reference-->\n"
         )
         lines_new.append(
-            f'{indent}<RegistryValue Type="string" Name="DisplayName" Value="{args.app_name}" />\n'
+            f'{indent}<RegistryValue Type="string" Name="DisplayName" Value="{display_app_name(args.app_name)}" />\n'
         )
         lines_new.append(
             f'{indent}<RegistryValue Type="string" Name="DisplayIcon" Value="[INSTALLFOLDER_INNER]{args.app_name}.exe" />\n'

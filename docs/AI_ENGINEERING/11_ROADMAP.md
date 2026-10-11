@@ -1,4 +1,4 @@
-# CloudSend 工程路线图 / Roadmap
+# AShell 工程路线图 / Roadmap
 
 接管基线：2026-07-12  
 状态：`proposed`
@@ -127,7 +127,7 @@
 - 补录上游 RustDesk/DaXianDesk 基线、license provenance 和本地修改边界。
 - 所有重大决定写入 `.codex/DECISION_LOG.md`。
 - 所有实施任务写入 `.codex/TASK_HISTORY.md`，包含验证和 rollback。
-- 重写 CloudSend README、security contact、contribution ownership；旧上游文档保留历史标识。
+- 重写 AShell README、security contact、contribution ownership；旧上游文档保留历史标识。
 - 建立 code owner/domain owner、review SLA 和 incident owner。
 - 采用规范 commit/PR subject；保留可审计变更原因。
 

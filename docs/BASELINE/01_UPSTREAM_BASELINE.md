@@ -1,5 +1,7 @@
 # RustDesk / DaXianDesk Upstream Baseline
 
+> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
+
 Baseline ID：`CS-BL-2026-07-12-77062b4`  
 状态：`PARTIAL / UNKNOWN-UPSTREAM / RELEASE-BLOCKING`
 
@@ -17,11 +19,11 @@ Baseline ID：`CS-BL-2026-07-12-77062b4`
 
 根提交是一次完整源码快照，而不是可重放的 upstream fork point。当前 Git 只能证明 2026-04-13 之后的本地演进。
 
-`PC-Build.md` 中出现的 RustDesk `1.4.6` 只属于后期上游构建背景，不能作为 CloudSend fork point 或 source baseline。
+`PC-Build.md` 中出现的 RustDesk `1.4.6` 只属于后期上游构建背景，不能作为 AShell fork point 或 source baseline。
 
 ## 2. RustDesk 来源证据
 
-以下结构共同证明 CloudSend 是 RustDesk 深度二次开发，而不是独立从零实现：
+以下结构共同证明 AShell 是 RustDesk 深度二次开发，而不是独立从零实现：
 
 - Rust workspace、`hbb_common`、`scrap`、`enigo`、rendezvous/message protobuf 布局。
 - controller/controlled endpoint、hbbs/hbbr contract、Sciter/Flutter 双 UI 和多平台平台层。
@@ -47,7 +49,7 @@ Baseline ID：`CS-BL-2026-07-12-77062b4`
 由 source/legal/release owners 提供并审核：
 
 1. upstream repository + exact commit/tag。
-2. DaXianDesk/CloudSend patch lineage 或等价的差异清单。
+2. DaXianDesk/AShell patch lineage 或等价的差异清单。
 3. authorship、license、NOTICE、AGPL Corresponding Source 策略。
 4. hbbs/hbbr compatibility matrix 与部署 revision。
 5. driver/native binary source revision、hash、publisher 与 redistribution rights。
@@ -57,6 +59,6 @@ Baseline ID：`CS-BL-2026-07-12-77062b4`
 
 ## 5. 维护策略
 
-- 当前维护以 CloudSend source 为实现真相，upstream changes 逐项人工评估，不做盲目整仓 merge。
+- 当前维护以 AShell source 为实现真相，upstream changes 逐项人工评估，不做盲目整仓 merge。
 - upstream sync、license route 或 fork-point 选择属于架构决定，必须有 ADR、compatibility、security 和 rollback。
 - 在 lineage 未闭环前，external registry 中 `EXT-HIST-001` 与 `EXT-COMP-001` 保持 blocking。

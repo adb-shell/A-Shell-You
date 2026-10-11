@@ -1,9 +1,9 @@
-# CloudSend Current Work
+# AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261012-002`
+Registry Revision：`WORK-20261012-006`
 
-Last Updated：2026-10-12T04:56:21+09:00
+Last Updated：2026-10-12T05:39:32+09:00
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-None。`T-2026-10-12-001` 已完成文档记忆落盘；后续用户请求从 T0 开始，重新核对 HEAD/status 和权限，不继承旧任务授权。
+none。T003完成两处ashell.匹配及全部文档品牌命名统一；T002/T003变更仍未提交。后续任务重核HEAD/status和用户授权；没有构建/部署权限。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ None。`T-2026-10-12-001` 已完成文档记忆落盘；后续用户请求从 T0
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-12-001`
-- Result：本轮接管证据、短记忆和观察基线已保存并接入新会话入口；仅文档变化，未提交/推送/云端上传。
-- Closed At：2026-10-12T04:56:21+09:00
+- Task ID：`T-2026-10-12-003`
+- Result：源码两处匹配、全部文档字段/路径/文件名统一；旧品牌全文/路径检索零命中（排除.git）。Flutter内部flutter_hbb保留；文档历史原文字在Git可恢复。未提交/构建/部署。
+- Closed At：2026-10-12T05:39:32+09:00
 - Final T-State：`T8 — complete`
-- State / Event：`STATE-20261012-002` / `CE-20261012-T001-01`
-- Decision：沿用 D-014；`N/A — no decision delta`。
-- Verification：V0 路径/引用/基线/范围/状态检查；未执行真实新聊天恢复测试；V1—V5 NOT_RUN。
+- State / Event：`STATE-20261012-004` / `CE-20261012-T003-01`
+- Decision：D-016补充D-015 / ADR-0014；治理沿用D-014。
+- Verification：V0全文/路径检索、源码谓词、Flutter package/import、82份修改/新增Markdown链接及diff检查；V1—V5 NOT_RUN。
 - Next Gate：new user request must start at T0；historical authorization inherited `none`。
-- Changelog pointer：`CHANGELOG_AI.md` 中 `T-2026-10-12-001`。
+- Changelog pointer：`CHANGELOG_AI.md` 中 `T-2026-10-12-003`。
 - Detailed record：`TASK_HISTORY.md` 中同 Task ID；修改清单见 `CHANGE_EVENT_LOG.md` 中同 Event。

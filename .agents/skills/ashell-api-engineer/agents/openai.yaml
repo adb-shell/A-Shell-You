@@ -1,0 +1,4 @@
+interface:
+  display_name: "AShell API Engineer"
+  short_description: "Maintain AShell account, HTTP, sync, and API contracts"
+  default_prompt: "Use $ashell-api-engineer to analyze this API or backend-contract task."

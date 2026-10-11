@@ -1,0 +1,4 @@
+interface:
+  display_name: "AShell Flutter Engineer"
+  short_description: "Maintain AShell Flutter UI, state, and bridges"
+  default_prompt: "Use $ashell-flutter-engineer to handle this Flutter task."

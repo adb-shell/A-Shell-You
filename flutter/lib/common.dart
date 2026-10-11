@@ -1768,7 +1768,7 @@ class AndroidAdbManager {
     if (!isAndroid) {
       return const <String, dynamic>{};
     }
-    final res = await _channel.invokeMethod(AndroidChannel.kCloudSendAdbInit);
+    final res = await _channel.invokeMethod(AndroidChannel.kAShellAdbInit);
     return _asStringKeyMap(res);
   }
 
@@ -1776,7 +1776,7 @@ class AndroidAdbManager {
     if (!isAndroid) {
       return const <String, dynamic>{};
     }
-    final res = await _channel.invokeMethod(AndroidChannel.kCloudSendAdbStatus);
+    final res = await _channel.invokeMethod(AndroidChannel.kAShellAdbStatus);
     return _asStringKeyMap(res);
   }
 
@@ -1784,7 +1784,7 @@ class AndroidAdbManager {
     if (!isAndroid) {
       return '';
     }
-    final res = await _channel.invokeMethod(AndroidChannel.kCloudSendAdbOutput);
+    final res = await _channel.invokeMethod(AndroidChannel.kAShellAdbOutput);
     return res?.toString() ?? '';
   }
 
@@ -1792,7 +1792,7 @@ class AndroidAdbManager {
     if (!isAndroid) {
       return const <String, dynamic>{};
     }
-    final res = await _channel.invokeMethod(AndroidChannel.kCloudSendAdbStart);
+    final res = await _channel.invokeMethod(AndroidChannel.kAShellAdbStart);
     return _asStringKeyMap(res);
   }
 
@@ -1800,7 +1800,7 @@ class AndroidAdbManager {
     if (!isAndroid) {
       return const <String, dynamic>{};
     }
-    final res = await _channel.invokeMethod(AndroidChannel.kCloudSendAdbStop);
+    final res = await _channel.invokeMethod(AndroidChannel.kAShellAdbStop);
     return _asStringKeyMap(res);
   }
 
@@ -1809,7 +1809,7 @@ class AndroidAdbManager {
       return const <String, dynamic>{};
     }
     final res =
-        await _channel.invokeMethod(AndroidChannel.kCloudSendAdbLocalShell);
+        await _channel.invokeMethod(AndroidChannel.kAShellAdbLocalShell);
     return _asStringKeyMap(res);
   }
 
@@ -1820,7 +1820,7 @@ class AndroidAdbManager {
     if (!isAndroid) {
       return const <String, dynamic>{};
     }
-    final res = await _channel.invokeMethod(AndroidChannel.kCloudSendAdbPair, {
+    final res = await _channel.invokeMethod(AndroidChannel.kAShellAdbPair, {
       'port': port,
       'code': code,
     });
@@ -1832,7 +1832,7 @@ class AndroidAdbManager {
       return const <String, dynamic>{};
     }
     final res = await _channel.invokeMethod(
-      AndroidChannel.kCloudSendAdbCommand,
+      AndroidChannel.kAShellAdbCommand,
       command,
     );
     return _asStringKeyMap(res);
@@ -1843,7 +1843,7 @@ class AndroidAdbManager {
       return const <String, dynamic>{};
     }
     final res = await _channel
-        .invokeMethod(AndroidChannel.kCloudSendAdbWirelessDebugStatus);
+        .invokeMethod(AndroidChannel.kAShellAdbWirelessDebugStatus);
     return _asStringKeyMap(res);
   }
 
@@ -1854,7 +1854,7 @@ class AndroidAdbManager {
       return const <String, dynamic>{};
     }
     final res = await _channel.invokeMethod(
-      AndroidChannel.kCloudSendAdbWirelessDebugSet,
+      AndroidChannel.kAShellAdbWirelessDebugSet,
       {'enable': enable},
     );
     return _asStringKeyMap(res);
@@ -1865,7 +1865,7 @@ class AndroidAdbManager {
       return const <String, dynamic>{};
     }
     final res = await _channel
-        .invokeMethod(AndroidChannel.kCloudSendAdbWirelessDebugCancel);
+        .invokeMethod(AndroidChannel.kAShellAdbWirelessDebugCancel);
     return _asStringKeyMap(res);
   }
 
@@ -3006,7 +3006,7 @@ Future<void> onActiveWindowChanged() async {
     } catch (err) {
       debugPrintStack(label: "$err");
     } finally {
-      debugPrint("Start closing CloudSend...");
+      debugPrint("Start closing AShell...");
       await windowManager.setPreventClose(false);
       await windowManager.close();
       if (isMacOS) {
@@ -3184,7 +3184,7 @@ int versionCmp(String v1, String v2) {
 }
 
 String getWindowName({WindowType? overrideType}) {
-  final name = bind.mainGetAppNameSync();
+  final name = appName;
   switch (overrideType ?? kWindowType) {
     case WindowType.Main:
       return name;
@@ -3223,7 +3223,7 @@ Future<void> updateSystemWindowTheme() async {
 ///
 /// Note: not found a general solution for rust based AVFoundation bingding.
 /// [AVFoundation] crate has compile error.
-const kMacOSPermChannel = MethodChannel("com.cloudsend.app/macos");
+const kMacOSPermChannel = MethodChannel("me.ashell/macos");
 
 enum PermissionAuthorizeType {
   undetermined,
@@ -4224,7 +4224,7 @@ List<String> getPrinterNames() {
   }
   try {
     final List<dynamic> printerNamesList = jsonDecode(printerNamesJson);
-    final appPrinterName = '$appName Printer';
+    final appPrinterName = '${bind.mainGetAppNameSync()} Printer';
     return printerNamesList
         .map((e) => e.toString())
         .where((name) => name != appPrinterName)
@@ -4239,6 +4239,7 @@ String _appName = '';
 String get appName {
   if (_appName.isEmpty) {
     _appName = bind.mainGetAppNameSync();
+    if (_appName == 'AShell') _appName = 'A Shell You';
   }
   return _appName;
 }

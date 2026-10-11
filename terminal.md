@@ -1,4 +1,4 @@
-# CloudSend Terminal Service Implementation
+# AShell Terminal Service Implementation
 
 > [!IMPORTANT]
 > This file is a historical terminal design note. The current documentation audit classifies it as reference-only: verify terminal facts against `src/server/terminal_service.rs`, `src/server/connection.rs`, and `flutter/lib/models/terminal_model.dart` before using them as implementation truth.
@@ -9,7 +9,7 @@
 
 This historical note describes remote terminal/shell access with multiple concurrent terminal sessions per connection and a persistence-oriented design. Treat the persistence details below as design background unless the current source files confirm the behavior.
 
-Current source-truth note (verified 2026-05-18): this subsystem is inherited from the upstream RustDesk terminal implementation, but project documentation should refer to the current product/runtime as CloudSend unless explicitly discussing upstream history.
+Current source-truth note (verified 2026-05-18): this subsystem is inherited from the upstream RustDesk terminal implementation, but project documentation should refer to the current product/runtime as AShell unless explicitly discussing upstream history.
 
 ## Architecture
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "AShell Security Engineer"
+  short_description: "Threat-model and review AShell security boundaries"
+  default_prompt: "Use $ashell-security-engineer to perform this security review safely."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "AShell Android Engineer"
+  short_description: "Maintain AShell Android runtime and capture pipeline"
+  default_prompt: "Use $ashell-android-engineer to handle this Android runtime task."

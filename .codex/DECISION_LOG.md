@@ -1,6 +1,8 @@
-# CloudSend Decision Log
+# AShell Decision Log
 
-最后更新：2026-07-12
+> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
+
+最后更新：2026-10-12
 
 > 这里记录可由源码、Git 历史或用户明确指令证明的重大决定。历史条目属于 retrospective record，不表示原提交时存在正式 ADR。未来决定必须记录备选项、风险、批准人和验证结果。
 
@@ -21,15 +23,15 @@
 - 影响：保留大量 RustDesk 命名、兼容路径、平台代码和 AGPL/第三方义务。
 - Related ADR：ADR-0001（`retrospective`，不自动提升为 accepted）。
 
-## D-002：产品品牌与 Android 身份迁移为 CloudSend
+## D-002：产品品牌与 Android 身份迁移为 AShell
 
 - 日期：2026-05-05—2026-05-13；2026-07-12 回溯记录。
 - 状态：`accepted`。
-- 决定：runtime/crate 使用 `CloudSend`/`cloudsend`，Android 使用 `云计划` 与 `com.cloudsend.app`。
+- 决定：runtime/crate 使用 `AShell`/`ashell`，Android 使用 `云计划` 与 `me.ashell`。
 - 影响：SO/DLL/deep link/package/build artifact 必须全链一致；上游注释和依赖名称不做盲目替换。
 - Related ADR：ADR-0002。
 
-## D-003：CloudSend 控制端会话强制 Relay
+## D-003：AShell 控制端会话强制 Relay
 
 - 日期：2026-06；2026-07-12 回溯记录。
 - 状态：`accepted`。
@@ -83,7 +85,7 @@
 - 日期：当前源码；2026-07-12 记录。
 - 状态：`accepted`。
 - 决定：`src/virtual_display_manager.rs::IDD_IMPL` 选择 Amyuni。
-- 边界：RustDesk IDD 分支和 `cloudsend_virtual_displays` key 仍保留但不是 active implementation。
+- 边界：RustDesk IDD 分支和 `ashell_virtual_displays` key 仍保留但不是 active implementation。
 - Related ADR：ADR-0009。
 
 ## D-010：GitHub Workflows 仅手动触发
@@ -113,7 +115,7 @@
 - Verification：八个 Skill schema/metadata 静态验证；入口、规则和 registry 交叉引用检查。正式 build/runtime evidence 未执行。
 - Rollback：文档可按用户批准恢复旧版，但不得通过删除历史文档完成；权限红线不能由下游 Skill 放宽。
 - Approved by：项目用户/owner。
-- Related task/docs：`T-2026-07-12-002`、`docs/AI_ENGINEERING/CLOUDSEND_AI_ENGINEERING_STRENGTHENING_REPORT.md`。
+- Related task/docs：`T-2026-07-12-002`、`docs/AI_ENGINEERING/ASHELL_AI_ENGINEERING_STRENGTHENING_REPORT.md`。
 - Related ADR：ADR-0012。
 
 ## D-013：AI 工程体系最终封版与安全 Superpowers 子集
@@ -121,14 +123,14 @@
 - 日期：2026-07-12。
 - 状态：`accepted`，批准者：项目用户/owner。
 - Context：长期商业维护需要永久 ADR、可引用 baseline、统一 task/test evidence，以及不扩大权限的结构化推理能力。
-- Decision：建立 `docs/ADR/`、`docs/BASELINE/`、`TASK_TEMPLATE.md` 和 `TEST_MATRIX.md`；采用本地 `cloudsend-superpowers-safe` adapter，只允许 brainstorming、planning、debugging、verification、review。
+- Decision：建立 `docs/ADR/`、`docs/BASELINE/`、`TASK_TEMPLATE.md` 和 `TEST_MATRIX.md`；采用本地 `ashell-superpowers-safe` adapter，只允许 brainstorming、planning、debugging、verification、review。
 - Security boundary：不安装/执行外部 Superpowers；adapter 始终只读，不允许文件编辑、build/test、Git write、external/production access；commit、push、release hard-denied。
 - Consequences：未来开发必须记录 Baseline ID、相关 ADR 与 TEST_MATRIX case IDs；accepted ADR 不授权 C2/C3；未执行验证保持 NOT_RUN/verification-required。
 - Verification：V0 schema、metadata、link、fence、scope、sensitive-value 和 worktree checks；未执行项目 build/test。
 - Rollback：通过 superseding ADR 调整治理；现有 ADR/baseline/history 不删除。扩大能力前需 owner + security/release review。
 - Approved by：项目用户/owner。
 - Related ADR：ADR-0000、ADR-0013。
-- Related task/docs：`T-2026-07-12-003`、`docs/AI_ENGINEERING/CLOUDSEND_AI_ENGINEERING_FINAL_SEAL_REPORT.md`。
+- Related task/docs：`T-2026-07-12-003`、`docs/AI_ENGINEERING/ASHELL_AI_ENGINEERING_FINAL_SEAL_REPORT.md`。
 
 ## D-014：建立 Repository-Owned Global Session Memory
 
@@ -145,7 +147,26 @@
 - Related ADR：ADR-0011、ADR-0012、ADR-0013；本次扩展既有 AI truth/task governance，不新增产品架构 ADR。
 - Related Task：`T-2026-07-12-004`。
 
-## 新决定模板
+## D-015：迁移AShell产品身份并保留Flutter内部包名
+
+- 日期：2026-10-12；状态：accepted；Approved by：当前用户明确请求及后续选项回复。
+- Context：原产品身份需迁为A Shell You，仓库目录名不是运行产品身份。
+- Decision：内部AShell/ashell；Android me.ashell，后台A Shell You、launcher一个壳子；PC A Shell You；跨层加载/打包/状态事件同步。Flutter内部package明确保留flutter_hbb，撤回其改名及关联导入。
+- Compatibility：公共服务分类机制及上游/历史证据保留；用户追加授权移除旧前缀回退并改ZEGO字段ashellSessionId，客户端/内嵌服务源码同步，构建机和实际服务未操作。Android包与本地配置身份独立，不迁旧数据/权限；后续匹配名和文档统一见D-016。
+- Verification：V0静态名称/路径/锁文件/生成声明核对；V1—V5 NOT_RUN，无编译成功保证。
+- Consequences：正式环境须验证新包/库/快捷方式/服务与外部资产；Apple/Google注册及签名不能由字符串替换代办。
+- Related：ADR-0014 supersedes ADR-0002；T-2026-10-12-002；CE-20261012-T002-01；迁移报告和观察基线。
+- Rollback：未来明确授权后按源HEAD审阅恢复；本轮未回退Git、未操作已安装产品。
+
+## D-016：完成所有文档与分类匹配的品牌名称统一
+
+- 日期：2026-10-12；状态：accepted；批准者：当前用户明确指出剩余两处源码并要求文档字段全部换名。
+- Decision：src/common.rs::is_public与src/hbbs_http/sync.rs::heartbeat_url使用ashell.匹配；全部文档中的品牌术语/代码示例/字段/路径统一，四份旧品牌文档更名，引用同步。Flutter内部package保留flutter_hbb。
+- History：用户本轮明确授权覆盖旧文档品牌措辞；历史文本加入规范化说明，原文/真实源仓地址保留在Git a036f31；不伪造ashell源仓链接，不改提交hash、日期、验证结论或Git对象。
+- Verification：V0全工作区文本/文件路径大小写不敏感扫描，排除.git；本地文档链接、两处谓词、Flutter包名/import及diff检查；未build/test/analyze/codegen/部署。
+- Related：ADR-0014补充；T-2026-10-12-003 / CE-20261012-T003-01。该决定不授权外部域名配置或服务操作。
+
+### 下一决定模板
 
 ```text
 ## D-NNN：标题

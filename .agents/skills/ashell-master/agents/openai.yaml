@@ -1,0 +1,4 @@
+interface:
+  display_name: "AShell Master Engineer"
+  short_description: "Coordinate safe cross-domain AShell engineering"
+  default_prompt: "Use $ashell-master to scope and coordinate this AShell task."

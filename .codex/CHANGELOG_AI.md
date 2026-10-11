@@ -1,8 +1,8 @@
-# CloudSend AI Changelog
+# AShell AI Changelog
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-12T04:53:24+09:00
+Last Updated：2026-10-12T05:39:32+09:00
 
 Mode：`append-only task-level index`
 
@@ -72,7 +72,28 @@ Mode：`append-only task-level index`
 - Next Gate：本任务关闭；新请求重查 HEAD/status 并从 T0 开始，不继承权限。
 - Detailed Record：`TASK_HISTORY.md` 的同 Task ID；完整修改清单见同 Event。
 
-## Update Rules
+## T-2026-10-12-002：AShell产品身份迁移
+
+- Record Type：contemporaneous；Status：completed — source/V0 only。
+- Authority：当前用户明确要求改产品身份/包名/文件/构建引用；后续明确保留flutter_hbb及其导入；禁止执行编译等命令。
+- Source：test / a036f31f80baeb6cd68bcf169f9e9fa8db39fe76；initial clean；当前变更未提交。
+- Outcome：AShell/ashell、me.ashell、后台/PC A Shell You、launcher一个壳子；跨层native加载和打包消费端、状态事件、当前文档/Skills同步。Flutter内部package不改。
+- Decision/Baseline/Events：D-015 / ADR-0014；AS-BL-2026-10-12-a036f31-worktree；CE-20261012-T002-01、CE-20261012-T002-02。
+- Verification：30项静态断言及引用/范围复核；V1—V5 NOT_RUN，无编译/运行成功结论。
+- Residual：公共服务guard和来源记录保留；按追加授权只用ASHELL_*变量与ashellSessionId字段，实际构建机/服务待同步。新包不继承旧数据和权限；native资产、ZEGO lock、签名及Apple/Google注册待验证。
+- Detail：TASK_HISTORY同ID；docs/tasks/T-2026-10-12-002-ashell-identity.md；迁移报告含编译验证需求。
+- Next Gate：新用户任务从T0重新核对；没有standing build/Git/release权限。
+
+## T-2026-10-12-003：统一全部品牌残留与文档字段
+
+- Status：completed — source/V0；用户明确要求补齐截图两处匹配和所有文档字段/文件名。
+- Source：test/a036f31；保留T002未提交变更。新增两处ashell.匹配；41份初始含旧词文档统一品牌，四份文档改名/引用同步；历史文本加规范化说明，原文/真实源仓地址留在Git。
+- Boundary：Flutter内部flutter_hbb保留；不改上游RustDesk技术名，不编造新源仓URL，不操作远端/部署。
+- Verification：排除.git后全文/路径零旧词命中，本地链接/两处谓词/Flutter包名和diff检查通过；未build/test/analyze/codegen。
+- Decision/Event/State：D-016补充ADR-0014；CE-20261012-T003-01；STATE-20261012-004 / WORK-20261012-006。
+- Detail：docs/tasks/T-2026-10-12-003-brand-normalization.md；迁移报告；TASK_HISTORY同ID。
+
+### 后续索引更新规则
 
 - 每个 completed、blocked 或 cancelled AI task 追加一条；长任务仅在正式 handoff milestone 时追加。
 - 只保存 scope、outcome、state delta、event IDs、verification、decision/ADR、residual risk 和 next gate 的摘要。

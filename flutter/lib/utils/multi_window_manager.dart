@@ -52,10 +52,10 @@ class MultiWindowCallResult {
 /// Window Manager
 /// mainly use it in `Main Window`
 /// use it in sub window is not recommended
-class CloudSendMultiWindowManager {
-  CloudSendMultiWindowManager._();
+class AShellMultiWindowManager {
+  AShellMultiWindowManager._();
 
-  static final instance = CloudSendMultiWindowManager._();
+  static final instance = AShellMultiWindowManager._();
 
   final Set<int> _inactiveWindows = {};
   final Set<int> _activeWindows = {};
@@ -560,4 +560,4 @@ class CloudSendMultiWindowManager {
   }
 }
 
-final rustDeskWinManager = CloudSendMultiWindowManager.instance;
+final rustDeskWinManager = AShellMultiWindowManager.instance;

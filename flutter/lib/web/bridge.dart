@@ -812,7 +812,7 @@ class RustdeskImpl {
   }
 
   String mainGetAppNameSync({dynamic hint}) {
-    return 'AppName';
+    return 'AShell';
   }
 
   String mainUriPrefixSync({dynamic hint}) {

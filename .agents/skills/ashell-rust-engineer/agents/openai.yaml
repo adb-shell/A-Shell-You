@@ -1,0 +1,4 @@
+interface:
+  display_name: "AShell Rust Engineer"
+  short_description: "Maintain AShell Rust core, FFI, and unsafe code"
+  default_prompt: "Use $ashell-rust-engineer to analyze this Rust or FFI task."

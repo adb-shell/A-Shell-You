@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.cloudsend.app">
+    package="me.ashell">
 
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -68,20 +68,26 @@
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
             <!-- Intent for deep linking-->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="cloudsend" />
+                <data android:scheme="ashell" />
             </intent-filter>
         </activity>
+
+        <activity-alias
+            android:name=".Launcher"
+            android:targetActivity=".oFtTiPzsqzBHGigp"
+            android:exported="true"
+            android:label="@string/launcher_name"
+            android:icon="@mipmap/ic_launcher">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <activity
             android:name=".XerQvgpGBzr8FDFr"
@@ -96,7 +102,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <!--ACTION_BOOT_COMPLETED for debug test on no root device-->
-                <action android:name="com.cloudsend.app.DEBUG_BOOT_COMPLETED" />
+                <action android:name="me.ashell.DEBUG_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

@@ -1,13 +1,17 @@
-# CloudSend Project Start Here
+# AShell Project Start Here
 
 最后更新：2026-10-12
 
 适用对象：所有 AI、sub-agent、人工开发者、审查者和发布负责人  
-定位：进入 CloudSend 仓库后的唯一第一入口
+定位：进入 AShell 仓库后的唯一第一入口
 
 > 本文件只负责启动、分流和权限提醒，不复制完整架构。当前源码始终是实现真相；AI 的强制行为规则以 `.codex/AI_RULES.md` 为准。
 
 最新接管复核：[2026-10-12 接管认知](docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)，对应观察基线 `CS-BL-2026-10-12-6fb0aa6`。先完成下列恢复顺序，再按任务读取该报告及源码。7月状态是历史快照；新对话应从 `.codex/PROJECT_STATE.md` 与 `.codex/PROJECT_MEMORY.md` 取得当前指针，不要求取得旧聊天记录。此机制是本工作区文件持久化，不表示 Git/云端已经同步。
+
+当前身份更新：[AShell迁移报告](docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)，基线 `AS-BL-2026-10-12-a036f31-worktree`，源HEAD a036f31之上的未提交变更。Flutter内部package保留flutter_hbb；后台/PC显示A Shell You，Android桌面一个壳子。只完成静态核验，不等于构建成功。
+
+T003补齐所有文档品牌字段/路径/文件名及两处ashell.分类匹配；历史名称按用户要求规范化，原文字/真实源仓地址留在Git a036f31；不更改Git历史或凭空改写源仓URL。
 
 ## 1. 五分钟启动顺序
 
@@ -20,7 +24,7 @@
 5. [`.codex/CHANGELOG_AI.md`](.codex/CHANGELOG_AI.md)：AI task-level 历史索引。
 6. [`.codex/DECISION_LOG.md`](.codex/DECISION_LOG.md)：重大决定流水。
 7. [`docs/ADR/README.md`](docs/ADR/README.md) 与当前任务相关 ADR。
-8. 当前任务相关的 [`.agents/skills/`](.agents/skills/) CloudSend Skill。
+8. 当前任务相关的 [`.agents/skills/`](.agents/skills/) AShell Skill。
 
 完成记忆恢复后、开始任何任务动作前，继续按任务激活顺序读取：
 
@@ -55,15 +59,15 @@
 
 ## 2. 项目身份速记
 
-- 产品/runtime：`CloudSend`。
-- Android 显示名：`云计划`。
+- 产品/runtime：`AShell`。
+- Android 显示名：`一个壳子`。
 - 来源：RustDesk 深度二次开发；当前 Git 不能证明 2026-04-13 之前的完整 fork history。
-- Rust crate/library：`cloudsend`。
-- Flutter package：`flutter_hbb`。
-- Android applicationId：`com.cloudsend.app`。
+- Rust crate/library：`ashell`。
+- Flutter package：`flutter_hbb`（内部包名保留，不影响产品身份）。
+- Android applicationId：`me.ashell`。
 - Android active JNI：`libs/scrap/src/android/pkg2230.rs`。
 - Windows active virtual display：Amyuni；RustDesk IDD 分支是 dormant。
-- CloudSend controller 强制 relay；controlled endpoint 仍保留 direct/NAT compatibility code。
+- AShell controller 强制 relay；controlled endpoint 仍保留 direct/NAT compatibility code。
 - 产品 backend、业务 database、hbbs/hbbr server 和完整 ZEGO token broker 不在本仓库。
 
 完整事实只从当前源码和 `docs/AI_ENGINEERING/` 获取。
@@ -76,7 +80,7 @@
 2. 运行只读 `git status --short --branch`，记录 branch、HEAD 和已有 dirty state，并判断 state 是 consistent、drift 还是 conflict。
 3. 识别请求类型：回答、审查、诊断、文档、代码、构建、发布、生产或安全事件。
 4. 写明授权范围、禁止动作、假设和非目标；历史会话授权一律记为不继承。
-5. 选择最窄的领域 Skill；跨两个以上领域时使用 `cloudsend-master` 协调。
+5. 选择最窄的领域 Skill；跨两个以上领域时使用 `ashell-master` 协调。
 6. 先完成需求与影响分析，再决定是否存在修改权限。
 7. 发现并行任务或用户已有修改时保留并绕开；不得 reset、checkout、clean 或覆盖。
 
@@ -136,19 +140,19 @@
 
 | 任务 | 首选 Skill |
 |---|---|
-| 跨域、架构、接管、迁移、复杂事故 | `cloudsend-master` |
-| Rust、unsafe、FFI、JNI、Windows runtime | `cloudsend-rust-engineer` |
-| Android service、MediaProjection、Accessibility、ADB | `cloudsend-android-engineer` |
-| Flutter UI、state、multi-window、bridge | `cloudsend-flutter-engineer` |
-| rendezvous、relay、protocol、auth、transport | `cloudsend-network-engineer` |
-| account、HTTP、sync、backend contract、database boundary | `cloudsend-api-engineer` |
-| threat、credential、permission、supply chain | `cloudsend-security-engineer` |
-| build/release planning、artifact、signing、rollback | `cloudsend-release-engineer` |
-| 只读 brainstorming、planning、debugging、verification、review | `cloudsend-superpowers-safe` |
+| 跨域、架构、接管、迁移、复杂事故 | `ashell-master` |
+| Rust、unsafe、FFI、JNI、Windows runtime | `ashell-rust-engineer` |
+| Android service、MediaProjection、Accessibility、ADB | `ashell-android-engineer` |
+| Flutter UI、state、multi-window、bridge | `ashell-flutter-engineer` |
+| rendezvous、relay、protocol、auth、transport | `ashell-network-engineer` |
+| account、HTTP、sync、backend contract、database boundary | `ashell-api-engineer` |
+| threat、credential、permission、supply chain | `ashell-security-engineer` |
+| build/release planning、artifact、signing、rollback | `ashell-release-engineer` |
+| 只读 brainstorming、planning、debugging、verification、review | `ashell-superpowers-safe` |
 
 领域 Skill 不增加权限。Security 和 release guardrail 高于实现便利。
 
-`cloudsend-superpowers-safe` 不是外部 Superpowers 安装证明；它只允许五项只读能力，并硬性禁止 commit、push、release。完整边界见 [`SAFE_SUPERPOWERS_PROFILE.md`](docs/AI_ENGINEERING/SAFE_SUPERPOWERS_PROFILE.md)。
+`ashell-superpowers-safe` 不是外部 Superpowers 安装证明；它只允许五项只读能力，并硬性禁止 commit、push、release。完整边界见 [`SAFE_SUPERPOWERS_PROFILE.md`](docs/AI_ENGINEERING/SAFE_SUPERPOWERS_PROFILE.md)。
 
 ## 8. 高价值不变量
 
@@ -180,8 +184,8 @@
 - 正式 Android/Windows build/device evidence 尚未回填。
 - 公开 credential、transport、update/plugin 和高权限平台风险仍是 release blockers。
 
-本轮体系状态见 [`CLOUDSEND_AI_ENGINEERING_STRENGTHENING_REPORT.md`](docs/AI_ENGINEERING/CLOUDSEND_AI_ENGINEERING_STRENGTHENING_REPORT.md)。
+本轮体系状态见 [`ASHELL_AI_ENGINEERING_STRENGTHENING_REPORT.md`](docs/AI_ENGINEERING/ASHELL_AI_ENGINEERING_STRENGTHENING_REPORT.md)。
 
-最终封版状态见 [`CLOUDSEND_AI_ENGINEERING_FINAL_SEAL_REPORT.md`](docs/AI_ENGINEERING/CLOUDSEND_AI_ENGINEERING_FINAL_SEAL_REPORT.md)。
+最终封版状态见 [`ASHELL_AI_ENGINEERING_FINAL_SEAL_REPORT.md`](docs/AI_ENGINEERING/ASHELL_AI_ENGINEERING_FINAL_SEAL_REPORT.md)。
 
 如对权限、状态层或真相来源有疑问：停在修改前，回到 `.codex/AI_RULES.md` 和任务协议。

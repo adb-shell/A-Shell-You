@@ -1,10 +1,10 @@
-# CloudSend 模块设计 / Module Design
+# AShell 模块设计 / Module Design
 
 基线：2026-07-12，`HEAD 77062b4`
 
 ## 1. 启动与进程模型
 
-`src/main.rs` 按 target/feature 分流；desktop 非 Flutter 走 `core_main()` + Sciter，Flutter 构建主要加载 `cloudsend` library。`src/core_main.rs` 继续处理 install、tray、server、CM、elevation、quick support 和 portable 参数。`flutter/lib/main.dart` 再按 window argument 启动 main/remote/file/terminal/port-forward/install/mobile。
+`src/main.rs` 按 target/feature 分流；desktop 非 Flutter 走 `core_main()` + Sciter，Flutter 构建主要加载 `ashell` library。`src/core_main.rs` 继续处理 install、tray、server、CM、elevation、quick support 和 portable 参数。`flutter/lib/main.dart` 再按 window argument 启动 main/remote/file/terminal/port-forward/install/mobile。
 
 设计含义：一次“启动问题”可能跨 Rust process args、native runner、Flutter engine 和 multi-window。不能只看 `main.dart`。
 
@@ -46,7 +46,7 @@ display_service/video_service
 
 Controller 由 `input_model.dart`、`flutter_ffi.rs`、`client::send_mouse` 编码；endpoint 在 `Connection::on_message()` 分发到 `input_service`；desktop 通过 enigo/portable service，Android 通过 JNI → Accessibility。
 
-CloudSend 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、browser、analysis、back、share、touch-block、Dev selector。它们是协议命令，不是纯 UI 操作。
+AShell 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、browser、analysis、back、share、touch-block、Dev selector。它们是协议命令，不是纯 UI 操作。
 
 安全边界：UI 密码/按钮可见性不是协议授权；endpoint 必须独立检查 session permission。当前部分 Mouse/Touch/Key 和自定义 mask 未形成完整 server-side gate，列为 P0/P1。
 
@@ -82,7 +82,7 @@ CloudSend 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、
 adb_page.dart
 → MethodChannel('mChannel')
 → oFtTiPzsqzBHGigp handlers
-→ CloudSendAdbManager
+→ AShellAdbManager
 → Runner / DNS discover / Accessibility automation
 → local libadb.so process
 ```

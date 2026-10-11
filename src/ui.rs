@@ -42,7 +42,7 @@ pub fn start(args: &mut [String]) {
     #[cfg(all(target_os = "linux", feature = "inline"))]
     {
         let app_dir = std::env::var("APPDIR").unwrap_or("".to_string());
-        let mut so_path = "/usr/share/rustdesk/libsciter-gtk.so".to_owned();
+        let mut so_path = "/usr/share/ashell/libsciter-gtk.so".to_owned();
         for (prefix, dir) in [
             ("", "/usr"),
             ("", "/app"),
@@ -51,7 +51,7 @@ pub fn start(args: &mut [String]) {
         ]
         .iter()
         {
-            let path = format!("{prefix}{dir}/share/rustdesk/libsciter-gtk.so");
+            let path = format!("{prefix}{dir}/share/ashell/libsciter-gtk.so");
             if std::path::Path::new(&path).exists() {
                 so_path = path;
                 break;
@@ -84,7 +84,7 @@ pub fn start(args: &mut [String]) {
     let mut frame = sciter::WindowBuilder::main_window().create();
     #[cfg(windows)]
     allow_err!(sciter::set_options(sciter::RuntimeOptions::UxTheming(true)));
-    frame.set_title(&crate::get_app_name());
+    frame.set_title(&crate::common::get_display_app_name());
     #[cfg(target_os = "macos")]
     crate::platform::delegate::make_menubar(frame.get_host(), args.is_empty());
     #[cfg(windows)]

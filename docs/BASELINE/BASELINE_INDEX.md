@@ -1,6 +1,8 @@
-# CloudSend Engineering Baseline Index
+# AShell Engineering Baseline Index
 
-最新 repository-observed 快照：[`CS-BL-2026-10-12-6fb0aa6`](05_OBSERVED_BASELINE_2026-10-12.md)，V0，正式 build/runtime 未验证。以下 `CS-BL-2026-07-12-77062b4` 及01—04文件保留为原冻结快照，不自动描述当前检出。
+> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
+
+最新 repository-observed 快照：[`AS-BL-2026-10-12-a036f31-worktree`](06_ASHELL_IDENTITY_BASELINE_2026-10-12.md)，未提交的产品身份迁移，V0，build/runtime未验证。之前的 [`CS-BL-2026-10-12-6fb0aa6`](05_OBSERVED_BASELINE_2026-10-12.md) 与下列 `CS-BL-2026-07-12-77062b4` / 01—04文件保留历史冻结含义。
 
 基线日期：2026-07-12  
 Baseline ID：`CS-BL-2026-07-12-77062b4`  
@@ -14,7 +16,7 @@ Source HEAD：`77062b4d8b63eae9a31afe288e3ac00a4f89e009`
 | 文件 | 记录内容 |
 |---|---|
 | `01_UPSTREAM_BASELINE.md` | RustDesk/DaXianDesk 来源证据、历史缺口和接管要求 |
-| `02_VERSION_MATRIX.md` | CloudSend 产品、平台、协议/bridge 与 artifact 版本矩阵 |
+| `02_VERSION_MATRIX.md` | AShell 产品、平台、协议/bridge 与 artifact 版本矩阵 |
 | `03_DEPENDENCY_BASELINE.md` | Cargo、Flutter、Gradle、protobuf、vcpkg 等锁定状态 |
 | `04_BUILD_ENVIRONMENT.md` | Android/Windows 正式构建环境、入口、外部资产和验证门 |
 

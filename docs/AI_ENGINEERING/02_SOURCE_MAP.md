@@ -1,4 +1,4 @@
-# CloudSend 源码地图 / Source Map
+# AShell 源码地图 / Source Map
 
 基线：2026-07-12，`HEAD 77062b4`
 
@@ -30,14 +30,14 @@
 
 | Crate | 关键目录 | 职责 |
 |---|---|---|
-| `cloudsend` | `src/` | controller、endpoint、FFI、平台与产品集成 |
+| `ashell` | `src/` | controller、endpoint、FFI、平台与产品集成 |
 | `hbb_common` | `libs/hbb_common/` | protobuf、config、crypto、socket、fs |
 | `scrap` | `libs/scrap/` | capture、codec、Android raw/JNI |
 | `enigo` | `libs/enigo/` | desktop input injection |
 | `clipboard` | `libs/clipboard/` | clipboard/CLIPRDR/file clipboard |
 | `virtual_display` | `libs/virtual_display/` | RustDesk IDD wrapper |
 | `dylib_virtual_display` | `libs/virtual_display/dylib/` | virtual display DLL ABI |
-| `cloudsend-portable-packer` | `libs/portable/` | Windows self-extracting package |
+| `ashell-portable-packer` | `libs/portable/` | Windows self-extracting package |
 | `remote_printer` | `libs/remote_printer/` | Windows printer/driver integration |
 
 `workspace.exclude` 指向的 `vdi/host`、`examples/custom_plugin` 当前不存在，是 manifest 历史残留。
@@ -134,10 +134,10 @@
 
 ### ADB module
 
-- `adb/CloudSendAdbManager.kt`：facade/state。
-- `CloudSendAdbRunner.kt`：`libadb.so` process、pair/connect/shell。
-- `CloudSendAdbDnsDiscover.kt`：NSD discovery/fallback。
-- `CloudSendAdbState.kt`：snapshot。
+- `adb/AShellAdbManager.kt`：facade/state。
+- `AShellAdbRunner.kt`：`libadb.so` process、pair/connect/shell。
+- `AShellAdbDnsDiscover.kt`：NSD discovery/fallback。
+- `AShellAdbState.kt`：snapshot。
 - `flutter/lib/mobile/pages/adb_page.dart`：UI。
 - `jniLibs/*/libadb.so`：LOCAL-ONLY ignored binary，干净 clone 缺失。
 
@@ -155,7 +155,7 @@
 - privacy：`src/privacy_mode.rs`, `src/privacy_mode/win_*`。
 - virtual display：`src/virtual_display_manager.rs`；当前 Amyuni。
 - driver/package：`res/vcpkg/`, `res/msi/`, external `usbmmidd_v2`, printer driver。
-- runner/library：`flutter/windows/runner/`, `cloudsend.dll`。
+- runner/library：`flutter/windows/runner/`, `ashell.dll`。
 
 ## 8. Protocol 与 API 地图
 

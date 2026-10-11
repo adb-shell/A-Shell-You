@@ -1,9 +1,9 @@
-# CloudSend 安全模型 / Security Model
+# AShell 安全模型 / Security Model
 
 接管基线：2026-07-12  
 状态：`verified` + `inferred` + `external` + `verification-required`
 
-> 本文是源码与公开仓库资产的静态安全接管，不是渗透测试。未测试任何 credential，有关值均不复述。当前结论足以判定：在 P0 人工处置和正式验证完成前，CloudSend 不应进入新的正式发布。
+> 本文是源码与公开仓库资产的静态安全接管，不是渗透测试。未测试任何 credential，有关值均不复述。当前结论足以判定：在 P0 人工处置和正式验证完成前，AShell 不应进入新的正式发布。
 
 ## 1. 总体判断
 
@@ -44,7 +44,7 @@
 ### 完整性与可用性
 
 - rendezvous/API/relay/key 配置。
-- CloudSend executable、SO/DLL、APK、driver、plugin、update。
+- AShell executable、SO/DLL、APK、driver、plugin、update。
 - Android core service/screen-share state。
 - Windows privacy/display recovery。
 - hbbs/hbbr/API/ZEGO external services。
@@ -66,7 +66,7 @@
 
 ## 4. 身份与授权模型
 
-CloudSend 至少存在六个身份域：
+AShell 至少存在六个身份域：
 
 1. Flutter 产品账号。
 2. Rust OIDC/account。
@@ -140,7 +140,7 @@ CloudSend 至少存在六个身份域：
 
 ### Deep link — Critical / E1
 
-Manifest 注册的 `cloudsend` custom scheme 缺少 host/path 限制。Flutter config URI path 可无确认导入并绕过 server validation，改写 rendezvous、relay、API 与信任 key；其他 URI 还可携带 connection password 并触发 remote/file/tunnel/terminal path，且完整 URI 可能进入日志。
+Manifest 注册的 `ashell` custom scheme 缺少 host/path 限制。Flutter config URI path 可无确认导入并绕过 server validation，改写 rendezvous、relay、API 与信任 key；其他 URI 还可携带 connection password 并触发 remote/file/tunnel/terminal path，且完整 URI 可能进入日志。
 
 要求：
 
@@ -224,7 +224,7 @@ Plugin ZIP 解压使用 archive-provided name 拼接 target path，未见 `enclo
 
 发布 gate：
 
-- CloudSend-only workflow，默认 `contents: read`。
+- AShell-only workflow，默认 `contents: read`。
 - third-party Actions 固定 full commit SHA。
 - untrusted PR、build、sign、publish job 隔离。
 - GitHub Environment 人工审批和受保护 signing secret。
@@ -256,7 +256,7 @@ Severity reflects static path and impact; except SEC-001, exploit success was no
 
 ## 12. Positive Controls
 
-- CloudSend controller does enforce relay-only and rejects explicit direct entry.
+- AShell controller does enforce relay-only and rejects explicit direct entry.
 - Endpoint still retains password/click/2FA/trusted-device authentication code.
 - HTTP client did not show an explicit disable-TLS-verification option.
 - Android AccessibilityService is not exported; MediaProjection permission remains system-mediated.
@@ -302,6 +302,6 @@ Formal isolated verification must cover:
 - ZEGO broker 缺独立、可审计工程。
 - upstream RustDesk fork point 未记录，影响 CVE/diff/license traceability。
 - AGPL-3.0 distribution、Corresponding Source、network-use 和 third-party notices 需专业法律意见；本文不是法律建议。
-- CloudSend 自有 security contact、incident SLA、disclosure policy、SBOM/NOTICE 尚未建立。
+- AShell 自有 security contact、incident SLA、disclosure policy、SBOM/NOTICE 尚未建立。
 
 这些资产补齐前，安全接管只能覆盖本仓库端点源码，不能宣称全系统安全闭环。

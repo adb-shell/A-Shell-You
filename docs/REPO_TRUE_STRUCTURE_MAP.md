@@ -1,5 +1,7 @@
 > [!IMPORTANT]
-> Current source-truth overlay (verified 2026-06-03): current project identity is CloudSend runtime + Android visible label `云计划`; Android package is `com.cloudsend.app`; Android SO is `libcloudsend.so`; Windows DLL is `cloudsend.dll`; current version is `5.2.1`; current Windows build script is `new-build.cmd` with output directory `PC-Bulid`.
+
+> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
+> Current source-truth overlay (verified 2026-06-03): current project identity is AShell runtime + Android visible label `云计划`; Android package is `me.ashell`; Android SO is `libashell.so`; Windows DLL is `ashell.dll`; current version is `5.2.1`; current Windows build script is `new-build.cmd` with output directory `PC-Bulid`.
 >
 > Documentation classification and handoff guidance were refreshed on 2026-06-03. For canonical current facts, prefer `docs/ENGINEERING_INDEX.md`, `docs/ENGINEERING_BASELINE.md`, `docs/ENGINEERING_ANDROID_RUNTIME.md`, `docs/TASK_ENTRYPOINTS.md`, and `docs/DOCUMENT_AUDIT.md`.
 
@@ -329,8 +331,8 @@ Android 重点：
 - `flutter/android/app/build.gradle`
 - `flutter/android/app/src/main/AndroidManifest.xml`
 - `flutter/android/app/src/main/jniLibs/`
-- `flutter/android/app/src/main/kotlin/com/cloudsend/app/`
-- `flutter/android/app/src/main/kotlin/com/cloudsend/app/adb/`
+- `flutter/android/app/src/main/kotlin/me/ashell/`
+- `flutter/android/app/src/main/kotlin/me/ashell/adb/`
 
 Kotlin / Java 文件：
 
@@ -352,10 +354,10 @@ Kotlin / Java 文件：
 
 ADB/LADB files:
 
-- `adb/CloudSendAdbState.kt`
-- `adb/CloudSendAdbRunner.kt`
-- `adb/CloudSendAdbManager.kt`
-- `adb/CloudSendAdbDnsDiscover.kt`
+- `adb/AShellAdbState.kt`
+- `adb/AShellAdbRunner.kt`
+- `adb/AShellAdbManager.kt`
+- `adb/AShellAdbDnsDiscover.kt`
 - `flutter/android/app/src/main/jniLibs/<abi>/libadb.so`
 - `flutter/android/app/src/main/jniLibs/LIBADB_LICENSE`
 
@@ -483,9 +485,9 @@ Boundary:
 flutter/lib/mobile/pages/adb_page.dart
 → flutter/lib/common.dart::AndroidAdbManager
 → MethodChannel('mChannel')
-→ oFtTiPzsqzBHGigp.kt cloudsend_adb_* handlers
-→ CloudSendAdbManager.kt
-→ CloudSendAdbRunner.kt / CloudSendAdbDnsDiscover.kt
+→ oFtTiPzsqzBHGigp.kt ashell_adb_* handlers
+→ AShellAdbManager.kt
+→ AShellAdbRunner.kt / AShellAdbDnsDiscover.kt
 → packaged libadb.so
 ```
 
@@ -494,8 +496,8 @@ Wireless-debugging automation branch:
 ```text
 adb_page.dart
 → AndroidAdbManager.wirelessDebugStatus/set/cancel
-→ cloudsend_adb_wireless_debug_*
-→ CloudSendAdbManager.kt
+→ ashell_adb_wireless_debug_*
+→ AShellAdbManager.kt
 → nZW99cdXQ0COhB2o.wirelessDebugAutomation*
 ```
 
@@ -526,19 +528,19 @@ Android:
 
 ```text
 build.sh
-→ Rust target/<triple>/release/libcloudsend.so
-→ flutter/android/app/src/main/jniLibs/<abi>/libcloudsend.so
-→ Kotlin System.loadLibrary("cloudsend")
-→ Dart DynamicLibrary.open('libcloudsend.so')
+→ Rust target/<triple>/release/libashell.so
+→ flutter/android/app/src/main/jniLibs/<abi>/libashell.so
+→ Kotlin System.loadLibrary("ashell")
+→ Dart DynamicLibrary.open('libashell.so')
 ```
 
 Windows:
 
 ```text
 new-build.cmd
-→ Rust/Flutter output cloudsend.dll
+→ Rust/Flutter output ashell.dll
 → flutter/windows/CMakeLists.txt install/copy
-→ flutter/lib/models/native_model.dart DynamicLibrary.open('cloudsend.dll')
+→ flutter/lib/models/native_model.dart DynamicLibrary.open('ashell.dll')
 → portable/self-extract output under PC-Bulid
 ```
 
@@ -554,7 +556,7 @@ new-build.cmd
 - Android Kotlin 主服务：`DFm8Y8iMScvB2YDw.kt` / `nZW99cdXQ0COhB2o.kt`
 - 账号 / 下载 / 上传：`src/hbbs_http/`
 - ZEGO voice-call Flutter model/UI plus Rust control shell：`flutter/lib/models/zego_voice_call_model.dart`, `src/client/io_loop.rs`, `src/server/connection.rs`
-- Android local ADB/LADB module：`flutter/android/app/src/main/kotlin/com/cloudsend/app/adb/`, `flutter/lib/mobile/pages/adb_page.dart`
+- Android local ADB/LADB module：`flutter/android/app/src/main/kotlin/me/ashell/adb/`, `flutter/lib/mobile/pages/adb_page.dart`
 
 ### 兼容 / 历史路径
 

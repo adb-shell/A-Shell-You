@@ -1,0 +1,4 @@
+interface:
+  display_name: "AShell Release Engineer"
+  short_description: "Plan reproducible AShell builds and guarded releases"
+  default_prompt: "Use $ashell-release-engineer to prepare this build or release plan."

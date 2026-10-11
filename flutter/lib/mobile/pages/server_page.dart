@@ -1211,7 +1211,7 @@ class _EnhancementsSectionState extends State<EnhancementsSection> {
             SwitchListTile(
               visualDensity: VisualDensity.compact,
               contentPadding: EdgeInsets.all(0),
-              title: Text(translate('Keep CloudSend background service')),
+              title: Text(translate('Keep A Shell You background service')),
               subtitle: Text('* ${translate('Ignore Battery Optimizations')}'),
               value: _ignoreBatteryOpt,
               onChanged: (value) async {

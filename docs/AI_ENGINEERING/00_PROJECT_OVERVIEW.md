@@ -1,8 +1,8 @@
-# CloudSend 项目总览 / Project Overview
+# AShell 项目总览 / Project Overview
 
 接管基线：2026-07-12  
 源码基线：`HEAD 77062b4`  
-接管角色：CloudSend Principal Engineer
+接管角色：AShell Principal Engineer
 
 2026-10-12 后续复核：[接管认知与证据](TAKEOVER_REVIEW_2026-10-12.md)、[新观察基线](../BASELINE/05_OBSERVED_BASELINE_2026-10-12.md)。本页7月基线保留；当前本地Git状态、历史源内容映射、ADB资产缺失、terminal生命周期及安全结论的证据边界以新复核和当前源码核对，不将旧环境描述冒充当前事实。
 
@@ -10,27 +10,27 @@
 
 ## 1. 项目身份
 
-CloudSend 是 RustDesk 的深度二次开发产品，Android 可见名称为 `云计划`。当前身份锚点：
+AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一个壳子`。当前身份锚点：
 
 | 项目 | 当前值 | 源码锚点 |
 |---|---|---|
-| Rust package/library | `cloudsend` / `cloudsend` | `Cargo.toml` |
+| Rust package/library | `ashell` / `ashell` | `Cargo.toml` |
 | Rust version | `5.2.1` | `Cargo.toml` |
-| Flutter package/version | `flutter_hbb` / `5.2.1+59` | `flutter/pubspec.yaml` |
-| Runtime app name | `CloudSend` | `libs/hbb_common/src/config.rs::APP_NAME` |
-| Android package | `com.cloudsend.app` | `flutter/android/app/build.gradle` |
-| Android label | `云计划` | `flutter/android/app/src/main/res/values/strings.xml` |
-| Android scheme | `cloudsend` | `flutter/android/app/src/main/AndroidManifest.xml` |
-| Android native library | `libcloudsend.so` | `build.sh`, `pkg2230.kt`, `native_model.dart` |
-| Windows native library | `cloudsend.dll` | `flutter/windows/CMakeLists.txt`, `native_model.dart` |
+| Flutter package/version | `flutter_hbb` / `5.2.1+59`；内部包名保留 | `flutter/pubspec.yaml` |
+| Runtime app name | `AShell` | `libs/hbb_common/src/config.rs::APP_NAME` |
+| Android package | `me.ashell` | `flutter/android/app/build.gradle` |
+| Android labels | application/后台 `A Shell You`；launcher `一个壳子` | strings.xml + manifest activity-alias |
+| Android scheme | `ashell` | `flutter/android/app/src/main/AndroidManifest.xml` |
+| Android native library | `libashell.so` | `build.sh`, `pkg2230.kt`, `native_model.dart` |
+| Windows native library | `ashell.dll` | `flutter/windows/CMakeLists.txt`, `native_model.dart` |
 
-`ORG = com.carriez`、大量 RustDesk 类型名、第三方仓库 URL、驱动名和兼容字段仍被保留。它们有些是上游兼容锚点，不允许做无差别品牌替换。
+2026-10-12 [身份迁移](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)将 `ORG` 改为 `me`。RustDesk内部类型名、第三方仓库URL、驱动名及外部兼容字段按用途保留，不做无差别替换。Flutter内部package明确保留flutter_hbb；当前身份基线为 `AS-BL-2026-10-12-a036f31-worktree`，只完成V0。
 
 ## 2. 来源与可追溯性
 
 - 当前 Git 不是多年完整历史。仓库只有 59 个提交、无 tag、无 merge commit；根提交 `96a9c7c` 于 2026-04-13 以 `DaXianDesk` 为题一次性导入完整源码。
 - 代码布局、协议、依赖和 README 明确来自 RustDesk；但当前仓库无法证明导入前的精确 upstream commit、补丁序列和 DaXian 阶段作者历史。
-- 远端 `Super-Build/Cloudsend` 当前由 GitHub 元数据标记为 public。远端没有 PR 或 Issue 记录；开发历史主要表现为直接提交到 `main`。
+- 远端 `历史源仓` 当前由 GitHub 元数据标记为 public。远端没有 PR 或 Issue 记录；开发历史主要表现为直接提交到 `main`。
 - 在没有上游基线 commit 前，只能称为“RustDesk 深度分支”，不能声称与某个官方版本存在可重放的 fork ancestry。
 
 ## 3. 资产规模
@@ -95,7 +95,7 @@ CloudSend 是 RustDesk 的深度二次开发产品，Android 可见名称为 `�
 2. Flutter 负责主产品 UI、session/model 状态和多平台窗口。
 3. Android 由 Flutter MethodChannel + Rust FFI/JNI + Kotlin service 三层共同组成；任何运行时改动都可能跨层。
 4. Windows 继续使用 RustDesk 平台底座，并叠加 Amyuni driver、隐私窗体和注入辅助进程。
-5. CloudSend 控制端会话固定请求 relay；受控端仍保留上游 direct/punch/LAN/NAT 代码，不能称为全局移除直连。
+5. AShell 控制端会话固定请求 relay；受控端仍保留上游 direct/punch/LAN/NAT 代码，不能称为全局移除直连。
 6. ZEGO 是独立 RTC 媒体旁路；旧 RustDesk `audio_service` 不承担当前语音媒体。
 7. 产品账号 API 与远控会话认证是两套边界，不能混为一个“登录”。
 
@@ -105,7 +105,7 @@ CloudSend 是 RustDesk 的深度二次开发产品，Android 可见名称为 `�
 |---|---|
 | 2026-04-13 | DaXianDesk/RustDesk 快照导入 |
 | 04-14—04-22 | 工程文档初建；Android 黑屏、独立防触、状态监测、双通道与无障碍守卫 |
-| 05-05—05-18 | CloudSend 品牌/package/SO/DLL/构建迁移；文档清理和源码审计 |
+| 05-05—05-18 | AShell 品牌/package/SO/DLL/构建迁移；文档清理和源码审计 |
 | 05-20—05-31 | Android 本地 ADB/LADB、mDNS、无线调试自动化 |
 | 05-31—06-07 | ZEGO 替换语音媒体；Token 服务和开发者登录旁路 |
 | 06-09—06-24 | relay 重连、core service/share 解耦、Android 首帧与投屏授权稳定性 |

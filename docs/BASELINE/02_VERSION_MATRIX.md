@@ -1,4 +1,6 @@
-# CloudSend Version Matrix
+# AShell Version Matrix
+
+> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
 
 Baseline ID：`CS-BL-2026-07-12-77062b4`  
 状态：source versions `SOURCE-PINNED`；runtime/artifact verification `VERIFICATION-REQUIRED`
@@ -7,8 +9,8 @@ Baseline ID：`CS-BL-2026-07-12-77062b4`
 
 | 维度 | 基线值 | Source of truth | 状态 |
 |---|---|---|---|
-| Product/runtime | `CloudSend` | `libs/hbb_common/src/config.rs::APP_NAME` | `SOURCE-PINNED` |
-| Rust package/library | `cloudsend` / `cloudsend` | root `Cargo.toml` | `SOURCE-PINNED` |
+| Product/runtime | `AShell` | `libs/hbb_common/src/config.rs::APP_NAME` | `SOURCE-PINNED` |
+| Rust package/library | `ashell` / `ashell` | root `Cargo.toml` | `SOURCE-PINNED` |
 | Rust product version | `5.2.1` | root `Cargo.toml` | `SOURCE-PINNED` |
 | Rust crate types | `cdylib`, `staticlib`, `rlib` | root `Cargo.toml` | `SOURCE-PINNED` |
 | Flutter package | `flutter_hbb` | `flutter/pubspec.yaml` | `SOURCE-PINNED` |
@@ -17,9 +19,9 @@ Baseline ID：`CS-BL-2026-07-12-77062b4`
 | Dart resolved constraint | `>=3.5.0 <4.0.0` | `flutter/pubspec.lock` | `LOCK-PINNED` |
 | Flutter resolved constraint | `>=3.24.0` | `flutter/pubspec.lock` | `LOCK-PINNED` |
 | Android visible name | `云计划` | Android resources | `SOURCE-PINNED` |
-| Android applicationId | `com.cloudsend.app` | `flutter/android/app/build.gradle` | `SOURCE-PINNED` |
+| Android applicationId | `me.ashell` | `flutter/android/app/build.gradle` | `SOURCE-PINNED` |
 | Android versionName/versionCode | Flutter `5.2.1` / `59`, injected through Flutter local properties | pubspec + Gradle | build artifact verification required |
-| Deep-link scheme | `cloudsend` | Android manifest + Rust URI helper | `SOURCE-PINNED` |
+| Deep-link scheme | `ashell` | Android manifest + Rust URI helper | `SOURCE-PINNED` |
 | Runtime ORG | `com.carriez` | shared config | inherited compatibility value |
 
 版本号和身份是发布资产。AI 不得自动修改；任何变更都要全链核对 package、SO/DLL、deep link、installer、update、server contract 和 rollback。
@@ -32,11 +34,11 @@ Baseline ID：`CS-BL-2026-07-12-77062b4`
 | Android target SDK | 33 | same | V0 |
 | Android min SDK | 21 | same | V0 |
 | Android Java source/target | 8 | same | V0 |
-| Android native library | `libcloudsend.so` | `build.sh`, JNI/Dart loaders | V0；link/package 未执行 |
+| Android native library | `libashell.so` | `build.sh`, JNI/Dart loaders | V0；link/package 未执行 |
 | Android formal ABI modes | mode 1 arm64；mode 2 arm64/armeabi-v7a/x86_64 | `build.sh` | `VERIFICATION-REQUIRED` |
 | Android active JNI | `pkg2230.rs` / `pkg2230.kt` | `libs/scrap/src/android/mod.rs` | V0 |
-| Windows native library | `cloudsend.dll` | CMake/Dart loader | V0；runtime 未执行 |
-| Windows executable/portable | `cloudsend.exe` / self-extract package | build scripts | `VERIFICATION-REQUIRED` |
+| Windows native library | `ashell.dll` | CMake/Dart loader | V0；runtime 未执行 |
+| Windows executable/portable | `ashell.exe` / self-extract package | build scripts | `VERIFICATION-REQUIRED` |
 | Windows virtual display | Amyuni active；RustDesk IDD dormant | `src/virtual_display_manager.rs` | V0 |
 | Controller transport policy | force relay | Rust/Flutter call path | V0；server integration 未执行 |
 
@@ -65,7 +67,7 @@ FRB runtime/codegen/generated markers 主要为 1.80.1，但 macro lock 为 1.82
 正式构建/发布前必须证明：
 
 - Cargo/Flutter/installer/version resources 使用同一批准版本。
-- `CloudSend`、`cloudsend`、`com.cloudsend.app`、`cloudsend://`、SO/DLL/EXE 名称全链一致。
+- `AShell`、`ashell`、`me.ashell`、`ashell://`、SO/DLL/EXE 名称全链一致。
 - generated bridge 与 `src/flutter_ffi.rs` 签名一致。
 - APK/EXE/DLL/driver 中的版本、hash、signature 映射到同一 source baseline。
 - update channel、backend、hbbs/hbbr、ZEGO contract 与目标版本兼容。

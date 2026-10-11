@@ -18,8 +18,8 @@ const APP_METADATA: &[u8] = include_bytes!("../app_metadata.toml");
 const APP_METADATA: &[u8] = &[];
 const APP_METADATA_CONFIG: &str = "meta.toml";
 const META_LINE_PREFIX_TIMESTAMP: &str = "timestamp = ";
-const APP_PREFIX: &str = "CloudSend";
-const APPNAME_RUNTIME_ENV_KEY: &str = "CLOUDSEND_APPNAME";
+const APP_PREFIX: &str = "AShell";
+const APPNAME_RUNTIME_ENV_KEY: &str = "ASHELL_APPNAME";
 #[cfg(windows)]
 const SET_FOREGROUND_WINDOW_ENV_KEY: &str = "SET_FOREGROUND_WINDOW";
 
@@ -59,53 +59,6 @@ fn write_meta(dir: &Path, ts: u64) {
         let _ = std::fs::write(meta_file, content);
     }
 }
-fn rename_file_if_exists(dir_path: &str, old_name: &str, new_name: &str) {
-    let dir = Path::new(dir_path);
-
-    if let Ok(entries) = fs::read_dir(dir) {
-        for entry in entries.flatten() {
-            if let Ok(file_type) = entry.file_type() {
-                if file_type.is_file() {
-                    if let Some(file_name) = entry.file_name().to_str() {
-                        if file_name == old_name {
-                            let new_path = dir.join(new_name);
-                            if let Err(e) = fs::rename(entry.path(), new_path) {
-                                eprintln!("Failed to rename file: {}", e);
-                            } else {
-                                println!("Renamed {} to {}", old_name, new_name);
-                            }
-                            break; 
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-fn remove_file_if_exists(dir_path: &str, file_name: &str) {
-    let dir = Path::new(dir_path);
-
-    if let Ok(entries) = fs::read_dir(dir) {
-        for entry in entries.flatten() {
-            if let Ok(file_type) = entry.file_type() {
-                if file_type.is_file() {
-                    if let Some(name) = entry.file_name().to_str() {
-                        if name == file_name {
-                            if let Err(e) = fs::remove_file(entry.path()) {
-                                eprintln!("Failed to remove file {}: {}", file_name, e);
-                            } else {
-                                println!("Removed file: {}", file_name);
-                            }
-                            break; 
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 fn setup(
     reader: BinaryReader,
     dir: Option<PathBuf>,
@@ -137,27 +90,7 @@ fn setup(
     for file in reader.files.iter() {
         file.write_to_file(&dir);
     }
-    let custom_appname = "CloudSend.exe";
-
-    rename_file_if_exists(dir.to_str().unwrap(), "rustdesk.exe", custom_appname);
-    rename_file_if_exists(dir.to_str().unwrap(), "cloudsend.exe", custom_appname);
-    
-    let xname_exists = fs::metadata(&dir)
-        .map(|metadata| {
-            fs::read_dir(&dir)
-                .map(|entries| {
-                    entries
-                        .flatten()
-                        .any(|entry| entry.file_name() == custom_appname)
-                })
-                .unwrap_or(false)
-        })
-        .unwrap_or(false);
-    if xname_exists {
-        
-        remove_file_if_exists(dir.to_str().unwrap(), "rustdesk.exe");
-        remove_file_if_exists(dir.to_str().unwrap(), "cloudsend.exe");
-    }
+    let custom_appname = "ashell.exe";
     write_meta(&dir, ts);
     #[cfg(windows)]
     windows::copy_runtime_broker(&dir);
@@ -251,7 +184,7 @@ mod windows {
 
     // Used for privacy mode(magnifier impl).
     pub const RUNTIME_BROKER_EXE: &'static str = "C:\\Windows\\System32\\RuntimeBroker.exe";
-    pub const WIN_TOPMOST_INJECTED_PROCESS_EXE: &'static str = "RuntimeBroker_cloudsend.exe";
+    pub const WIN_TOPMOST_INJECTED_PROCESS_EXE: &'static str = "RuntimeBroker_ashell.exe";
 
     pub(super) fn copy_runtime_broker(dir: &Path) {
         let src = RUNTIME_BROKER_EXE;
