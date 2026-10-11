@@ -3,6 +3,8 @@
 import os
 import optparse
 from hashlib import md5
+from pathlib import Path
+import subprocess
 import brotli
 import datetime
 
@@ -14,24 +16,30 @@ encoding = 'utf-8'
 # output: {path: (compressed_data, file_md5)}
 
 
+def fail_walk(error):
+    raise error
+
+
 def generate_md5_table(folder: str, level) -> dict:
     res: dict = dict()
-    curdir = os.curdir
-    os.chdir(folder)
-    for root, _, files in os.walk('.'):
-        # remove ./
-        for f in files:
+    source = Path(folder).resolve()
+    for root, directories, files in os.walk(source, onerror=fail_walk):
+        directories.sort()
+        # Do not follow a linked file or directory outside the compiled bundle.
+        for name in directories + files:
+            Path(root, name).resolve().relative_to(source)
+        for name in sorted(files):
             md5_generator = md5()
-            full_path = os.path.join(root, f)
-            print(f"Processing {full_path}...")
-            f = open(full_path, "rb")
-            content = f.read()
+            full_path = Path(root, name)
+            relative_path = os.path.join('.', str(full_path.relative_to(source)))
+            print(f"Processing {relative_path}...")
+            with full_path.open("rb") as f:
+                content = f.read()
             content_compressed = brotli.compress(
                 content, quality=level)
             md5_generator.update(content)
             md5_code = md5_generator.hexdigest().encode(encoding=encoding)
-            res[full_path] = (content_compressed, md5_code)
-    os.chdir(curdir)
+            res[relative_path] = (content_compressed, md5_code)
     return res
 
 
@@ -65,11 +73,11 @@ def write_app_metadata(output_folder: str):
     print(f"App metadata has been written to {output_path}")
 
 def build_portable(output_folder: str, target: str):
-    os.chdir(output_folder)
+    command = ["cargo", "build", "--release"]
     if target:
-        os.system("cargo build --release --target " + target)
-    else:
-        os.system("cargo build --release")
+        command.extend(["--target", target])
+    # A failed Cargo invocation must fail Python and its CMD/CI caller as well.
+    subprocess.run(command, cwd=output_folder, check=True)
 
 # Linux: python3 generate.py -f ../rustdesk-portable-packer/test -o . -e ./test/main.py
 # Windows: python3 .\generate.py -f ..\ashell\flutter\build\windows\runner\Debug\ -o . -e ..\ashell\flutter\build\windows\runner\Debug\ashell.exe
@@ -88,18 +96,28 @@ if __name__ == '__main__':
     parser.add_option("-l", "--level", dest="level", type="int",
                       help="compression level, default is 11, highest", default=11)
     (options, args) = parser.parse_args()
-    folder = options.folder or './ashell'
-    output_folder = os.path.abspath(options.output_folder or './')
+    source = Path(options.folder or './ashell').resolve()
+    output = Path(options.output_folder or './').resolve()
+    if not source.is_dir():
+        parser.error("The source folder does not exist")
+    if not output.is_dir():
+        parser.error("The portable project folder does not exist")
+    if output == source or source in output.parents:
+        parser.error("The portable project must be outside the source bundle")
 
-    if not options.executable:
-        options.executable = 'ashell.exe'
-    if not options.executable.startswith(folder):
-        options.executable = folder + '/' + options.executable
-    exe: str = os.path.abspath(options.executable)
-    if not exe.startswith(os.path.abspath(folder)):
-        print("The executable must locate in source folder")
-        exit(-1)
-    exe = '.' + exe[len(os.path.abspath(folder)):]
+    requested_exe = Path(options.executable or 'ashell.exe')
+    executable = requested_exe.resolve()
+    if source not in executable.parents:
+        executable = (source / requested_exe).resolve()
+    try:
+        relative_exe = executable.relative_to(source)
+    except ValueError:
+        parser.error("The executable must locate in source folder")
+    if not executable.is_file():
+        parser.error("The startup executable does not exist")
+    exe = os.path.join('.', str(relative_exe))
+    folder = str(source)
+    output_folder = str(output)
     print("Executable path: " + exe)
     print("Compression level: " + str(options.level))
     md5_table = generate_md5_table(folder, options.level)

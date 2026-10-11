@@ -216,7 +216,7 @@ flutter test
 命令：
 
 ```bat
-new-build.cmd
+build.cmd
 ```
 
 环境要求：`PC-Build.md` 定义的 Windows Server/Windows 10-11 正式构建环境，`C:\DevEnv`、`C:\DevTool`、VS 2022 Build Tools、Rust 1.75 MSVC、Flutter 3.24.x、LLVM、vcpkg、Amyuni/driver/helper artifacts 和签名条件。

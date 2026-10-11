@@ -215,13 +215,14 @@ Rust 映射：
 ### Windows / PC（Windows Server 构建机）
 
 ```bat
-new-build.cmd
+build.cmd
 ```
 
 说明：
 
-- `new-build.cmd` 适配 `PC-Build.md` 中的 `C:\DevEnv` + `C:\DevTool` 环境。
-- 生成的自解压产物输出到：`PC-Bulid\<源码目录名>.exe`。
+- `build.cmd` 适配 `PC-Build.md` 中的 `C:\DevEnv` + `C:\DevTool` 环境。
+- 生成的自解压产物输出到：`PC-Bulid\ashell.exe`。
+- 2026-10-12 T005：仅保留此PC入口；只打包本次Release编译产物，不装配外部DLL/驱动，Python Brotli需在正式环境预装。
 - 旧 `build.cmd` 仍保留，但不是当前推荐的新环境入口。
 
 ### Desktop / Flutter（通用）

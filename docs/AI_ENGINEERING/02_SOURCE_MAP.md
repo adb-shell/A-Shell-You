@@ -18,8 +18,8 @@
 | `Cargo.toml`, `Cargo.lock` | PRIMARY | root crate、workspace、feature、依赖锁定 |
 | `build.rs` | PRIMARY | 生成 `src/version.rs`、native link/build |
 | `build.sh`, `env.sh` | PRIMARY/Android | Linux Android 环境与构建编排 |
-| `new-build.cmd` | PRIMARY/Windows | 当前 `C:\DevEnv` + `C:\DevTool` PC 构建 |
-| `build.cmd`, `build.py` | COMPAT | 旧环境和跨平台包装；部分命名已漂移 |
+| `build.cmd` | PRIMARY/Windows | 当前 `C:\DevEnv` + `C:\DevTool` PC 构建 |
+| `build.py` | PRIMARY/Windows + COMPAT/other platforms | 当前PC入口调用的主编译包装，同时保留跨平台分支 |
 | `.github/workflows/` | COMPAT | 上游多平台 Actions；当前全部手动触发 |
 | `res/`, `appimage/`, `flatpak/`, `fastlane/` | PLATFORM | installer、driver、icons、store metadata |
 | `.info` | PRIMARY config | 跟踪的基础设施 endpoint 文件；高变更/泄露面 |
@@ -176,7 +176,7 @@
 | waiting/reconnect | `model.dart`, `server_model.dart`, `flutter.rs` |
 | API/token | `user_model.dart`, `hbbs_http/`, `client/helper.rs` |
 | Windows privacy | `privacy_mode.rs`, `win_*`, `virtual_display_manager.rs` |
-| build/release | `new-build.cmd`, `build.sh`, `build.py`, workflows |
+| build/release | `build.cmd`, `build.sh`, `build.py`, workflows |
 
 ## 10. 生成与可复现性规则
 

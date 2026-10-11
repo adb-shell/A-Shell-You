@@ -1,6 +1,6 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
-2026-10-12产品身份迁移：见 `docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md`、ADR-0014、D-016。迁移已由f423335固化并推送test，仅V0。T004在其上替换仓内服务器默认配置，尚未提交，见 `docs/tasks/T-2026-10-12-004-server-configuration.md`。Flutter内部包名flutter_hbb必须保留。T003按用户要求统一两处ashell.匹配和全部文档品牌字段/路径/文件名，历史原文可从Git恢复；新会话先核对HEAD/status。
+2026-10-12产品身份迁移：见 `docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md`、ADR-0014、D-016。迁移已由f423335固化，T004服务器配置由c0951b5固化。T005在其上统一PC入口为build.cmd、仅打包编译后的Release产物，未提交，见 `docs/tasks/T-2026-10-12-005-pc-build-entry.md`；仅V0。Flutter内部包名flutter_hbb必须保留。T003按用户要求统一两处ashell.匹配和全部文档品牌字段/路径/文件名，历史原文可从Git恢复；新会话先核对HEAD/status。
 
 最后一次与全仓源码对齐：2026-07-12
 最近一次文档分层整理：2026-07-12
@@ -225,14 +225,14 @@ Rust 映射：
 ### Windows / PC（Windows Server 构建机）
 
 ```bat
-new-build.cmd
+build.cmd
 ```
 
 说明：
 
-- `new-build.cmd` 适配 `PC-Build.md` 中的 `C:\DevEnv` + `C:\DevTool` 环境。
+- `build.cmd` 适配 `PC-Build.md` 中的 `C:\DevEnv` + `C:\DevTool` 环境。
 - 生成的自解压产物输出到：`PC-Bulid\ashell.exe`。
-- 旧 `build.cmd` 仍保留，但不是当前推荐的新环境入口。
+- 2026-10-12 T005：仅保留 `build.cmd`，沿用原新环境入口；自解压只包含本次编译的Release目录，不再附加外部DLL/驱动。
 
 ### Desktop / Flutter（通用）
 

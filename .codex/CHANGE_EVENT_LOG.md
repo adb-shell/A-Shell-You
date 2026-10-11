@@ -190,6 +190,19 @@ Mode：`append-only logical persisted-change events`
 - Related：D-017；T004任务与Network/API工程文档；STATE-20261012-005 / WORK-20261012-008。
 - Git / Build / Delete / Move / Version / External / Release：本任务全部none；未读取/修改外部秘密值、未试用Key。
 
+## CE-20261012-T005-01：统一PC入口和自解压范围
+
+- Timestamp：2026-10-12T06:37:59+09:00；Task ID：T-2026-10-12-005。
+- Actor / Skill：Codex / ashell-release-engineer，ashell-security-engineer静态复核；无子代理。
+- Authority：用户明确要求删除旧入口、迁名原新入口并只打包编译产物；Edit + scoped delete/move，不包含实际构建/打包或Git。
+- Files（26）：`.agents/skills/ashell-release-engineer/SKILL.md`、`.codex/AI_RULES.md`、`.codex/CHANGE_EVENT_LOG.md`、`.codex/CHANGELOG_AI.md`、`.codex/CURRENT_WORK.md`、`.codex/DECISION_LOG.md`、`.codex/PROJECT_MEMORY.md`、`.codex/PROJECT_STATE.md`、`.codex/TASK_HISTORY.md`、`AGENTS.md`、`build.cmd`、`CLAUDE.md`、`docs/AI_ENGINEERING/02_SOURCE_MAP.md`、`docs/AI_ENGINEERING/05_WINDOWS_PIPELINE.md`、`docs/AI_ENGINEERING/08_BUILD_SYSTEM.md`、`docs/AI_ENGINEERING/09_DEBUG_SYSTEM.md`、`docs/AI_ENGINEERING/10_SECURITY_MODEL.md`、`docs/BASELINE/07_PC_BUILD_BASELINE_2026-10-12.md`、`docs/BASELINE/BASELINE_INDEX.md`、`docs/tasks/T-2026-10-12-005-pc-build-entry.md`、`EXTERNAL_ASSET_REGISTRY.md`、`libs/portable/generate.py`、`new-build.cmd`、`PC-Build.md`、`PROJECT_START_HERE.md`、`TEST_MATRIX.md`。
+- Delta：移除外部DLL/驱动装配与暂存搬运；清理固定Release后主编译并直接压缩，Brotli提前检查不自动安装；Cargo失败传递、输入路径边界、manifest恢复、临时输出后成功替换最终EXE。
+- Delete/move：旧build.cmd内容被替换；new-build.cmd迁至build.cmd后原路径删除。只有这两个入口参与迁移，未清理实际生成资产；旧实现可从c0951b5恢复。新建task/baseline，其他文档update；无generated文件编辑。
+- Verification：仅V0 Python AST、内嵌PowerShell解析、CMD标签/打包调用关系、路径/额外资产检索、文档引用及diff检查。修改后正式build/runtime NOT_RUN；旧用户日志不可冒充本轮成功证据。
+- Compatibility：运行/协议/版本不变，compiled native DLL保留；外部组件功能完整性不保证。历史baseline/task不改写。
+- Related：D-018；AS-BL-2026-10-12-c0951b5-pc-build-worktree；STATE-20261012-006 / WORK-20261012-010。
+- Git / actual build/test/package / install / external / version/sign/release：全部none。
+
 ### 后续事件模板
 
 ```text

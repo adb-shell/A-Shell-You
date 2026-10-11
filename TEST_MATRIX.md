@@ -171,6 +171,8 @@ Never include token、password、credential、production URL/IP、peer/device ID
 
 ## 14. Formal Verification Request
 
+T005 / 2026-10-12 PC入口补充（全部NOT_RUN）：正式Windows环境从仓库根运行 `build.cmd`；确认仅一个入口、最终 `PC-Bulid/ashell.exe` 的解压清单与本次Release一致。缺外部DLL/驱动时仍能完成产物打包；缺Brotli在编译前失败；源目录越界链接被拒绝；portable Cargo失败时CMD非零、不交付旧packer；manifest成功/失败路径可恢复。WIN-03/05/06/07/08分别验证未附带组件时的功能边界、资产策略和启动行为；这些源码规则不等于测试通过。
+
 When execution is needed but not authorized, output and stop:
 
 ```text

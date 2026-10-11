@@ -199,9 +199,9 @@ Plugin ZIP 解压使用 archive-provided name 拼接 target path，未见 `enclo
 
 - Privacy topmost path 会将 `WindowInjection.dll` 注入其他进程，当前只检查文件存在。
 - Virtual display dylib 按裸库名加载，存在 search-order risk。
-- device installer、Amyuni/usbmmidd/print driver/helper 从本地 cache 复制，应用层 provenance/hash/signature 不完整。
+- T005后的PC `build.cmd` 不再从cache下载/复制device installer、Amyuni/usbmmidd/print driver或注入DLL；仅压缩本次Release产物。运行时代码及其他历史发布路径的外部组件provenance/hash/signature缺口仍存在，不能据此标为已解决。
 - 某些 privacy modes 在 hook/capture verification 失败时可能 fail-open。
-- `new-build.cmd` 未见 Windows Authenticode signing stage。
+- `build.cmd` 未见 Windows Authenticode signing stage。
 
 要求：
 

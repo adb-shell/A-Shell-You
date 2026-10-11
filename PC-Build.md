@@ -1,11 +1,13 @@
 > [!IMPORTANT]
 > Current AShell / 一个壳子 source truth (verified 2026-06-03): this file is a Windows Server environment background note derived from the upstream RustDesk build setup. It is not the current build command reference.
 >
-> Current project build entry: run `new-build.cmd` from the repository root. Current version: `5.2.1`. Current Windows DLL: `ashell.dll`. Current portable output directory: `PC-Bulid`. The script uses the `C:\DevEnv` / `C:\DevTool` toolchain layout described here, then drives the local `build.py`/Flutter packaging flow for this fork.
+> Current project build entry: run `build.cmd` from the repository root. Current version: `5.2.1`. Current Windows DLL: `ashell.dll`. Current portable output directory: `PC-Bulid`. The script uses the `C:\DevEnv` / `C:\DevTool` toolchain layout described here, then drives the local `build.py`/Flutter packaging flow for this fork.
 >
 > Treat old names in this document such as `RustDesk`, `rustdesk-1.4.6`, `rustdesk.exe`, and `C:\Code\RustDesk` as upstream environment examples unless a current script or source file confirms them.
 >
-> Do not directly copy old build commands from the body to modify the current repository. For current PC builds, use `new-build.cmd`; for current engineering truth, read `docs/ENGINEERING_INDEX.md`, `docs/ENGINEERING_BASELINE.md`, and `docs/TASK_ENTRYPOINTS.md`.
+> Do not directly copy old build commands from the body to modify the current repository. For current PC builds, use `build.cmd`; for current engineering truth, read `docs/ENGINEERING_INDEX.md`, `docs/ENGINEERING_BASELINE.md`, and `docs/TASK_ENTRYPOINTS.md`.
+
+> 2026-10-12 T005：当前 `build.cmd` 只打包本次编译的Release目录；以下历史教程中WindowInjection、虚拟显示和打印驱动的下载/编译/复制步骤不再是该入口的打包前置条件。Python Brotli需在构建环境预装，入口不自动pip安装。以 [当前构建说明](docs/AI_ENGINEERING/08_BUILD_SYSTEM.md) 为准；最终输出固定为 `PC-Bulid/ashell.exe`。
 
 下面是按你当前实际情况重新整理的 **Windows Server 2022 从零搭建 RustDesk 官方 x86-64 自解压 `.exe` 编译环境教程**。
 

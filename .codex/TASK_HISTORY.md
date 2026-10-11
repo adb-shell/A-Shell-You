@@ -153,6 +153,18 @@
 - Git/release actions：本任务none；前序品牌提交和推送已完成，不继承授权。回滚只在未来明确授权后反向应用本任务patch。
 - Decision/Event/State：D-017 / CE-20261012-T004-01 / STATE-20261012-005；详见docs/tasks/T-2026-10-12-004-server-configuration.md。
 
+## T-2026-10-12-005：仅保留build.cmd并打包编译产物
+
+- 状态：completed / T8 / V0；请求者/批准者：当前用户，明确授权旧入口删除、新入口迁名与优化。
+- 基线：test/c0951b5，initial clean；新观察基线AS-BL-2026-10-12-c0951b5-pc-build-worktree。旧脚本实现从该HEAD可恢复。
+- 修改：保留新环境编译配置，先清理受限Release输出后编译，直接压缩Release；移除额外驱动/DLL和根目录暂存装配，Brotli提前检查不自动安装。generator修复cwd/范围/失败传播；manifest和最终产物检查保留并加强。
+- 安全/兼容：保留已编译Flutter/native依赖和产品身份；拒绝包外链接及清理路径中的reparse point；不因此保证依赖外部DLL/驱动的功能可用。不改变协议、运行代码、依赖版本或license。
+- 验证：仅AST/PowerShell语法解析、CMD标签、打包输入、依赖边界和diff等V0；未执行脚本/单元测试/构建/实际打包。用户提供的旧日志不能作为T005构建通过证据。
+- 实际Git/发布：none。实际删除/迁移：按用户请求替换旧build.cmd并移除new-build.cmd路径；未删除本机生成资产。
+- 文档/记忆：工程构建/Windows/security/source map、当前入口/Skill、验证矩阵、外部资产、新baseline和恢复链同步；历史文档旧入口名称仍是历史证据。
+- 编译验证需求：见任务文件；Windows正式环境build.cmd，验证清单/解压/启动/缺驱动与失败退出；全部NOT_RUN。
+- Decision/Event：D-018 / CE-20261012-T005-01；任务docs/tasks/T-2026-10-12-005-pc-build-entry.md。
+
 ## 新任务模板
 
 ```text

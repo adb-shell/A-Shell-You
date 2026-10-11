@@ -102,6 +102,15 @@ Mode：`append-only task-level index`
 - Decision/Event/State：D-017；CE-20261012-T004-01；STATE-20261012-005 / WORK-20261012-008。
 - Detail：docs/tasks/T-2026-10-12-004-server-configuration.md；TASK_HISTORY同ID；无standing Git/build/external权限。
 
+## T-2026-10-12-005：PC入口合并和编译产物打包
+
+- Status：completed — source/V0；用户明确授权旧脚本删除与新入口迁名、移除外部驱动装配。
+- Source：test/c0951b5，initial clean。build.cmd现为唯一PC入口；generator修正失败传播与输入边界；同步工程说明、入口、Skill和恢复记忆。
+- Verification：Python AST与3段内嵌PowerShell仅解析，CMD label/调用关系与diff静态检查；不执行产品脚本、安装、构建、测试或打包。
+- Limits：Python Brotli需预置；未附带组件的运行功能不保证可用；其他历史workflow未改，旧基线保留。
+- Decision/Event/State：D-018 / CE-20261012-T005-01 / STATE-20261012-006 / WORK-20261012-010。
+- Detail：docs/tasks/T-2026-10-12-005-pc-build-entry.md；新baseline07；本轮未提交/推送。
+
 ### 后续索引更新规则
 
 - 每个 completed、blocked 或 cancelled AI task 追加一条；长任务仅在正式 handoff milestone 时追加。

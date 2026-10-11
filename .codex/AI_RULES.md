@@ -64,7 +64,7 @@
 - `cargo build` / `cargo test` 及其他 Cargo product/feature build。
 - `flutter build` / `flutter test` / project analyzer/codegen。
 - Gradle/Android build、APK 安装或设备操作。
-- `new-build.cmd`、`build.sh`、`build.py` product build。
+- `build.cmd`、`build.sh`、`build.py` product build。
 - Docker build、package、sign 或 publish command。
 
 需要验证时输出：

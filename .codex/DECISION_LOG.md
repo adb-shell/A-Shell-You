@@ -175,6 +175,16 @@
 - Related：T-2026-10-12-004 / CE-20261012-T004-01；Network/API工程文档。
 - Rollback：未来明确授权后只反向恢复本任务patch；不自动重置仓库或服务。
 
+## D-018：统一PC入口并限制自解压包为编译产物
+
+- 日期：2026-10-12；状态：accepted；批准者：当前用户明确请求。
+- Decision：删除旧PC脚本实现，将原新环境入口迁为唯一build.cmd；先清理固定Release输出再编译，直接压缩Release，不下载/装配额外驱动、注入DLL或打印adapter。不自动pip安装，Brotli由构建环境预置。
+- Compatibility：ashell命名、版本、Flutter内部包名和主编译feature不变；dylib_virtual_display.dll及Flutter依赖属于编译bundle，保留。运行侧依赖外部资产的能力不因打包变小而保证可用。
+- Reliability：Cargo失败传播、输入范围检查、清理路径/reparse检查、manifest恢复与最终文件检查；保留旧产物不代表本次成功。
+- Verification：仅V0；旧日志不代表修改后的流程通过。WIN-03/05/06/07/08正式环境未执行。
+- ADR：N/A — 本次变更构建交付策略，未改变运行架构/协议；沿用ADR-0014产品身份。Baseline：AS-BL-2026-10-12-c0951b5-pc-build-worktree。
+- Related：T-2026-10-12-005 / CE-20261012-T005-01；08_BUILD_SYSTEM；回滚需未来明确授权，旧入口可从c0951b5恢复。
+
 ### 下一决定模板
 
 ```text

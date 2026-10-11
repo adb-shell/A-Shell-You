@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261012-008`
+Registry Revision：`WORK-20261012-010`
 
-Last Updated：2026-10-12T06:16:00+09:00
+Last Updated：2026-10-12T06:37:59+09:00
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none；本轮服务器默认配置任务已完成V0交付，变更未提交。新会话仍须核对HEAD/status及当前请求。
+none；T005已完成源码/V0交付，变更未提交。新会话须重新核对HEAD/status及当前请求。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ none；本轮服务器默认配置任务已完成V0交付，变更未提交。�
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-12-004`
-- Result：12份原配置/源码/脚本/文档仅作指定服务器值替换；旧值零残留（排除.git），记忆同步。Flutter内部flutter_hbb保留。本轮未提交/构建/部署。
-- Closed At：2026-10-12T06:16:00+09:00
+- Task ID：`T-2026-10-12-005`
+- Result：唯一PC入口build.cmd，只打包本次Release；移除外部驱动装配，共用generator修复失败传播/输入边界，当前文档与记忆同步。本轮未提交/构建/打包。
+- Closed At：2026-10-12T06:37:59+09:00
 - Final T-State：`T8 — complete`
-- State / Event：`STATE-20261012-005` / `CE-20261012-T004-01`
-- Decision：D-017；产品身份沿用D-015/D-016 / ADR-0014；治理沿用D-014。
-- Verification：V0字面值差异、旧值扫描、端口派生、公钥格式、31处文档链接及diff检查；V1—V5 NOT_RUN。
+- State / Event：`STATE-20261012-006` / `CE-20261012-T005-01`
+- Decision：D-018；服务器D-017、产品身份D-015/D-016 / ADR-0014仍有效；治理沿用D-014。
+- Verification：V0 Python AST、3段PowerShell解析、CMD标签/打包输入/资产边界、文档引用及diff检查；V1—V5 NOT_RUN。
 - Next Gate：new user request must start at T0；historical authorization inherited `none`。
-- Changelog pointer：`CHANGELOG_AI.md` 中 `T-2026-10-12-004`。
+- Changelog pointer：`CHANGELOG_AI.md` 中 `T-2026-10-12-005`。
 - Detailed record：`TASK_HISTORY.md` 中同 Task ID；修改清单见 `CHANGE_EVENT_LOG.md` 中同 Event。

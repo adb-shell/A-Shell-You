@@ -92,7 +92,7 @@ FRB 文件带 1.80.1 生成标记，且 Git 历史显示 Rust FFI 后续仍有�
 推荐入口是 Windows 正式构建机仓库根目录：
 
 ```bat
-new-build.cmd
+build.cmd
 ```
 
 该脚本按 `C:\DevEnv` + `C:\DevTool` 布局调用：
@@ -105,9 +105,17 @@ new-build.cmd
 - `build.py --portable --hwcodec --flutter --vram --skip-portable-pack`。
 - portable self-extract packer。
 
-最终自解压产物写入 `PC-Bulid\<source-folder>.exe`。这个目录名当前拼写就是 `PC-Bulid`，不要在未迁移所有脚本前擅自更正。
+最终自解压产物固定为 `PC-Bulid\ashell.exe`。这个目录名当前拼写就是 `PC-Bulid`，不要在未迁移所有脚本前擅自更正。
 
-`PC-Build.md` 包含大量历史/环境搭建材料，其中仍有上游 RustDesk 名称和旧命令；当前入口以 `new-build.cmd` 源码为准。
+2026-10-12 T005：旧PC入口由原新环境脚本替换，仓库只保留 `build.cmd`。脚本先检查Python Brotli、工具链与manifest恢复状态；对固定的 `flutter/build/windows/x64/runner/Release` 路径和reparse point做检查后清除旧bundle，再编译。Rust/Flutter增量缓存保留，`CARGO_TARGET_DIR` 固定为仓库 `target`。
+
+自解压直接消费本次Release目录，不再搬运到根目录暂存文件夹，也不复制 `WindowInjection.dll`、`usbmmidd_v2`、打印驱动/adapter或外部Driver.ps1。`dylib_virtual_display.dll` 是 `build.py` 从本仓源码生成并放入Release的DLL，仍随编译产物打包；Flutter插件/运行库和data资源同样保留。这不是全功能驱动安装包，依赖未附带组件的隐私模式、虚拟显示和打印功能仍需单独验证。
+
+打包阶段不自动pip安装；Brotli需预装。Rust/Flutter正常构建仍可能解析/下载编译依赖，不承诺完全离线。`libs/portable/generate.py` 检查输入目录/启动文件及范围，拒绝指向bundle外的链接，压缩时不切换全局cwd；Cargo失败通过异常返回非零，CMD停止交付。脚本在正常和已处理失败路径恢复manifest，检测到旧备份则停止以保留恢复材料。最终只有成功且非空的packer产物才复制到输出目录。
+
+验证范围：仅V0；用户提供的旧脚本日志只证明此前主编译成功，不能证明本次修改后的构建或自解压成功。任务及正式环境验证要求见 [T005](../tasks/T-2026-10-12-005-pc-build-entry.md)。
+
+`PC-Build.md` 包含大量历史/环境搭建材料，其中仍有上游 RustDesk 名称和旧命令；当前入口以 `build.cmd` 源码为准。
 
 ## 6. 其他平台
 

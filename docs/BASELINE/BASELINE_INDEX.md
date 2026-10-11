@@ -2,7 +2,7 @@
 
 > 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
 
-最新 repository-observed 快照：[`AS-BL-2026-10-12-a036f31-worktree`](06_ASHELL_IDENTITY_BASELINE_2026-10-12.md)，未提交的产品身份迁移，V0，build/runtime未验证。之前的 [`CS-BL-2026-10-12-6fb0aa6`](05_OBSERVED_BASELINE_2026-10-12.md) 与下列 `CS-BL-2026-07-12-77062b4` / 01—04文件保留历史冻结含义。
+最新 repository-observed 快照：[`AS-BL-2026-10-12-c0951b5-pc-build-worktree`](07_PC_BUILD_BASELINE_2026-10-12.md)，T005统一PC入口与纯Release打包，V0，修改后build/runtime未验证。之前的 [`AS-BL-2026-10-12-a036f31-worktree`](06_ASHELL_IDENTITY_BASELINE_2026-10-12.md) 已经f423335固化；[`CS-BL-2026-10-12-6fb0aa6`](05_OBSERVED_BASELINE_2026-10-12.md) 与下列 `CS-BL-2026-07-12-77062b4` / 01—04文件保留历史冻结含义。
 
 基线日期：2026-07-12  
 Baseline ID：`CS-BL-2026-07-12-77062b4`  

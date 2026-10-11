@@ -512,15 +512,9 @@ Controller Windows 收到 Printer job：
 
 ## 12. 构建与打包边界
 
-当前 Windows 推荐入口为 `new-build.cmd`，面向 `C:\DevEnv` + `C:\DevTool`。
+当前 Windows 推荐入口为 `build.cmd`，面向 `C:\DevEnv` + `C:\DevTool`。
 
-脚本/installer 期望打包：
-
-- `ashell.dll` 与 Flutter runner
-- `WindowInjection.dll`
-- `usbmmidd_v2`
-- printer adapter/driver
-- MSI custom actions
+2026-10-12 T005后，此CMD仅把本次Release目录（`ashell.dll`、runner、Flutter插件/运行库、`dylib_virtual_display.dll`、data资源）交给portable generator。它不再装配 `WindowInjection.dll`、`usbmmidd_v2`、printer adapter/driver，也不调用MSI打包流程。源码仍保留对应运行功能；没有配套文件时的隐私模式、虚拟显示和打印能力不能宣称可用。其他installer/历史workflow应按各自源码分析，不继承此CMD的资产策略。
 
 安装/运行逻辑会从目标 OS 派生 `RuntimeBroker_ashell.exe`，正式包不应把未知来源的同名 binary 当作仓外依赖注入。仓库只包含部分下载/复制/安装逻辑，不包含所有原始工程或二进制。正式发布前必须维护：
 
@@ -591,4 +585,4 @@ Controller Windows 收到 Printer job：
 | W19 | Printer load | 大 XPS、并发 job、multiple controllers | 有 size limit；不 OOM；目标 controller 明确 |
 | W20 | External artifacts | clean clone + approved artifact set | DLL/driver hash、签名、版本和 ABI 全部匹配 |
 
-正式 PC 构建机应在仓库根目录执行 `new-build.cmd`。其环境必须符合 `PC-Build.md` 的 `C:\DevEnv` / `C:\DevTool` 布局。任何安装 driver、运行注入 helper、安装 printer、发布或上传操作仍需用户明确授权。
+正式 PC 构建机应在仓库根目录执行 `build.cmd`。其环境必须符合 `PC-Build.md` 的 `C:\DevEnv` / `C:\DevTool` 布局。任何安装 driver、运行注入 helper、安装 printer、发布或上传操作仍需用户明确授权。

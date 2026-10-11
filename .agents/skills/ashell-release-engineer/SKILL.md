@@ -53,7 +53,7 @@ Record commit, branch, dirty state, version, platform/channel, source provenance
 ### 2. Select the canonical path
 
 - Android: repository-root `build.sh` on the formal Linux toolchain; modes 1/2 have different ABI outputs.
-- Windows: repository-root `new-build.cmd` on the `C:\DevEnv`/`C:\DevTool` environment.
+- Windows: repository-root `build.cmd` on the `C:\DevEnv`/`C:\DevTool` environment.
 - Treat `PC-Build.md` and generic `build.py` branches as historical/contextual until verified.
 - Keep `ashell`, `libashell.so`, `ashell.dll`, `me.ashell`, deep-link scheme, and `PC-Bulid` output naming consistent.
 
