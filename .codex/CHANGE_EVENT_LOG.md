@@ -2,7 +2,8 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-07-12T06:45:42+08:00  
+Last Updated：2026-10-12T04:53:24+09:00
+
 Mode：`append-only logical persisted-change events`
 
 > 一个 Change Event 是一次逻辑完整的代码/文档持久化修改批次，不是每次按键、每个 patch hunk、只读调查或对话消息。本文件建立前的精确 edit-event 历史无法重建，只能按已知 Task 做 aggregate backfill。日志自身的创建/追加属于对应事件，不递归生成第二条事件。
@@ -122,6 +123,22 @@ Mode：`append-only logical persisted-change events`
 - Verification：addresses the only remaining order/relation failures from the final V0 audit；full recheck follows this event。
 - Corrects / Supersedes：metadata references only；previous event meanings remain unchanged。
 - Git / Build / Delete / Move / Version / External / Release：none。
+
+## CE-20261012-T001-01：保存接管证据并接入新会话恢复
+
+- Timestamp：2026-10-12T04:53:24+09:00
+- Task ID：`T-2026-10-12-001`
+- Actor / Primary Skill：Codex / `cloudsend-master`
+- Permission：`C1`；当前用户明确要求保存本轮记忆供工作区新对话恢复；不扩大为业务修改或远端上传。
+- Event Type：create / update / task closure；一个逻辑文档事务，包含其状态与日志同步。
+- Files（13）：`AGENTS.md`、`PROJECT_START_HERE.md`、`EXTERNAL_ASSET_REGISTRY.md`、`.codex/PROJECT_MEMORY.md`、`.codex/PROJECT_STATE.md`、`.codex/CURRENT_WORK.md`、`.codex/CHANGELOG_AI.md`、`.codex/CHANGE_EVENT_LOG.md`、`.codex/TASK_HISTORY.md`、`docs/AI_ENGINEERING/00_PROJECT_OVERVIEW.md`、`docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md`、`docs/BASELINE/BASELINE_INDEX.md`、`docs/BASELINE/05_OBSERVED_BASELINE_2026-10-12.md`。
+- Change Summary：保存本轮源码/历史审查摘要和证据报告，追加新观察基线；接入恢复入口、更新当前状态和历史指针，最后关闭活动任务。
+- Behavior / State Delta：工作区跨会话导航更新；产品/runtime行为无变化。历史7月记录保留；当前 branch/HEAD、jniLibs存在性、broker源码范围及凭据有效性表述以10月观察纠正。
+- Source of Truth / Generated Status：非生成 Markdown；源代码与本轮只读Git/API观察为证据，文档不覆盖源码或证明运行结果。
+- Related Decision / ADR：沿用 D-014；`N/A — no decision delta`；无新 ADR。
+- Verification：V0 引用、入口、基线、范围、状态关联与 diff whitespace 检查；关闭后复核。V1—V5 NOT_RUN，未做真实新聊天恢复测试。
+- Git Write / Build / Delete / Move / Version / External Write / Release：none。
+- Corrects / Supersedes：只纠正旧快照被误用为当前事实的风险，不重写历史基线、旧事件或原聊天结论；没有保存敏感值。
 
 ## Event Schema
 

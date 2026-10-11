@@ -1,10 +1,13 @@
 # CloudSend External Asset Registry
 
-最后更新：2026-07-12  
+最后更新：2026-10-12
+
 状态：repository-side inventory complete；owner/provenance onboarding incomplete  
 范围：不在 Git tracked source 中，或不能由 clean clone 独立复现的 service、database、driver、binary、signing/build/release infrastructure 和历史 provenance
 
 > 本登记表不保存 credential、token、password、private key、生产 IP/domain、连接串或 PII。发现这类值时只记录资产类型、所在路径和处置状态。
+
+2026-10-12 存在性复核：当前检出 `jniLibs/` 不存在，ADB binary 标为 MISSING；历史hash保留，不代表当前文件。ZEGO broker为脚本内嵌实现的PARTIAL资产、SDK lock drift仍在。相邻API/WEB/SERVER仓和实际生产服务未检查，其他资产条目仍为带日期的历史材料。证据见 [接管认知](docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)。
 
 ## 1. 状态词汇
 
@@ -54,15 +57,15 @@ Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织�
 | `EXT-OPS-001` | DNS、TLS certificates、load balancer、production endpoint routing | `EXTERNAL` | endpoint/config consumers；具体值不在本表 | `OWNER-REQUIRED` | inventory、certificate owner/expiry、environment split、change/rollback/runbook | endpoint migration 和 HTTPS availability `BLOCKING` |
 | `EXT-OPS-002` | Monitoring、logging、alerting、incident/on-call | `MISSING` | repository 只有 local logs/diagnostic behavior | `OWNER-REQUIRED` | metrics/log pipeline、redaction、retention、alerts、SLO/SLA、incident process | 生产可观测性和安全响应 `BLOCKING` |
 
-## 4. Android Local-only Assets
+## 4. Android Native and Reference Assets
 
 | ID | 资产 | 当前存在性 | 仓内消费/证据锚点 | Owner | 主要缺口 | 影响 |
 |---|---|---|---|---|---|---|
-| `EXT-BIN-ADB-001` | `libadb.so` for arm64-v8a / armeabi-v7a / x86_64 | `LOCAL-ONLY`：位于 ignored `flutter/android/app/src/main/jniLibs/` | `CloudSendAdbRunner.kt`, Android packaging | `OWNER-REQUIRED` | upstream/source commit、reproducible build recipe、per-ABI hash、signature、version、license mapping、artifact registry | clean clone 不能复现 ADB packaging；Android release `BLOCKING` |
+| `EXT-BIN-ADB-001` | `libadb.so` for arm64-v8a / armeabi-v7a / x86_64 | `MISSING`：2026-10-12 当前检出没有 `flutter/android/app/src/main/jniLibs/`；7月 LOCAL-ONLY 为历史观察 | `CloudSendAdbRunner.kt`, Android packaging | `OWNER-REQUIRED` | upstream/source commit、reproducible build recipe、per-ABI hash、signature、version、license mapping、artifact registry | clean clone 不能复现 ADB packaging；Android release `BLOCKING` |
 | `EXT-REF-ADB-002` | `ADB-CODE/` research/decompiled materials | `LOCAL-ONLY`：ignored | `docs/ADB_LADB_INTEGRATION_MEMORY.md` 的研究背景 | `OWNER-REQUIRED` | origin、revision、legal/provenance、是否仅研究使用、保留策略 | 研究不可复现；不得直接进入 release source |
 | `EXT-REF-ADB-003` | `LADB/` reference source | `LOCAL-ONLY`：ignored | ADB integration memory 与实现设计背景 | `OWNER-REQUIRED` | upstream URL/commit、license obligations、Play Store restriction mapping、修改清单 | license/distribution 风险；不得等同 bundled binary source |
 
-当前本机存在三个 `libadb.so` 和一份 license 文件，但它们均未 tracked。2026-07-12 只读盘点得到的 SHA-256 为：
+历史记录：2026-07-12 当时本机存在三个 `libadb.so` 和一份 license 文件，均未 tracked；2026-10-12 当前检出并不存在该目录，未重新取得或验证这些文件。以下仅保留7月记录的 SHA-256：
 
 | ABI | Observed SHA-256 |
 |---|---|
@@ -70,7 +73,7 @@ Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织�
 | `armeabi-v7a` | `0AFEA102225CD4DDA85D2C01F36A56473724B741CC63B6386163EE286EFF268E` |
 | `x86_64` | `62CC0F7707C83C98AA4DE699492C61091EDA9D68B3DB9EA2A185B179DA505BFA` |
 
-这些 hash 仅标识当前本机观察到的文件，不能证明 source、publisher、license、完整性或 release approval，也不能把本机存在当作 provenance。
+这些历史 hash 不能证明当前文件存在，也不能证明 source、publisher、license、完整性或 release approval。
 
 ## 5. Windows Drivers, DLLs and Helpers
 

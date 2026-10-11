@@ -1,5 +1,7 @@
 # CloudSend Engineering Baseline Index
 
+最新 repository-observed 快照：[`CS-BL-2026-10-12-6fb0aa6`](05_OBSERVED_BASELINE_2026-10-12.md)，V0，正式 build/runtime 未验证。以下 `CS-BL-2026-07-12-77062b4` 及01—04文件保留为原冻结快照，不自动描述当前检出。
+
 基线日期：2026-07-12  
 Baseline ID：`CS-BL-2026-07-12-77062b4`  
 Source HEAD：`77062b4d8b63eae9a31afe288e3ac00a4f89e009`  

@@ -1,10 +1,13 @@
 # CloudSend Project Start Here
 
-最后更新：2026-07-12  
+最后更新：2026-10-12
+
 适用对象：所有 AI、sub-agent、人工开发者、审查者和发布负责人  
 定位：进入 CloudSend 仓库后的唯一第一入口
 
 > 本文件只负责启动、分流和权限提醒，不复制完整架构。当前源码始终是实现真相；AI 的强制行为规则以 `.codex/AI_RULES.md` 为准。
+
+最新接管复核：[2026-10-12 接管认知](docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)，对应观察基线 `CS-BL-2026-10-12-6fb0aa6`。先完成下列恢复顺序，再按任务读取该报告及源码。7月状态是历史快照；新对话应从 `.codex/PROJECT_STATE.md` 与 `.codex/PROJECT_MEMORY.md` 取得当前指针，不要求取得旧聊天记录。此机制是本工作区文件持久化，不表示 Git/云端已经同步。
 
 ## 1. 五分钟启动顺序
 

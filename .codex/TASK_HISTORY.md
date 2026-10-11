@@ -1,6 +1,6 @@
 # CloudSend Task History
 
-最后更新：2026-07-12
+最后更新：2026-10-12
 
 > 本文件记录 AI 参与的工程任务、授权边界和验证结果。它不是产品 changelog，也不替代 Git history。
 
@@ -81,6 +81,24 @@
 - Git/build/delete/version/release actions：none。
 - Change Events：`CE-20260712-T004-01`—`CE-20260712-T004-06`。
 - Related decisions/docs：D-014、ADR-0011、ADR-0012、ADR-0013、`.codex/SESSION_START_PROTOCOL.md`。
+
+## T-2026-10-12-001：本轮接管记忆持久化
+
+- 状态：completed / T8；工作区文件已保存，未进行远端同步。
+- 请求者/批准者：当前用户；明确要求保存本轮记忆供工作区新对话使用。C1 仅覆盖记忆、报告及必要入口/状态/日志/基线文档。前序接管任务 C0 只读结果独立保留。
+- T0 源码与现场：`test / 6fb0aa6e147901243d4cb14a5dc68ae75a13b890`，非 shallow、1条本地初始化提交；文档任务前 clean。新增观察基线 `CS-BL-2026-10-12-6fb0aa6`；不改旧 `CS-BL-2026-07-12-77062b4` 冻结内容。
+- T1/T2 问题与证据：聊天结论不能替代可由新会话读取的项目文件；已有 D-014/session recovery 机制。把本轮源码/历史观察整理为短摘要和详细证据，明确来源、静态推断、未验证运行条件及覆盖缺口。
+- T3/T4 范围：沿用既有恢复顺序，接入 AGENTS/Start Here，更新状态与当前资产观察。验收是文件存在、入口可追踪、引用有效、任务/事件/基线一致；不宣称已经在真实新聊天验证。
+- T5 修改：13个 Markdown 文件，精确清单见 `CE-20261012-T001-01`；新增接管报告和观察基线，其余为入口、memory/state、资产登记与日志。无业务源码、manifest、lock、版本、生成文件或产品行为变化。
+- 安全/隐私：只保存工程结论、源码相对路径和证据标签；不复制凭据值、生产地址、设备标识、PII、绝对用户路径或聊天原文。旧安全判断纠正为字面量事实与当前有效性未知，不试用凭据。
+- T6 验证：V0 静态本地链接、源码基线、文档范围、入口顺序、Task/Event/State/Work 关联及 diff whitespace 检查；关闭后再次检查。V1—V5 NOT_RUN；未启动产品、设备或真实新聊天。
+- 《编译验证需求》：N/A；本次仅保存文档，产品运行证据继续按报告与 TEST_MATRIX 保持待验证。
+- T7 同步：PROJECT_MEMORY、PROJECT_STATE、CURRENT_WORK、CHANGELOG_AI、CHANGE_EVENT_LOG、TASK_HISTORY、工程概览、Baseline 索引及 External Registry。Decision Log/ADR 已评估 `N/A — no decision delta`，沿用 D-014；TEST_MATRIX 无本次产品测试结果可写入。
+- T8 关闭：`STATE-20261012-002` / `WORK-20261012-002` / `CE-20261012-T001-01`；最后关闭当前活动行。后续任务重查 HEAD/status，不恢复旧授权。
+- 回滚说明：如后续需要纠正，通过新的获准文档 patch 追加纠正记录；本次没有执行回退或删除历史。
+- 未执行：业务修改、依赖安装、build/test/analyze/codegen、服务启动、Git stage/commit/push/fetch/pull/branch切换、部署/发布、云端上传、生产或凭据验证。
+- 局限：文件只持久化在当前工作区，尚未进入 Git 提交或远端；新机器/新 worktree 必须包含这些文件。旧7月历史记录保留，不当作本轮实测结果。
+- 交付：`docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md`、`docs/BASELINE/05_OBSERVED_BASELINE_2026-10-12.md`、`.codex/PROJECT_MEMORY.md` 及入口索引。
 
 ## 任务记录规则
 

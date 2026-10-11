@@ -1,7 +1,20 @@
 # CloudSend Project Memory
 
-最后更新：2026-07-12  
+最后更新：2026-10-12
+
 用途：AI 会话的稳定入口，不替代源码和完整工程文档。
+
+## 0. Latest Recovery Snapshot
+
+最新复核：[2026-10-12 接管认知](../docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)。Baseline：`CS-BL-2026-10-12-6fb0aa6`；本地 `test / 6fb0aa6e147901243d4cb14a5dc68ae75a13b890`，非 shallow，仅一次初始化提交。原审查工作树 clean；随后 `T-2026-10-12-001` 只保存记忆文档，未提交/推送。新对话必须重新核对 HEAD/status，不能假定工作树永远 clean。
+
+- **来源**：本地 HEAD 的975个 tracked blob 路径/hash与历史源 `Super-Build/Cloudsend@cbce0ba36c5c` 一致。源仓60提交、最早2026-04-13无父导入；准确 RustDesk fork point 未知。RustDesk1.4.0对照有615同路径同blob文件，仅证明部分继承。
+- **四个关键边界**：Android core/share/frame/waiting 分离；controller relay-only 不删除 endpoint direct/NAT兼容；产品账号不是 endpoint密码认证；ZEGO邀请/Token/录音同意分离，媒体走SDK。
+- **容易遗漏的当前行为**：永久密码 getter固定常量、setter不更新；Android已认证输入分支缺desktop对应keyboard gate；terminal有进程内persistent但重连回放TODO；record_upload dormant；ADB为本地子系统。
+- **风险解释**：JNI正常帧保存Image buffer裸地址后延迟读取；握手有non-secure fallback；双向nonce无方向标识；Android来电3秒自动接受；默认API/token HTTP与本地token保护有边界缺口。均为源码事实/静态风险，未证明已利用漏洞或凭据当前有效。
+- **当前资产**：jniLibs目录不存在，不能沿用7月本机libadb.so存在记录；ZEGO声明未进入pubspec.lock；broker有脚本内嵌Go实现，但独立工程/实际部署未知。`.info`是Windows构建输入，不是已证明的运行时配置入口。
+- **验证**：仅V0；未build/test/analyze/codegen、未运行服务/设备/生产验证，未审相邻API/WEB/SERVER仓。55处Rust测试标记不等于通过；Flutter cm_test是手动harness。
+- **恢复方式**：入口→状态/活动任务→本摘要→相关报告章节/源码。保持中文解释与English anchor；后续用户请求决定权限，不从已关闭任务恢复授权。文件在同一检出中可读；新worktree/机器必须实际包含这些文件才能恢复。
 
 ## 1. Entry and Source of Truth
 
@@ -26,7 +39,7 @@
 
 - 产品/runtime：`CloudSend`。
 - Android 显示名：`云计划`。
-- 来源：RustDesk 深度二次开发；本地 Git 只能追溯到 2026-04-13 的一次性 `DaXianDesk` 导入，导入前 upstream commit 未确认。
+- 来源：RustDesk 深度二次开发；当前本地只有2026-10-12初始化历史，2026-04-13一次性导入来自上节映射的历史源仓；导入前 upstream commit 未确认。
 - Rust crate/library：`cloudsend`。
 - Flutter package：`flutter_hbb`。
 - Android applicationId：`com.cloudsend.app`。
@@ -44,7 +57,7 @@
 - Android active JNI：`libs/scrap/src/android/pkg2230.rs`；`ffi.rs` 是未导出的兼容层。
 - Windows privacy/display：`src/privacy_mode.rs`、`src/privacy_mode/`、`src/virtual_display_manager.rs`。
 - account/API/sync/download：`src/hbbs_http/` 与 Flutter models。
-- external infrastructure：hbbs、hbbr、产品 API、ZEGO Token broker/RTC；服务端实现不在本仓库。
+- external infrastructure：hbbs、hbbr、产品 API/DB、ZEGO RTC；ZEGO Token broker 仅有 deployment script 内嵌Go实现，缺独立受控工程与部署证据。
 
 完整架构见 `docs/AI_ENGINEERING/01_ARCHITECTURE.md`。
 
@@ -62,7 +75,7 @@
 
 ## 5. Highest Risks
 
-- Public repository/history 中存在真实 credential 类型的字面值；值不得复制到文档或对话。
+- 公开源仓内容有 credential 类型字面值；当前有效性和生产用途未测试，不把字面值存在等同已确认生产事件；值不得复制。
 - 构建内置共享远控密码可由公开源码获知，permanent-password setter 不真正更新；需要每设备高熵凭据迁移。
 - Android ImageReader DirectBuffer ownership 可能失效；JNI `static mut` 存在 data-race/UB 风险。
 - Android input/custom command 在受控端的 permission enforcement 不完整。
@@ -71,7 +84,7 @@
 - peer secure handshake、secretbox nonce 和本地 password protection 需密码学专项审计。
 - 产品 HTTP/sync 路径存在 plaintext/auth boundary 风险。
 - Windows privacy/injection/virtual display 是高权限、崩溃恢复敏感区。
-- ignored `libadb.so` 和 driver/helper assets 破坏 clean-clone reproducibility。
+- 当前缺失的 `libadb.so` 和未闭环的 driver/helper assets 限制 clean-clone reproducibility。
 
 风险详情见 `docs/AI_ENGINEERING/10_SECURITY_MODEL.md`。
 

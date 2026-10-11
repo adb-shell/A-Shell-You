@@ -4,6 +4,8 @@
 源码基线：`HEAD 77062b4`  
 接管角色：CloudSend Principal Engineer
 
+2026-10-12 后续复核：[接管认知与证据](TAKEOVER_REVIEW_2026-10-12.md)、[新观察基线](../BASELINE/05_OBSERVED_BASELINE_2026-10-12.md)。本页7月基线保留；当前本地Git状态、历史源内容映射、ADB资产缺失、terminal生命周期及安全结论的证据边界以新复核和当前源码核对，不将旧环境描述冒充当前事实。
+
 > 本文是新 AI 工程体系的入口。结论分为源码已证实（`verified`）、静态推断（`inferred`）、仓外依赖（`external`）和待正式环境验证（`verification-required`）。源码永远高于本文。
 
 ## 1. 项目身份
