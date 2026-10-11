@@ -9,9 +9,11 @@
 
 最新接管复核：[2026-10-12 接管认知](docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)，对应观察基线 `CS-BL-2026-10-12-6fb0aa6`。先完成下列恢复顺序，再按任务读取该报告及源码。7月状态是历史快照；新对话应从 `.codex/PROJECT_STATE.md` 与 `.codex/PROJECT_MEMORY.md` 取得当前指针，不要求取得旧聊天记录。此机制是本工作区文件持久化，不表示 Git/云端已经同步。
 
-当前身份更新：[AShell迁移报告](docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)，身份基线已由f423335固化，[T004服务器配置](docs/tasks/T-2026-10-12-004-server-configuration.md) 已由c0951b5固化。[T005 PC入口](docs/tasks/T-2026-10-12-005-pc-build-entry.md) 统一为build.cmd、只打包本次Release产物，现已由c9b7cd1固化。[T006产品图标](docs/tasks/T-2026-10-12-006-product-icons.md) 统一主图后，最新 [T007覆盖复核](docs/tasks/T-2026-10-12-007-icon-coverage.md) 补齐Android通知/主题/悬浮图、Windows旧UI/自解压窗口和卸载快捷方式。两轮合并51文件未提交。Flutter内部package保留flutter_hbb；后台/PC显示A Shell You，Android桌面一个壳子。仅完成静态核验，不等于构建或设备显示成功。
+当前身份更新：[AShell迁移报告](docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)，身份基线已由f423335固化，[T004服务器配置](docs/tasks/T-2026-10-12-004-server-configuration.md) 已由c0951b5固化。[T005 PC入口](docs/tasks/T-2026-10-12-005-pc-build-entry.md) 统一为build.cmd、只打包本次Release产物，现已由c9b7cd1固化。[T006产品图标](docs/tasks/T-2026-10-12-006-product-icons.md) 统一主图后，[T007覆盖复核](docs/tasks/T-2026-10-12-007-icon-coverage.md) 补齐Android通知/主题/悬浮图、Windows旧UI/自解压窗口和卸载快捷方式；两轮51文件已由fb5c393提交。Flutter内部package保留flutter_hbb；后台/PC显示A Shell You，Android桌面一个壳子。静态核验不等于构建或设备显示成功。
 
 T003补齐所有文档品牌字段/路径/文件名及两处ashell.分类匹配；历史名称按用户要求规范化，原文字/真实源仓地址留在Git a036f31；不更改Git历史或凭空改写源仓URL。
+
+最新状态补充：[T008 Android构建诊断](docs/tasks/T-2026-10-12-008-android-resource-build.md)。上述T006/T007图标已由fb5c393（修改图标）提交到test并快进合并/推送main；当前main。本轮仅修正build.sh捕获日志为APK路径及失败传播，改动未提交；用户旧目录增量资源合并异常仍需构建机清理生成目录后验证，未升级工具链或执行编译。
 
 ## 1. 五分钟启动顺序
 

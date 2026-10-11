@@ -77,6 +77,12 @@ FRB 文件带 1.80.1 生成标记，且 Git 历史显示 Rust FFI 后续仍有�
 
 签名环境是发布机机密，不得复制到仓库或诊断输出。
 
+### Android打包错误传播（T008 / 2026-10-12）
+
+`build.sh::flutter_build_split_abi_apk` 和 `flutter_build_universal_apk` 供调用者命令替换捕获，stdout仅返回APK路径；阶段标题、verbose与Flutter日志均输出stderr。Flutter构建失败显式保留退出码，两个模式调用者立即return，不再进入旧APK查找、签名和成品复制。此前全局set -e不能可靠保护命令替换内部，日志也曾污染apk_in；详见 [T008](../tasks/T-2026-10-12-008-android-resource-build.md)。
+
+用户在原目录增量构建时遇到AGP7.3.1的mergeReleaseResources/source-sets异常，与官方206674992同类问题相符，根因仍需完整stacktrace和构建机验证。建议该机先对Flutter生成目录执行flutter clean再用修正后的build.sh重试；本轮未自动清理、未改AGP/Gradle/Kotlin版本、未构建。新图标配置保持不变，不能把脚本通道修正等同于资源合并错误已复现解决。
+
 ### 不可复现资产
 
 当前工作树 `flutter/android/app/src/main/jniLibs/` 下的 `libadb.so` 为 ignored/local-only binary。`ADB-CODE/`、`LADB/` 研究目录也被忽略。干净 clone 不能仅凭 tracked source 复现 ADB packaging，必须补充：

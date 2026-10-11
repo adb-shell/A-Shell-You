@@ -227,6 +227,18 @@ Mode：`append-only logical persisted-change events`
 - Corrects / Supersedes：补齐T006未覆盖的notification/floating及legacy/portable窗口；T006时monochrome复用前景已由本轮独立mask取代。旧任务历史不改写。
 - Git / build/test/analyze/project-codegen / install/run / actual package / delete/move / version/sign / external write / release：none。图片转换是获准资源生成，不是产品构建或代码生成。
 
+## CE-20261012-T008-01：Android构建日志与返回路径隔离
+
+- Timestamp：2026-10-12T07:41:06+09:00；Task：T-2026-10-12-008；Actor：Codex / ashell-release-engineer；Android静态复核，无子代理。
+- Scope：用户报告Android构建失败并确认原目录增量编译；完成诊断并修正直接相关的脚本错误。前轮提交/推送/合并请求已完成，本轮不继承Git或构建权限。
+- Source：main/fb5c393fe1e29a2cf805e75847820b315c468b3d，initial clean。纠正提交前STATE-008为当前状态的误读；T006/T007历史不改写。
+- Files（11）：build.sh；新增docs/tasks/T-2026-10-12-008-android-resource-build.md；docs/AI_ENGINEERING/08_BUILD_SYSTEM.md、09_DEBUG_SYSTEM.md；PROJECT_START_HERE.md；.codex/PROJECT_MEMORY.md、PROJECT_STATE.md、CURRENT_WORK.md、CHANGELOG_AI.md、CHANGE_EVENT_LOG.md、TASK_HISTORY.md。
+- Delta：split/universal标题与完整构建日志输出stderr，stdout仅APK路径；失败显式return原退出码；模式调用者显式传播失败，Flutter失败不再继续选历史APK、签名或复制。图标/依赖/版本/签名配置不改。
+- Diagnosis：AGP7.3.1+旧目录增量MergeResources/source-sets问题与官方206674992相符，仍为inferred。已确认脚本stdout污染和失败传播缺口独立于该根因；未宣称clean或代码修正已解决AGP异常。
+- Verification：bash --noprofile --norc -n仅语法解析、三份图标XML解析、stdout/失败路径人工静态检查、diff/范围/链接。无项目代码执行、无构建/测试结果。
+- Related：N/A — no decision delta / ADR-0014；STATE-20261012-009 / WORK-20261012-016。
+- Git/build/test/analyze/project-codegen/clean/delete/move/install/sign/deploy/release：none；未提交。正式构建机验证需求记录在task。
+
 ### 后续事件模板
 
 ```text

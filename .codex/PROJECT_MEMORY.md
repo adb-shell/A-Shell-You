@@ -6,6 +6,10 @@
 
 ## 0. Latest Recovery Snapshot
 
+当前最新：`T-2026-10-12-008`，见 [Android构建诊断](../docs/tasks/T-2026-10-12-008-android-resource-build.md)。main/fb5c393（修改图标），开始clean；T006/T007此前已按明确请求推送test并快进合并/推送main。用户原目录更新源码后增量编译遇到mergeReleaseResources/source-sets，疑似旧AGP增量问题，未取得完整stacktrace，不能确认根因。已静态修正build.sh两打包函数的stdout路径协议与错误码传播；不会在Flutter失败后继续选旧APK/签名。未改图标和工具链，未清缓存/编译/Git写入；源码修改未提交，只有bash -n及静态检查。CE-20261012-T008-01 / STATE-20261012-009；后续构建机clean/retry需要实际结果。
+
+以下T007为图标修改完成、Git提交之前的历史快照，不代表当前分支或dirty状态。
+
 最新任务：`T-2026-10-12-007`，见 [图标覆盖复核](../docs/tasks/T-2026-10-12-007-icon-coverage.md)。源test/c9b7cd135be838989953e7ab7037f8c6d8d6aa31，initial dirty为T006的32文件；新增补齐后合并51文件未提交。Android通知/主题使用同源机器人白色alpha，默认悬浮球保留完整原图；Windows旧Sciter改为读取同源128 PNG、自解压窗口持有small/big图标、卸载快捷方式引用主EXE。主EXE/服务/托盘/MSI消费链已静态核对；OS RuntimeBroker、系统服务管理器通用图标及用户customSvg不覆盖。12PNG/16XML、引用/ignore、源图及T006图片hash保护检查通过，只有V0。NWG API对照官方源码，本地解析依赖不可核对；实际Windows/Android显示未验证。事件CE-20261012-T007-01；STATE-20261012-008；无架构决定delta，禁止继承编译或Git权限。
 
 T006历史：[产品图标记录](../docs/tasks/T-2026-10-12-006-product-icons.md)。从同一原PNG转换21个图片资源，统一Windows主程序/自解压EXE/托盘、Flutter角标及Android桌面；原图实际1254方形RGBA，源图/UI主图规范为1024。loadIcon使用同源PNG主图与备用，不再回退旧SVG。此轮图片和Flutter代码在T007保持hash不变；T006没有覆盖的通知/悬浮图及主题配置由T007补齐。两轮均未编译/测试/实际打包/安装/Git写入。

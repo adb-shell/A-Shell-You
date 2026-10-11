@@ -646,12 +646,17 @@ pick_existing_apk() {
 
 flutter_build_split_abi_apk() {
   local target="$1"
-  local flutter_platform apk_in
+  local flutter_platform apk_in build_status
 
-  flutter_platform="$(target_to_flutter_platform "$target")"
+  flutter_platform="$(target_to_flutter_platform "$target")" || return $?
 
-  section "Flutter 打包 (split-per-abi, $target)"
-  (cd "$REPO_ROOT/flutter" && run flutter build apk "--$RELTYPE" --target-platform "$flutter_platform" --split-per-abi)
+  # This function is captured by $(...): stdout must contain only the APK path.
+  section "Flutter 打包 (split-per-abi, $target)" >&2
+  (cd "$REPO_ROOT/flutter" && run flutter build apk "--$RELTYPE" --target-platform "$flutter_platform" --split-per-abi) >&2 || {
+    build_status=$?
+    err "Flutter 打包失败 (split-per-abi, $target, exit=$build_status)，停止查找/签名 APK"
+    return "$build_status"
+  }
 
   case "$target" in
     aarch64-linux-android)
@@ -692,8 +697,14 @@ flutter_build_split_abi_apk() {
 }
 
 flutter_build_universal_apk() {
-  section "Flutter 打包 (universal)"
-  (cd "$REPO_ROOT/flutter" && run flutter build apk "--$RELTYPE" --target-platform android-arm64,android-arm,android-x64)
+  local build_status
+  # Keep build logs out of the APK path captured by the caller.
+  section "Flutter 打包 (universal)" >&2
+  (cd "$REPO_ROOT/flutter" && run flutter build apk "--$RELTYPE" --target-platform android-arm64,android-arm,android-x64) >&2 || {
+    build_status=$?
+    err "Flutter 打包失败 (universal, exit=$build_status)，停止查找/签名 APK"
+    return "$build_status"
+  }
 
   local apk_in=""
   apk_in="$(pick_existing_apk \
@@ -767,7 +778,7 @@ build_mode_aarch64() {
   section "开始构建: aarch64"
   install_android_deps_for_target "$target"
   build_rust_lib_for_target "$target"
-  apk_in="$(flutter_build_split_abi_apk "$target")"
+  apk_in="$(flutter_build_split_abi_apk "$target")" || return $?
   sign_apk_manual "$apk_in" "$signed_tmp_apk"
   finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "ashell-aarch64-release.apk"
 
@@ -788,7 +799,7 @@ build_mode_universal() {
     build_rust_lib_for_target "$t"
   done
 
-  apk_in="$(flutter_build_universal_apk)"
+  apk_in="$(flutter_build_universal_apk)" || return $?
   sign_apk_manual "$apk_in" "$signed_tmp_apk"
   finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "ashell-universal-release.apk"
 

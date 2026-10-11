@@ -248,3 +248,11 @@ build.cmd
 - reviewer 和日期。
 
 在正式结果回填前，本文所有相关项保持 `verification-required`。
+
+## 12. Android资源合并失败与脚本二次报错（T008）
+
+- 第一错误：app:mergeReleaseResources的Unable to locate resourceFile in source-sets；指向merged-not-compiled-resources内的AppCompat XML，不等于应用src/main/res缺少同名文件。AGP7.3.1+原目录增量构建与官方206674992同类问题相符，但未取得完整stacktrace/构建机缓存，暂为inferred。
+- 第二错误：旧build.sh把Flutter打包标题/日志一起捕获为apk_in，sign_apk_manual的require_file因而把日志当文件路径。新代码将这些输出送stderr，构建失败显式return，未改变图标或依赖版本。
+- 构建机验证顺序：同步修正后的build.sh；在真实仓库flutter目录执行flutter clean，回根目录运行./build.sh 1或2；仅构建机后续执行，本轮没有清缓存或编译。
+- 若仍失败，保留第一处Caused by/stacktrace及实际AGP/Gradle/Flutter版本；可在flutter/android目录对:app:mergeReleaseResources加--stacktrace --info收集诊断。不要用--scan上传环境信息，也不要直接删除全局Gradle缓存或把AppCompat XML拷进业务资源。
+- 证据、未执行范围和回滚见 [T008](../tasks/T-2026-10-12-008-android-resource-build.md)。

@@ -190,6 +190,18 @@
 - Git/build/test/analyze/project-codegen/install/run/actual packaging/delete/move/version/sign/external/release：none。回滚仅未来获准后反向T007 patch，不覆盖T006。
 - 文档/Decision：当前恢复链已同步；N/A — no decision delta，沿用ADR-0014；CE-20261012-T007-01 / STATE-20261012-008 / WORK-20261012-014。详见docs/tasks/T-2026-10-12-007-icon-coverage.md。
 
+## T-2026-10-12-008：Android资源合并失败诊断与脚本修正
+
+- 状态：completed — scoped source/V0，正式构建结果待验证；用户报告失败并确认原目录更新源码后增量构建。
+- Baseline：main/fb5c393fe1e29a2cf805e75847820b315c468b3d，initial clean；此前图标commit/push/test→main已完成。本轮只改脚本与10文档，不继承Git/build/清理权限。
+- 诊断：AGP7.3.1及merged-not-compiled-resources的AppCompat文件source-set异常与官方206674992同类问题相符，但缺少stacktrace/缓存和复现，暂为inferred；图片格式损坏无当前证据。
+- 已确认：build.sh通过apk_in="$(...)"捕获完整构建标题/日志，随后require_file把多行文本当路径；命令替换内依赖set -e可能在失败后继续选择旧APK。两函数与调用者已显式分离日志/路径并传播错误码。
+- 兼容/安全：无toolchain/Gradle/AGP/图标/权限/签名/依赖修改，无自动删除缓存。stderr保持日志可见，不暴露额外签名信息。回滚仅未来获准后反向本任务patch，保留图标提交。
+- 验证：bash -n只解析、XML解析、静态失败流程/diff/范围/链接。未执行shell函数测试或构建，AND-08等正式证据NOT_RUN。
+- 后续验证：构建机同步脚本，在flutter目录clean后回根运行build.sh 1或2；仍失败时提供首个Caused by及stacktrace。完整命令/范围见任务文件。
+- 记忆：08_BUILD_SYSTEM、09_DEBUG_SYSTEM、恢复入口及ledger同步；N/A — no decision delta，沿用ADR-0014；CE-20261012-T008-01 / STATE-20261012-009 / WORK-20261012-016。
+- Git/compile/test/analyze/codegen/clean/delete/move/install/sign/deploy/release：none。详见docs/tasks/T-2026-10-12-008-android-resource-build.md。
+
 ## 新任务模板
 
 ```text

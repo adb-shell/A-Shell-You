@@ -131,6 +131,16 @@ Mode：`append-only task-level index`
 - Decision：N/A — no decision delta，沿用ADR-0014；Event CE-20261012-T007-01；STATE-20261012-008 / WORK-20261012-014。
 - Detail：docs/tasks/T-2026-10-12-007-icon-coverage.md；本条补充T006历史范围，不改写当时结论。
 
+## T-2026-10-12-008：Android资源错误诊断与脚本结果通道
+
+- Status：completed — scoped source/V0；资源合并根因及构建机验证仍verification-required。
+- Source：main/fb5c393（修改图标），initial clean；前轮test/main已同步，本轮11文件未提交。
+- Evidence：用户确认旧目录增量构建；AGP7.3.1的source-sets异常与官方同类问题相符，未复现。脚本Missing file混入早先打包标题，则由stdout捕获路径可直接解释。
+- Outcome：build.sh split/universal日志送stderr、stdout仅路径、构建失败和调用者保留非零退出，不再失败后选择旧APK。没有自动clean或版本升级，图标不改。
+- Verification：bash -n、XML解析、静态输出/失败链、diff/范围与链接；build/test/运行/清缓存/Git全部none。构建机后续clean/retry步骤见task。
+- Decision/Event：N/A — no decision delta；CE-20261012-T008-01；STATE-20261012-009 / WORK-20261012-016。
+- Detail：docs/tasks/T-2026-10-12-008-android-resource-build.md；源码修正未宣称资源合并已恢复。
+
 ### 后续索引更新规则
 
 - 每个 completed、blocked 或 cancelled AI task 追加一条；长任务仅在正式 handoff milestone 时追加。
