@@ -93,6 +93,15 @@ Mode：`append-only task-level index`
 - Decision/Event/State：D-016补充ADR-0014；CE-20261012-T003-01；STATE-20261012-004 / WORK-20261012-006。
 - Detail：docs/tasks/T-2026-10-12-003-brand-normalization.md；迁移报告；TASK_HISTORY同ID。
 
+## T-2026-10-12-004：更新服务器默认配置
+
+- Status：completed — source/V0；用户明确提供新IP、七端口映射和服务器Key。
+- Source：test/f423335，开始时clean且与origin/test一致；此前品牌变更已由用户提交并按请求推送。
+- Outcome：12份原配置/源码/脚本/文档仅作指定值替换，旧值排除.git后零残留；同步工程文档与恢复入口。本轮未提交。
+- Verification：逐文件对照HEAD的预期字面替换一致；端口派生、公钥格式和diff检查通过；运行/构建/握手/部署均NOT_RUN。自定义配置和构建环境仍可覆盖默认值。
+- Decision/Event/State：D-017；CE-20261012-T004-01；STATE-20261012-005 / WORK-20261012-008。
+- Detail：docs/tasks/T-2026-10-12-004-server-configuration.md；TASK_HISTORY同ID；无standing Git/build/external权限。
+
 ### 后续索引更新规则
 
 - 每个 completed、blocked 或 cancelled AI task 追加一条；长任务仅在正式 handoff milestone 时追加。

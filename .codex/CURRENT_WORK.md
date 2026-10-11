@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261012-006`
+Registry Revision：`WORK-20261012-008`
 
-Last Updated：2026-10-12T05:39:32+09:00
+Last Updated：2026-10-12T06:16:00+09:00
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none。T003完成两处ashell.匹配及全部文档品牌命名统一；T002/T003变更仍未提交。后续任务重核HEAD/status和用户授权；没有构建/部署权限。
+none；本轮服务器默认配置任务已完成V0交付，变更未提交。新会话仍须核对HEAD/status及当前请求。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ none。T003完成两处ashell.匹配及全部文档品牌命名统一；T002/T00
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-12-003`
-- Result：源码两处匹配、全部文档字段/路径/文件名统一；旧品牌全文/路径检索零命中（排除.git）。Flutter内部flutter_hbb保留；文档历史原文字在Git可恢复。未提交/构建/部署。
-- Closed At：2026-10-12T05:39:32+09:00
+- Task ID：`T-2026-10-12-004`
+- Result：12份原配置/源码/脚本/文档仅作指定服务器值替换；旧值零残留（排除.git），记忆同步。Flutter内部flutter_hbb保留。本轮未提交/构建/部署。
+- Closed At：2026-10-12T06:16:00+09:00
 - Final T-State：`T8 — complete`
-- State / Event：`STATE-20261012-004` / `CE-20261012-T003-01`
-- Decision：D-016补充D-015 / ADR-0014；治理沿用D-014。
-- Verification：V0全文/路径检索、源码谓词、Flutter package/import、82份修改/新增Markdown链接及diff检查；V1—V5 NOT_RUN。
+- State / Event：`STATE-20261012-005` / `CE-20261012-T004-01`
+- Decision：D-017；产品身份沿用D-015/D-016 / ADR-0014；治理沿用D-014。
+- Verification：V0字面值差异、旧值扫描、端口派生、公钥格式、31处文档链接及diff检查；V1—V5 NOT_RUN。
 - Next Gate：new user request must start at T0；historical authorization inherited `none`。
-- Changelog pointer：`CHANGELOG_AI.md` 中 `T-2026-10-12-003`。
+- Changelog pointer：`CHANGELOG_AI.md` 中 `T-2026-10-12-004`。
 - Detailed record：`TASK_HISTORY.md` 中同 Task ID；修改清单见 `CHANGE_EVENT_LOG.md` 中同 Event。

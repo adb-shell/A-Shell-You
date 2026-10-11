@@ -1,6 +1,6 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
-2026-10-12产品身份迁移：见 `docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md`、ADR-0014、D-016。源HEAD为a036f31；迁移未提交、仅V0。Flutter内部包名flutter_hbb必须保留。T003按用户要求统一两处ashell.匹配和全部文档品牌字段/路径/文件名，历史原文可从Git恢复；新会话先核对HEAD/status。
+2026-10-12产品身份迁移：见 `docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md`、ADR-0014、D-016。迁移已由f423335固化并推送test，仅V0。T004在其上替换仓内服务器默认配置，尚未提交，见 `docs/tasks/T-2026-10-12-004-server-configuration.md`。Flutter内部包名flutter_hbb必须保留。T003按用户要求统一两处ashell.匹配和全部文档品牌字段/路径/文件名，历史原文可从Git恢复；新会话先核对HEAD/status。
 
 最后一次与全仓源码对齐：2026-07-12
 最近一次文档分层整理：2026-07-12

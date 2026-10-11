@@ -3,6 +3,8 @@
 接管基线：2026-07-12  
 状态：`verified` + `external` + `verification-required`
 
+2026-10-12 默认配置更新（T004 / V0）：`src/common.rs::get_api_server()` 的显式API默认值与 `.info` 构建输入已更新为用户指定服务器、端口10084；其 `RENDEZVOUS_PORT - 2` 派生也为10084。`src/client/helper.rs::DEFAULT_ZEGO_TOKEN_URL` 使用新服务器、端口10083；`scripts/deploy_zego_token_service.sh` 的Shell及内嵌Go默认端口和ZEGO部署文档同步。HTTP scheme、请求字段、认证与覆盖逻辑未改，服务未启动/部署/访问。构建环境的 `API_SERVER` 等实际值仍需由维护方核对，不能从源码默认值替换推断已经迁移。
+
 ## 1. 结论先行
 
 本仓库不是 AShell 后台仓库。它包含：

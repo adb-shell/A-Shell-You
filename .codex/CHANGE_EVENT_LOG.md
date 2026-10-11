@@ -178,6 +178,18 @@ Mode：`append-only logical persisted-change events`
 - Decision/State：D-016 / ADR-0014补充；STATE-20261012-004 / WORK-20261012-006；取代T002对两处旧匹配及历史品牌措辞的保留方案。
 - Git write / build/test/analyze/codegen / dependency install / credentials / external / release：none。
 
+## CE-20261012-T004-01：替换服务器默认配置并同步恢复记录
+
+- Timestamp：2026-10-12T06:16:00+09:00；Task ID：T-2026-10-12-004。
+- Actor / Skill：Codex / ashell-master、ashell-network-engineer、ashell-api-engineer；没有子代理委派。
+- Permission：当前用户明确提供目标值并要求替换本仓服务器信息；Event Type：update/create/task closure。
+- Files（25）：`.info`、`libs/hbb_common/src/config.rs`、`src/common.rs`、`src/client/helper.rs`、`src/rendezvous_mediator.rs`、`flutter/lib/mobile/pages/server_page.dart`、`scripts/deploy_zego_token_service.sh`、`docs/DOCUMENT_AUDIT.md`、`docs/ENGINEERING_BASELINE.md`、`docs/ZEGO_VOICE_CALL_ARCHITECTURE.md`、`docs/ZEGO_VOICE_CALL_INTEGRATION.md`、`docs/ZEGO_TOKEN_SERVICE_DEPLOYMENT.md`、`docs/AI_ENGINEERING/06_NETWORK_PROTOCOL.md`、`docs/AI_ENGINEERING/07_API_SYSTEM.md`、`docs/tasks/T-2026-10-12-004-server-configuration.md`、`EXTERNAL_ASSET_REGISTRY.md`、`AGENTS.md`、`PROJECT_START_HERE.md`、`.codex/PROJECT_MEMORY.md`、`.codex/PROJECT_STATE.md`、`.codex/CURRENT_WORK.md`、`.codex/DECISION_LOG.md`、`.codex/CHANGELOG_AI.md`、`.codex/TASK_HISTORY.md`、`.codex/CHANGE_EVENT_LOG.md`。
+- Delta：服务器默认IP、相关端口、公钥及脚本/文档引用替换；协议与配置覆盖语义不变。新task文件为新增，其余update；无generated变更。
+- Corrects：恢复入口中a036f31未提交状态已过时，更新为本轮开始前已观察到的f423335和此前推送完成；保留旧任务历史。
+- Verification：12文件对照HEAD仅指定字面值变更；旧值零残留、公钥Base64为32字节、端口派生和diff检查通过，仅V0。实际服务/构建NOT_RUN。
+- Related：D-017；T004任务与Network/API工程文档；STATE-20261012-005 / WORK-20261012-008。
+- Git / Build / Delete / Move / Version / External / Release：本任务全部none；未读取/修改外部秘密值、未试用Key。
+
 ### 后续事件模板
 
 ```text

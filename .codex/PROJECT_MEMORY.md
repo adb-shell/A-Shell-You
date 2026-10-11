@@ -6,7 +6,9 @@
 
 ## 0. Latest Recovery Snapshot
 
-最新任务：`T-2026-10-12-003` 补齐全部品牌文字/字段/文档命名，承接T002迁移。源 `test / a036f31f80baeb6cd68bcf169f9e9fa8db39fe76`，变更仍未提交；基线 `AS-BL-2026-10-12-a036f31-worktree` 加T003增量。产品 A Shell You，内部 AShell/ashell，Android me.ashell，后台 A Shell You、launcher 一个壳子。**Flutter内部package必须保留flutter_hbb及其导入。** 两处公共服务匹配也改为ashell.；构建变量ASHELL_*，ZEGO字段ashellSessionId。包括历史文档在内的品牌术语和路径按用户要求统一，原文字/源仓地址从Git a036f31恢复，不能虚构新源仓链接。详见 [迁移报告](../docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。仅V0，未编译/测试/codegen/部署；实际构建机和服务未操作。下段接管记录保留历史日期与验证结论，名称已规范化，不表示当前HEAD或运行验证。
+最新任务：`T-2026-10-12-004` 按用户提供的新服务器IP、端口和Key替换仓内默认配置，详见 [任务记录](../docs/tasks/T-2026-10-12-004-server-configuration.md)。源 `test / f423335e90885975c101484977abbe8c7524b42e`；T002/T003品牌迁移已由用户提交，随后按用户要求推送，开始本任务时clean且与origin/test一致。本轮服务器配置及记忆更新未提交，未访问/部署服务；只做V0。构建环境和已保存自定义配置可能覆盖新默认值，实际服务配套待验证。
+
+产品 A Shell You，内部 AShell/ashell，Android me.ashell，后台 A Shell You、launcher 一个壳子。**Flutter内部package必须保留flutter_hbb及其导入。** 两处公共服务匹配使用ashell.；构建变量ASHELL_*，ZEGO字段ashellSessionId。基线 `AS-BL-2026-10-12-a036f31-worktree` 加T003增量已由f423335固化。历史文档品牌名称按用户要求规范化，原文字/源仓地址从Git a036f31恢复。详见 [迁移报告](../docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。未编译/测试/codegen；实际构建机和服务未操作。下段接管记录保留历史日期与验证结论，不表示当前HEAD或运行验证。
 
 ### 迁移前接管证据（历史）
 

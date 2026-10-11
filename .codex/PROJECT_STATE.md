@@ -1,17 +1,17 @@
 # AShell Project State
 
 Schema Version：`1.0`  
-State Revision：`STATE-20261012-004`
+State Revision：`STATE-20261012-005`
 
-Last Updated：2026-10-12T05:39:32+09:00
+Last Updated：2026-10-12T06:16:00+09:00
 
-Observed At：2026-10-12T05:39:32+09:00
+Observed At：2026-10-12T06:16:00+09:00
 
 Evidence Scope：`repository-observed / V0 / external and runtime verification pending`
 
 > 本文件是截至 `Observed At` 的当前状态快照，不是生产实时监控，也不替代源码、`docs/AI_ENGINEERING/`、ADR 或 Baseline。新会话必须用只读检查确认其新鲜度；发现漂移时记录 conflict/stale，不得用本文件覆盖源码事实或改写旧 Baseline。
 
-最新变更证据：[AShell身份迁移](../docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。之前的 [接管认知](../docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)及旧基线保留迁移前事实。当前产品身份已变，Flutter内部package保留flutter_hbb；只完成静态检查，未执行编译或运行验证。
+最新变更证据：[T004服务器配置](../docs/tasks/T-2026-10-12-004-server-configuration.md)。[AShell身份迁移](../docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)已由f423335固化并推送；当前服务器默认值更新尚未提交。之前的 [接管认知](../docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)及旧基线保留迁移前事实。Flutter内部package保留flutter_hbb；只完成静态检查，未执行编译或运行验证。
 
 T003补充：用户明确要求两处公共服务匹配字符串也改为ashell.，全部文档字段/代码示例/路径/文件名统一品牌。历史文档已标注名称规范化，原文字与真实源仓地址从a036f31恢复；当前工作区排除.git后，旧品牌文本/路径大小写不敏感检索零命中。
 
@@ -23,8 +23,8 @@ T003补充：用户明确要求两处公共服务匹配字符串也改为ashell.
 | Rust / Flutter version | `5.2.1` / `5.2.1+59` | manifests + Baseline |
 | Baseline ID | `AS-BL-2026-10-12-a036f31-worktree` | `docs/BASELINE/06_ASHELL_IDENTITY_BASELINE_2026-10-12.md` |
 | Branch | `test` | read-only Git observation |
-| HEAD | `a036f31f80baeb6cd68bcf169f9e9fa8db39fe76` | read-only Git observation |
-| Worktree | T-2026-10-12-002开始时clean；产品身份迁移的源码/配置/重命名/文档均未提交 | 精确列表每次会话重查；未stage/commit/push |
+| HEAD | `f423335e90885975c101484977abbe8c7524b42e` | read-only Git observation |
+| Worktree | T004开始时clean且与origin/test一致；当前服务器默认配置及文档更新未提交 | 精确列表每次会话重查；本任务未stage/commit/push |
 | History mapping | a036f31提交前轮记忆；6fb0aa6初始化的975 blobs与历史源匹配是迁移前证据，准确RustDesk fork未知 | 历史接管报告；不能用该一致性描述当前dirty tree |
 | Highest completed verification | `V0` repository/document/schema checks | `TEST_MATRIX.md` + task records |
 | Formal build/runtime evidence | `NOT_RUN / VERIFICATION-REQUIRED` | Android/Windows/Network/API formal environments absent |
@@ -59,18 +59,18 @@ T003补充：用户明确要求两处公共服务匹配字符串也改为ashell.
 
 - Active task registry：`CURRENT_WORK.md`。
 - Detailed task history：`TASK_HISTORY.md`。
-- Latest completed AI task：`T-2026-10-12-003`（品牌文字与文档补齐/V0交付；正式构建未验证）。
+- Latest completed AI task：`T-2026-10-12-004`（服务器默认配置/V0；正式连接和构建未验证）。
 - Current active task：`none`；以 CURRENT_WORK 实时行和新会话只读复核为准。
-- Latest recorded modification event：`CE-20261012-T003-01`。
-- Latest product decision：`D-016`补充D-015 / ADR-0014；治理仍沿用D-014。
+- Latest recorded modification event：`CE-20261012-T004-01`。
+- Latest product decision：`D-017`服务器默认配置；产品身份仍沿用D-015/D-016 / ADR-0014；治理仍沿用D-014。
 - Architecture decisions：`docs/ADR/README.md`；ADR-0014取代ADR-0002产品身份决定。
 
 ## 5. Standing Authority State
 
 - There is no standing C2 or C3 authorization.
 - Historical approvals in memory、Task History、Decision Log or ADR never transfer to a new session.
-- 旧任务与本轮T-2026-10-12-003品牌文字变更授权在交付后关闭；后续请求按当前用户授权重新定界，不继承历史权限。
-- 本轮仅执行明确授权范围内的源码/配置/文档修改及产品路径重命名；Git write、build/test/analyze/codegen、依赖安装、version/sign/package、upload/deploy/release和production/credential操作均未执行。
+- 旧任务与本轮T-2026-10-12-004服务器配置变更授权在交付后关闭；后续请求按当前用户授权重新定界，不继承历史权限。
+- 本轮仅执行明确授权范围内的源码/配置/文档编辑；没有Git写入、构建/测试/codegen、安装、服务访问或部署。此前品牌提交已按单独请求推送；该动作不构成本轮或未来Git写入权限。
 
 ## 6. Freshness and Update Contract
 
