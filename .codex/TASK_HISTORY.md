@@ -165,6 +165,31 @@
 - 编译验证需求：见任务文件；Windows正式环境build.cmd，验证清单/解压/启动/缺驱动与失败退出；全部NOT_RUN。
 - Decision/Event：D-018 / CE-20261012-T005-01；任务docs/tasks/T-2026-10-12-005-pc-build-entry.md。
 
+## T-2026-10-12-006：用户PNG统一产品图标
+
+- 状态：completed / T8 / V0；批准者：当前用户，明确上传原图并要求保持设计、转换替换，禁止编译。
+- 基线：test/c9b7cd135be838989953e7ab7037f8c6d8d6aa31，initial clean；引用AS-BL-2026-10-12-c0951b5-pc-build-worktree并记录T005已提交的drift。
+- 修改：21图像（3个9尺寸ICO、3个源图/UI PNG、15个Android PNG）和loadIcon同源PNG回退、定向gitignore例外；9份工程文档/恢复记忆。精确清单在task；没有删除/移动。
+- 原图：实际1254×1254 RGBA，转换为需要尺寸，保留原始设计、透明度及细节；原用户文件SHA不变。不执行重绘或自动描摹。
+- 安全/兼容：没有新增网络、权限、FFI、安装器逻辑或依赖；继承既有Androidmonochrome复用前景，主题着色待设备确认。旧SVG保留但loadIcon不再使用；Flutter内部package不变。
+- 验证：18PNG尺寸/alpha、3ICO全部27帧独立解码、Android内容范围、源图未变、引用/ignore、图片静态预览、diff和文件范围。System.Drawing的256多帧选择与独立帧解码差别已如实记录，不当作应用/系统显示测试。
+- 正式验证：WIN-08、AND-08、FLT-02/07 NOT_RUN；《编译验证需求》登记于task，仅供未来明确授权的正式Windows/Linux环境。
+- 记忆/Decision：更新恢复入口和状态；N/A — no decision delta，沿用ADR-0014；CE-20261012-T006-01 / STATE-20261012-007 / WORK-20261012-012。
+- Git / build/test/analyze/project-codegen / dependency install / actual packaging / signing / version / external / release：none；未提交。
+- 回滚：未来获准后按c9b7cd1逐文件反向恢复，本次不执行Git恢复/删除。交付docs/tasks/T-2026-10-12-006-product-icons.md。
+
+## T-2026-10-12-007：图标覆盖复核与遗漏补齐
+
+- 状态：completed / T8 / V0；批准者：当前用户，要求继续检查Windows/Android产品图标，发现遗漏继续生成替换，不编译。
+- 基线：test/c9b7cd135be838989953e7ab7037f8c6d8d6aa31；T006的32文件已dirty。沿用AS-BL-2026-10-12-c0951b5-pc-build-worktree，不改写旧基线。
+- 发现/修改：Android两处通知共用旧ic_stat_logo、默认悬浮旧vector，主题复用白卡片导致轮廓失真；Windows旧Sciter硬编码旧图、portable窗口无图标、卸载快捷方式强制系统图标。按同一原图补齐12图片、3 Rust、3 XML、1 ignore及9文档，共28文件；合并51文件未提交。
+- 覆盖：主程序/服务/portable-service同EXE，托盘PNG/ICO、程序列表/文件关联、MSI AppIcon与快捷方式、旧UI及自解压窗口均追踪。Android Manifest应用/服务继承、桌面彩色/主题、前台通知/状态栏和默认悬浮图已核对。
+- 安全/兼容：新增Win32 WM_SETICON仅针对本对象窗口，HICON由BasicApp持有，窗口先销毁。无依赖/权限/协议变化；系统RuntimeBroker和服务管理器通用图标不改，用户customSvg仍可覆盖。Mac/Linux/web专有资源保留。
+- 验证：Pillow独立读取12PNG、16XML解析、alpha/单色/眼睛间隙和尺寸、include/资源/ignore引用、预览、T006图片与Flutter代码及原图hash不变、diff/范围/文档链接。正式WIN-08/AND-08/FLT-02/07/RST-01 NOT_RUN。
+- 《编译验证需求》：已登记task，由未来明确授权的正式Windows/Linux环境执行；本地NWG源码/portable lock缺失，上游API检查不代替编译。实际Shell、第三方多窗口插件、OEM主题/图标缓存均待验证。
+- Git/build/test/analyze/project-codegen/install/run/actual packaging/delete/move/version/sign/external/release：none。回滚仅未来获准后反向T007 patch，不覆盖T006。
+- 文档/Decision：当前恢复链已同步；N/A — no decision delta，沿用ADR-0014；CE-20261012-T007-01 / STATE-20261012-008 / WORK-20261012-014。详见docs/tasks/T-2026-10-12-007-icon-coverage.md。
+
 ## 新任务模板
 
 ```text

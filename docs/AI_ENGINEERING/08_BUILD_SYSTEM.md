@@ -197,6 +197,23 @@ cargo build --release --features flutter
 
 本轮不具备也未执行上述发布动作。
 
+## 产品图标资源（T006 / 2026-10-12）
+
+- Windows主程序由 `flutter/windows/runner/Runner.rc` 读取 `resources/app_icon.ico`；自解压EXE由 `libs/portable/build.rs` 读取 `res/icon.ico`。两者与 `res/tray-icon.ico` 均已同步为同源9尺寸ICO（16/20/24/32/40/48/64/128/256）。
+- `flutter/lib/common.dart::loadIcon` 优先读取 `flutter/assets/icon.png`（1024），失败读取独立同源 `icon-fallback.png`（256），再次失败保留布局空位；旧 `icon.svg` 保留但不再作为该入口回退。`src/tray.rs` 也优先读取已打包的Flutter主PNG，备用ICO保持同源。
+- Android五密度 `ic_launcher.png` / `ic_launcher_round.png` 为48/72/96/144/192；`ic_launcher_foreground.png` 为108/162/216/324/432，按66/108比例居中保留完整原图。T006时anydpi-v26的monochrome复用前景，T007已改为独立机器人单色层（见下）；白色背景及Manifest的roundIcon指向ic_launcher保持不变。
+- `res/icon.png` 同步为1024源图。现有构建脚本不会自动运行launcher icon生成器；两个新增Flutter PNG已加入根.gitignore的定向例外，pubspec沿用assets/声明。新增源图也会被其他使用共有Flutter角标的界面消费，不等于Apple/Linux/web专有图标迁移。
+- 本次仅将用户提供的1254×1254 RGBA图做确定性尺寸/格式转换，未重新设计或修改原文件。21个图片资源及加载链的V0检查见 [T006](../tasks/T-2026-10-12-006-product-icons.md)，正式EXE/APK构建与显示均NOT_RUN。
+
+### 图标覆盖补充（T007 / 2026-10-12）
+
+- Android通知/前台服务的两处 `setSmallIcon(R.mipmap.ic_stat_logo)` 已替换五密度白色机器人alpha图（24/36/48/72/96）。两个adaptive XML的monochrome改用新 `ic_launcher_monochrome.png`（108/162/216/324/432），避免白底板变成唯一主题轮廓；彩色桌面图不变。
+- 默认悬浮球 `drawable/floating_window.xml` 改为引用 `drawable-nodpi/ashell_floating_icon.png`（320），原Kotlin消费资源名保持不变。已有用户 `customSvg` 仍优先，未清理用户配置。六个新增Android PNG均有精确ignore例外。
+- Windows旧Sciter `src/ui.rs::get_icon` 的Windows分支改为嵌入同源 `res/128x128.png`，覆盖其主窗/远程窗/CM/聊天窗消费链。portable `BasicApp.window_icon` 持有同一PNG生成的HICON，窗口builder绑定small，并通过WM_SETICON绑定big；不改变已有加载文字/动画。
+- Windows EXE安装路径的卸载快捷方式 `IconLocation` 改为主程序exe索引0。服务及portable-service复用主EXE，程序列表/文件关联/普通快捷方式使用主EXE图标；MSI的AppIcon由preprocess从 `res/icon.ico` 复制。当前没有实际生成MSI资源副本或EXE。
+- services.msc通用图标和OS派生RuntimeBroker辅助进程不属于项目品牌资源；未修改系统或第三方签名二进制。其他平台专用图标保留，通用 `res/128x128.png` 的既有bundle消费者也会看到新图。
+- 详见 [T007覆盖表与28文件清单](../tasks/T-2026-10-12-007-icon-coverage.md)。12PNG/16XML及引用V0检查通过，T006图片hash不变；本地NWG源码/portable lock缺失，API仅对照官方上游源码。无编译、产品测试、运行、打包或Git写入，Windows实际Shell与Android设备显示待验证。
+
 ## 12. 2026-10-12 AShell身份迁移补充
 
 当前命名和静态证据见 [迁移报告](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。Rust crate/native artifact迁为ashell，Flutter内部package保留flutter_hbb。Android与Windows正式脚本、portable marker长度、加载端和C符号已同步；未执行任何脚本/编译。FRB generated_bridge.dart仅做C符号的机械同步，与手写导出对应，未改API类型；正式环境仍需重生成核对，不能把V0检查当成codegen或构建通过。jniLibs缺失、ZEGO lock drift、外部签名/驱动及Apple/Google注册仍待验证。

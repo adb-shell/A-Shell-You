@@ -1393,7 +1393,7 @@ sLinkFile = \"{tmp_path}\\Uninstall {display_name}.lnk\"
 Set oLink = oWS.CreateShortcut(sLinkFile)
     oLink.TargetPath = \"{exe}\"
     oLink.Arguments = \"--uninstall\"
-    oLink.IconLocation = \"msiexec.exe\"
+    oLink.IconLocation = \"{exe},0\"
 oLink.Save
         "
         ),

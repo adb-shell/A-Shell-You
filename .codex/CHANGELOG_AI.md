@@ -111,6 +111,26 @@ Mode：`append-only task-level index`
 - Decision/Event/State：D-018 / CE-20261012-T005-01 / STATE-20261012-006 / WORK-20261012-010。
 - Detail：docs/tasks/T-2026-10-12-005-pc-build-entry.md；新baseline07；本轮未提交/推送。
 
+## T-2026-10-12-006：原图统一Windows与Android产品图标
+
+- Status：completed / T8 / V0；用户明确授权保持原图设计做尺寸/格式转换及指定资源替换，禁止编译。
+- Source：test/c9b7cd1，initial clean；T005已由该HEAD固化。本任务32文件未提交：21图片、2加载/ignore配置、9任务/工程/恢复文档。
+- Outcome：3个9尺寸ICO，1024源图/UI主图、256备用PNG；Android五密度普通/备用圆形/自适应前景。loadIcon不再回退旧SVG，两个新增PNG可被Git发现。
+- Verification：文件解码、PNG/ICO尺寸与alpha、内容留白、源图SHA未变、资源引用和ignore例外、静态预览及diff检查；无build/test/analyze/codegen/安装/实际打包/Git写入。
+- Limits：正式Windows Shell/EXE与Android APK/主题/启动器显示未验证；通知、悬浮球、横向Logo、动画和其他平台专有资源不在范围。
+- Decision：N/A — no decision delta，沿用ADR-0014；Event：CE-20261012-T006-01；STATE-20261012-007 / WORK-20261012-012。
+- Detail：docs/tasks/T-2026-10-12-006-product-icons.md；后续构建/Git按新的明确请求执行。
+
+## T-2026-10-12-007：Windows / Android 图标覆盖补齐
+
+- Status：completed / T8 / V0；用户追加授权检查所有Windows/Android产品图标并继续生成替换，继续禁止编译。
+- Source：test/c9b7cd1；initial dirty为T006的32文件，本轮28文件，与T006重叠9文件，合并51文件未提交。
+- Outcome：Android五密度通知小图/独立monochrome、默认悬浮球；Windows旧Sciter同源图、自解压窗口small/big、卸载快捷方式品牌图标；精确ignore例外。主EXE/服务/托盘/MSI路径已核对。
+- Verification：12PNG/16XML、尺寸/alpha/遮罩空洞、图片预览、include/资源引用、T006图片及Flutter加载代码hash保护、范围/diff/记忆链接。仅V0；无build/test/analyze/codegen/安装/运行/打包/Git写入。
+- Limits：系统服务管理器与OS RuntimeBroker图标不改；用户自定义悬浮图可覆盖默认；其他平台专有资源不在范围。本地NWG依赖源码缺失，正式编译与Shell/设备显示仍待验证。
+- Decision：N/A — no decision delta，沿用ADR-0014；Event CE-20261012-T007-01；STATE-20261012-008 / WORK-20261012-014。
+- Detail：docs/tasks/T-2026-10-12-007-icon-coverage.md；本条补充T006历史范围，不改写当时结论。
+
 ### 后续索引更新规则
 
 - 每个 completed、blocked 或 cancelled AI task 追加一条；长任务仅在正式 handoff milestone 时追加。

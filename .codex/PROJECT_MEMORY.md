@@ -6,7 +6,11 @@
 
 ## 0. Latest Recovery Snapshot
 
-最新任务：`T-2026-10-12-005` 统一PC构建入口，详见 [任务记录](../docs/tasks/T-2026-10-12-005-pc-build-entry.md)。源 `test / c0951b53ddd2ac59093df3d4a7a6aab5c53bf24a`，initial clean；T004服务器配置已提交。本轮保留原新环境流程为唯一build.cmd，删除重复入口，直接打包本次清理后编译的Release，不再下载/装配外部DLL和驱动；Python Brotli预装，共用generator传播Cargo错误并检查输入边界，保留manifest恢复与最终产物检查。外部组件对应的运行功能不因本轮自动获得配套文件。用户旧日志只证明修改前主编译成功，T005后仅V0，未构建/打包/测试/安装/Git写入。本轮变更未提交；基线AS-BL-2026-10-12-c0951b5-pc-build-worktree。
+最新任务：`T-2026-10-12-007`，见 [图标覆盖复核](../docs/tasks/T-2026-10-12-007-icon-coverage.md)。源test/c9b7cd135be838989953e7ab7037f8c6d8d6aa31，initial dirty为T006的32文件；新增补齐后合并51文件未提交。Android通知/主题使用同源机器人白色alpha，默认悬浮球保留完整原图；Windows旧Sciter改为读取同源128 PNG、自解压窗口持有small/big图标、卸载快捷方式引用主EXE。主EXE/服务/托盘/MSI消费链已静态核对；OS RuntimeBroker、系统服务管理器通用图标及用户customSvg不覆盖。12PNG/16XML、引用/ignore、源图及T006图片hash保护检查通过，只有V0。NWG API对照官方源码，本地解析依赖不可核对；实际Windows/Android显示未验证。事件CE-20261012-T007-01；STATE-20261012-008；无架构决定delta，禁止继承编译或Git权限。
+
+T006历史：[产品图标记录](../docs/tasks/T-2026-10-12-006-product-icons.md)。从同一原PNG转换21个图片资源，统一Windows主程序/自解压EXE/托盘、Flutter角标及Android桌面；原图实际1254方形RGBA，源图/UI主图规范为1024。loadIcon使用同源PNG主图与备用，不再回退旧SVG。此轮图片和Flutter代码在T007保持hash不变；T006没有覆盖的通知/悬浮图及主题配置由T007补齐。两轮均未编译/测试/实际打包/安装/Git写入。
+
+T005历史：统一PC入口为build.cmd，直接打包本次清理后编译的Release，不下载/装配外部DLL和驱动；Brotli需预装，共用generator传播Cargo错误并检查输入边界，保留manifest恢复与最终产物检查。当前由c9b7cd1固化；历史基线AS-BL-2026-10-12-c0951b5-pc-build-worktree保持冻结。修改后正式构建和未附带外部组件时的功能仍待验证。
 
 产品 A Shell You，内部 AShell/ashell，Android me.ashell，后台 A Shell You、launcher 一个壳子。**Flutter内部package必须保留flutter_hbb及其导入。** 两处公共服务匹配使用ashell.；构建变量ASHELL_*，ZEGO字段ashellSessionId。基线 `AS-BL-2026-10-12-a036f31-worktree` 加T003增量已由f423335固化。历史文档品牌名称按用户要求规范化，原文字/源仓地址从Git a036f31恢复。详见 [迁移报告](../docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。未编译/测试/codegen；实际构建机和服务未操作。下段接管记录保留历史日期与验证结论，不表示当前HEAD或运行验证。
 

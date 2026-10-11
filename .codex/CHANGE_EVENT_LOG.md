@@ -203,6 +203,30 @@ Mode：`append-only logical persisted-change events`
 - Related：D-018；AS-BL-2026-10-12-c0951b5-pc-build-worktree；STATE-20261012-006 / WORK-20261012-010。
 - Git / actual build/test/package / install / external / version/sign/release：全部none。
 
+## CE-20261012-T006-01：用户原图统一产品图标
+
+- Timestamp：2026-10-12T07:07:58+09:00；Task：T-2026-10-12-006；Actor：Codex；ashell-master / ashell-release-engineer / ashell-flutter-engineer；无子代理。
+- Authority：当前用户明确提供PNG并要求按既定方案转换、替换指定平台图标，保持原设计，禁止编译。图像转换和必要加载/ignore引用调整获得本轮授权，不继承旧任务Git或构建权限。
+- Source：test/c9b7cd135be838989953e7ab7037f8c6d8d6aa31，initial clean；纠正当前恢复入口中T005尚未提交的过时快照，历史记录不改写。
+- Files（32）：res/icon.png、res/icon.ico、res/tray-icon.ico；flutter/windows/runner/resources/app_icon.ico；flutter/assets/icon.png与icon-fallback.png（新增）；flutter/android/app/src/main/res/mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/{ic_launcher.png,ic_launcher_round.png,ic_launcher_foreground.png}（15个）；flutter/lib/common.dart、.gitignore；docs/tasks/T-2026-10-12-006-product-icons.md（新增）、docs/AI_ENGINEERING/08_BUILD_SYSTEM.md、PROJECT_START_HERE.md；.codex/PROJECT_MEMORY.md、PROJECT_STATE.md、CURRENT_WORK.md、CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md。精确展开清单见task。
+- Delta：21个图像通过本机System.Drawing确定性转换；ICO9尺寸，PNG18个；loadIcon新增同源PNG回退并移除旧SVG引用，不删除SVG；精确ignore例外避免新资源遗漏。Android自适应前景保留66/108内容比例，白色背景和monochrome引用不变。
+- Provenance：用户源图实际1254×1254 RGBA；source SHA-256与ICO SHA-256记录在task，不保存用户绝对路径。无重绘、清边、裁切或依赖安装。
+- Verification：V0独立Pillow解码18个PNG/27个ICO子帧、尺寸/透明度/留白、源图未变、资源路径/ignore规则、静态图片预览及diff检查。System.Drawing多帧256选择返回128但独立256 ICO帧可正常解码，不能冒充Shell运行验证。
+- Related：ADR-0014沿用；N/A — no decision delta；STATE-20261012-007 / WORK-20261012-012。
+- Git / project build/test/analyze/codegen / actual package / install / delete/move / version/sign / external write / release：none。修改尚未提交；正式EXE/APK显示NOT_RUN。
+
+## CE-20261012-T007-01：补齐产品图标消费链
+
+- Timestamp：2026-10-12T07:20:08+09:00；Task：T-2026-10-12-007；Actor：Codex / ashell-master，Release/Rust/Android/Security静态复核；无子代理。
+- Authority：当前用户追加要求检查Windows进程/任务栏/状态栏/服务及Android图标遗漏，继续生成并替换；保持原图、禁止编译。必要资源引用和文档修改在范围内。
+- Source：test/c9b7cd135be838989953e7ab7037f8c6d8d6aa31，initial dirty为T006的32文件；保留其21图像及Flutter加载代码hash。
+- Files（28）：res/128x128.png；src/ui.rs、src/platform/windows.rs、libs/portable/src/ui.rs；flutter/android/app/src/main/res/mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/ic_stat_logo.png；同五目录新ic_launcher_monochrome.png；mipmap-anydpi-v26/ic_launcher.xml与ic_launcher_round.xml；drawable/floating_window.xml；新增drawable-nodpi/ashell_floating_icon.png；.gitignore；新增docs/tasks/T-2026-10-12-007-icon-coverage.md；docs/AI_ENGINEERING/08_BUILD_SYSTEM.md、PROJECT_START_HERE.md；.codex/PROJECT_MEMORY.md、PROJECT_STATE.md、CURRENT_WORK.md、CHANGELOG_AI.md、CHANGE_EVENT_LOG.md、TASK_HISTORY.md。展开清单见task。
+- Delta：12图片（6新增/6替换）；通知与主题使用原机器人单色alpha而非白底卡片，悬浮球保留完整原图；legacy Windows get_icon读取新PNG；portable由BasicApp持有HICON并绑定small/big；卸载快捷方式指向主EXE图标。无依赖/权限/版本/协议变更。
+- Verification：12PNG/16XML静态检查、源图与既有资源hash、图片预览、消费路径/ignore/include、diff与文档链接；无正式编译运行证据。本地NWG源码/lock不可用，API对照官方上游master并记录限制。
+- Related：N/A — no decision delta / ADR-0014；STATE-20261012-008 / WORK-20261012-014；合并T006后51文件未提交。
+- Corrects / Supersedes：补齐T006未覆盖的notification/floating及legacy/portable窗口；T006时monochrome复用前景已由本轮独立mask取代。旧任务历史不改写。
+- Git / build/test/analyze/project-codegen / install/run / actual package / delete/move / version/sign / external write / release：none。图片转换是获准资源生成，不是产品构建或代码生成。
+
 ### 后续事件模板
 
 ```text

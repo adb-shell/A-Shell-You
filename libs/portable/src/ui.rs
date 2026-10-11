@@ -4,6 +4,7 @@ use std::cell::RefCell;
 
 const GIF_DATA: &[u8] = include_bytes!("./res/spin.gif");
 const LABEL_DATA: &[u8] = include_bytes!("./res/label.png");
+const WINDOW_ICON_DATA: &[u8] = include_bytes!("../../../res/128x128.png");
 const GIF_SIZE: i32 = 32;
 const BG_COLOR: [u8; 3] = [90, 90, 120];
 const BORDER_COLOR: [u8; 3] = [40, 40, 40];
@@ -12,6 +13,7 @@ const GIF_DELAY: u64 = 30;
 #[derive(Default)]
 pub struct BasicApp {
     window: nwg::Window,
+    window_icon: nwg::Icon,
 
     border_image: nwg::ImageFrame,
     bg_image: nwg::ImageFrame,
@@ -82,6 +84,11 @@ mod basic_app_ui {
     impl nwg::NativeUi<BasicAppUi> for BasicApp {
         fn build_ui(mut data: BasicApp) -> Result<BasicAppUi, nwg::NwgError> {
             data.decoder = nwg::ImageDecoder::new()?;
+            nwg::Icon::builder()
+                .source_bin(Some(WINDOW_ICON_DATA))
+                .size(Some((32, 32)))
+                .strict(true)
+                .build(&mut data.window_icon)?;
             let col_cnt: i32 = 7;
             let row_cnt: i32 = 3;
             let border_width: i32 = 1;
@@ -95,7 +102,21 @@ mod basic_app_ui {
                 .flags(nwg::WindowFlags::POPUP | nwg::WindowFlags::VISIBLE)
                 .size(window_size)
                 .center(true)
+                .icon(Some(&data.window_icon))
                 .build(&mut data.window)?;
+
+            // NWG sets ICON_SMALL; also set the icon used for Alt-Tab/taskbar.
+            // BasicApp owns the icon until after its window is destroyed.
+            if let nwg::ControlHandle::Hwnd(hwnd) = &data.window.handle {
+                unsafe {
+                    winapi::um::winuser::SendMessageW(
+                        *hwnd,
+                        winapi::um::winuser::WM_SETICON,
+                        winapi::um::winuser::ICON_BIG as usize,
+                        data.window_icon.handle as isize,
+                    );
+                }
+            }
 
             nwg::ImageFrame::builder()
                 .parent(&data.window)

@@ -3892,10 +3892,12 @@ Widget loadIcon(double size) {
   return Image.asset('assets/icon.png',
       width: size,
       height: size,
-      errorBuilder: (ctx, error, stackTrace) => SvgPicture.asset(
-            'assets/icon.svg',
+      errorBuilder: (ctx, error, stackTrace) => Image.asset(
+            'assets/icon-fallback.png',
             width: size,
             height: size,
+            errorBuilder: (ctx, error, stackTrace) =>
+                SizedBox(width: size, height: size),
           ));
 }
 

@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261012-010`
+Registry Revision：`WORK-20261012-014`
 
-Last Updated：2026-10-12T06:37:59+09:00
+Last Updated：2026-10-12T07:20:08+09:00
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none；T005已完成源码/V0交付，变更未提交。新会话须重新核对HEAD/status及当前请求。
+none；T007已完成资源补齐与V0静态核验，正式编译/设备显示未执行。新请求从T0重新核对。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ none；T005已完成源码/V0交付，变更未提交。新会话须重新核对
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-12-005`
-- Result：唯一PC入口build.cmd，只打包本次Release；移除外部驱动装配，共用generator修复失败传播/输入边界，当前文档与记忆同步。本轮未提交/构建/打包。
-- Closed At：2026-10-12T06:37:59+09:00
+- Task ID：`T-2026-10-12-007`
+- Result：补齐Android通知/主题/默认悬浮图、Windows旧UI/自解压窗口small+big/卸载快捷方式；本轮28文件，T006合并后51文件未提交。原图及T006产品文件保持；未编译/运行/实际打包。
+- Closed At：2026-10-12T07:20:08+09:00
 - Final T-State：`T8 — complete`
-- State / Event：`STATE-20261012-006` / `CE-20261012-T005-01`
-- Decision：D-018；服务器D-017、产品身份D-015/D-016 / ADR-0014仍有效；治理沿用D-014。
-- Verification：V0 Python AST、3段PowerShell解析、CMD标签/打包输入/资产边界、文档引用及diff检查；V1—V5 NOT_RUN。
+- State / Event：`STATE-20261012-008` / `CE-20261012-T007-01`
+- Decision：N/A — no decision delta；D-018、D-017、D-015/D-016 / ADR-0014仍有效；治理沿用D-014。
+- Verification：V0 12PNG/16XML、尺寸/alpha/单色眼睛间隙、源图及T006图片/Flutter代码SHA未变、资源/include/ignore/文档链接、预览及51文件范围检查；V1—V5 NOT_RUN。
 - Next Gate：new user request must start at T0；historical authorization inherited `none`。
-- Changelog pointer：`CHANGELOG_AI.md` 中 `T-2026-10-12-005`。
+- Changelog pointer：`CHANGELOG_AI.md` 中 `T-2026-10-12-007`。
 - Detailed record：`TASK_HISTORY.md` 中同 Task ID；修改清单见 `CHANGE_EVENT_LOG.md` 中同 Event。
