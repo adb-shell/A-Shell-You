@@ -161,6 +161,8 @@ jobs:
     needs: android-native
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    env:
+      GRADLE_USER_HOME: ${{ runner.temp }}/ashell-gradle
     defaults:
       run:
         shell: bash
@@ -200,6 +202,18 @@ jobs:
           for file in src/bridge_generated.rs src/bridge_generated.io.rs flutter/lib/generated_bridge.dart flutter/lib/generated_bridge.freezed.dart; do
             test -s "$file"
           done
+
+      - name: Configure Gradle memory for APK packaging
+        run: |
+          # User-home properties override the project's local 1 GiB heap setting.
+          mkdir -p "$GRADLE_USER_HOME"
+          cat > "$GRADLE_USER_HOME/gradle.properties" <<'EOF'
+          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
+          org.gradle.workers.max=2
+          org.gradle.parallel=false
+          org.gradle.vfs.watch=false
+          kotlin.compiler.execution.strategy=in-process
+          EOF
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
