@@ -106,6 +106,7 @@ jobs:
           echo "VCPKG_BINARY_SOURCES=clear;files,$RUNNER_TEMP/vcpkg-cache,readwrite" >> "$GITHUB_ENV"
 
       - name: Cache native dependencies
+        id: native-cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ${{ runner.temp }}/vcpkg-cache
@@ -120,14 +121,22 @@ jobs:
             ln -s arm-neon-android "$VCPKG_INSTALLED_ROOT/arm-android"
           fi
 
+      - name: Save completed native dependencies
+        if: steps.native-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: vcpkg-ubuntu22-${{ matrix.triplet }}-${{ env.NDK_VERSION }}-${{ env.VCPKG_COMMIT_ID }}-${{ hashFiles('vcpkg.json', 'res/vcpkg/**') }}
+
       - name: Compile libashell.so and stage JNI libraries
         run: |
           cargo ndk --platform "$ANDROID_API" --target '${{ matrix.target }}' \
-            build --locked --release --lib --features '${{ matrix.features }}'
+            build --release --lib --features '${{ matrix.features }}'
           destination="native/${{ matrix.abi }}"
           mkdir -p "$destination"
           cp "target/${{ matrix.target }}/release/libashell.so" "$destination/"
           cp "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/${{ matrix.ndk_triple }}/libc++_shared.so" "$destination/"
+          cp Cargo.lock 'native/Cargo-${{ matrix.abi }}.lock'
           test -s "$destination/libashell.so"
           test -s "$destination/libc++_shared.so"
 
@@ -190,7 +199,18 @@ jobs:
         with:
           pattern: android-native-*
           merge-multiple: true
-          path: flutter/android/app/src/main/jniLibs
+          path: ${{ runner.temp }}/android-native
+
+      - name: Prepare JNI libraries and resolved Cargo locks
+        run: |
+          mkdir -p flutter/android/app/src/main/jniLibs artifacts/android
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            source="$RUNNER_TEMP/android-native/$abi"
+            if [[ -d "$source" ]]; then
+              cp -R "$source" flutter/android/app/src/main/jniLibs/
+              cp "$RUNNER_TEMP/android-native/Cargo-$abi.lock" artifacts/android/
+            fi
+          done
 
       - name: Create an ephemeral test signing identity
         run: |
@@ -246,7 +266,8 @@ jobs:
           (out / 'apk-contents.txt').write_text('\n'.join(sorted(names)) + '\n', encoding='utf-8')
           info = {key: os.environ[key] for key in ('GITHUB_SHA', 'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT', 'RUST_VERSION', 'FLUTTER_VERSION', 'NDK_VERSION', 'ANDROID_CMDLINE_TOOLS_VERSION', 'VCPKG_COMMIT_ID', 'ANDROID_ARCH')}
           info['signing'] = 'ephemeral Android test key; not for production'
-          info['lock_sha256'] = {path: hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest() for path in ('Cargo.lock', 'flutter/pubspec.lock')}
+          info['lock_sha256'] = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(out.glob('Cargo-*.lock'))}
+          info['lock_sha256']['pubspec.lock'] = hashlib.sha256(pathlib.Path('flutter/pubspec.lock').read_bytes()).hexdigest()
           (out / 'build-info.json').write_text(json.dumps(info, indent=2) + '\n', encoding='utf-8')
           (out / 'SHA256SUMS.txt').write_text(f'{hashlib.sha256(apk.read_bytes()).hexdigest()}  {apk.name}\n', encoding='utf-8')
           (out / 'pubspec.lock').write_bytes(pathlib.Path('flutter/pubspec.lock').read_bytes())
