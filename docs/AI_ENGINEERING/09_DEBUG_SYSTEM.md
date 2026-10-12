@@ -205,11 +205,11 @@ flutter test
 ./build.sh 2
 ```
 
-环境要求：项目规定 Linux Android 构建机、`/opt/rustdesk-toolchain` 等价受控环境、Rust/Flutter/JDK、Android SDK/NDK 27.2、vcpkg、签名环境、ZEGO SDK、受控 `libadb.so` artifacts；Android 10/13/14/15 真机。
+环境要求：项目规定 Linux Android 构建机、`/opt/rustdesk-toolchain` 等价受控环境、Rust/Flutter/JDK、Android SDK/NDK 27.2、vcpkg、签名环境、ZEGO SDK；Android 10/13/14/15 真机。
 
 执行目录：AShell 仓库根目录。
 
-验证目标：三 ABI packaging、签名、JNI linkage；MediaProjection one-shot；share loss 不杀 core；DirectBuffer ownership；旋转/折叠/小于 350px 边界；input permission enforcement；ADB 旧系统/高输出/并发；ZEGO 明确接受/拒绝和麦克风行为。
+验证目标：三 ABI packaging、签名、JNI linkage；MediaProjection one-shot；share loss 不杀 core；DirectBuffer ownership；旋转/折叠/小于 350px 边界；input permission enforcement；旧 ADB 页面/通道/打包残留为零（T009）；ZEGO 明确接受/拒绝和麦克风行为。
 
 ### 11.4 Windows release build 与系统验证
 

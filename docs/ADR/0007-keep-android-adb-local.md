@@ -1,11 +1,11 @@
 # ADR-0007: Keep Android ADB as a Local Subsystem
 
-- Status：`accepted`
+- Status：`superseded by ADR-0015`（2026-10-12 T009）；以下为历史决定
 - Record Type：`backfill`
 - Decision Date：2026-05；Recorded：2026-07-12
 - Original Approver / Alternatives：not recorded
 - Related Decision Log：D-007
-- Implementation State：implemented；Evidence：V0, V3 required
+- Implementation State：retired by T009；旧实现描述仅作历史，当前见 [ADR-0015](0015-retire-legacy-adb.md)
 
 ## Decision
 

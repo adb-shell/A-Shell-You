@@ -221,3 +221,15 @@
 - Git/release actions：
 - Related decisions/docs：
 ```
+
+## T-2026-10-12-009：移除旧 ADB 页面与组件
+
+- 日期：2026-10-12；状态：completed（源码交付/V0，运行验收 pending）。
+- Source：main / 13f792d552db49fd1b702ff24cb2b3d0c5030c38；initial clean；T008 先前已提交。
+- Authority：当前用户明确要求剔除，含 C2 相关代码/配置和 C3 删除 5 个旧组件源文件；C1 同步当前工程事实。未继承旧 Git/build 权限。
+- Outcome：删除 AdbPage、Dart wrapper/constants、11 个 native handler、4 个 Kotlin 模块、36 个 Accessibility 自动化方法及其状态/事件钩子；移除两项专用权限/keep 规则，排除 libadb.so，移除 host adb 检查。未接入新组件。
+- Preserve：Windows/Rust 核心/JNI/MainService/DevAutoSelectorController/依赖版本及协议字段不变；其余 native packaging 与 Wi-Fi 保活保留；用户 prefs/配对/系统设置未操作。
+- Verification：V0 diff/删除边界、残留/调用扫描、Manifest XML、Bash 仅语法解析、协议字段及保留代码对比。V2/V3 NOT_RUN。
+- Decision / Baseline / Event：D-019 / ADR-0015；AS-BL-2026-10-12-13f792d-adb-retired-worktree；CE-20261012-T009-01。
+- Docs：当前领域/入口/Skills、Test Matrix、External Registry、ADR/Baseline、全局记忆已同步；旧集成记录标 HISTORICAL/RETIRED，未删除历史。
+- Git / build / install / device / release：none；本轮修改未提交。正式验证需求和回滚见 [任务记录](../docs/tasks/T-2026-10-12-009-remove-legacy-adb.md)。

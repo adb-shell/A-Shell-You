@@ -51,7 +51,7 @@ AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一�
 | `LADB/` | 79 文件 / 19.45 MiB | 被排除的参考源码；许可证包含 Play Store 分发限制 |
 | `flutter/android/app/src/main/jniLibs/` | 4 文件 / 13.66 MiB | 被 `flutter/.gitignore` 排除；含 3 ABI `libadb.so` 与许可证 |
 
-因此，干净 clone 不能独立重建当前 Android ADB 资产。必须建立受控的 binary provenance、hash、license 和获取流程。
+以上为 7 月历史资产观察；T009 已删除旧 ADB 源码并排除 libadb.so，当前不再要求取得这些退役资产。历史 provenance 记录保留，不代表来源已经验证。
 
 ## 4. 产品能力全景
 
@@ -62,7 +62,7 @@ AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一�
 - 键鼠/触控输入、剪贴板、文件剪贴板、文件传输、端口转发、截图、录制、终端。
 - Flutter 桌面多窗口、移动端 UI、旧 Sciter UI 兼容面。
 - Android `MainService`、`MediaProjection`、Accessibility 输入、normal/SKL/ignore 三帧源、黑屏、防触、Dev 自动点选、状态监测和自动重连。
-- Android 本地 ADB/LADB、mDNS 发现与无线调试辅助。
+- 旧 Android 本地 ADB/LADB、mDNS 与无线调试辅助已在 T009 移除；新组件尚未接入。
 - Windows DXGI/GDI capture、privacy mode、Amyuni virtual display、输入注入与 portable service。
 - Flutter 产品账号、地址簿、设备组、Rust OIDC client、sync/heartbeat/downloader。
 - ZEGO 1v1 语音媒体；Rust 仅承载邀请/状态控制。
@@ -120,7 +120,7 @@ AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一�
 4. Android raw frame 存在 direct `ByteBuffer` 与 `Image.close()` 生命周期疑点；JNI 还有跨线程 `static mut` data-race 风险。
 5. Android 已授权连接的输入/自定义命令缺少完整服务端 permission gate；Dev UI 密码不是协议鉴权。
 6. Windows privacy/driver/injection 是高权限面，且部分 WinAPI 初始化和快速显示器切换有 UB/崩溃风险。
-7. ADB binary、参考源码和部分构建依赖是本地/外部资产，干净 clone 不可复现。
+7. 旧 ADB binary/参考源码已退役；其他构建外部依赖仍需独立闭环。
 8. CI 全部改为手动触发；Flutter/Android 自动化测试极薄，文档与代码漂移缺少门禁。
 
 详见 `10_SECURITY_MODEL.md`、`11_ROADMAP.md` 和 `DOCUMENT_AUDIT_REPORT.md`。

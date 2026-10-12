@@ -1,5 +1,7 @@
 # CLAUDE.md — AShell / 一个壳子 v5.2.1
 
+2026-10-12 T009：按用户要求剔除旧 ADB 页面/组件/专用权限和构建依赖；Windows 未发现旧运行组件。仅 V0，无编译/设备验证。当前状态先核对 HEAD/status；ADR-0015 取代 ADR-0007。
+
 最后一次与全仓源码对齐：2026-07-12
 最近一次文档分层整理：2026-07-12
 
@@ -48,7 +50,7 @@
 6. Legacy desktop UI：`src/ui/`
 7. Account / HTTP / sync / upload：`src/hbbs_http/`
 8. Windows privacy mode / virtual display：`src/privacy_mode.rs` + `src/virtual_display_manager.rs`
-9. Android local ADB/LADB：`flutter/android/app/src/main/kotlin/me/ashell/adb/` + `flutter/lib/mobile/pages/adb_page.dart`
+9. 旧 Android 本地 ADB/LADB 已移除（T009 / ADR-0015）；不再有主页 ADB 页签或旧组件，新组件尚未接入。
 10. ZEGO voice call：Flutter RTC side path + Rust control-channel invitation state
 
 不要把项目误读成：
@@ -56,7 +58,7 @@
 - 只有 Flutter，没有旧 UI
 - 只有远控，没有账号/同步链
 - Android 只有 Kotlin，没有 Rust JNI 主链
-- ADB/LADB 只是外部研究目录；当前 Android 本地 ADB 已有落地模块
+- 旧 ADB/LADB 仍在运行；它已退役，历史实现只作参考，不能恢复旧桥接/打包依赖
 - ZEGO 语音走 RustDesk 原 `audio_service`；当前媒体只走 ZEGO SDK
 - 品牌/运行名已经迁移到 AShell，但上游文档、翻译、兼容判断和第三方依赖中仍会有历史 RustDesk 字样
 
@@ -75,11 +77,7 @@
 - `common.kt` = Android 全局状态
 - `KeyboardKeyEventMapper.kt` = 键盘映射
 - `VolumeController.kt` = 音量控制
-- `adb/AShellAdbManager.kt` = Android local ADB/LADB facade
-- `adb/AShellAdbRunner.kt` = packaged `libadb.so` runner
-- `adb/AShellAdbDnsDiscover.kt` = wireless debugging mDNS discovery
-- `adb/AShellAdbState.kt` = ADB state snapshot
-- ADB pair/connect currently uses endpoint fallback (`localhost`, `127.0.0.1`, active Wi-Fi IPv4), mDNS retry/fallback, `preferredSerial`, and cancellable wireless-debugging automation. PC remote ADB command protocol is still future work.
+- 旧 ADB 的四个 Kotlin 模块和无线调试自动化已移除；DevAutoSelectorController、远控输入/采集保持。详见 `docs/tasks/T-2026-10-12-009-remove-legacy-adb.md`。
 - `pkg2230.kt` = 主 JNI bridge
 - `ffi.kt` = 兼容 JNI bridge
 - `p50.java` + `q50.java` = XOR / 混淆辅助

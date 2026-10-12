@@ -102,7 +102,7 @@
 | `flutter/lib/models/` | session、server、input、file、terminal、user、AB、group、ZEGO |
 | `flutter/lib/desktop/pages/` | connection、remote、file、terminal、settings |
 | `flutter/lib/desktop/widgets/` | toolbar、tab、status、controls |
-| `flutter/lib/mobile/pages/` | server、connection、remote、file、ADB |
+| `flutter/lib/mobile/pages/` | server、connection、remote、file；主页只装载 ServerPage |
 | `flutter/lib/common/widgets/` | dialog、overlay、input、peer cards |
 | `flutter/lib/native/`, `utils/` | platform/FFI utilities |
 | `flutter/lib/web/` | web bridge；多处 TODO/DORMANT |
@@ -117,10 +117,10 @@
 
 | 文件 | 角色 |
 |---|---|
-| `oFtTiPzsqzBHGigp.kt` | `FlutterActivity`、MethodChannel、deep link、ADB handler |
+| `oFtTiPzsqzBHGigp.kt` | `FlutterActivity`、MethodChannel、deep link |
 | `XerQvgpGBzr8FDFr.kt` | 透明权限 Activity、fresh `MediaProjection` intent |
 | `DFm8Y8iMScvB2YDw.kt` | `MainService`、core keep-alive、normal capture、ZEGO bridge |
-| `nZW99cdXQ0COhB2o.kt` | Accessibility、input、screenshot、overlay、Dev/ADB automation |
+| `nZW99cdXQ0COhB2o.kt` | Accessibility、input、screenshot、overlay、DevAutoSelectorController（独立于已删除的旧 ADB 自动化） |
 | `DFrLMwitwQbfu7AC.kt` | floating keep-alive service |
 | `BootReceiver.kt` | boot core-service path |
 | `DevAutoSelectorController.kt` | 微信 Dev 自动点选 |
@@ -132,14 +132,9 @@
 | `ffi.kt` | COMPAT JNI declarations |
 | `p50.java`, `q50.java` | XOR/obfuscation helper |
 
-### ADB module
+### 旧 ADB module — retired
 
-- `adb/AShellAdbManager.kt`：facade/state。
-- `AShellAdbRunner.kt`：`libadb.so` process、pair/connect/shell。
-- `AShellAdbDnsDiscover.kt`：NSD discovery/fallback。
-- `AShellAdbState.kt`：snapshot。
-- `flutter/lib/mobile/pages/adb_page.dart`：UI。
-- `jniLibs/*/libadb.so`：LOCAL-ONLY ignored binary，干净 clone 缺失。
+T009 已删除 AdbPage、Dart wrapper、11 个 MethodChannel 分支、adb/ 四个 Kotlin 文件及无线调试自动化。Gradle 排除旧 libadb.so；不再存在此运行模块。历史位置和回滚基准见 [T009](../tasks/T-2026-10-12-009-remove-legacy-adb.md)。
 
 ### Rust JNI
 
@@ -182,6 +177,6 @@
 
 - 不手改 generated bridge；改 `flutter_ffi.rs` 后在正式环境重新生成并检查 diff。
 - `src/version.rs` 必须由 build script 生成。
-- LOCAL-ONLY ADB/driver/assets 必须先进入受控 artifact manifest，不能依赖个人机器。
+- 仍使用的 driver/assets 必须进入受控 artifact manifest；旧 ADB assets 已退役。
 - Git dependency 应同时记录 manifest source 与 lock revision。
 - clean clone 复现是 release gate；当前尚未满足。

@@ -371,20 +371,6 @@ class AndroidChannel {
   static final kGetStartOnBootOpt = "get_start_on_boot_opt";
   static final kSetStartOnBootOpt = "set_start_on_boot_opt";
   static final kSyncAppDirConfigPath = "sync_app_dir";
-  static final kAShellAdbInit = "ashell_adb_init";
-  static final kAShellAdbStatus = "ashell_adb_status";
-  static final kAShellAdbOutput = "ashell_adb_output";
-  static final kAShellAdbStart = "ashell_adb_start";
-  static final kAShellAdbStop = "ashell_adb_stop";
-  static final kAShellAdbLocalShell = "ashell_adb_local_shell";
-  static final kAShellAdbPair = "ashell_adb_pair";
-  static final kAShellAdbCommand = "ashell_adb_command";
-  static final kAShellAdbWirelessDebugStatus =
-      "ashell_adb_wireless_debug_status";
-  static final kAShellAdbWirelessDebugSet =
-      "ashell_adb_wireless_debug_set";
-  static final kAShellAdbWirelessDebugCancel =
-      "ashell_adb_wireless_debug_cancel";
 }
 
 /// flutter/packages/flutter/lib/src/services/keyboard_key.dart -> _keyLabels

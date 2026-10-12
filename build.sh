@@ -205,7 +205,7 @@ check_global_env() {
   [[ -n "$bt_dir" ]] || die "未找到 Android build-tools 目录: $ANDROID_SDK_ROOT/build-tools"
   info "Build-tools: $bt_dir"
 
-  for c in bash git sed awk grep rustup cargo flutter dart sdkmanager adb keytool apksigner zipalign pkg-config zip find sort tail; do
+  for c in bash git sed awk grep rustup cargo flutter dart sdkmanager keytool apksigner zipalign pkg-config zip find sort tail; do
     require_cmd "$c"
   done
 

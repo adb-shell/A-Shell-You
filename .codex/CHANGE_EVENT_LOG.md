@@ -266,3 +266,64 @@ Mode：`append-only logical persisted-change events`
 - 不复制完整 diff、源码正文、prompt/transcript、secret/token/password/key、生产地址、IP、peer/device/UUID、PII 或绝对用户路径。
 - 删除、移动、generated、Git、build、external、release 若实际发生必须逐项记录；未发生明确写 `none`。
 - 错误记录通过新 Event `corrects/supersedes`，旧事件保留。
+
+## CE-20261012-T009-01：旧 ADB 功能链退役
+
+- Task：T-2026-10-12-009；日期：2026-10-12；Actor：Codex / ashell-master。
+- Source：main / 13f792d552db49fd1b702ff24cb2b3d0c5030c38；开始 clean，本轮 Git 写入 none。
+- Authority：当前用户明确要求剔除旧 ADB；C2 相关代码/配置，C3 删除 5 个旧组件源文件；C1 当前事实与记忆同步。
+- Change：删除 AdbPage、AndroidAdbManager、11 个 MethodChannel handler、四个 Kotlin 模块及 36 个 Accessibility 自动化方法；移除两项专用权限/keep 规则、build.sh 的 host adb 检查和 env.sh 的独立 adb 预装/检查；排除旧 libadb.so。SDK platform-tools 保留；协议只改陈旧注释，字段不变。
+- Preserve：Windows/Rust core/JNI/MainService/DevAutoSelectorController/依赖锁无修改；其余 native packaging、Wi-Fi 保活、采集/输入/重连/terminal/ZEGO 原实现保持。
+- Decision / Baseline / State：D-019 / ADR-0015；AS-BL-2026-10-12-13f792d-adb-retired-worktree；STATE-20261012-010 / WORK-20261012-018。
+- Verification：V0 残留/引用、删除边界、XML 结构、Bash 仅语法解析、diff/链接检查；V2/V3 NOT_RUN。
+- Limit：删除空 adb/ 目录的命令被自动审批策略拦截，仅返回 blocked by policy；未绕过，只读复核目录内 0 个文件。历史设备 prefs/配对/系统设置未清理；外部构建机资产未访问。
+- Build / test / analyze / codegen / install / device / sign / release：none。
+- Files（含本事件日志）：
+
+- `.agents/skills/ashell-android-engineer/SKILL.md`
+- `.agents/skills/ashell-flutter-engineer/SKILL.md`
+- `.agents/skills/ashell-release-engineer/SKILL.md`
+- `.codex/CHANGELOG_AI.md`
+- `.codex/CHANGE_EVENT_LOG.md`
+- `.codex/CURRENT_WORK.md`
+- `.codex/DECISION_LOG.md`
+- `.codex/PROJECT_MEMORY.md`
+- `.codex/PROJECT_STATE.md`
+- `.codex/TASK_HISTORY.md`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `EXTERNAL_ASSET_REGISTRY.md`
+- `PROJECT_START_HERE.md`
+- `TEST_MATRIX.md`
+- `build.sh`
+- `docs/ADB_LADB_INTEGRATION_MEMORY.md`
+- `docs/ADR/0007-keep-android-adb-local.md`
+- `docs/ADR/0015-retire-legacy-adb.md`
+- `docs/ADR/README.md`
+- `docs/AI_ENGINEERING/00_PROJECT_OVERVIEW.md`
+- `docs/AI_ENGINEERING/01_ARCHITECTURE.md`
+- `docs/AI_ENGINEERING/02_SOURCE_MAP.md`
+- `docs/AI_ENGINEERING/03_MODULE_DESIGN.md`
+- `docs/AI_ENGINEERING/04_ANDROID_PIPELINE.md`
+- `docs/AI_ENGINEERING/08_BUILD_SYSTEM.md`
+- `docs/AI_ENGINEERING/09_DEBUG_SYSTEM.md`
+- `docs/AI_ENGINEERING/10_SECURITY_MODEL.md`
+- `docs/AI_ENGINEERING/11_ROADMAP.md`
+- `docs/BASELINE/08_ADB_RETIREMENT_BASELINE_2026-10-12.md`
+- `docs/BASELINE/BASELINE_INDEX.md`
+- `docs/tasks/T-2026-10-12-009-remove-legacy-adb.md`
+- `env.sh`
+- `flutter/android/app/build.gradle`
+- `flutter/android/app/proguard-rules`
+- `flutter/android/app/src/main/AndroidManifest.xml`
+- `flutter/android/app/src/main/kotlin/me/ashell/adb/AShellAdbDnsDiscover.kt`
+- `flutter/android/app/src/main/kotlin/me/ashell/adb/AShellAdbManager.kt`
+- `flutter/android/app/src/main/kotlin/me/ashell/adb/AShellAdbRunner.kt`
+- `flutter/android/app/src/main/kotlin/me/ashell/adb/AShellAdbState.kt`
+- `flutter/android/app/src/main/kotlin/me/ashell/nZW99cdXQ0COhB2o.kt`
+- `flutter/android/app/src/main/kotlin/me/ashell/oFtTiPzsqzBHGigp.kt`
+- `flutter/lib/common.dart`
+- `flutter/lib/consts.dart`
+- `flutter/lib/mobile/pages/adb_page.dart`
+- `flutter/lib/mobile/pages/home_page.dart`
+- `libs/hbb_common/protos/message.proto`

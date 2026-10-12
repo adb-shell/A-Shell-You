@@ -1,6 +1,6 @@
 ---
 name: ashell-android-engineer
-description: Analyze and maintain AShell Android Kotlin, Java, JNI, MediaProjection, AccessibilityService, screen capture, input injection, local ADB/LADB, keep-alive, and ZEGO integration. Use for Android runtime, permission, lifecycle, frame, reconnect, and device-specific tasks.
+description: Analyze and maintain AShell Android Kotlin, Java, JNI, MediaProjection, AccessibilityService, screen capture, input injection, keep-alive, and ZEGO integration. Use for Android runtime, permission, lifecycle, frame, reconnect, and device-specific tasks.
 ---
 
 # AShell Android Engineer
@@ -17,7 +17,7 @@ For development, record the Baseline ID and related ADRs in `TASK_TEMPLATE.md`, 
 
 ## Routing Boundaries
 
-- Own Kotlin/Java, Android OS permission, Service/Activity/receiver lifecycle, MediaProjection, Accessibility, overlay, local ADB and Android bridge endpoint behavior.
+- Own Kotlin/Java, Android OS permission, Service/Activity/receiver lifecycle, MediaProjection, Accessibility, overlay and Android bridge endpoint behavior.
 - Route Dart presentation/state to `ashell-flutter-engineer`, Rust unsafe/ABI/buffer implementation to `ashell-rust-engineer`, and peer wire schema/authorization to `ashell-network-engineer`.
 - Use `ashell-master` when MethodChannel/JNI/wire/UI contracts change on more than one side.
 - Add `ashell-security-engineer` for permission, microphone, deep-link, ADB or sensitive-data boundaries.
@@ -77,11 +77,11 @@ For frames, trace buffer ownership from ImageReader/Accessibility screenshot thr
 - Validate scaling against zero and distinguish physical vs scaled metrics.
 - Synchronize shared screenshot buffers.
 - Enforce input/custom command permissions in `server/connection.rs`, not only the Flutter UI.
-- Treat Accessibility, overlay, `WRITE_SECURE_SETTINGS`, local shell, contact selector, full-screen voice, and microphone as security/privacy boundaries.
+- Treat Accessibility, overlay, contact selector, full-screen voice, and microphone as security/privacy boundaries.
 
 ### 5. Keep subsystems distinct
 
-- Local ADB/LADB is not remote terminal and not a PC command protocol.
+- Legacy local ADB/LADB was removed by T009 / ADR-0015. Do not restore its runner/bridge/permissions; future replacement requires separate scope. Remote terminal and DevAutoSelectorController remain independent.
 - ZEGO media is separate from RustDesk audio and requires explicit microphone consent.
 - SKL and ignore are alternate frame sources, not proof normal sharing recovered.
 - MainService restart is not a generic response to network, lock, memory, or projection events.
@@ -113,4 +113,4 @@ For frames, trace buffer ownership from ImageReader/Accessibility screenshot thr
 
 ## Verification
 
-When authorized, verify on formal Android builds and real devices: static frame, high FPS, rotation, split/fold, lock/unlock, background, low memory, service replacement, network loss, permissions off/on, all command masks, local ADB boundaries, and voice accept/reject/microphone behavior. Otherwise emit 《编译验证需求》 and keep results `verification-required`.
+When authorized, verify on formal Android builds and real devices: static frame, high FPS, rotation, split/fold, lock/unlock, background, low memory, service replacement, network loss, permissions off/on, all command masks, absence of retired ADB components, and voice accept/reject/microphone behavior. Otherwise emit 《编译验证需求》 and keep results `verification-required`.

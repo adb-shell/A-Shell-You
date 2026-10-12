@@ -185,6 +185,16 @@
 - ADR：N/A — 本次变更构建交付策略，未改变运行架构/协议；沿用ADR-0014产品身份。Baseline：AS-BL-2026-10-12-c0951b5-pc-build-worktree。
 - Related：T-2026-10-12-005 / CE-20261012-T005-01；08_BUILD_SYSTEM；回滚需未来明确授权，旧入口可从c0951b5恢复。
 
+## D-019：退役旧 Android 本地 ADB
+
+- 日期：2026-10-12；状态：accepted；批准：当前用户明确要求剔除旧 ADB，后续再对接新组件。
+- Decision：删除主页右侧 AdbPage、Dart/native 通道、四个 Kotlin 模块和无线调试自动化；移除两项专用权限/keep 规则，排除 libadb.so，去掉未使用的 host adb 检查。
+- Boundaries：无替代组件；Windows/远控/terminal/JNI/MainService/DevAutoSelectorController/ZEGO 保持；设备历史 prefs/配对/系统授权不自动清理。保留剩余 native packaging 行为和 Wi-Fi 保活权限。
+- Assets：旧 libadb.so/ADB-CODE/LADB retired，不再阻断当前构建；历史来源/许可记录仍保留。
+- Verification：V0 完成；正式构建、APK 清单、升级和设备交互 NOT_RUN，不保证未经运行验证的无回归。
+- Related：ADR-0015 supersedes ADR-0007 的现役实现决定；T-2026-10-12-009 / CE-20261012-T009-01。
+- Rollback：未来授权后从 13f792d 按任务边界恢复，不整仓 reset 或覆盖后续变更。
+
 ### 下一决定模板
 
 ```text

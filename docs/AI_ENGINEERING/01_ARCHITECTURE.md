@@ -28,7 +28,7 @@ flowchart LR
 - rendezvous/relay：仓外基础设施；只在协议客户端中有定义。
 - 产品 API：账号、地址簿、设备组、策略和 sync；后端不在仓库。
 - ZEGO：Token service 与 ZEGO RTC 是两个外部域。
-- Android OS：`MediaProjection`、Accessibility、overlay、ADB、前台服务分别由系统授权。
+- Android OS：`MediaProjection`、Accessibility、overlay、前台服务分别由系统授权。
 - Windows OS：driver、service、injection、privacy window 和 input hook 是本机高权限边界。
 
 ## 2. 分层架构
@@ -122,7 +122,7 @@ Flutter 普通产品登录和资源 API多为 Dart 直接 HTTP；Rust `account.r
 - Android disconnect 不得自动停止 screen share。
 - waiting 不得自动切 ignore/screenshot fallback。
 - ZEGO 不得进入旧 `audio_service` 媒体链。
-- ADB/LADB 不得污染 screen share/video/side-button 状态。
+- T009 移除旧 ADB/LADB；screen share/video/side-button/terminal 不承担其职责，新组件另行设计。
 - controller relay-only 与 endpoint direct surface 必须明确区分。
 - 任何 protobuf 改动必须同步 sender、receiver、FFI/UI 和兼容策略。
 - Windows privacy/virtual-display 修改必须带 driver/OS/permission 恢复方案。

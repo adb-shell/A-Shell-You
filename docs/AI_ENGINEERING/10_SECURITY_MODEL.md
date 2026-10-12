@@ -39,7 +39,7 @@
 - 剪贴板、文件、terminal、tunnel 流量。
 - 联系人/Dev selector 数据、地址簿、设备分组。
 - peer/device ID、UUID、IP、system info、连接状态。
-- 本地 ADB shell 和 `WRITE_SECURE_SETTINGS` 能力。
+- 旧本地 ADB shell 与 WRITE_SECURE_SETTINGS 已移除（T009）；历史安装的授权/配对数据未自动清理。
 
 ### 完整性与可用性
 
@@ -152,7 +152,7 @@ Manifest 注册的 `ashell` custom scheme 缺少 host/path 限制。Flutter conf
 
 ### Runtime permission — High / E1
 
-Accessibility、overlay、全文件、录音、系统设置、MediaProjection、本地 ADB 和 `WRITE_SECURE_SETTINGS` 组合形成极高权限面。BootReceiver exported + debug action 允许其他 app 触发 core start，虽不等于获得 MediaProjection。
+Accessibility、overlay、全文件、录音、系统设置、MediaProjection 仍组合形成高权限面；T009 已移除旧 ADB 与 WRITE_SECURE_SETTINGS 声明。BootReceiver exported + debug action 允许其他 app 触发 core start，虽不等于获得 MediaProjection。
 
 要求：permission purpose matrix、最小化、明确 user gesture、持续可见状态、撤销/恢复、审计和 store-policy review。声明 backup/data extraction policy，避免 token/config 被设备备份。
 
@@ -166,7 +166,7 @@ Accessibility、overlay、全文件、录音、系统设置、MediaProjection、
 
 ### ADB 与 Voice — High / E1
 
-- Local ADB UI 可运行任意 shell 并自动尝试 `pm grant`，必须保持本地、显式、可撤销和可审计。
+- 历史 Local ADB UI/shell/pm grant 路径已在 T009 删除；不代表既有设备的配对、系统设置或历史授权已撤销。
 - PC remote ADB 尚不存在，不能复用现有输入/terminal 协议直接开放。
 - ZEGO token client credential 可提取；Android incoming call 自动接受，取消/返回也进入接受语义，缺少明确拒绝。
 
@@ -190,7 +190,7 @@ Plugin ZIP 解压使用 archive-provided name 拼接 target path，未见 `enclo
 
 - 多个 Cargo Git dependency 未在 manifest 固定 `rev`；lockfile 只固定当前 snapshot。
 - Gradle/Maven、vcpkg、Python 和 Actions 存在 mutable source/online download。
-- ignored `libadb.so`、Windows driver/helper/DLL 缺少统一 source revision/hash/license registry。
+- 旧 libadb.so 已退役并排除打包；Windows driver/helper/DLL 仍缺统一 source revision/hash/license registry。
 - 未见完整 SBOM、NOTICE、binary provenance。
 
 目标：建立 `THIRD_PARTY_ARTIFACTS.lock`/等价清单，记录 URL label、version、source commit、SHA-256、signature/publisher、license、owner；构建使用 locked/verified dependency。
@@ -260,7 +260,7 @@ Severity reflects static path and impact; except SEC-001, exploit success was no
 - Endpoint still retains password/click/2FA/trusted-device authentication code.
 - HTTP client did not show an explicit disable-TLS-verification option.
 - Android AccessibilityService is not exported; MediaProjection permission remains system-mediated.
-- Local ADB pairing code is passed through stdin and no PC remote ADB protocol was found.
+- Legacy local ADB pairing/runner was removed in T009; no replacement or PC remote ADB protocol was added.
 - Workflows are manual-triggered today and repository has no GitHub Release observed at takeover time.
 
 These controls reduce some paths but do not close the P0/P1 findings.
@@ -286,7 +286,7 @@ Formal isolated verification must cover:
 - HTTP→HTTPS migration, MITM resistance and authenticated heartbeat/config。
 - deep-link hostile source, config/key rewrite, URI redaction and user consent。
 - Android input permission off, DirectBuffer lifetime, data races and service replacement。
-- ADB local-only reachability and permission revoke。
+- T009 旧 ADB 页/通道/打包排除验证；历史设备授权不自动撤销。
 - ZEGO explicit accept/reject, token scope/TTL/rate limit and microphone consent。
 - update wrong host/hash/signature/publisher/downgrade and atomic rollback。
 - plugin absolute/parent/symlink/oversize archive cases。

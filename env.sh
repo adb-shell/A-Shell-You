@@ -200,7 +200,7 @@ install_system_deps() {
     python3 python3-pip python3-venv jq rsync file patchelf \
     sed gawk grep findutils coreutils \
     openjdk-17-jdk openjdk-17-jdk-headless \
-    adb clang lldb lld llvm-dev libclang-dev \
+    clang lldb lld llvm-dev libclang-dev \
     gcc-multilib g++ g++-multilib libc6-dev \
     autoconf automake libtool libtool-bin m4 gettext \
     dos2unix nasm \
@@ -526,7 +526,7 @@ one_key_check_current_env_status() {
   echo
   echo "${C_BOLD}核心命令${C_RESET}"
   local c
-  for c in bash git curl wget unzip zip tar java javac rustup cargo flutter sdkmanager adb keytool apksigner zipalign pkg-config cmake ninja; do
+  for c in bash git curl wget unzip zip tar java javac rustup cargo flutter sdkmanager keytool apksigner zipalign pkg-config cmake ninja; do
     if ! check_item "命令: $c" "command -v '$c'"; then inc_failed; fi
   done
 

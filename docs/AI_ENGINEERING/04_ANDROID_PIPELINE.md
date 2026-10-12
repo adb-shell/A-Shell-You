@@ -11,7 +11,7 @@ Android 不是“Flutter 应用加一个 Service”，而是四层共同组成�
 1. Flutter 页面、session model 与 PC 侧控制 UI。
 2. Flutter Rust Bridge、手工 C FFI 与 Android MethodChannel。
 3. Rust client/server/protocol、`scrap` raw frame 与 JNI。
-4. Kotlin `MainService`、`AccessibilityService`、`MediaProjection`、overlay、ADB 和 ZEGO SDK。
+4. Kotlin `MainService`、`AccessibilityService`、`MediaProjection`、overlay 和 ZEGO SDK。
 
 主要源码：
 
@@ -28,10 +28,10 @@ Android 不是“Flutter 应用加一个 Service”，而是四层共同组成�
 | Accessibility/Input | `nZW99cdXQ0COhB2o.kt` |
 | Bitmap/frame helper | `EqljohYazB0qrhnj.kt` |
 | Android JNI | `libs/scrap/src/android/pkg2230.rs` |
-| ADB/LADB | `flutter/lib/mobile/pages/adb_page.dart`，`flutter/android/app/src/main/kotlin/me/ashell/adb/*.kt` |
+| 旧 ADB/LADB（已移除） | T009 / ADR-0015；无运行入口，新组件未接入 |
 | ZEGO | `flutter/lib/models/zego_voice_call_model.dart`，`flutter/lib/models/server_model.dart`，`src/client/helper.rs` |
 
-当前移动主页只直接装载 `ServerPage` 与 `AdbPage`。Remote、file、terminal、camera、settings 等移动页面仍有源码，但不是当前主页的直接导航入口。
+当前移动主页只直接装载 `ServerPage`（T009 删除右侧 AdbPage）。Remote、file、terminal、camera、settings 等移动页面仍有源码，但不是当前主页的直接导航入口。
 
 ## 2. 总体链路
 
@@ -381,45 +381,11 @@ JNI 修改规则：
 3. 不手工改 generated Flutter bridge。
 4. 涉及 raw pointer、GlobalRef、direct buffer 时必须写明 ownership 和 thread。
 
-## 12. ADB/LADB
+## 12. 旧 ADB/LADB 已退役
 
-### 12.1 当前链
+T009 删除 AdbPage、AndroidAdbManager、11 个 ashell_adb_* 通道、adb/ 四个 Kotlin 文件和 Accessibility 中专用无线调试状态/自动操作；不再提供配对、mDNS、本地 shell 或自动开关无线调试。Manifest 移除 WRITE_SECURE_SETTINGS、CHANGE_WIFI_MULTICAST_STATE，保留 MainService Wi-Fi 保活和其他权限。Gradle 排除 libadb.so，保持其余 native packaging 行为。
 
-```text
-AdbPage
-  -> AndroidAdbManager Dart wrapper
-  -> MethodChannel mChannel
-  -> FlutterActivity
-  -> AShellAdbManager
-  -> AShellAdbRunner / AShellAdbDnsDiscover
-  -> packaged libadb.so
-```
-
-`verified` 能力：
-
-- local ADB server
-- wireless debugging mDNS discovery
-- pair/connect
-- localhost、loopback、active Wi-Fi IPv4 fallback
-- preferred serial
-- device scan
-- long-lived `adb shell`
-- local command input/output
-- bounded restart attempts
-- wireless-debugging Settings automation
-- `paired_before` 本地历史标记
-
-当前没有 PC remote ADB protocol。ADB 不得复用 remote terminal、side-button、MediaProjection、SKL、ignore 或 ZEGO 状态。
-
-### 12.2 ADB 风险
-
-- Dart 在 start flow 后每 100ms 同时拉 `status` 与 `output`；status 已包含 output，且 stop 不取消 timer。
-- `supported = SDK >= 30` 被 native 返回，但当前 AdbPage 没有消费或强制旧系统退出。
-- port/code 缺少范围和格式验证。
-- shell process/start/stop/status 的并发所有权不清晰。
-- runner 先等待部分命令退出再消费完整 output，高输出命令可能遇到 pipe backpressure。
-- local shell 可执行任意命令；未来远程化必须新建鉴权、审计、allowlist、timeout、output limit 和 exit-code contract。
-- packaged `libadb.so` 与参考源码属于本地/外部资产，干净 clone 的 provenance 需要另建清单。
+远控输入、DevAutoSelectorController、正常/SKL/ignore 采集、MediaProjection、ZEGO 和 terminal 原实现保留。既有安装的历史配对/prefs/系统无线调试设置不自动清理；源码移除不等于撤销系统授权。新组件另行接入，不复用旧协议。历史说明保留在 [集成档案](../ADB_LADB_INTEGRATION_MEMORY.md)，当前证据见 [T009](../tasks/T-2026-10-12-009-remove-legacy-adb.md)。
 
 ## 13. ZEGO 语音旁路
 
@@ -467,7 +433,7 @@ Rust 只承担邀请、接受/关闭和状态控制；Flutter ZEGO SDK 负责 mi
 | P1 | screen info 重复 rebind | scaled `SCREEN_INFO.width` 与 raw width 比较 | `inferred`，真机确认 |
 | P1 | shared imageBuffer race | 普通 singleton 引用，无 volatile/lock | `verified` |
 | P1 | 非显式 destroy 的 stale JNI context | 旧 GlobalRef 保留至新 Service 建立 | `inferred` |
-| P1 | ADB 高频双轮询与 shell 边界 | 100ms status/output、local arbitrary shell | `verified` |
+| retired | 旧 ADB 轮询与 shell | T009 已删除相关实现，历史观察不再是当前路径 | `V0；运行待验证` |
 | P1 | 高敏 Android 权限组合 | Accessibility all packages、screenshot、overlay、boot、audio、settings | `verified`，合规审计 |
 | P2 | FFI/compat drift | `pkg2230.rs` 与 `ffi.rs` 非同一实现 | `verified` |
 | P2 | Flutter timer/controller 泄漏 | 每个 FFI 构建 ServerModel 500ms timer；StatelessWidget controller 无真实 dispose | `verified` |
@@ -499,7 +465,7 @@ Rust 只承担邀请、接受/关闭和状态控制；Flutter ZEGO SDK 负责 mi
 
 ### ADB/ZEGO
 
-- [ ] ADB 是否仍为 local-only？
+- [ ] 旧 ADB 页/通道/libadb.so 是否确实不在当前产品中（T009）？
 - [ ] 是否限制 command timeout、size、output 和 lifecycle？
 - [ ] ZEGO 是否仍不触发旧 `audio_service`？
 - [ ] token 是否只经 TLS/服务端 secret manager？
@@ -524,8 +490,8 @@ Rust 只承担邀请、接受/关闭和状态控制；Flutter ZEGO SDK 负责 mi
 | A11 | input permission | endpoint keyboard off 后发送 mouse/key/mask 37—44 | 行为符合经批准的服务端策略 |
 | A12 | connection settle | 首连 1.5s 内外发送开/关共享 | 仅 live/starting/in-flight 的短窗口噪声被忽略 |
 | A13 | service death | 非显式 kill MainService | 无旧 GlobalRef crash；500ms guarded restart；relay 可恢复 |
-| A14 | ADB API 29/30+ | pair/auto/connect/stop/page dispose | 旧系统明确拒绝或安全失败；无 timer/setState/process race |
-| A15 | ADB high output | 长输出 shell command | 无 pipe deadlock；有 output limit/timeout |
+| A14 | 旧 ADB 退役 | 首次启动/升级后主页左右滑动、导航返回 | 无 ADB 页和自动无线调试入口；ServerPage 行为保持 |
+| A15 | 旧 ADB 打包排除 | 检查各 ABI APK lib/ | 无 libadb.so；主库及 ZEGO 等所需 native 库仍在 |
 | A16 | ZEGO foreground/background | incoming、accept、reject、back、permission denied | 不自动越权打开麦克风；关闭后 busy state 清理 |
 | A17 | 状态推送 | share/ignore/SKL/blank/touch-block 快速切换 | immediate + throttled packet 均为真实值；8s stale 回 unknown |
 

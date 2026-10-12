@@ -58,7 +58,7 @@
 ### P1-1 Reproducible build
 
 - 固定 Rust/Flutter/NDK/JDK/vcpkg/FRB 版本。
-- 将 `libadb.so`、Windows drivers/DLL helper 纳入有 hash、license、source revision 的 artifact registry。
+- 将仍使用的 Windows drivers/DLL helper 纳入有 hash、license、source revision 的 artifact registry。
 - 建立 Android/Windows clean-clone build manifest。
 - 生成 SBOM 与 third-party notices。
 
@@ -142,7 +142,7 @@
 - record upload。
 - 新 capture/virtual-display backend。
 
-其中 PC 远程 ADB 不是当前本地 LADB 的简单暴露；它需要新协议、最小权限、command allowlist、用户确认、审计和退出机制。
+旧本地 LADB 已在 T009 移除，新组件与 PC 远程 ADB 均未实现；它需要新协议、最小权限、command allowlist、用户确认、审计和退出机制。
 
 ## 7. 决策门
 

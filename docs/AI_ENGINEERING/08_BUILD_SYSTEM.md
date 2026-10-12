@@ -83,15 +83,11 @@ FRB 文件带 1.80.1 生成标记，且 Git 历史显示 Rust FFI 后续仍有�
 
 用户在原目录增量构建时遇到AGP7.3.1的mergeReleaseResources/source-sets异常，与官方206674992同类问题相符，根因仍需完整stacktrace和构建机验证。建议该机先对Flutter生成目录执行flutter clean再用修正后的build.sh重试；本轮未自动清理、未改AGP/Gradle/Kotlin版本、未构建。新图标配置保持不变，不能把脚本通道修正等同于资源合并错误已复现解决。
 
-### 不可复现资产
+### 旧 ADB 打包依赖已退役（T009）
 
-当前工作树 `flutter/android/app/src/main/jniLibs/` 下的 `libadb.so` 为 ignored/local-only binary。`ADB-CODE/`、`LADB/` 研究目录也被忽略。干净 clone 不能仅凭 tracked source 复现 ADB packaging，必须补充：
+已删除旧 ADB 源码/混淆规则；build.sh 不再检查从未调用的 host adb，env.sh 也删除独立 adb 的 apt 安装/强制检查，保留标准 Android SDK platform-tools。app/build.gradle 通过 `jniLibs.excludes += ["**/libadb.so"]` 排除旧构建目录可能留下的二进制；其余库仍沿用 `useLegacyPackaging = true`。这是 [AGP 7.3 官方 excludes API](https://developer.android.com/reference/tools/gradle-api/7.3/com/android/build/api/dsl/JniLibsPackagingOptions) 支持的打包过滤。
 
-- binary provenance 与 source revision。
-- license mapping。
-- hash/checksum manifest。
-- 受控下载或内部 artifact registry。
-- 支持 ABI 清单。
+当前检出没有 jniLibs、ADB-CODE 或 LADB 资产；不会下载或删除外部构建机资产。忽略规则和历史 provenance/许可记录保留。运行时主库/JNI、工具链版本、两种打包模式与 T008 错误传播保持；此修改只经 V0，须正式构建检查 APK 排除结果。
 
 ## 5. Windows 正式入口
 
@@ -183,7 +179,7 @@ cargo build --release --features flutter
 3. `workspace.exclude` 引用不存在目录。
 4. FRB generated files 与最近 FFI 修改可能不同步。
 5. 非 Windows/Android build naming 尚有 RustDesk 残留。
-6. ignored `libadb.so` 破坏 clean-clone reproducibility。
+6. 旧 libadb.so 已被排除（T009）；正式产物仍须检查排除生效及其他 ABI/JNI 库完整。
 7. workflow 全手动，当前没有可证明的 required check。
 
 ## 11. 发布交付清单

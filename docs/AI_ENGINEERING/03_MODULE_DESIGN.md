@@ -70,26 +70,15 @@ AShell 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、bro
 ## 8. Android runtime 模块
 
 - `MainService`：core/JNI、foreground keep-alive、normal capture、MethodChannel relay。
-- `AccessibilityService`：input、overlay、screenshot/ignore、Dev/ADB automation。
+- `AccessibilityService`：input、overlay、screenshot/ignore、DevAutoSelectorController。
 - Rust JNI：raw buffers、pixel gates、command dispatch。
 - Flutter：permission UI、session waiting、status/reconnect。
 
 这不是单 Kotlin 模块，而是三语言状态机。详见 `04_ANDROID_PIPELINE.md`。
 
-## 9. Android local ADB
+## 9. 旧 Android local ADB — retired
 
-```text
-adb_page.dart
-→ MethodChannel('mChannel')
-→ oFtTiPzsqzBHGigp handlers
-→ AShellAdbManager
-→ Runner / DNS discover / Accessibility automation
-→ local libadb.so process
-```
-
-当前支持 manual pair/connect、endpoint fallback、NSD retry、preferred serial、shell restart cap、best-effort wireless-debug Settings automation。PC remote ADB protocol 未实现。
-
-`libadb.so` 为本地 ignored asset，构建可复现性和来源清单未闭环。
+T009 / ADR-0015 已移除原主页 ADB 页、Dart/native bridge、配对/进程/mDNS 模块及专用 Accessibility 自动化。libadb.so 被排除，不再是运行依赖。当前没有新 ADB 实现或 PC remote ADB protocol；远程 terminal 等原有链路保持。
 
 ## 10. Windows privacy/virtual display
 

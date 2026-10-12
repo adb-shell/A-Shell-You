@@ -64,7 +64,7 @@ retrospective -> 只有 decision owner 重新批准才可 accepted
 | 0004 | Separate Android Core and Screen Share | accepted | backfill | D-004 | implemented / V0；V3 required |
 | 0005 | Use `pkg2230` as Active Android JNI Route | accepted | backfill | D-005 | implemented / V0 |
 | 0006 | First Frame Uses Normal Refresh Only | accepted | backfill | D-006 | implemented / V0；V3 required |
-| 0007 | Keep Android ADB Local | accepted | backfill | D-007 | implemented / V0；V3 required |
+| 0007 | Keep Android ADB Local | superseded by 0015 | backfill | D-007 | historical；旧组件已退役 |
 | 0008 | Use ZEGO for Voice Media | accepted | backfill | D-008 | implemented / V0；V4 required |
 | 0009 | Use Amyuni as Active Windows Virtual Display | accepted | backfill | D-009 | implemented / V0；V3 required |
 | 0010 | Keep GitHub Workflows Manual-Only | accepted | backfill | D-010 | implemented governance debt / V0 |
@@ -72,6 +72,7 @@ retrospective -> 只有 decision owner 重新批准才可 accepted
 | 0012 | Adopt Task Protocol and Permission Gates | accepted | backfill | D-012 | implemented / V0 |
 | 0013 | Integrate a Safe Superpowers Subset | accepted | contemporaneous | D-013 | implemented / V0 |
 | 0014 | AShell Product Identity | accepted | contemporaneous | D-015 | source edits / V0；formal build pending |
+| 0015 | Retire Legacy Local ADB | accepted | contemporaneous | D-019 | source removal / V0；V2/V3 pending |
 
 ## 6. Responsibility Boundaries
 

@@ -6,6 +6,10 @@
 
 ## 0. Latest Recovery Snapshot
 
+当前最新：`T-2026-10-12-009`，见 [旧 ADB 退役](../docs/tasks/T-2026-10-12-009-remove-legacy-adb.md)。main/13f792d，初始 clean；T008 已提交。删除主页右侧 ADB 页、Dart/native 通道、4 个 Kotlin 模块、无线调试自动化及两项专用权限，排除旧 libadb.so，移除 host adb 检查；新组件未接入。Windows/远控核心/JNI/MainService/DevAutoSelectorController 未改。V0 核对完成，未 build/test/analyze/codegen/操作设备/Git 写入；本轮修改未提交。D-019 / ADR-0015 / CE-20261012-T009-01 / STATE-20261012-010。
+
+以下 T008/T007 为当时快照，不代表当前工作区状态。
+
 当前最新：`T-2026-10-12-008`，见 [Android构建诊断](../docs/tasks/T-2026-10-12-008-android-resource-build.md)。main/fb5c393（修改图标），开始clean；T006/T007此前已按明确请求推送test并快进合并/推送main。用户原目录更新源码后增量编译遇到mergeReleaseResources/source-sets，疑似旧AGP增量问题，未取得完整stacktrace，不能确认根因。已静态修正build.sh两打包函数的stdout路径协议与错误码传播；不会在Flutter失败后继续选旧APK/签名。未改图标和工具链，未清缓存/编译/Git写入；源码修改未提交，只有bash -n及静态检查。CE-20261012-T008-01 / STATE-20261012-009；后续构建机clean/retry需要实际结果。
 
 以下T007为图标修改完成、Git提交之前的历史快照，不代表当前分支或dirty状态。
@@ -24,7 +28,7 @@ T005历史：统一PC入口为build.cmd，直接打包本次清理后编译的Re
 
 - **来源**：本地 HEAD 的975个 tracked blob 路径/hash与历史源 `历史源仓@cbce0ba36c5c` 一致。源仓60提交、最早2026-04-13无父导入；准确 RustDesk fork point 未知。RustDesk1.4.0对照有615同路径同blob文件，仅证明部分继承。
 - **四个关键边界**：Android core/share/frame/waiting 分离；controller relay-only 不删除 endpoint direct/NAT兼容；产品账号不是 endpoint密码认证；ZEGO邀请/Token/录音同意分离，媒体走SDK。
-- **容易遗漏的当前行为**：永久密码 getter固定常量、setter不更新；Android已认证输入分支缺desktop对应keyboard gate；terminal有进程内persistent但重连回放TODO；record_upload dormant；ADB为本地子系统。
+- **容易遗漏的当前行为**：永久密码 getter固定常量、setter不更新；Android已认证输入分支缺desktop对应keyboard gate；terminal有进程内persistent但重连回放TODO；record_upload dormant；旧本地 ADB 子系统已在 T009 移除。
 - **风险解释**：JNI正常帧保存Image buffer裸地址后延迟读取；握手有non-secure fallback；双向nonce无方向标识；Android来电3秒自动接受；默认API/token HTTP与本地token保护有边界缺口。均为源码事实/静态风险，未证明已利用漏洞或凭据当前有效。
 - **当前资产**：jniLibs目录不存在，不能沿用7月本机libadb.so存在记录；ZEGO声明未进入pubspec.lock；broker有脚本内嵌Go实现，但独立工程/实际部署未知。`.info`是Windows构建输入，不是已证明的运行时配置入口。
 - **验证**：仅V0；未build/test/analyze/codegen、未运行服务/设备/生产验证，未审相邻API/WEB/SERVER仓。55处Rust测试标记不等于通过；Flutter cm_test是手动harness。
@@ -83,7 +87,7 @@ T005历史：统一PC入口为build.cmd，直接打包本次清理后编译的Re
 - Android 真实 RGBA/Texture frame 必须清 PC waiting。
 - controller 当前强制 relay；受控端仍保留 rendezvous/direct/NAT compatibility code。
 - Windows 当前 virtual display implementation 是 Amyuni；RustDesk IDD 分支是 dormant。
-- Android ADB 是设备本地 LADB 子系统，不是 PC remote ADB protocol。
+- 旧 Android 本地 ADB/LADB 已在 T009 移除；无新组件或 PC remote ADB protocol，不能从历史集成文档恢复旧入口。
 - ZEGO 媒体不走原 RustDesk audio service；peer protocol 只传 invitation/control state。
 - `verify_login()` 的 legacy UI bypass 不等于产品 API、hbbs 或 endpoint authentication bypass。
 
@@ -98,7 +102,7 @@ T005历史：统一PC入口为build.cmd，直接打包本次清理后编译的Re
 - peer secure handshake、secretbox nonce 和本地 password protection 需密码学专项审计。
 - 产品 HTTP/sync 路径存在 plaintext/auth boundary 风险。
 - Windows privacy/injection/virtual display 是高权限、崩溃恢复敏感区。
-- 当前缺失的 `libadb.so` 和未闭环的 driver/helper assets 限制 clean-clone reproducibility。
+- 仍使用的 driver/helper assets 来源尚未闭环；旧 libadb.so 已排除，不再是当前构建前置。
 
 风险详情见 `docs/AI_ENGINEERING/10_SECURITY_MODEL.md`。
 
@@ -121,7 +125,7 @@ T005历史：统一PC入口为build.cmd，直接打包本次清理后编译的Re
 - hbbs/hbbr source、version、config 和部署拓扑。
 - 产品 backend/OpenAPI/DB/schema/migration/backup。
 - ZEGO broker 独立受控 project/commit、dependency lock、production provenance 和 credential ownership；当前 deployment script 只内嵌了部分 Go server source。
-- ADB binary、Windows driver/helper 的 source revision、license 和 hashes。
+- 当前 Windows driver/helper 的 source revision、license 和 hashes；旧 ADB binary 历史记录保留，不是当前输入。
 - 正式 Android/Windows build 与 regression evidence。
 
 这些缺口未补齐前，不得宣称全系统接管或发布就绪。

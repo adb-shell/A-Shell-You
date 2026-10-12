@@ -59,7 +59,7 @@ Record commit, branch, dirty state, version, platform/channel, source provenance
 
 ### 3. Prove reproducibility
 
-Inventory compiler/SDK/NDK/JDK/Flutter/FRB/vcpkg versions, dependency locks, Git dependencies, native binaries, drivers, helper DLLs, signing identities, environment variables, and network downloads. Require source revision, license, checksum, and controlled artifact source for ignored `libadb.so` and Windows high-privilege assets.
+Inventory compiler/SDK/NDK/JDK/Flutter/FRB/vcpkg versions, dependency locks, Git dependencies, native binaries, drivers, helper DLLs, signing identities, environment variables, and network downloads. Require source revision, license, checksum, and controlled artifact source for active Windows high-privilege assets. Legacy libadb.so was retired by T009; verify it is absent from APKs instead of requiring it as a build input.
 
 ### 4. Design quality gates
 

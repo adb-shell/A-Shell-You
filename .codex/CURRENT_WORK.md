@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261012-016`
+Registry Revision：`WORK-20261012-018`
 
-Last Updated：2026-10-12T07:42:41+09:00
+Last Updated：2026-10-12T20:52:15+09:00
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none；T008脚本静态修正及诊断记录已交付，AGP资源合并根因/clean后构建结果待该构建机验证。没有活动构建或Git任务。
+none；T009 已完成源码剔除、V0 核对和文档交付。正式构建/设备验证未执行；没有活动构建或 Git 任务。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ none；T008脚本静态修正及诊断记录已交付，AGP资源合并根因/cl
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-12-008`
-- Result：Android资源合并失败分层诊断；build.sh隔离stdout APK路径与stderr日志，显式传播Flutter失败至调用者，停止旧APK选择/签名。11文件未提交；AGP增量根因与构建恢复仍待验证。
-- Closed At：2026-10-12T07:42:41+09:00
-- Final T-State：`T8 — complete`
-- State / Event：`STATE-20261012-009` / `CE-20261012-T008-01`
-- Decision：N/A — no decision delta；D-018、D-017、D-015/D-016 / ADR-0014仍有效；治理沿用D-014。
-- Verification：V0 Bash语法仅解析、三份图标XML解析、两模式stdout/失败链人工检查、diff/11文件范围和链接；图片/Gradle无diff。未运行项目代码/构建/测试/清缓存/Git写入。
-- Next Gate：new user request must start at T0；historical authorization inherited `none`。
-- Changelog pointer：`CHANGELOG_AI.md` 中 `T-2026-10-12-008`。
-- Detailed record：`TASK_HISTORY.md` 中同 Task ID；修改清单见 `CHANGE_EVENT_LOG.md` 中同 Event。
+- Task ID：`T-2026-10-12-009`
+- Result：旧 ADB 功能链/页面/模块/专用权限移除，排除旧 libadb.so，未接入新组件；源码和文档修改未提交。
+- Closed At：2026-10-12T20:52:15+09:00
+- Final T-State：`T8 — complete`（源码交付；运行验收待验证）
+- State / Event：`STATE-20261012-010` / `CE-20261012-T009-01`
+- Decision：D-019 / ADR-0015；既有其他边界保持。
+- Verification：V0 删除边界、旧符号/通道扫描、Manifest XML、Bash 仅解析、协议无字段变化、保留源码/范围检查；V2/V3 NOT_RUN。
+- Next Gate：新组件/编译/设备/Git 操作须按新的用户请求开始 T0；历史授权不继承。
+- Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md 中同 ID。
+- Detailed record：docs/tasks/T-2026-10-12-009-remove-legacy-adb.md。

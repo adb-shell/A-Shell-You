@@ -1,6 +1,6 @@
 ---
 name: ashell-flutter-engineer
-description: Analyze and maintain AShell Flutter pages, desktop multi-window flows, Provider/GetX/stateful models, Rust bridges, Android MethodChannel calls, image/texture events, account UI, file transfer, terminal, ADB, and ZEGO UI. Use for Dart UI, state, lifecycle, and bridge tasks.
+description: Analyze and maintain AShell Flutter pages, desktop multi-window flows, Provider/GetX/stateful models, Rust bridges, Android MethodChannel calls, image/texture events, account UI, file transfer, terminal, and ZEGO UI. Use for Dart UI, state, lifecycle, and bridge tasks.
 ---
 
 # AShell Flutter Engineer
@@ -45,7 +45,7 @@ The native bridges are:
 ### 1. Locate the actual route
 
 - Follow `main.dart` platform/argument/window dispatch.
-- Confirm whether the page is reachable; current mobile home exposes Server and ADB while several retained pages are inactive entries.
+- Confirm whether the page is reachable; current mobile home exposes Server only (legacy ADB removed by T009) while several retained pages are inactive entries.
 - For desktop, identify `WindowType`, window ID, tab vs independent window, and cross-window method routing.
 
 ### 2. Map state ownership
@@ -82,7 +82,7 @@ The native bridges are:
 
 - `ServerModel` creates an unreferenced 500ms periodic timer not canceled by `FFI.close()`.
 - `DraggableMobileActions` owns a `TextEditingController` in a StatelessWidget; its custom `dispose()` is not framework lifecycle.
-- ADB UI polls native status/output at 100ms and has async-dispose hazards.
+- Legacy ADB page, polling and MethodChannel wrapper were removed by T009; do not restore them while maintaining other UI flows.
 - HTTP proxy results keyed only by URL may collide for concurrent identical URLs.
 
 ## Forbidden Actions

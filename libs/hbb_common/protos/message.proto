@@ -852,7 +852,7 @@ message VoiceCallRequest {
   bool is_connect = 2;
   // AShell: third-party RTC voice call metadata. These fields are only used
   // by the ZEGO voice-call path and do not affect the existing remote-control
-  // video/input/file/ADB channels.
+  // video/input/file channels.
   string rtc_provider = 3;
   uint32 app_id = 4;
   string room_id = 5;

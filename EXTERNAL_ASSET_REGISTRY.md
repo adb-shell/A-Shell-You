@@ -1,5 +1,7 @@
 # AShell External Asset Registry
 
+2026-10-12 T009：EXT-BIN-ADB-001、EXT-REF-ADB-002/003 已 RETIRED，不再是当前构建依赖或发布阻断项。Gradle 排除旧 libadb.so；历史 hash/license 缺口保留供追溯，新 ADB 组件未接入。
+
 最后更新：2026-10-12
 
 状态：repository-side inventory complete；owner/provenance onboarding incomplete  
@@ -63,9 +65,9 @@ Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织�
 
 | ID | 资产 | 当前存在性 | 仓内消费/证据锚点 | Owner | 主要缺口 | 影响 |
 |---|---|---|---|---|---|---|
-| `EXT-BIN-ADB-001` | `libadb.so` for arm64-v8a / armeabi-v7a / x86_64 | `MISSING`：2026-10-12 当前检出没有 `flutter/android/app/src/main/jniLibs/`；7月 LOCAL-ONLY 为历史观察 | `AShellAdbRunner.kt`, Android packaging | `OWNER-REQUIRED` | upstream/source commit、reproducible build recipe、per-ABI hash、signature、version、license mapping、artifact registry | clean clone 不能复现 ADB packaging；Android release `BLOCKING` |
-| `EXT-REF-ADB-002` | `ADB-CODE/` research/decompiled materials | `LOCAL-ONLY`：ignored | `docs/ADB_LADB_INTEGRATION_MEMORY.md` 的研究背景 | `OWNER-REQUIRED` | origin、revision、legal/provenance、是否仅研究使用、保留策略 | 研究不可复现；不得直接进入 release source |
-| `EXT-REF-ADB-003` | `LADB/` reference source | `LOCAL-ONLY`：ignored | ADB integration memory 与实现设计背景 | `OWNER-REQUIRED` | upstream URL/commit、license obligations、Play Store restriction mapping、修改清单 | license/distribution 风险；不得等同 bundled binary source |
+| `EXT-BIN-ADB-001` | 旧 libadb.so（三 ABI） | RETIRED / T009；当前本地缺失 | 旧 Runner 已删除，Gradle 排除 | 历史 owner 待确认 | 历史 provenance/hash/license 记录保留，未验证来源 | 不再是当前发布 blocker；验证 APK 无旧库 |
+| `EXT-REF-ADB-002` | ADB-CODE/ 历史研究材料 | RETIRED / T009；当前本地缺失 | 仅历史集成档案 | 历史 owner 待确认 | origin/revision/legal 记录未闭环 | 不再是当前构建依赖；不得重新纳入产品 |
+| `EXT-REF-ADB-003` | LADB/ 历史参考源码 | RETIRED / T009；当前本地缺失 | 仅历史集成档案 | 历史 owner 待确认 | upstream/license 历史义务保留 | 不再是当前构建依赖；不能冒充新组件来源 |
 
 历史记录：2026-07-12 当时本机存在三个 `libadb.so` 和一份 license 文件，均未 tracked；2026-10-12 当前检出并不存在该目录，未重新取得或验证这些文件。以下仅保留7月记录的 SHA-256：
 
@@ -101,7 +103,7 @@ Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织�
 | `EXT-SIGN-002` | Windows Authenticode identity、timestamp 与 remote signing service | `MISSING/EXTERNAL` | `res/job.py` 保留 remote signing client 线索；canonical Windows build 尚无完整签名 gate | Release/Security owner required | signing service repo/API、certificate chain、HSM/key custody、timestamp、ACL/audit、artifact hash binding、rotation/revoke | trustworthy Windows release `BLOCKING` |
 | `EXT-BUILD-001` | Linux Android formal build host/toolchain | `EXTERNAL` | `build.sh`, `/opt/rustdesk-toolchain`-style layout | Release owner required | host image/version、SDK/NDK/JDK/Rust/Flutter/vcpkg locks、access、rebuild/runbook | Android V2 build evidence `BLOCKING` |
 | `EXT-BUILD-002` | Windows formal build host and caches | `EXTERNAL` | `build.cmd`, `C:\DevEnv` / `C:\DevTool` layout | Release owner required | host image、VS/Rust/Flutter/LLVM/vcpkg locks、third-party cache provenance、access | Windows V2 build evidence `BLOCKING` |
-| `EXT-BUILD-003` | Internal artifact registry / immutable binary store | `MISSING` | required by `libadb.so`, driver/DLL and release provenance | Release/Security owner required | storage、ACL、retention、checksum/signature manifest、promotion policy | clean-clone reproducibility and supply chain `BLOCKING` |
+| `EXT-BUILD-003` | Internal artifact registry / immutable binary store | `MISSING` | required by remaining driver/DLL and release provenance | Release/Security owner required | storage、ACL、retention、checksum/signature manifest、promotion policy | clean-clone reproducibility and supply chain `BLOCKING` |
 | `EXT-CI-001` | GitHub environments、runners、secrets、branch/release protections | `EXTERNAL/UNVERIFIED` | `.github/workflows/` 当前以 manual dispatch 为主；存在 mutable action refs 与自动 commit/push 型维护 workflow，仓内未见 `CODEOWNERS` | Repository/Release owner required | permission inventory、immutable Actions SHA、required checks、environment approval、runner trust、secret boundary | 现有 workflows 不能直接视作可信 release system |
 | `EXT-REL-001` | Distribution channels and release storage | `EXTERNAL/UNVERIFIED` | legacy GitHub/WinGet/F-Droid/store workflows and packaging docs | Product/Release owner required | supported channels、accounts、publisher identity、approval、rollout/rollback、source offer | no authorized release path is currently documented |
 | `EXT-COMP-001` | AGPL Corresponding Source / third-party notice delivery | `MISSING` | root AGPL license and binary distribution obligations | Legal/Product/Release owner required | upstream baseline、source archive/tag、offer mechanism、NOTICE/SBOM、legal review | commercial distribution compliance `BLOCKING` |
@@ -121,7 +123,7 @@ Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织�
 正式发布前至少关闭：
 
 1. `EXT-SVC-004` credential/token-broker incident response。
-2. `EXT-BIN-ADB-001` Android ADB binary provenance。
+2. T009 退役验证：确认 APK 不再打入旧 libadb.so；EXT-BIN-ADB-001 历史来源缺口不再阻断当前产品。
 3. `EXT-WIN-001`—`005` driver/DLL/helper provenance 与 signature。
 4. `EXT-SIGN-001`、`002` signing custody 和 verification。
 5. `EXT-BUILD-001`—`003` formal build environment 与 immutable artifact store。

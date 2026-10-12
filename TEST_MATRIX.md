@@ -61,7 +61,7 @@ These are coverage facts, not pass results.
 | AND-03 | P1 | Display metrics | rotate、split、fold、narrow/small、density change；rapid changes | no divide-by-zero、token restart or rebind storm；orientation/topology recover | V3 / E-A | Android / Android QA |
 | AND-04 | P0 | Reconnect | 10s/70s loss、latency、jitter、relay failure、process background | one 2.5s timer；60s behavior and last frame hold；strict relay；no timer pileup | V3+V4 / E-A+E-N | Android+Network / QA+infra |
 | AND-05 | P0 | Input authorization | permission on/off；mouse/key/touch；command masks 37–44；modified controller | controlled endpoint rejects unauthorized actions；UI hiding is not oracle | V3+V4 / E-A+E-N | Android+Network+Security / QA |
-| AND-06 | P0 | Local ADB/LADB | API 29/30+；pair/connect/mDNS/fallback/cancel/high output/concurrent/page dispose；3 ABI | local-only reachability；safe cancel/timeout；no deadlock/race；revocation works | V3 / E-A | Android+Security / Android QA |
+| AND-06 | P0 | Legacy ADB retirement (T009) | fresh install/upgrade；home swipe/back；three ABI APK inventory | no old page/channel/automation/libadb.so；ServerPage and other native libraries remain | V2+V3 / E-A | Android+Security+Release / QA |
 | AND-07 | P0 | ZEGO voice consent | incoming/accept/reject/cancel/background/busy/reconnect/mic denial | no auto mic；reject is distinct；busy state clears；token/room scoped | V3+V4 / E-A+E-P | Android+Flutter+API+Security / QA+backend |
 | AND-08 | P0 | Packaging/permissions | clean approved native assets；ABI/JNI；manifest/boot/exported components；permission revoke | hashes/license/provenance match；all ABIs link；no hidden privilege grant | V2+V3 / E-A | Android+Release+Security / Release evidence owner |
 
@@ -87,7 +87,7 @@ These are coverage facts, not pass results.
 | FLT-03 | P0 | EventToUI/first frame | session ID；RGBA/Texture；duplicate/late/malformed event | correct model receives event；both frame types clear waiting | V1+V3 / E-F+E-A | Flutter+Rust / QA |
 | FLT-04 | P0 | Lifecycle/reconnect | timers/subscriptions/controllers；logout/nav/background/close；race/late callback | no leak、double reconnect、post-dispose update or stale client | V1+V3 / E-F | Flutter / QA |
 | FLT-05 | P0 | Bridge contract | FRB/handwritten FFI/MethodChannel；generated drift；bad ABI/error | signatures match all sides；generated diff reviewed；errors bounded | V1+V2 / E-F+E-R | Flutter+Rust+Android / QA |
-| FLT-06 | P1 | Product flows | account/file/terminal/ADB/ZEGO success、deny、timeout、back navigation | state/error/consent remains domain-correct；no sensitive logging | V1+V3+V4 / E-F+E-A+E-P | Flutter+API+Security / QA |
+| FLT-06 | P1 | Product flows | account/file/terminal/ZEGO success、deny、timeout、back navigation | state/error/consent remains domain-correct；no sensitive logging | V1+V3+V4 / E-F+E-A+E-P | Flutter+API+Security / QA |
 | FLT-07 | P2 | UX/accessibility | narrow/wide、localization、keyboard/focus、window close/restore | no inaccessible controls、layout loss or stale dialog overlay | V1+V3 / E-F | Flutter / QA |
 
 ## 8. Rust Suite

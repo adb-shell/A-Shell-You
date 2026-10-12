@@ -29,7 +29,6 @@ import android.util.DisplayMetrics
 import androidx.annotation.RequiresApi
 import org.json.JSONArray
 import org.json.JSONObject
-import me.ashell.adb.AShellAdbManager
 import com.hjq.permissions.XXPermissions
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -230,90 +229,6 @@ class oFtTiPzsqzBHGigp : FlutterActivity() {
                 "flush_pending_voice_call_event" -> {
                     activeMainService()?.flushPendingVoiceCallEvent()
                     result.success(true)
-                }
-                "ashell_adb_init" -> {
-                    result.success(AShellAdbManager.initialize(applicationContext).toMap())
-                }
-                "ashell_adb_status" -> {
-                    result.success(AShellAdbManager.snapshot().toMap())
-                }
-                "ashell_adb_output" -> {
-                    result.success(AShellAdbManager.output(applicationContext))
-                }
-                "ashell_adb_start" -> {
-                    thread {
-                        try {
-                            val state = AShellAdbManager.start(applicationContext).toMap()
-                            runOnUiThread { result.success(state) }
-                        } catch (e: Exception) {
-                            runOnUiThread {
-                                result.error("ADB_START_FAILED", e.message, null)
-                            }
-                        }
-                    }
-                }
-                "ashell_adb_stop" -> {
-                    thread {
-                        try {
-                            val state = AShellAdbManager.stop(applicationContext).toMap()
-                            runOnUiThread { result.success(state) }
-                        } catch (e: Exception) {
-                            runOnUiThread {
-                                result.error("ADB_STOP_FAILED", e.message, null)
-                            }
-                        }
-                    }
-                }
-                "ashell_adb_local_shell" -> {
-                    thread {
-                        try {
-                            val state = AShellAdbManager.startLocalShell(applicationContext).toMap()
-                            runOnUiThread { result.success(state) }
-                        } catch (e: Exception) {
-                            runOnUiThread {
-                                result.error("ADB_LOCAL_SHELL_FAILED", e.message, null)
-                            }
-                        }
-                    }
-                }
-                "ashell_adb_pair" -> {
-                    val args = call.arguments as? Map<*, *>
-                    val port = args?.get("port")?.toString() ?: ""
-                    val code = args?.get("code")?.toString() ?: ""
-                    thread {
-                        try {
-                            val state = AShellAdbManager.pair(applicationContext, port, code).toMap()
-                            runOnUiThread { result.success(state) }
-                        } catch (e: Exception) {
-                            runOnUiThread {
-                                result.error("ADB_PAIR_FAILED", e.message, null)
-                            }
-                        }
-                    }
-                }
-                "ashell_adb_command" -> {
-                    val command = call.arguments?.toString() ?: ""
-                    thread {
-                        try {
-                            val state = AShellAdbManager.sendCommand(applicationContext, command).toMap()
-                            runOnUiThread { result.success(state) }
-                        } catch (e: Exception) {
-                            runOnUiThread {
-                                result.error("ADB_COMMAND_FAILED", e.message, null)
-                            }
-                        }
-                    }
-                }
-                "ashell_adb_wireless_debug_status" -> {
-                    result.success(AShellAdbManager.wirelessDebugStatus(applicationContext))
-                }
-                "ashell_adb_wireless_debug_set" -> {
-                    val args = call.arguments as? Map<*, *>
-                    val enable = args?.get("enable") == true
-                    result.success(AShellAdbManager.setWirelessDebugging(applicationContext, enable))
-                }
-                "ashell_adb_wireless_debug_cancel" -> {
-                    result.success(AShellAdbManager.cancelWirelessDebugging(applicationContext))
                 }
                 p50.a(byteArrayOf(25, -111, -85, 2, -11, -126, 49, -44, 6, -106, -95, 19), byteArrayOf(112, -1, -62, 118, -86, -15, 84, -90)) -> {
                     // Legacy init_service is core-service initialization only.

@@ -94,8 +94,9 @@ android {
 
     packagingOptions {
         jniLibs {
-            // AShell ADB module executes bundled libadb.so via ProcessBuilder.
-            // The library must be extracted to applicationInfo.nativeLibraryDir.
+            // Do not package the retired component from existing build directories.
+            excludes += ["**/libadb.so"]
+            // Preserve packaging behavior for the remaining native libraries.
             useLegacyPackaging = true
         }
     }
