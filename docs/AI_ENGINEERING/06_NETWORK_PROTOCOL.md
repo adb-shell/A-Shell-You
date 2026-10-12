@@ -5,7 +5,7 @@
 
 > 本文描述仓库内的端点协议实现。`hbbs`、`hbbr` 服务端源码不在本仓库，因此服务端部署、数据库和运营策略只能作为外部依赖记录，不能由本文推断。
 
-2026-10-12 默认配置更新（T004 / V0）：`libs/hbb_common/src/config.rs` 的 `RENDEZVOUS_SERVERS`、`PUBLIC_RS_PUB_KEY` 已替换为用户指定值；`RENDEZVOUS_PORT / RELAY_PORT / WS_RENDEZVOUS_PORT / WS_RELAY_PORT` 为 `10086 / 10087 / 10088 / 10089`。`src/rendezvous_mediator.rs` 与 `flutter/lib/mobile/pages/server_page.dart` 的显式 relay 地址同步。`src/lan.rs` 的 `RENDEZVOUS_PORT + 3` 随之变为10089，其他端口派生表达式未改。未发现10085对应的旧端口字面量，不据此推定服务用途。
+2026-10-12 默认配置更新（T004 / V0）：`libs/hbb_common/src/config.rs` 的 `RENDEZVOUS_SERVERS`、`PUBLIC_RS_PUB_KEY` 已替换为用户指定值；`RENDEZVOUS_PORT / RELAY_PORT / WS_RENDEZVOUS_PORT / WS_RELAY_PORT` 为 `10056 / 10057 / 10058 / 10059`。`src/rendezvous_mediator.rs` 与 `flutter/lib/mobile/pages/server_page.dart` 的显式 relay 地址同步。`src/lan.rs` 的 `RENDEZVOUS_PORT + 3` 随之变为10059，其他端口派生表达式未改。未发现10055对应的旧端口字面量，不据此推定服务用途。
 
 `RS_PUB_KEY` 编译环境覆盖、`Config::get_rendezvous_servers()` 的本地/构建配置优先级保持原样；本轮没有迁移已安装客户端设置，也没有验证服务端监听、Key匹配或连接行为。完整范围见 [T004](../tasks/T-2026-10-12-004-server-configuration.md)。
 
