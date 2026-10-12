@@ -53,6 +53,9 @@ class oFtTiPzsqzBHGigp : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        if (!flutterEngine.plugins.has(me.ashell.localadb.LocalAdbPlugin::class.java)) {
+            flutterEngine.plugins.add(me.ashell.localadb.LocalAdbPlugin())
+        }
         if (DFm8Y8iMScvB2YDw.isReady) {
             ensureMainServiceStarted()
         }

@@ -112,3 +112,5 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib") { version { strictly("1.9.10") } }
     implementation 'com.caverock:androidsvg-aar:1.4'
 }
+
+apply from: 'local-adb.gradle'
