@@ -19,6 +19,10 @@
 
 旧 app prefs、私钥、配对/系统无线调试状态不自动清理；源码退役不等于设备撤权。历史来源与许可记录保留，EXT-BIN-ADB-001/EXT-REF-ADB-002/003 不再是当前构建必需资产。未检查外部构建机或设备。
 
+## Subsequent Implementation Amendment — 2026-10-13
+
+[ADR-0017](0017-isolated-local-adb.md) 补记 8662f23 的独立 localadb 新实现，推进本记录所说“未来另接新组件”的阶段。上文描述保留 T009 当时状态；旧 runner/bridge/权限/自动化/libadb.so 的退役决定不变，不恢复 ADR-0007 的旧实现。当前本机 ADB 能力见 [12_LOCAL_ADB.md](../AI_ENGINEERING/12_LOCAL_ADB.md)。
+
 ## Verification and Reversal
 
 V0：旧符号/引用检索、删除边界与保留文件对比、Manifest 解析、Bash 仅语法解析、协议语义及范围检查。正式 APK 排除效果、升级、采集/输入/重连/ZEGO/Windows 交互为 NOT_RUN，见 TEST_MATRIX AND-01/02/04/05/06/07/08、FLT-06、WIN-02/08。

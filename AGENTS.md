@@ -1,6 +1,8 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
-2026-10-13 T001：GitHub CI 仅保留 build-clients.yml，独立配置 Android/Windows 手动编译、Android aarch64/universal、临时测试签名、Actions-only artifacts。见 docs/BUILD_CLIENTS_ACTIONS.md；本地 build.sh/build.cmd 仍独立。仅 V0，未运行 runner。观察 HEAD 8662f23 已含新的 local ADB 模块，下文“新组件尚未接入”是 T009 历史状态，不覆盖当前源码。
+2026-10-13 T003：已同步 8662f23 独立本机 ADB 的文档，当前观察 main/f84a78f。Android 主页右侧为 LocalAdbPage，API 30+ 手动配对/连接/shell；无 PC ADB 或 ADB 投屏。详见 `docs/AI_ENGINEERING/12_LOCAL_ADB.md`、ADR-0017；旧组件保持退役，V2/V3 未提供结果。
+
+2026-10-13 T001：GitHub CI 仅保留 build-clients.yml，独立配置 Android/Windows 手动编译、Android aarch64/universal、临时测试签名、Actions-only artifacts。见 docs/BUILD_CLIENTS_ACTIONS.md；本地 build.sh/build.cmd 仍独立。历史源码验证为 V0，runner 成功证据待补。
 
 2026-10-12 T009：按用户要求剔除旧 ADB 页面/组件/专用权限和构建依赖；Windows 未发现旧运行组件。仅 V0，无编译/设备验证。当前状态先核对 HEAD/status；ADR-0015 取代 ADR-0007。
 
@@ -56,7 +58,7 @@
 6. Legacy desktop UI：`src/ui/`
 7. Account / HTTP / sync / upload：`src/hbbs_http/`
 8. Windows privacy mode / virtual display：`src/privacy_mode.rs` + `src/virtual_display_manager.rs`
-9. 旧 Android 本地 ADB/LADB 已移除（T009 / ADR-0015）；不再有主页 ADB 页签或旧组件，新组件尚未接入。
+9. 旧 Android 本地 ADB/LADB 已移除（T009 / ADR-0015）；新 `LocalAdbPage` + `me.ashell.localadb` 已接入（8662f23 / ADR-0017），仅本机无线调试 shell，与采集/远控独立。
 10. ZEGO voice call：Flutter RTC side path + Rust control-channel invitation state
 
 不要把项目误读成：
@@ -83,7 +85,7 @@
 - `common.kt` = Android 全局状态
 - `KeyboardKeyEventMapper.kt` = 键盘映射
 - `VolumeController.kt` = 音量控制
-- 旧 ADB 的四个 Kotlin 模块和无线调试自动化已移除；DevAutoSelectorController、远控输入/采集保持。详见 `docs/tasks/T-2026-10-12-009-remove-legacy-adb.md`。
+- 旧 ADB 的四个 Kotlin 模块和无线调试自动化已移除；DevAutoSelectorController、远控输入/采集保持。新 ADB 是 `flutter/android/app/src/main/java/me/ashell/localadb/` 下五个 Java 类；独立通道 `me.ashell/local_adb/v1`，不走产品 JNI。详见 `docs/AI_ENGINEERING/12_LOCAL_ADB.md`。
 - `pkg2230.kt` = 主 JNI bridge
 - `ffi.kt` = 兼容 JNI bridge
 - `p50.java` + `q50.java` = XOR / 混淆辅助

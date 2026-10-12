@@ -19,6 +19,8 @@ flowchart LR
     PCBridge --> ZegoToken["External ZEGO Token service"]
     PCUI --> ZegoRTC["ZEGO SDK media"]
     AndroidKotlin --> ZegoRTC
+    LocalAdbUI["Android LocalAdbPage"] --> LocalAdbPlugin["独立 localadb MethodChannel / Java"]
+    LocalAdbPlugin --> LocalAdbd["本机 adbd / loopback"]
 ```
 
 必须分开的信任域：
@@ -122,7 +124,7 @@ Flutter 普通产品登录和资源 API多为 Dart 直接 HTTP；Rust `account.r
 - Android disconnect 不得自动停止 screen share。
 - waiting 不得自动切 ignore/screenshot fallback。
 - ZEGO 不得进入旧 `audio_service` 媒体链。
-- T009 移除旧 ADB/LADB；screen share/video/side-button/terminal 不承担其职责，新组件另行设计。
+- T009 移除旧 ADB/LADB；8662f23 新增独立 LocalAdbPage → me.ashell/local_adb/v1 → LocalAdbPlugin → 本机 adbd。screen share/video/side-button/terminal 不承担其职责，PC ADB/ADB 投屏未实现。详见 [本机 ADB](12_LOCAL_ADB.md)。
 - controller relay-only 与 endpoint direct surface 必须明确区分。
 - 任何 protobuf 改动必须同步 sender、receiver、FFI/UI 和兼容策略。
 - Windows privacy/virtual-display 修改必须带 driver/OS/permission 恢复方案。

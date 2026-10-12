@@ -353,3 +353,54 @@ Mode：`append-only logical persisted-change events`
 - Review：用户日志证明初版初始化失败；修复后 V0 YAML/Bash/Python、初始化顺序/权限/Action SHA/Windows不变/diff/引用。无产品构建/远端 dispatch；仅按既有请求交付 commit/push，结果以 Git 回执为准。
 - Decision：D-020 / ADR-0016 reviewed-no-change；baseline AS-BL-2026-10-13-c521601-android-sdk-setup-worktree；STATE-20261013-002 / WORK-20261013-004。
 - Recovery / Next：按 c521601 对本次 patch 逐文件恢复；新运行选择修复 SHA，等待实际 SDK/NDK 安装、编译与 artifacts 证据。
+
+## CE-20261013-T003-01：独立本机 ADB 文档回填与整理
+
+- Date / Actor：2026-10-13 / Codex / ashell-master；Task T-2026-10-13-003。
+- Authority：当前用户明确同步ADB文档（C1）；原实现8662f23已提交。本轮无C2产品改动、Git写入、编译/设备/发布动作。
+- Source：main/f84a78f87d1009c24acfdff478cf95bb463547e5，initial clean；后续CI修复保留，localadb模块相对8662f23未变。
+- Delta：当前说明取代入口中“新组件未接入”的陈旧断言，新增ADR-0017/Baseline11/四项依赖登记/AND-09—13，旧集成档案仅加跳转。正文保持当前、历史、未实现和未验证四者分明。
+- Verification：V0源码/接口/常量/钩子对照、实现commit范围、上游license只读来源、diff/新增相对链接/新增文档空白/全Markdown范围；V2/V3 NOT_RUN。
+- Decision / State / Registry：D-021 / ADR-0017；STATE-20261013-003 / WORK-20261013-006；AS-BL-2026-10-13-f84a78f-local-adb。
+- Recovery：仅按本事件路径和文档diff审阅恢复；不回滚8662f23产品代码或后续CI提交，不删除历史资产。
+- Final actions：34个Markdown文件（4新增、30修改），无文件删除；本轮未stage/commit/push、build/test/analyze/codegen、依赖安装、设备、版本、签名、上传或发布。
+
+新增路径：
+
+- `docs/AI_ENGINEERING/12_LOCAL_ADB.md`
+- `docs/ADR/0017-isolated-local-adb.md`
+- `docs/BASELINE/11_LOCAL_ADB_BASELINE_2026-10-13.md`
+- `docs/tasks/T-2026-10-13-003-local-adb-docs.md`
+
+修改路径：
+
+- `AGENTS.md`
+- `CLAUDE.md`
+- `PROJECT_START_HERE.md`
+- `README.md`
+- `EXTERNAL_ASSET_REGISTRY.md`
+- `TEST_MATRIX.md`
+- `docs/ADB_LADB_INTEGRATION_MEMORY.md`
+- `docs/ADR/README.md`
+- `docs/ADR/0015-retire-legacy-adb.md`
+- `docs/BASELINE/BASELINE_INDEX.md`
+- `docs/AI_ENGINEERING/00_PROJECT_OVERVIEW.md`
+- `docs/AI_ENGINEERING/01_ARCHITECTURE.md`
+- `docs/AI_ENGINEERING/02_SOURCE_MAP.md`
+- `docs/AI_ENGINEERING/03_MODULE_DESIGN.md`
+- `docs/AI_ENGINEERING/04_ANDROID_PIPELINE.md`
+- `docs/AI_ENGINEERING/08_BUILD_SYSTEM.md`
+- `docs/AI_ENGINEERING/09_DEBUG_SYSTEM.md`
+- `docs/AI_ENGINEERING/10_SECURITY_MODEL.md`
+- `docs/AI_ENGINEERING/11_ROADMAP.md`
+- `.agents/skills/ashell-android-engineer/SKILL.md`
+- `.agents/skills/ashell-flutter-engineer/SKILL.md`
+- `.agents/skills/ashell-release-engineer/SKILL.md`
+- `.codex/ARCHITECTURE_MEMORY.md`
+- `.codex/PROJECT_MEMORY.md`
+- `.codex/PROJECT_STATE.md`
+- `.codex/CURRENT_WORK.md`
+- `.codex/DECISION_LOG.md`
+- `.codex/TASK_HISTORY.md`
+- `.codex/CHANGELOG_AI.md`
+- `.codex/CHANGE_EVENT_LOG.md`

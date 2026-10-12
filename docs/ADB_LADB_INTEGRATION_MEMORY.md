@@ -1,6 +1,8 @@
 # AShell ADB/LADB Integration Memory
 
-> HISTORICAL / RETIRED（2026-10-12 T009）：本文件保存旧实现/研究记录，正文的 current/implemented 指当时状态。旧 ADB 页面、Kotlin 模块、通道、自动化与专用权限已移除，libadb.so 排除打包；不得依此恢复旧组件。当前事实见 [T009](tasks/T-2026-10-12-009-remove-legacy-adb.md) 和 [ADR-0015](ADR/0015-retire-legacy-adb.md)。
+> HISTORICAL / RETIRED（2026-10-12 T009）：本文件保存旧实现/研究记录，正文的 current/implemented 指当时状态。旧 ADB 页面、Kotlin 模块、通道、自动化与专用权限已移除，libadb.so 排除打包；不得依此恢复旧组件。退役记录见 [T009](tasks/T-2026-10-12-009-remove-legacy-adb.md) 和 [ADR-0015](ADR/0015-retire-legacy-adb.md)。
+>
+> CURRENT（2026-10-13）：8662f23 新增独立 `libadb-android` 模块。当前用法、源码、依赖与验证以 [本机 ADB](AI_ENGINEERING/12_LOCAL_ADB.md) / [ADR-0017](ADR/0017-isolated-local-adb.md) 为准；本档案中的 bundled runner、mDNS 和 Accessibility 自动化不是新模块行为。
 
 Generated: 2026-05-20
 Last synchronized with source: 2026-06-04

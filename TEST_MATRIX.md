@@ -1,5 +1,7 @@
 # AShell Commercial Test Matrix
 
+2026-10-13 ADB 增量：8662f23 / [Baseline 11](docs/BASELINE/11_LOCAL_ADB_BASELINE_2026-10-13.md) 已接入独立本机模块。AND-06 继续验证旧组件退役；新增 AND-09—13 验证新实现。T003 仅文档/V0，所有新增 V2/V3 用例 `NOT_RUN`，没有从文档同步请求推定编译或真机 PASS。
+
 最后更新：2026-07-12  
 Baseline：`CS-BL-2026-07-12-77062b4`  
 当前执行状态：本次封版只完成 V0 文档/源码静态盘点；下列 V1—V5 cases 均未执行
@@ -64,6 +66,13 @@ These are coverage facts, not pass results.
 | AND-06 | P0 | Legacy ADB retirement (T009) | fresh install/upgrade；home swipe/back；three ABI APK inventory | no old page/channel/automation/libadb.so；ServerPage and other native libraries remain | V2+V3 / E-A | Android+Security+Release / QA |
 | AND-07 | P0 | ZEGO voice consent | incoming/accept/reject/cancel/background/busy/reconnect/mic denial | no auto mic；reject is distinct；busy state clears；token/room scoped | V3+V4 / E-A+E-P | Android+Flutter+API+Security / QA+backend |
 | AND-08 | P0 | Packaging/permissions | clean approved native assets；ABI/JNI；manifest/boot/exported components；permission revoke | hashes/license/provenance match；all ABIs link；no hidden privilege grant | V2+V3 / E-A | Android+Release+Security / Release evidence owner |
+| AND-09 | P0 | Local ADB pairing/connect | API 30+ 正确/错误/过期六位码与配对端口；改用连接端口；API < 30；撤销系统配对 | 只有配对成功后再连接并通过 id/exit=0 才 ready；失败不假报；旧系统提示不支持；无自动调试/重连 | V3 / E-A | Android+Security / QA |
+| AND-10 | P0 | Shell-v2 result | id、Unicode stdout/stderr、非零退出码、空/NUL/超长输入；连续单次命令 | 输出/exitCode 真实；坏输入拒绝；无 PTY/会话持久化假象；原产品状态不受查询影响 | V3 / E-A | Android+Flutter / QA |
+| AND-11 | P0 | Timeout/cancel/output bound | 错误端口、阻塞命令、重复点击、取消、20 秒 watchdog；输出超过 64 KiB | UI 不阻塞/不重复回调；取消后实际清理完成才可重试；超限 truncated、exitCode 可空；不自动重试有副作用命令 | V3 / E-A | Android+Flutter / QA |
+| AND-12 | P0 | Identity/lifecycle | 同进程重复断开连接、进程重启、前后台/切页/engine 销毁；测试环境损坏身份/忘记配对 | 身份不静默替换；无配对码/命令内容日志；断开不伪称撤权；无 timer/worker 泄漏；恢复需明确操作 | V3 / E-A | Android+Security / QA |
+| AND-13 | P0 | New ADB Release dependencies | 本地模式1/2或独立CI；目标三ABI；Release shrink；全新依赖解析 | 四项版本/来源可追溯；SPAKE2/Conscrypt JNI 可加载；旧libadb.so缺席；原libashell/ZEGO完整；无新增敏感权限 | V2+V3 / E-A | Android+Release+Security / Release evidence owner |
+
+ADB 详细步骤、限制和取证项见 [本机 ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)。至少覆盖 Android 10 的拒绝路径、Android 11/13/14/15 与目标 ROM；pair 和 connect 两种端口必须分开测。以无副作用查询验证原 AND-01/02/04/05/07/08、FLT-04/05/06；不要把用户主动修改系统的 shell 副作用当成实现自动改动。取消只是关闭传输，不以后台子进程一定被终止作为当前实现保证。
 
 ## 6. Windows Suite
 

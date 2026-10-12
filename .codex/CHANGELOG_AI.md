@@ -179,3 +179,11 @@ Mode：`append-only task-level index`
 - Authority：延续同一会话工作流修复与 Git 提交要求；无远端 dispatch/产品编译/签名/发布。
 - Decision/State/Event：D-020 reviewed-no-change；STATE-20261013-002 / WORK-20261013-004 / CE-20261013-T002-01。
 - Details：[任务](../docs/tasks/T-2026-10-13-002-android-sdk-setup.md)、baseline10；需用新 SHA 发起 Run workflow。
+
+## T-2026-10-13-003：同步独立本机 ADB 文档
+
+- Source：main/f84a78f、initial clean；8662f23模块无后续差异。
+- Outcome：12_LOCAL_ADB集中说明使用、源码/桥接、生命周期、身份、依赖、排查与验证；ADR-0017/D-021补记新模块；Baseline11/External Registry/AND-09—13/入口/Skills/记忆同步。历史LADB正文不重写。
+- Authority / verification：当前文档同步请求C1；仅Markdown/V0，无产品代码、Git写入、构建测试或设备操作。V2/V3未提供结果，不标PASS。
+- State / Event：STATE-20261013-003 / WORK-20261013-006 / CE-20261013-T003-01；文档交付complete，修改未提交。
+- Detail：[当前ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[任务](../docs/tasks/T-2026-10-13-003-local-adb-docs.md)。PC ADB与ADB投屏未实现；新依赖hash/NOTICE/JNI与ROM验证待补。

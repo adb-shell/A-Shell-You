@@ -45,7 +45,7 @@ The native bridges are:
 ### 1. Locate the actual route
 
 - Follow `main.dart` platform/argument/window dispatch.
-- Confirm whether the page is reachable; current mobile home exposes Server only (legacy ADB removed by T009) while several retained pages are inactive entries.
+- Confirm whether the page is reachable; Android non-outgoing-only home exposes ServerPage followed by LocalAdbPage (8662f23). The new page uses its own me.ashell/local_adb/v1 channel; legacy AdbPage remains retired. See docs/AI_ENGINEERING/12_LOCAL_ADB.md; several other retained pages remain inactive entries.
 - For desktop, identify `WindowType`, window ID, tab vs independent window, and cross-window method routing.
 
 ### 2. Map state ownership

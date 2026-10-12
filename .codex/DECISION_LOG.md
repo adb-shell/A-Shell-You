@@ -207,6 +207,15 @@
 - Related：ADR-0016 补充 ADR-0010；T-2026-10-13-001 / CE-20261013-T001-01；AS-BL-2026-10-13-8662f23-client-actions-worktree。
 - Verification：V0；runner build/安装/发布 NOT_RUN。Rollback：未来按 8662f23 对应路径和本任务 patch 审阅恢复，不整仓重置。
 
+## D-021：独立本机 ADB，原产品链路保持隔离
+
+- 记录日期：2026-10-13；状态：accepted / backfill；批准来源：用户原实现请求明确授权自主选型与代码集成，本次明确要求同步文档。
+- Decision：采用 libadb-android 3.1.1，新 Java localadb + Flutter页面 + 独立 me.ashell/local_adb/v1；API30+ 手动配对、连接/id验证、单次 shell。三个小接入点，无旧 runner/libadb.so/自动化恢复。
+- Boundaries：原产品身份、无障碍、MediaProjection、Rust/JNI、远控/terminal/ZEGO 未由 ADB 集成改变；无 PC ADB 或 ADB 投屏实现。断开不撤销系统配对；新独立身份不迁移旧 key。
+- Evidence：实现提交8662f23，当前f84a78f模块未变；文档V0；没有V2/V3结果。新依赖hash/NOTICE/SBOM、Release JNI/R8与ROM测试待补。
+- Related：ADR-0017 补充 ADR-0015 的后续新组件阶段，旧退役决定保持；T-2026-10-13-003 / CE-20261013-T003-01 / AS-BL-2026-10-13-f84a78f-local-adb。
+- 本轮仅补记事实，不批准新远程协议/视频链路，不改变D-020/ADR-0016 CI边界；回滚须按实现提交路径审阅，不整仓reset。
+
 ```text
 ## D-NNN：标题
 - 日期：

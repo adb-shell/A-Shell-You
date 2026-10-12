@@ -83,6 +83,10 @@ FRB 文件带 1.80.1 生成标记，且 Git 历史显示 Rust FFI 后续仍有�
 
 用户在原目录增量构建时遇到AGP7.3.1的mergeReleaseResources/source-sets异常，与官方206674992同类问题相符，根因仍需完整stacktrace和构建机验证。建议该机先对Flutter生成目录执行flutter clean再用修正后的build.sh重试；本轮未自动清理、未改AGP/Gradle/Kotlin版本、未构建。新图标配置保持不变，不能把脚本通道修正等同于资源合并错误已复现解决。
 
+### 独立本机 ADB 依赖（8662f23）
+
+`app/build.gradle` 加载 `local-adb.gradle`：固定 libadb-android 3.1.1、spake2-android 2.2.1、bcprov-jdk15to18 1.81、conscrypt-android 2.5.3；前两项关闭传递依赖，JitPack/Maven Central 各按指定 module/group 隔离。`local-adb.pro` 保留 Conscrypt 反射和 SPAKE2 JNI 类。未升级 SDK/AGP/Gradle/Java 或改变 Rust/Flutter 生成链。见 [当前模块](12_LOCAL_ADB.md)、[Baseline 11](../BASELINE/11_LOCAL_ADB_BASELINE_2026-10-13.md) 与 EXT-LIB-ADB-004—007。固定版本不代表构建已经通过，正式 Release 各 ABI 解析、R8、JNI 和产物 hash 尚待证据。
+
 ### 旧 ADB 打包依赖已退役（T009）
 
 已删除旧 ADB 源码/混淆规则；build.sh 不再检查从未调用的 host adb，env.sh 也删除独立 adb 的 apt 安装/强制检查，保留标准 Android SDK platform-tools。app/build.gradle 通过 `jniLibs.excludes += ["**/libadb.so"]` 排除旧构建目录可能留下的二进制；其余库仍沿用 `useLegacyPackaging = true`。这是 [AGP 7.3 官方 excludes API](https://developer.android.com/reference/tools/gradle-api/7.3/com/android/build/api/dsl/JniLibsPackagingOptions) 支持的打包过滤。

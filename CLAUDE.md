@@ -1,6 +1,6 @@
 # CLAUDE.md — AShell / 一个壳子 v5.2.1
 
-2026-10-12 T009：按用户要求剔除旧 ADB 页面/组件/专用权限和构建依赖；Windows 未发现旧运行组件。仅 V0，无编译/设备验证。当前状态先核对 HEAD/status；ADR-0015 取代 ADR-0007。
+2026-10-13 T003：8662f23 已接入新的独立本机 ADB，观察 main/f84a78f；API 30+ 手动配对、连接验证和 shell。见 `docs/AI_ENGINEERING/12_LOCAL_ADB.md` / ADR-0017；V0，V2/V3 未提供结果。T009 / ADR-0015 的旧组件退役决定继续生效。
 
 最后一次与全仓源码对齐：2026-07-12
 最近一次文档分层整理：2026-07-12
@@ -50,7 +50,7 @@
 6. Legacy desktop UI：`src/ui/`
 7. Account / HTTP / sync / upload：`src/hbbs_http/`
 8. Windows privacy mode / virtual display：`src/privacy_mode.rs` + `src/virtual_display_manager.rs`
-9. 旧 Android 本地 ADB/LADB 已移除（T009 / ADR-0015）；不再有主页 ADB 页签或旧组件，新组件尚未接入。
+9. 旧 Android 本地 ADB/LADB 已移除（T009 / ADR-0015）；主页右侧现为新的 `LocalAdbPage`，通过独立 `me.ashell/local_adb/v1` 通道连接本机 adbd。无 PC ADB/ADB 投屏。
 10. ZEGO voice call：Flutter RTC side path + Rust control-channel invitation state
 
 不要把项目误读成：

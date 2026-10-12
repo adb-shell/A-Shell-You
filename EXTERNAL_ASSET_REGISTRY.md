@@ -1,6 +1,6 @@
 # AShell External Asset Registry
 
-2026-10-12 T009：EXT-BIN-ADB-001、EXT-REF-ADB-002/003 已 RETIRED，不再是当前构建依赖或发布阻断项。Gradle 排除旧 libadb.so；历史 hash/license 缺口保留供追溯，新 ADB 组件未接入。
+2026-10-13 T003：8662f23 新模块依赖登记为 EXT-LIB-ADB-004—007，详见 [本机 ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)；固定版本/许可来源已记录，实际构建 hash、ABI、NOTICE/SBOM 与验证证据待补。T009 的 EXT-BIN-ADB-001、EXT-REF-ADB-002/003 继续 RETIRED，不是新模块来源；Gradle 仍排除旧 libadb.so。
 
 最后更新：2026-10-12
 
@@ -26,6 +26,7 @@ T004 / 2026-10-12：`EXT-SVC-001`—`004` 的仓内默认地址、相关端口�
 | `MISSING` | 需要的 source、contract、binary 或运维材料未提供 |
 | `UNVERIFIED` | 存在某些材料，但 version/hash/signature/license/owner 未核验 |
 | `BLOCKING` | 缺口阻止正式验证、可复现构建、安全接受或发布 |
+| `RETIRED` | 已退出现役依赖；历史 provenance/许可记录保留，不代表设备授权自动撤销 |
 
 Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织。
 
@@ -68,6 +69,12 @@ Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织�
 | `EXT-BIN-ADB-001` | 旧 libadb.so（三 ABI） | RETIRED / T009；当前本地缺失 | 旧 Runner 已删除，Gradle 排除 | 历史 owner 待确认 | 历史 provenance/hash/license 记录保留，未验证来源 | 不再是当前发布 blocker；验证 APK 无旧库 |
 | `EXT-REF-ADB-002` | ADB-CODE/ 历史研究材料 | RETIRED / T009；当前本地缺失 | 仅历史集成档案 | 历史 owner 待确认 | origin/revision/legal 记录未闭环 | 不再是当前构建依赖；不得重新纳入产品 |
 | `EXT-REF-ADB-003` | LADB/ 历史参考源码 | RETIRED / T009；当前本地缺失 | 仅历史集成档案 | 历史 owner 待确认 | upstream/license 历史义务保留 | 不再是当前构建依赖；不能冒充新组件来源 |
+| `EXT-LIB-ADB-004` | libadb-android 3.1.1 | EXTERNAL / SOURCE-PINNED | local-adb.gradle；LocalAdbClient / AdbShell | OWNER-REQUIRED | JitPack；源码注释 revision c849886ebc6d48e7b46d967e78a6bb65c90c3b74；Apache-2.0 选项；实际 AAR hash/NOTICE/解析结果待补 | 本机 ADB 协议依赖；Release 构建验证待补 |
+| `EXT-LIB-ADB-005` | spake2-android 2.2.1 | EXTERNAL / SOURCE-PINNED | local-adb.gradle / local-adb.pro；libadb 配对 | OWNER-REQUIRED | JitPack；LGPL-3.0；上游 README 标未审计；artifact hash/JNI ABI/分发材料待补 | 配对与 native 依赖；安全/合规审查未闭环 |
+| `EXT-LIB-ADB-006` | bcprov-jdk15to18 1.81 | EXTERNAL / SOURCE-PINNED | local-adb.gradle / AdbIdentity | OWNER-REQUIRED | Maven Central；MIT 风格许可；JAR hash/notice 待补 | ASN.1 证书构造；无全局 provider 注册 |
+| `EXT-LIB-ADB-007` | conscrypt-android 2.5.3 | EXTERNAL / SOURCE-PINNED | local-adb.gradle / local-adb.pro；libadb TLS | OWNER-REQUIRED | Maven Central；Apache-2.0；AAR/SO hash、第三方 notices/ABI 待补 | TLS 与反射/JNI 依赖；Release R8/加载待验证 |
+
+新资产的完整 Maven 坐标、上游许可链接、仓库过滤与构建要求集中在 [12_LOCAL_ADB.md](docs/AI_ENGINEERING/12_LOCAL_ADB.md) / [Baseline 11](docs/BASELINE/11_LOCAL_ADB_BASELINE_2026-10-13.md)。SOURCE-PINNED 仅指源码固定版本，不代表实际下载/验证完成。未把旧 libadb.so 的历史 hash 复用到任何新依赖。
 
 历史记录：2026-07-12 当时本机存在三个 `libadb.so` 和一份 license 文件，均未 tracked；2026-10-12 当前检出并不存在该目录，未重新取得或验证这些文件。以下仅保留7月记录的 SHA-256：
 

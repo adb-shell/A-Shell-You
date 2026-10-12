@@ -1,5 +1,7 @@
 # AShell Engineering Baseline Index
 
+最新 ADB 观察快照：[AS-BL-2026-10-13-f84a78f-local-adb](11_LOCAL_ADB_BASELINE_2026-10-13.md)。8662f23 新模块在 f84a78f 保持；T003 仅补记文档，V0，V2/V3 未取得结果。以下“最新”指各自记录日期的历史快照；旧基线不重写。
+
 最新 CI 工作树快照：[AS-BL-2026-10-13-c521601-android-sdk-setup-worktree](10_ANDROID_SDK_SETUP_BASELINE_2026-10-13.md)。T002 修复初版 sdkmanager 缺失；固定两 Android job 的 SDK setup 和 CLI 版本；修复后 V0，runner 构建待验证。原 [独立客户端 Actions 快照](09_CLIENT_ACTIONS_BASELINE_2026-10-13.md) 与以下旧快照保留冻结含义，不代表当前 HEAD。
 
 最新 repository-observed 快照：[AS-BL-2026-10-12-13f792d-adb-retired-worktree](08_ADB_RETIREMENT_BASELINE_2026-10-12.md)。T009 删除旧 ADB 功能链/权限并排除旧 native binary，V0；构建和运行未验证。下文所称最新 PC 构建快照为此前历史状态，旧基线不重写。

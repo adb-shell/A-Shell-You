@@ -1,7 +1,7 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261013-004`
+Registry Revision：`WORK-20261013-006`
 
 Last Updated：2026-10-13
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none；T-2026-10-13-002 配置/V0 交付完成，正在按同一会话提交要求完成 Git 交付；最终 commit/push 结果以 Git 回执为准。
+none；T-2026-10-13-003 文档/V0 交付完成，修改未提交；构建和设备验证待正式证据，不属于活动文档任务。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ none；T-2026-10-13-002 配置/V0 交付完成，正在按同一会话提交要�
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-13-002`
-- Result：Android native/APK job 均先初始化 SDK / CLI 16.0，消除依赖 runner PATH 的配置缺陷。
+- Task ID：`T-2026-10-13-003`
+- Result：8662f23 独立本机 ADB 的使用/架构/依赖/验证、ADR/Baseline、入口/Skills 与记忆已同步；旧档案保持历史。
 - Closed At：2026-10-13（Asia/Tokyo）
-- Final T-State：`T8 — complete`（配置交付/V0；runner V2待验证）
-- State / Event：`STATE-20261013-002` / `CE-20261013-T002-01`
-- Decision：D-020 / ADR-0016，保留ADR-0010 manual-only边界。
-- Verification：V0 YAML、SDK setup 顺序/Action SHA、11 段 Bash / 1 段 Python AST、权限/输入/矩阵/Windows job 不变、diff/引用；修复后 runner NOT_RUN。
-- Next Gate：修复提交后 Run workflow 选 main 新建运行；不使用旧运行 Re-run 验证新源码。本轮不 dispatch/build/sign/package/release。
+- Final T-State：`T8 — complete`（文档/V0；ADB V2/V3结果未提供）
+- State / Event：`STATE-20261013-003` / `CE-20261013-T003-01`
+- Decision：D-021 / ADR-0017 补记新模块；ADR-0015 旧退役与 D-020 / ADR-0016 CI 边界保持。
+- Verification：V0 源码/8662f23差异、34文件仅Markdown、39个新增相对链接、diff/新文件空白与事件路径清单检查通过；原产品代码无diff。
+- Next Gate：待正式构建/设备结果补证据；新 PC ADB/投屏需独立设计。本轮无Git写入/build/test/device/dispatch/sign/package/release。
 - Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md 中同 ID。
-- Detailed record：docs/tasks/T-2026-10-13-002-android-sdk-setup.md。
+- Detailed record：docs/tasks/T-2026-10-13-003-local-adb-docs.md；观察main/f84a78f，initial clean，34份Markdown留工作树未提交。

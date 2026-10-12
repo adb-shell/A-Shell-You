@@ -39,7 +39,7 @@
 - 剪贴板、文件、terminal、tunnel 流量。
 - 联系人/Dev selector 数据、地址簿、设备分组。
 - peer/device ID、UUID、IP、system info、连接状态。
-- 旧本地 ADB shell 与 WRITE_SECURE_SETTINGS 已移除（T009）；历史安装的授权/配对数据未自动清理。
+- 旧本地 ADB shell 与 WRITE_SECURE_SETTINGS 已移除（T009）；8662f23 新增独立手动本机 shell，API 30+ 系统配对、loopback transport、独立加密身份；历史授权/配对不自动清理。见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md)。
 
 ### 完整性与可用性
 
@@ -167,7 +167,8 @@ Accessibility、overlay、全文件、录音、系统设置、MediaProjection �
 ### ADB 与 Voice — High / E1
 
 - 历史 Local ADB UI/shell/pm grant 路径已在 T009 删除；不代表既有设备的配对、系统设置或历史授权已撤销。
-- PC remote ADB 尚不存在，不能复用现有输入/terminal 协议直接开放。
+- 新 localadb 接受本机页面主动输入的任意 shell，不带命令 allowlist、二次批准或持久审计。RSA 身份以 AndroidKeyStore AES-GCM 包装后写 noBackupFilesDir，进程内仍有解密 key；disconnect 不撤权/清零身份。配对码不落盘，不记录命令/异常敏感 payload；20 秒 watchdog/64 KiB 上限降低阻塞和输出风险，但关闭 stream 不回滚系统副作用。
+- PC remote ADB 尚不存在，不能复用现有输入/terminal 协议直接开放；本机通道也没有新增对既有远控触控 UI 的隔离。SPAKE2 上游标未审计，依赖 hash/NOTICE/分发材料与 ROM/ABI 验证仍待补。
 - ZEGO token client credential 可提取；Android incoming call 自动接受，取消/返回也进入接受语义，缺少明确拒绝。
 
 要求：voice 必须当前用户明确接受，麦克风状态持续可见；ADB 远程化必须新协议、allowlist、consent、audit 和 kill switch。
@@ -255,7 +256,7 @@ Severity reflects static path and impact; except SEC-001, exploit success was no
 - Endpoint still retains password/click/2FA/trusted-device authentication code.
 - HTTP client did not show an explicit disable-TLS-verification option.
 - Android AccessibilityService is not exported; MediaProjection permission remains system-mediated.
-- Legacy local ADB pairing/runner was removed in T009; no replacement or PC remote ADB protocol was added.
+- Legacy local ADB pairing/runner was removed in T009. Commit 8662f23 added a separate local-only module; no dedicated PC remote ADB protocol or mirroring integration was added. See ADR-0017 and 12_LOCAL_ADB.md.
 - Workflows are manual-triggered today and repository has no GitHub Release observed at takeover time.
 
 These controls reduce some paths but do not close the P0/P1 findings.
@@ -281,7 +282,7 @@ Formal isolated verification must cover:
 - HTTP→HTTPS migration, MITM resistance and authenticated heartbeat/config。
 - deep-link hostile source, config/key rewrite, URI redaction and user consent。
 - Android input permission off, DirectBuffer lifetime, data races and service replacement。
-- T009 旧 ADB 页/通道/打包排除验证；历史设备授权不自动撤销。
+- T009 旧 ADB 页/通道/打包排除验证，AND-09—13 新本机配对、shell、身份与取消验证；历史设备授权不自动撤销。
 - ZEGO explicit accept/reject, token scope/TTL/rate limit and microphone consent。
 - update wrong host/hash/signature/publisher/downgrade and atomic rollback。
 - plugin absolute/parent/symlink/oversize archive cases。

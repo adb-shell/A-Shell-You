@@ -1,6 +1,6 @@
 # AShell Architecture Memory
 
-最后更新：2026-10-12（身份索引更新；运行链未重新验证）
+最后更新：2026-10-13（独立本机 ADB 索引更新；V0，运行待验证）
 用途：跨会话架构速记；详细设计只在 `docs/AI_ENGINEERING/` 维护。
 
 ## 1. Runtime Topology
@@ -17,7 +17,12 @@ Flutter UI / legacy UI
 
 Android Rust core
   <-> pkg2230 JNI
-  <-> MainService / Accessibility / MediaProjection / local ADB
+  <-> MainService / Accessibility / MediaProjection
+
+Android LocalAdbPage（独立旁路）
+  <-> me.ashell/local_adb/v1
+  <-> LocalAdbPlugin / LocalAdbClient
+  <-> loopback / 本机 adbd
 
 Windows Rust core
   <-> capture/input
@@ -25,7 +30,7 @@ Windows Rust core
   <-> Amyuni virtual display
 ```
 
-完整图：`docs/AI_ENGINEERING/01_ARCHITECTURE.md`。
+完整图：`docs/AI_ENGINEERING/01_ARCHITECTURE.md`；本机 ADB：`docs/AI_ENGINEERING/12_LOCAL_ADB.md`。localadb 不走产品 Rust/JNI，PC ADB/ADB 投屏未实现。
 
 ## 2. Core Modules
 

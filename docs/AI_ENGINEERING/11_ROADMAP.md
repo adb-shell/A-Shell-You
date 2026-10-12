@@ -142,7 +142,7 @@
 - record upload。
 - 新 capture/virtual-display backend。
 
-旧本地 LADB 已在 T009 移除，新组件与 PC 远程 ADB 均未实现；它需要新协议、最小权限、command allowlist、用户确认、审计和退出机制。
+旧本地 LADB 已在 T009 移除；8662f23 的独立本机无线配对与 shell 已实现，见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md)，V2/V3 待证据。PC 远程 ADB 和 scrcpy/ADB 投屏仍是未实现方向，需要独立协议、受控端授权、command allowlist、用户确认、审计和退出机制；本轮文档同步不批准新视频或输入链路。
 
 ## 7. 决策门
 

@@ -76,9 +76,11 @@ AShell 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、bro
 
 这不是单 Kotlin 模块，而是三语言状态机。详见 `04_ANDROID_PIPELINE.md`。
 
-## 9. 旧 Android local ADB — retired
+## 9. Android local ADB — 独立新模块
 
-T009 / ADR-0015 已移除原主页 ADB 页、Dart/native bridge、配对/进程/mDNS 模块及专用 Accessibility 自动化。libadb.so 被排除，不再是运行依赖。当前没有新 ADB 实现或 PC remote ADB protocol；远程 terminal 等原有链路保持。
+当前 `LocalAdbPage` → `LocalAdbBridge` → `me.ashell/local_adb/v1` → `LocalAdbPlugin`，串行 worker 由 `LocalAdbClient` 管理本机配对和连接。`AdbIdentity` 管独立加密身份，`AdbLocalSocket` 管可取消 loopback transport，`AdbShell` 管 shell-v2。完整状态/生命周期/合同见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md)。
+
+T009 / ADR-0015 的旧 runner、bridge、mDNS、Accessibility 自动化及 libadb.so 保持退役。新模块没有 PC remote ADB protocol 或视频流；远程 terminal 等原有链路保持。ADR-0017 补记新集成的决定与边界。
 
 ## 10. Windows privacy/virtual display
 

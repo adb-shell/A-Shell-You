@@ -81,7 +81,7 @@ For frames, trace buffer ownership from ImageReader/Accessibility screenshot thr
 
 ### 5. Keep subsystems distinct
 
-- Legacy local ADB/LADB was removed by T009 / ADR-0015. Do not restore its runner/bridge/permissions; future replacement requires separate scope. Remote terminal and DevAutoSelectorController remain independent.
+- Legacy local ADB/LADB was removed by T009 / ADR-0015. Its runner/bridge/permissions remain retired. Commit 8662f23 adds the separate Java localadb plugin and me.ashell/local_adb/v1 channel; read docs/AI_ENGINEERING/12_LOCAL_ADB.md and ADR-0017. Remote terminal, capture and DevAutoSelectorController remain independent; no PC ADB or mirroring integration exists.
 - ZEGO media is separate from RustDesk audio and requires explicit microphone consent.
 - SKL and ignore are alternate frame sources, not proof normal sharing recovered.
 - MainService restart is not a generic response to network, lock, memory, or projection events.

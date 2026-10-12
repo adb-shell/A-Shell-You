@@ -255,3 +255,14 @@
 - 同一会话既有 Git 请求覆盖本次修复提交/推送；本记录提交前写入，最终 Git 状态见回执。没有 dispatch、产品构建、依赖安装、生产签名/发布或文件删除。
 - Decision/Event：D-020 / ADR-0016 reviewed-no-change；CE-20261013-T002-01；状态与记忆/构建说明/registry/matrix/baseline10 同步。
 - [详细任务](../docs/tasks/T-2026-10-13-002-android-sdk-setup.md)：修复推送后新建 Run workflow 验证，旧 Re-run 保留旧 SHA。
+
+## T-2026-10-13-003：独立本机 ADB 文档同步
+
+- 日期：2026-10-13；状态：complete / T8 / V0（文档交付）；source main/f84a78f，initial clean。
+- Authority：用户当前明确同步整理ADB文档；此前8662f23代码实现与Git交付已完成，本轮仅C1，不自动Git/构建/设备操作。
+- Outcome：新增12_LOCAL_ADB当前说明、ADR-0017、Baseline11和任务；修正主页/新模块/旧组件退役的混淆，登记四项新依赖、AND-09—13，更新相关领域/入口/Skills/全局记忆。原ADB档案正文与冻结基线保留。
+- Verification：V0源码合同/常量、8662f23模块对比、变更范围、diff/新增链接/新文件空白检查；上游许可来源只读核对。未收到APK/编译日志/真机结果，V2/V3仍NOT_RUN。
+- Boundary：无PC ADB或ADB投屏；原产品代码、无障碍、画面/远控链不改。加密身份/配对/连接/取消等文档陈述不等于运行验收。
+- Decision / State / Event：D-021 / ADR-0017；STATE-20261013-003 / WORK-20261013-006；CE-20261013-T003-01。
+- Final：34个Markdown文件（4新增、30修改）留工作树；无stage/commit/push、build/test/analyze/codegen、依赖安装、设备、删除、签名或发布。
+- Detail：[任务记录](../docs/tasks/T-2026-10-13-003-local-adb-docs.md)；后续按正式环境结果补证据，PC ADB/投屏另行设计。

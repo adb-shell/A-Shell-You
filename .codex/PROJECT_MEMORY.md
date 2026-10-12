@@ -6,6 +6,8 @@
 
 ## 0. Latest Recovery Snapshot
 
+最新：`T-2026-10-13-003`，[本机 ADB 文档同步](../docs/tasks/T-2026-10-13-003-local-adb-docs.md)。观察 main/f84a78f，initial clean；8662f23 的独立模块保持，当前主页 ServerPage → LocalAdbPage，API 30+ 手动配对/连接/id验证/shell。无 PC ADB/ADB 投屏；旧 LADB 仍退役。当前事实见 [12_LOCAL_ADB.md](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)。本轮仅 Markdown/V0；V2/V3 结果未提供，未执行 Git 写入、构建、设备或发布。D-021 / ADR-0017 / STATE-20261013-003 / CE-20261013-T003-01；以下为各任务当时快照，不覆盖当前 HEAD。
+
 最新：`T-2026-10-13-002`，见 [SDK 初始化修复](../docs/tasks/T-2026-10-13-002-android-sdk-setup.md)。main/c521601、initial clean；T001 已按同一会话“提交github”要求推送。用户报告 sdkmanager 缺失，native/APK 两 job 补固定 SDK setup / CLI 16.0；修复后 V0，运行待验证。STATE-20261013-002 / CE-20261013-T002-01，D-020 reviewed-no-change。本快照在修复提交前写入，后续提交/推送状态以 Git 回执为准；以下 T001 为当时历史快照。
 
 当前最新：`T-2026-10-13-001`，见 [独立客户端 Actions](../docs/BUILD_CLIENTS_ACTIONS.md) 与 [任务](../docs/tasks/T-2026-10-13-001-client-actions.md)。main/8662f23、initial clean；HEAD 已含新的隔离 local ADB。唯一 build-clients.yml 手动选择 Android/Windows/both 与 aarch64/universal，默认 both+aarch64；Android 临时测试签名、Windows unsigned EXE/ZIP；仅 Actions artifacts 14天。旧12个workflow及失效Dependabot移除，本地脚本元数据解耦。只完成V0，未实际编译/Git/签名/上传；本轮修改未提交。D-020 / ADR-0016 / CE-20261013-T001-01 / STATE-20261013-001。
@@ -93,7 +95,7 @@ T005历史：统一PC入口为build.cmd，直接打包本次清理后编译的Re
 - Android 真实 RGBA/Texture frame 必须清 PC waiting。
 - controller 当前强制 relay；受控端仍保留 rendezvous/direct/NAT compatibility code。
 - Windows 当前 virtual display implementation 是 Amyuni；RustDesk IDD 分支是 dormant。
-- 旧 Android 本地 ADB/LADB 已在 T009 移除；无新组件或 PC remote ADB protocol，不能从历史集成文档恢复旧入口。
+- 旧 Android 本地 ADB/LADB 已在 T009 移除；8662f23 新 localadb 模块独立提供本机 shell，尚无 PC remote ADB protocol 或视频集成，不能从历史档案恢复旧入口/自动化。完整合同见 12_LOCAL_ADB.md。
 - ZEGO 媒体不走原 RustDesk audio service；peer protocol 只传 invitation/control state。
 - `verify_login()` 的 legacy UI bypass 不等于产品 API、hbbs 或 endpoint authentication bypass。
 
