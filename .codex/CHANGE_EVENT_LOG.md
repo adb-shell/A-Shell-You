@@ -343,3 +343,13 @@ Mode：`append-only logical persisted-change events`
 - Decision/Baseline/State：D-020 / ADR-0016；AS-BL-2026-10-13-8662f23-client-actions-worktree；STATE-20261013-001 / WORK-20261013-002。
 - Actual actions：删除13份旧编排；无Git写入、产品build/test/analyze/codegen、实际签名/打包、远端dispatch/上传/发布；全部变更未提交。
 - Recovery：按8662f23对应路径和本任务patch审阅恢复，不整仓reset或重写历史。运行签名/依赖/安装限制见任务与使用说明。
+
+## CE-20261013-T002-01：Android SDK 初始化修复
+
+- Date / Actor：2026-10-13 / Codex / Release；Task T-2026-10-13-002；source main/c521601，initial clean。
+- Authority：原客户端 Actions 实现、当前失败反馈及同一会话“提交github”要求；T001 后续已提交推送 c521601，补充旧事件的提交前状态。
+- Workflow：新增 ANDROID_CMDLINE_TOOLS_VERSION=12266719；两 Android job 使用 setup-android v3.2.2 固定 SHA，显式 platform-tools；去除重复 licenses 命令，打印路径/版本，安装固定 SDK root；Android build-info 记录 CLI。
+- Files：.github/workflows/build-clients.yml；docs/BUILD_CLIENTS_ACTIONS.md；docs/AI_ENGINEERING/08_BUILD_SYSTEM.md、09_DEBUG_SYSTEM.md；EXTERNAL_ASSET_REGISTRY.md；TEST_MATRIX.md；docs/BASELINE/BASELINE_INDEX.md、10_ANDROID_SDK_SETUP_BASELINE_2026-10-13.md；docs/tasks/T-2026-10-13-002-android-sdk-setup.md；.codex/PROJECT_STATE.md、PROJECT_MEMORY.md、CURRENT_WORK.md、CHANGELOG_AI.md、TASK_HISTORY.md 及本 ledger。
+- Review：用户日志证明初版初始化失败；修复后 V0 YAML/Bash/Python、初始化顺序/权限/Action SHA/Windows不变/diff/引用。无产品构建/远端 dispatch；仅按既有请求交付 commit/push，结果以 Git 回执为准。
+- Decision：D-020 / ADR-0016 reviewed-no-change；baseline AS-BL-2026-10-13-c521601-android-sdk-setup-worktree；STATE-20261013-002 / WORK-20261013-004。
+- Recovery / Next：按 c521601 对本次 patch 逐文件恢复；新运行选择修复 SHA，等待实际 SDK/NDK 安装、编译与 artifacts 证据。

@@ -1,7 +1,7 @@
 # AShell Project State
 
 Schema Version：`1.0`  
-State Revision：`STATE-20261013-001`
+State Revision：`STATE-20261013-002`
 
 Last Updated：2026-10-13（Asia/Tokyo）
 
@@ -11,7 +11,7 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 
 > 本文件是截至 `Observed At` 的当前状态快照，不是生产实时监控，也不替代源码、`docs/AI_ENGINEERING/`、ADR 或 Baseline。新会话必须用只读检查确认其新鲜度；发现漂移时记录 conflict/stale，不得用本文件覆盖源码事实或改写旧 Baseline。
 
-最新变更证据：[T-2026-10-13-001 客户端 Actions](../docs/tasks/T-2026-10-13-001-client-actions.md)。当前 main/8662f23，initial clean；T009 已由03aec41固化，c81d9f7更新配置，8662f23已新增隔离 local ADB，旧摘要“未接入新组件”已过期。本轮将 GitHub 编排替换为独立手动 Android/Windows 工作流，仅测试 artifacts；本轮修改未提交。只有 V0，runner build/安装 NOT_RUN；新 local ADB 运行语义未在本任务重新审计。
+最新变更证据：[T-2026-10-13-002 SDK 初始化](../docs/tasks/T-2026-10-13-002-android-sdk-setup.md)。提交前观察 main/c521601，initial clean；T001 已按用户要求提交并推送。用户报告 Android sdkmanager 缺失，T002 为 native/APK 两 job 补固定 SHA 的 SDK setup / CLI 16.0；修复后只有 V0，runner 成功证据待补。本快照记录修复提交前状态，后续 Git 回执/HEAD 为准。8662f23 新 local ADB 保持，未在本任务重新审计。
 
 T003补充：用户明确要求两处公共服务匹配字符串也改为ashell.，全部文档字段/代码示例/路径/文件名统一品牌。历史文档已标注名称规范化，原文字与真实源仓地址从a036f31恢复；当前工作区排除.git后，旧品牌文本/路径大小写不敏感检索零命中。
 
@@ -21,13 +21,13 @@ T003补充：用户明确要求两处公共服务匹配字符串也改为ashell.
 |---|---|---|
 | Product/runtime | `A Shell You` / `AShell`；crate ashell；Android me.ashell；Flutter内部flutter_hbb | source + ADR-0014 |
 | Rust / Flutter version | `5.2.1` / `5.2.1+59` | manifests + Baseline |
-| Baseline ID | `AS-BL-2026-10-13-8662f23-client-actions-worktree` | `docs/BASELINE/09_CLIENT_ACTIONS_BASELINE_2026-10-13.md` |
+| Baseline ID | `AS-BL-2026-10-13-c521601-android-sdk-setup-worktree` | `docs/BASELINE/10_ANDROID_SDK_SETUP_BASELINE_2026-10-13.md` |
 | Branch | `main` | read-only Git observation |
-| HEAD | `8662f2369a33f5286c20f9de4d640d2072175ca7` | 当前只读观察；本轮无 Git 写入 |
-| Worktree | 本任务开始 clean；工作流/元数据兼容/文档记忆修改未提交 | 删除13份旧编排配置，新增独立客户端工作流；详见任务事件 |
+| HEAD | `c52160116e1f6f582aba64fb05465c972a5d0673` | T002 提交前观察；T001 Git 交付已完成 |
+| Worktree | 本任务开始 clean；仅 SDK 工作流修复与必要文档记忆 | 按同一会话既有提交请求交付；最终状态看 Git 回执 |
 | History mapping | a036f31提交前轮记忆；6fb0aa6初始化的975 blobs与历史源匹配是迁移前证据，准确RustDesk fork未知 | 历史接管报告；不能用该一致性描述当前dirty tree |
 | Highest completed verification | `V0` repository/document/schema checks | `TEST_MATRIX.md` + task records |
-| Formal build/runtime evidence | 本任务 `NOT_RUN / VERIFICATION-REQUIRED` | CI-01—04 runner 首次构建/下载、签名/ABI、Windows运行待验证；历史设备风险不因CI源码整改关闭 |
+| Formal build/runtime evidence | 修复前 SDK 初始化失败（用户日志）；修复后 `NOT_RUN / VERIFICATION-REQUIRED` | CI-01—04 构建/下载、签名/ABI、Windows运行待验证；完整 run URL/SHA 尚未提供 |
 | Release readiness | `BLOCKED` | security、external assets、V2—V4、signing/SBOM/rollback gaps |
 
 ## 2. Governance and Knowledge Readiness
@@ -59,9 +59,9 @@ T003补充：用户明确要求两处公共服务匹配字符串也改为ashell.
 
 - Active task registry：`CURRENT_WORK.md`。
 - Detailed task history：`TASK_HISTORY.md`。
-- Latest completed AI task：`T-2026-10-13-001`（独立客户端Actions源码/V0；V2未执行）。
+- Latest completed AI task：`T-2026-10-13-002`（SDK 初始化源码/V0；修复后 V2 未执行）。
 - Current active task：`none`；以 CURRENT_WORK 实时行和新会话只读复核为准。
-- Latest recorded modification event：`CE-20261013-T001-01`。
+- Latest recorded modification event：`CE-20261013-T002-01`。
 - Latest decision：`D-020` / ADR-0016 独立手动客户端Actions；既有产品/网络边界保持。
 - Architecture decisions：`docs/ADR/README.md`；ADR-0015 取代 ADR-0007 的现役实现决定；ADR-0014 产品身份保持。
 
@@ -69,8 +69,8 @@ T003补充：用户明确要求两处公共服务匹配字符串也改为ashell.
 
 - There is no standing C2 or C3 authorization.
 - Historical approvals in memory、Task History、Decision Log or ADR never transfer to a new session.
-- 本轮客户端Actions编辑范围在交付后关闭；未来 Git/runner 执行请求从 T0 重新核对，不继承历史权限。
-- 本轮删除12个旧workflow和1份失效Dependabot配置；没有业务/用户数据删除、Git写入、产品构建/测试/codegen、实际签名/打包、远端dispatch/上传/发布。
+- T002 延续同一会话的客户端 Actions 修复与“提交github”要求；交付后不形成未来任务授权。
+- 本轮仅配置/文档修复与指定 commit/push；不删除文件、不执行产品构建/测试/codegen、签名/打包、远端 dispatch 或产物发布。
 
 ## 6. Freshness and Update Contract
 

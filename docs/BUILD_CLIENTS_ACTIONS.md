@@ -33,6 +33,7 @@
 全部 CI 配置位于 workflow：Ubuntu 22.04 / Windows 2022 hosted runner、Rust 1.75.0、Flutter 3.24.5、cargo-ndk 3.1.2、NDK 27.2.12479018（API 21）、JDK 17、Android SDK/Build Tools 34、Windows LLVM 15.0.6 / Python 3.11.9 / CMake 3.28.3 / Brotli 1.1.0、vcpkg `6f29f12e82a8293156836ad81cc9bf5af41fe836`。宿主 image、MSVC/JDK patch 和包源仍可能变动；完整 reproducibility 尚未验证。
 
 - native Android 直接执行 vcpkg 和 cargo-ndk，ARM 两 ABI 使用 `flutter,hwcodec`，x86_64 使用 `flutter`；合并相应的 `libashell.so` 与 NDK `libc++_shared.so` 后执行 Flutter APK 构建。APK 检查全部预期 ABI 和四种核心库，并排除退役 `libadb.so`。HEAD 中新的 local ADB 模块和 Maven dependencies 保留。
+- native 和 APK job 各自在 JDK setup 后运行固定 SHA 的 `android-actions/setup-android` v3.2.2，固定 command-line tools 12266719 / 16.0，安装 platform-tools、接受 licenses 并配置 PATH 和两个 SDK 根变量。后续 SDK/NDK 安装显式使用 `--sdk_root="$ANDROID_HOME"`；不依赖 runner 预装 sdkmanager。CLI 版本同时记录到 Android build-info。
 - Windows 调用 `python build.py --portable --hwcodec --flutter --vram --skip-portable-pack`，再调用 `libs/portable/generate.py`。仅打包本次 Release，包括本仓编译的 `dylib_virtual_display.dll` 和 Flutter 插件；不附加外部驱动、`WindowInjection.dll` 或上游自定义 engine。相关功能仍需单独验证。
 - 使用 tracked FRB bridge，不运行旧 bridge workflow 或自动重生成。两平台应用现有 Flutter dropdown patch，产品版本/包名/协议不改。
 - 不调用本地 `build.sh`、`env.sh`、`build.cmd`、`flutter/ndk_*.sh` 或 `flutter/build_android_deps.sh`。本地构建机仍使用原入口；为删除旧工作流解除的元数据依赖不改变入口。
@@ -40,7 +41,9 @@
 
 ## 验证状态
 
-2026-10-13 仅完成 V0 YAML、Bash/Python/PowerShell 语法、矩阵/权限/路径和源依赖核对，**尚未在 GitHub runner 编译**。当前 `flutter/pubspec.yaml` 的 ZEGO 声明尚未进入 tracked lock，`flutter pub get` 会解析并把实际 lock 保存到 artifact；本轮不自动更新源 lock。CI 首次执行仍需确认 JitPack/ZEGO/vcpkg/Cargo 下载与工具链兼容。
+2026-10-13：初版完成 V0 后已由 c521601 提交。用户随后提供 runner 的 `sdkmanager: command not found` / 127 日志，失败发生在 NDK 安装前；T002 为两个 Android job 补齐上述 SDK 初始化。修复后仅完成 V0，**尚无修复后 runner 成功证据**。当前 `flutter/pubspec.yaml` 的 ZEGO 声明尚未进入 tracked lock，`flutter pub get` 会解析并把实际 lock 保存到 artifact；本轮不自动更新源 lock。后续仍需确认 JitPack/ZEGO/vcpkg/Cargo 下载与工具链兼容。
+
+验证修复时，在修复推送后用 **Run workflow → main** 创建新运行，先选 `android + aarch64`。旧运行的 **Re-run jobs** 仍使用原来的 commit，无法验证新工作流；见 [GitHub 重运行规则](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs)。SDK 初始化应显示 sdkmanager 路径和 16.0 版本，随后安装 NDK。详情见 [T002 修复记录](tasks/T-2026-10-13-002-android-sdk-setup.md)。
 
 《编译验证需求》：在 GitHub Actions 按 `android+aarch64`、`android+universal`、`windows`、`both` 四组运行，从 checkout 根目录执行工作流定义的步骤；确认 job 选择、APK 签名与 ABI、EXE/ZIP 完整性、失败不交付和下载。参考 [任务记录](tasks/T-2026-10-13-001-client-actions.md)、[CI 基线](BASELINE/09_CLIENT_ACTIONS_BASELINE_2026-10-13.md) 和 [TEST_MATRIX](../TEST_MATRIX.md)。
 

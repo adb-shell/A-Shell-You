@@ -245,3 +245,13 @@
 - Documentation：使用说明、build/debug/security/source map、ADR/baseline/registry/test matrix、入口/Release skill/全局记忆同步。
 - Decision/Event：D-020 / ADR-0016 / CE-20261013-T001-01；STATE-20261013-001；关闭 WORK-20261013-002。
 - Git/build/sign/package/upload/release：none；仅授权旧编排删除。恢复点 8662f23；[具体任务与编译验证需求](../docs/tasks/T-2026-10-13-001-client-actions.md)。
+
+## T-2026-10-13-002：Android Actions SDK setup
+
+- 日期：2026-10-13；source main/c521601，initial clean；owner Codex / Release，Security 约束复核。
+- T001 后续用户明确“提交github”，已 commit/push c521601 到 origin/main；旧记录保留其提交前时点。
+- 用户报告 sdkmanager command not found / 127，native/APK 源码均缺 SDK 初始化；补固定 setup-android SHA / CLI 16.0、显式 platform-tools、路径/版本诊断和 SDK root。
+- V0：YAML、11 Bash、1 inline Python AST、两个 job 的初始化顺序、固定 action SHA、权限/选择/矩阵/Windows job 不变、diff/链接。修复后 V2 NOT_RUN。
+- 同一会话既有 Git 请求覆盖本次修复提交/推送；本记录提交前写入，最终 Git 状态见回执。没有 dispatch、产品构建、依赖安装、生产签名/发布或文件删除。
+- Decision/Event：D-020 / ADR-0016 reviewed-no-change；CE-20261013-T002-01；状态与记忆/构建说明/registry/matrix/baseline10 同步。
+- [详细任务](../docs/tasks/T-2026-10-13-002-android-sdk-setup.md)：修复推送后新建 Run workflow 验证，旧 Re-run 保留旧 SHA。

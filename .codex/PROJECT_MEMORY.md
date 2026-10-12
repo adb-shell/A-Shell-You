@@ -6,6 +6,8 @@
 
 ## 0. Latest Recovery Snapshot
 
+最新：`T-2026-10-13-002`，见 [SDK 初始化修复](../docs/tasks/T-2026-10-13-002-android-sdk-setup.md)。main/c521601、initial clean；T001 已按同一会话“提交github”要求推送。用户报告 sdkmanager 缺失，native/APK 两 job 补固定 SDK setup / CLI 16.0；修复后 V0，运行待验证。STATE-20261013-002 / CE-20261013-T002-01，D-020 reviewed-no-change。本快照在修复提交前写入，后续提交/推送状态以 Git 回执为准；以下 T001 为当时历史快照。
+
 当前最新：`T-2026-10-13-001`，见 [独立客户端 Actions](../docs/BUILD_CLIENTS_ACTIONS.md) 与 [任务](../docs/tasks/T-2026-10-13-001-client-actions.md)。main/8662f23、initial clean；HEAD 已含新的隔离 local ADB。唯一 build-clients.yml 手动选择 Android/Windows/both 与 aarch64/universal，默认 both+aarch64；Android 临时测试签名、Windows unsigned EXE/ZIP；仅 Actions artifacts 14天。旧12个workflow及失效Dependabot移除，本地脚本元数据解耦。只完成V0，未实际编译/Git/签名/上传；本轮修改未提交。D-020 / ADR-0016 / CE-20261013-T001-01 / STATE-20261013-001。
 
 以下 T009 及更早段落是当时快照；“未接入新组件”不能覆盖8662f23当前源码。T009删除的旧libadb.so仍排除，新的local ADB不是该旧组件。

@@ -148,7 +148,9 @@ Android Release APK 使用每次运行生成的临时测试 key，不能覆盖�
 
 为解除旧 workflow 文件读取，build.sh 的 FRB 版本保持自身默认，vcpkg 读取 manifest baseline；历史 flutter/build_fdroid.sh 保留自身冻结版本。二者未在本轮运行，现有 Linux/Windows 本地构建入口继续保留。
 
-操作、完整版本表、签名/依赖限制见 [Actions 使用说明](../BUILD_CLIENTS_ACTIONS.md) 和 [CI baseline](../BASELINE/09_CLIENT_ACTIONS_BASELINE_2026-10-13.md)。只有 V0，GitHub runner V2 尚未执行；依然没有 push/PR 自动质量 gate、bridge drift 检测或正式发布证据。
+T002：用户反馈初版 sdkmanager 不在 PATH，native job 在 NDK 安装前失败。native/APK 两 job 现在均先运行固定 SHA 的 setup-android v3.2.2 / CLI 12266719（16.0），统一 SDK 根变量和 PATH、接受 licenses；显式仅安装 platform-tools，避免旧 tools 默认包。后续 sdkmanager 显式指定 SDK 根，路径/版本进入日志，CLI 版本进入产物元数据。
+
+操作、完整版本表、签名/依赖限制见 [Actions 使用说明](../BUILD_CLIENTS_ACTIONS.md) 和 [SDK 修复基线](../BASELINE/10_ANDROID_SDK_SETUP_BASELINE_2026-10-13.md)。修复后只有 V0，runner V2 尚未验证；依然没有 push/PR 自动质量 gate、bridge drift 检测或正式发布证据。
 
 ## 8. 依赖与供应链
 

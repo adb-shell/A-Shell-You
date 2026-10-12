@@ -1,6 +1,6 @@
 # AShell Engineering Baseline Index
 
-最新 CI 工作树快照：[AS-BL-2026-10-13-8662f23-client-actions-worktree](09_CLIENT_ACTIONS_BASELINE_2026-10-13.md)。独立手动 Android/Windows Actions 与测试 artifacts；V0，runner 构建未执行。以下为旧冻结快照，不代表当前 HEAD。
+最新 CI 工作树快照：[AS-BL-2026-10-13-c521601-android-sdk-setup-worktree](10_ANDROID_SDK_SETUP_BASELINE_2026-10-13.md)。T002 修复初版 sdkmanager 缺失；固定两 Android job 的 SDK setup 和 CLI 版本；修复后 V0，runner 构建待验证。原 [独立客户端 Actions 快照](09_CLIENT_ACTIONS_BASELINE_2026-10-13.md) 与以下旧快照保留冻结含义，不代表当前 HEAD。
 
 最新 repository-observed 快照：[AS-BL-2026-10-12-13f792d-adb-retired-worktree](08_ADB_RETIREMENT_BASELINE_2026-10-12.md)。T009 删除旧 ADB 功能链/权限并排除旧 native binary，V0；构建和运行未验证。下文所称最新 PC 构建快照为此前历史状态，旧基线不重写。
 

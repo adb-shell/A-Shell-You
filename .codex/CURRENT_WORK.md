@@ -1,7 +1,7 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261013-002`
+Registry Revision：`WORK-20261013-004`
 
 Last Updated：2026-10-13
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none；T-2026-10-13-001 已完成工作流配置、V0 核对和文档交付；尚无 runner 构建/Git/上传任务。
+none；T-2026-10-13-002 配置/V0 交付完成，正在按同一会话提交要求完成 Git 交付；最终 commit/push 结果以 Git 回执为准。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ none；T-2026-10-13-001 已完成工作流配置、V0 核对和文档交付；�
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-13-001`
-- Result：独立手动 Android/Windows Actions；平台/ABI选择、临时测试签名、仅Artifacts；删除12个旧workflow与失效Dependabot；本轮配置/文档未提交。
+- Task ID：`T-2026-10-13-002`
+- Result：Android native/APK job 均先初始化 SDK / CLI 16.0，消除依赖 runner PATH 的配置缺陷。
 - Closed At：2026-10-13（Asia/Tokyo）
 - Final T-State：`T8 — complete`（配置交付/V0；runner V2待验证）
-- State / Event：`STATE-20261013-001` / `CE-20261013-T001-01`
+- State / Event：`STATE-20261013-002` / `CE-20261013-T002-01`
 - Decision：D-020 / ADR-0016，保留ADR-0010 manual-only边界。
-- Verification：V0 YAML/矩阵/Action SHA、11段Bash/1段Python AST/6段PowerShell、两份local shell语法、链接/权限/diff；产品源码/manifest/locks未改。
-- Next Gate：Git写入/远端dispatch/构建须按新的明确请求开始T0；本轮未执行签名/打包/上传/发布。
+- Verification：V0 YAML、SDK setup 顺序/Action SHA、11 段 Bash / 1 段 Python AST、权限/输入/矩阵/Windows job 不变、diff/引用；修复后 runner NOT_RUN。
+- Next Gate：修复提交后 Run workflow 选 main 新建运行；不使用旧运行 Re-run 验证新源码。本轮不 dispatch/build/sign/package/release。
 - Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md 中同 ID。
-- Detailed record：docs/tasks/T-2026-10-13-001-client-actions.md。
+- Detailed record：docs/tasks/T-2026-10-13-002-android-sdk-setup.md。

@@ -170,3 +170,12 @@ Mode：`append-only task-level index`
 - Verification：V0 YAML、矩阵、固定SHA、shell/Python/PowerShell语法、引用和diff；没有编译、远端运行、签名、上传或Git写入。
 - Decision/Event/State：D-020 / ADR-0016；CE-20261013-T001-01；STATE-20261013-001 / WORK-20261013-002。
 - Details：[使用说明](../docs/BUILD_CLIENTS_ACTIONS.md)、[任务](../docs/tasks/T-2026-10-13-001-client-actions.md)、baseline09。临时签名不能跨次覆盖安装，Windows驱动能力/依赖解析/runner兼容仍需正式验证。
+
+## T-2026-10-13-002：修复 Android SDK 初始化
+
+- Source：main/c521601，initial clean；corrects T001 交付后的状态：用户随后明确要求“提交github”，T001 已提交并推送。
+- Outcome：两个 Android job 显式 setup-android v3.2.2 / CLI 16.0，配置 PATH/SDK root/许可证；后续 sdkmanager 打印路径/版本并固定安装根目录。仅配置修复，Windows job 和原编译选项保持。
+- Evidence：用户报告旧流程 command not found / 127；修复后 V0 YAML/11 Bash/1 Python、步骤顺序/固定 SHA/不变量与 diff/引用检查。runner 未重跑。
+- Authority：延续同一会话工作流修复与 Git 提交要求；无远端 dispatch/产品编译/签名/发布。
+- Decision/State/Event：D-020 reviewed-no-change；STATE-20261013-002 / WORK-20261013-004 / CE-20261013-T002-01。
+- Details：[任务](../docs/tasks/T-2026-10-13-002-android-sdk-setup.md)、baseline10；需用新 SHA 发起 Run workflow。
