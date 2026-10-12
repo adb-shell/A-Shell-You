@@ -161,8 +161,6 @@ jobs:
     needs: android-native
     runs-on: ubuntu-22.04
     timeout-minutes: 60
-    env:
-      GRADLE_USER_HOME: ${{ runner.temp }}/ashell-gradle
     defaults:
       run:
         shell: bash
@@ -206,8 +204,10 @@ jobs:
       - name: Configure Gradle memory for APK packaging
         run: |
           # User-home properties override the project's local 1 GiB heap setting.
-          mkdir -p "$GRADLE_USER_HOME"
-          cat > "$GRADLE_USER_HOME/gradle.properties" <<'EOF'
+          gradle_home="$RUNNER_TEMP/ashell-gradle"
+          echo "GRADLE_USER_HOME=$gradle_home" >> "$GITHUB_ENV"
+          mkdir -p "$gradle_home"
+          cat > "$gradle_home/gradle.properties" <<'EOF'
           org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
           org.gradle.workers.max=2
           org.gradle.parallel=false
