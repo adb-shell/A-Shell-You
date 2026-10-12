@@ -201,7 +201,7 @@ jobs:
             test -s "$file"
           done
 
-      - name: Configure Gradle memory for APK packaging
+      - name: Configure Gradle memory and APK ABIs
         run: |
           # User-home properties override the project's local 1 GiB heap setting.
           gradle_home="$RUNNER_TEMP/ashell-gradle"
@@ -213,6 +213,19 @@ jobs:
           org.gradle.parallel=false
           org.gradle.vfs.watch=false
           kotlin.compiler.execution.strategy=in-process
+          EOF
+          # Flutter 3.24's target-platform selects Flutter engines, but does not
+          # filter third-party JNI libraries in a non-split universal APK.
+          mkdir -p "$gradle_home/init.d"
+          cat > "$gradle_home/init.d/ashell-apk-abis.gradle" <<'EOF'
+          if (System.getenv('ANDROID_ARCH') == 'universal') {
+              gradle.beforeProject { project ->
+                  project.pluginManager.withPlugin('com.android.application') {
+                      project.android.defaultConfig.ndk.abiFilters.clear()
+                      project.android.defaultConfig.ndk.abiFilters.addAll(['arm64-v8a', 'armeabi-v7a', 'x86_64'])
+                  }
+              }
+          }
           EOF
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
