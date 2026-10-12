@@ -130,6 +130,12 @@ jobs:
 
       - name: Compile libashell.so and stage JNI libraries
         run: |
+          ndk_sysroot="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+          rust_target='${{ matrix.target }}'
+          # Scope bindgen to the Android target; host build scripts keep host headers.
+          # armv7-linux-androideabi uses the NDK's arm-linux-androideabi headers.
+          test -d "$ndk_sysroot/usr/include/${{ matrix.ndk_triple }}"
+          export "BINDGEN_EXTRA_CLANG_ARGS_${rust_target//-/_}=--sysroot=$ndk_sysroot -I$ndk_sysroot/usr/include/${{ matrix.ndk_triple }} -D__ANDROID_API__=$ANDROID_API"
           cargo ndk --platform "$ANDROID_API" --target '${{ matrix.target }}' \
             build --release --lib --features '${{ matrix.features }}'
           destination="native/${{ matrix.abi }}"
