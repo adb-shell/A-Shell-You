@@ -1,10 +1,14 @@
 # AShell Project Memory
 
-最后更新：2026-10-12
+最后更新：2026-10-13
 
 用途：AI 会话的稳定入口，不替代源码和完整工程文档。
 
 ## 0. Latest Recovery Snapshot
+
+当前最新：`T-2026-10-13-001`，见 [独立客户端 Actions](../docs/BUILD_CLIENTS_ACTIONS.md) 与 [任务](../docs/tasks/T-2026-10-13-001-client-actions.md)。main/8662f23、initial clean；HEAD 已含新的隔离 local ADB。唯一 build-clients.yml 手动选择 Android/Windows/both 与 aarch64/universal，默认 both+aarch64；Android 临时测试签名、Windows unsigned EXE/ZIP；仅 Actions artifacts 14天。旧12个workflow及失效Dependabot移除，本地脚本元数据解耦。只完成V0，未实际编译/Git/签名/上传；本轮修改未提交。D-020 / ADR-0016 / CE-20261013-T001-01 / STATE-20261013-001。
+
+以下 T009 及更早段落是当时快照；“未接入新组件”不能覆盖8662f23当前源码。T009删除的旧libadb.so仍排除，新的local ADB不是该旧组件。
 
 当前最新：`T-2026-10-12-009`，见 [旧 ADB 退役](../docs/tasks/T-2026-10-12-009-remove-legacy-adb.md)。main/13f792d，初始 clean；T008 已提交。删除主页右侧 ADB 页、Dart/native 通道、4 个 Kotlin 模块、无线调试自动化及两项专用权限，排除旧 libadb.so，移除 host adb 检查；新组件未接入。Windows/远控核心/JNI/MainService/DevAutoSelectorController 未改。V0 核对完成，未 build/test/analyze/codegen/操作设备/Git 写入；本轮修改未提交。D-019 / ADR-0015 / CE-20261012-T009-01 / STATE-20261012-010。
 

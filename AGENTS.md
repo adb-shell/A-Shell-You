@@ -1,5 +1,7 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
+2026-10-13 T001：GitHub CI 仅保留 build-clients.yml，独立配置 Android/Windows 手动编译、Android aarch64/universal、临时测试签名、Actions-only artifacts。见 docs/BUILD_CLIENTS_ACTIONS.md；本地 build.sh/build.cmd 仍独立。仅 V0，未运行 runner。观察 HEAD 8662f23 已含新的 local ADB 模块，下文“新组件尚未接入”是 T009 历史状态，不覆盖当前源码。
+
 2026-10-12 T009：按用户要求剔除旧 ADB 页面/组件/专用权限和构建依赖；Windows 未发现旧运行组件。仅 V0，无编译/设备验证。当前状态先核对 HEAD/status；ADR-0015 取代 ADR-0007。
 
 2026-10-12产品身份迁移：见 `docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md`、ADR-0014、D-016。迁移已由f423335固化，T004服务器配置由c0951b5固化。T005在其上统一PC入口为build.cmd、仅打包编译后的Release产物，未提交，见 `docs/tasks/T-2026-10-12-005-pc-build-entry.md`；仅V0。Flutter内部包名flutter_hbb必须保留。T003按用户要求统一两处ashell.匹配和全部文档品牌字段/路径/文件名，历史原文可从Git恢复；新会话先核对HEAD/status。

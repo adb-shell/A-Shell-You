@@ -213,14 +213,9 @@ Plugin ZIP 解压使用 archive-provided name 拼接 target path，未见 `enclo
 
 ## 10. CI/CD 与 Release
 
-现有 workflows 虽主要为 manual `workflow_dispatch`，但不能视为可信发布系统：
+2026-10-13 T001 已删除旧 12 个 workflow 和失效的 submodule Dependabot 编排，新增唯一手动 `build-clients.yml`：direct Actions 固定 full commit SHA、`contents: read`、checkout 不保留凭据、不接收任意命令输入、无自动 commit/push 或 Release/tag/store。Android 临时测试 key 不上传/缓存，Windows unsigned；只交付 Actions 测试构建 artifacts，14 天保留。
 
-- 存在 RustDesk/旧版本/旧 artifact 名称和上游发布目标残留。
-- 有 workflow 自动 `git commit`/`git push`。
-- Android/Windows/macOS 存在 debug-key 或 unsigned publish path。
-- 多个 third-party Action 使用 mutable branch/tag。
-- 多数 workflow 未显式声明最小 `permissions`。
-- 构建期下载 binary 未普遍固定 hash。
+这关闭了旧 workflow 中的上游发布目标、广权限和自动 Git 写路径，但不等于完整供应链/发布风险关闭：hosted image、JDK/MSVC patch、未完全锁定的依赖和部分构建期下载仍需实际 provenance/SBOM；tracked Flutter lock 与 ZEGO 声明仍漂移。测试签名不能作为生产身份，临时 key 每次变化；runner 执行/安装验证 NOT_RUN。SEC-014 的旧编排部分静态整改，其余 dependency/external 控制继续待验证。
 
 发布 gate：
 

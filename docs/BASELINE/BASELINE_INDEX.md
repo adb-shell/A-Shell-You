@@ -1,5 +1,7 @@
 # AShell Engineering Baseline Index
 
+最新 CI 工作树快照：[AS-BL-2026-10-13-8662f23-client-actions-worktree](09_CLIENT_ACTIONS_BASELINE_2026-10-13.md)。独立手动 Android/Windows Actions 与测试 artifacts；V0，runner 构建未执行。以下为旧冻结快照，不代表当前 HEAD。
+
 最新 repository-observed 快照：[AS-BL-2026-10-12-13f792d-adb-retired-worktree](08_ADB_RETIREMENT_BASELINE_2026-10-12.md)。T009 删除旧 ADB 功能链/权限并排除旧 native binary，V0；构建和运行未验证。下文所称最新 PC 构建快照为此前历史状态，旧基线不重写。
 
 > 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。

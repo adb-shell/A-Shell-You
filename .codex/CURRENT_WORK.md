@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261012-018`
+Registry Revision：`WORK-20261013-002`
 
-Last Updated：2026-10-12T20:52:15+09:00
+Last Updated：2026-10-13
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none；T009 已完成源码剔除、V0 核对和文档交付。正式构建/设备验证未执行；没有活动构建或 Git 任务。
+none；T-2026-10-13-001 已完成工作流配置、V0 核对和文档交付；尚无 runner 构建/Git/上传任务。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ none；T009 已完成源码剔除、V0 核对和文档交付。正式构建/设�
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-12-009`
-- Result：旧 ADB 功能链/页面/模块/专用权限移除，排除旧 libadb.so，未接入新组件；源码和文档修改未提交。
-- Closed At：2026-10-12T20:52:15+09:00
-- Final T-State：`T8 — complete`（源码交付；运行验收待验证）
-- State / Event：`STATE-20261012-010` / `CE-20261012-T009-01`
-- Decision：D-019 / ADR-0015；既有其他边界保持。
-- Verification：V0 删除边界、旧符号/通道扫描、Manifest XML、Bash 仅解析、协议无字段变化、保留源码/范围检查；V2/V3 NOT_RUN。
-- Next Gate：新组件/编译/设备/Git 操作须按新的用户请求开始 T0；历史授权不继承。
+- Task ID：`T-2026-10-13-001`
+- Result：独立手动 Android/Windows Actions；平台/ABI选择、临时测试签名、仅Artifacts；删除12个旧workflow与失效Dependabot；本轮配置/文档未提交。
+- Closed At：2026-10-13（Asia/Tokyo）
+- Final T-State：`T8 — complete`（配置交付/V0；runner V2待验证）
+- State / Event：`STATE-20261013-001` / `CE-20261013-T001-01`
+- Decision：D-020 / ADR-0016，保留ADR-0010 manual-only边界。
+- Verification：V0 YAML/矩阵/Action SHA、11段Bash/1段Python AST/6段PowerShell、两份local shell语法、链接/权限/diff；产品源码/manifest/locks未改。
+- Next Gate：Git写入/远端dispatch/构建须按新的明确请求开始T0；本轮未执行签名/打包/上传/发布。
 - Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md 中同 ID。
-- Detailed record：docs/tasks/T-2026-10-12-009-remove-legacy-adb.md。
+- Detailed record：docs/tasks/T-2026-10-13-001-client-actions.md。

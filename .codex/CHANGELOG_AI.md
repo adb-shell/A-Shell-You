@@ -160,3 +160,13 @@ Mode：`append-only task-level index`
 - Decision / Baseline / Event：D-019 / ADR-0015；AS-BL-2026-10-12-13f792d-adb-retired-worktree；CE-20261012-T009-01。
 - Docs：当前领域/入口/Skills、Test Matrix、External Registry、ADR/Baseline、全局记忆已同步；旧集成记录标 HISTORICAL/RETIRED，未删除历史。
 - Git / build / install / device / release：none；本轮修改未提交。正式验证需求和回滚见 [任务记录](../docs/tasks/T-2026-10-12-009-remove-legacy-adb.md)。
+
+## T-2026-10-13-001：独立客户端 GitHub Actions
+
+- Status：completed — workflow/configuration/V0；runner V2 NOT_RUN。
+- Source：main/8662f23，initial clean；新 local ADB 已在 HEAD，本轮不改。
+- Outcome：清理12个旧 workflow 与失效 submodule Dependabot；唯一 build-clients.yml 手动选择 Android/Windows/both、aarch64/universal，默认 both+aarch64，Android 临时测试签名，Windows unsigned EXE/ZIP；仅 Actions artifacts，14 天。
+- Compatibility：不调用本地 Bash/CMD 入口；build.sh 和历史 F-Droid 解除对删除文件的版本读取；产品源码/manifest/locks/generated bridge 保持。
+- Verification：V0 YAML、矩阵、固定SHA、shell/Python/PowerShell语法、引用和diff；没有编译、远端运行、签名、上传或Git写入。
+- Decision/Event/State：D-020 / ADR-0016；CE-20261013-T001-01；STATE-20261013-001 / WORK-20261013-002。
+- Details：[使用说明](../docs/BUILD_CLIENTS_ACTIONS.md)、[任务](../docs/tasks/T-2026-10-13-001-client-actions.md)、baseline09。临时签名不能跨次覆盖安装，Windows驱动能力/依赖解析/runner兼容仍需正式验证。

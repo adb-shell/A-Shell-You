@@ -73,6 +73,7 @@ retrospective -> 只有 decision owner 重新批准才可 accepted
 | 0013 | Integrate a Safe Superpowers Subset | accepted | contemporaneous | D-013 | implemented / V0 |
 | 0014 | AShell Product Identity | accepted | contemporaneous | D-015 | source edits / V0；formal build pending |
 | 0015 | Retire Legacy Local ADB | accepted | contemporaneous | D-019 | source removal / V0；V2/V3 pending |
+| 0016 | Independent Manual Client Actions | accepted | contemporaneous | D-020 | workflow source / V0；runner V2 pending |
 
 ## 6. Responsibility Boundaries
 

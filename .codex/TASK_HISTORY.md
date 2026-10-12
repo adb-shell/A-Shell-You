@@ -233,3 +233,15 @@
 - Decision / Baseline / Event：D-019 / ADR-0015；AS-BL-2026-10-12-13f792d-adb-retired-worktree；CE-20261012-T009-01。
 - Docs：当前领域/入口/Skills、Test Matrix、External Registry、ADR/Baseline、全局记忆已同步；旧集成记录标 HISTORICAL/RETIRED，未删除历史。
 - Git / build / install / device / release：none；本轮修改未提交。正式验证需求和回滚见 [任务记录](../docs/tasks/T-2026-10-12-009-remove-legacy-adb.md)。
+
+## T-2026-10-13-001：独立 Android/Windows Actions
+
+- 日期：2026-10-13；状态：completed — configuration/V0，runner V2 未执行。
+- Source：main/8662f2369a33f5286c20f9de4d640d2072175ca7；initial clean。T009 与当前 HEAD 有可解释漂移，新 local ADB 保留。
+- Authority：当前用户明确授权工作流新增/旧编排删除、平台与 ABI 选择、默认测试签名和仅 Actions 下载；没有继承 Git/build/发布权限。
+- Outcome：一个独立手动入口；native Android matrix + APK assembly；Windows build.py + portable generator；14 天成品下载/hash/provenance。删除 12 个旧 workflow 和失效 Dependabot，解除 build.sh/F-Droid 元数据依赖。
+- Verification：V0 YAML/输入/矩阵/9个直接 Action SHA、11段 Bash/1段Python AST/6段PowerShell、两份本地 shell 仅语法、diff/引用/范围核对；未实际运行产品或 CI。
+- Limits：临时 Android 测试证书跨运行不一致；Windows unsigned 且无外部 driver/helper；Pub lock/依赖可用性与 hosted runner 兼容需首次执行验证。
+- Documentation：使用说明、build/debug/security/source map、ADR/baseline/registry/test matrix、入口/Release skill/全局记忆同步。
+- Decision/Event：D-020 / ADR-0016 / CE-20261013-T001-01；STATE-20261013-001；关闭 WORK-20261013-002。
+- Git/build/sign/package/upload/release：none；仅授权旧编排删除。恢复点 8662f23；[具体任务与编译验证需求](../docs/tasks/T-2026-10-13-001-client-actions.md)。

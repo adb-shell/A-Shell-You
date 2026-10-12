@@ -171,6 +171,17 @@ Never include token、password、credential、production URL/IP、peer/device ID
 
 ## 14. Formal Verification Request
 
+### Client Actions（T-2026-10-13-001）
+
+| ID | Target / Action | Pass Oracle | Level / Environment | Status |
+|---|---|---|---|---|
+| CI-01 | dispatch android + aarch64 | 仅 ARM64 native + APK jobs；APK arm64-v8a 核心 SO 完整、apksigner 成功；Windows skipped | V2 / GitHub ubuntu-22.04 | NOT_RUN |
+| CI-02 | dispatch android + universal | 三 native jobs 成功后生成三 ABI APK；无 libadb.so；新 local ADB 的依赖保留 | V2 / GitHub ubuntu-22.04 | NOT_RUN |
+| CI-03 | dispatch windows | Android jobs skipped；EXE + 完整 ZIP、当前 Release 所有必需文件与 SHA256；无外部 driver 拼装 | V2 / GitHub windows-2022 | NOT_RUN |
+| CI-04 | dispatch both / failure / rerun | 两平台独立成功上传；一边失败不取消另一边、不上传失败成品；同 run 未过期 native artifacts 可复用；无 Release/tag/Git 写入 | V2 / 两种 hosted runner | NOT_RUN |
+
+本轮 V0 YAML/矩阵/语法/权限静态检查不升级上述状态。安装/启动与功能回归继续使用 AND-08、WIN-08、FLT-05、RST-03 等现有 cases。签名与下载说明见 [Actions 使用说明](docs/BUILD_CLIENTS_ACTIONS.md)。
+
 T005 / 2026-10-12 PC入口补充（全部NOT_RUN）：正式Windows环境从仓库根运行 `build.cmd`；确认仅一个入口、最终 `PC-Bulid/ashell.exe` 的解压清单与本次Release一致。缺外部DLL/驱动时仍能完成产物打包；缺Brotli在编译前失败；源目录越界链接被拒绝；portable Cargo失败时CMD非零、不交付旧packer；manifest成功/失败路径可恢复。WIN-03/05/06/07/08分别验证未附带组件时的功能边界、资产策略和启动行为；这些源码规则不等于测试通过。
 
 When execution is needed but not authorized, output and stop:

@@ -197,6 +197,16 @@
 
 ### 下一决定模板
 
+## D-020：独立手动客户端 Actions，产物仅供下载
+
+- 日期：2026-10-13；状态：accepted；批准者：当前用户明确请求。
+- Decision：用 build-clients.yml 替换 12 个旧 workflow，支持 android/windows/both 与 aarch64/universal。CI 自行配置工具链，不调用本地 Bash/CMD 入口；Windows 可调用 build.py/portable generate.py。
+- Artifacts：Android Release 临时测试签名，Windows unsigned EXE + ZIP；最终仅 Actions artifacts 14 天，无 Release/tag/自动 Git 写入/生产 secrets。
+- Security：direct Actions 固定 SHA、contents: read、checkout 不保留凭据，测试 key 不上传/缓存；临时签名每次变化，安装兼容限制明确。依赖/hosted image/实际构建 provenance 尚待 V2。
+- Compatibility：本地脚本解除对已删编排的版本读取，保留本地构建入口；新 local ADB/产品版本/bridge/runtime 不改。
+- Related：ADR-0016 补充 ADR-0010；T-2026-10-13-001 / CE-20261013-T001-01；AS-BL-2026-10-13-8662f23-client-actions-worktree。
+- Verification：V0；runner build/安装/发布 NOT_RUN。Rollback：未来按 8662f23 对应路径和本任务 patch 审阅恢复，不整仓重置。
+
 ```text
 ## D-NNN：标题
 - 日期：

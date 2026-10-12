@@ -20,7 +20,7 @@
 | `build.sh`, `env.sh` | PRIMARY/Android | Linux Android 环境与构建编排 |
 | `build.cmd` | PRIMARY/Windows | 当前 `C:\DevEnv` + `C:\DevTool` PC 构建 |
 | `build.py` | PRIMARY/Windows + COMPAT/other platforms | 当前PC入口调用的主编译包装，同时保留跨平台分支 |
-| `.github/workflows/` | COMPAT | 上游多平台 Actions；当前全部手动触发 |
+| `.github/workflows/build-clients.yml` | PRIMARY/CI | 独立手动 Android/Windows 构建，Actions artifacts only；V0，runner V2 pending |
 | `res/`, `appimage/`, `flatpak/`, `fastlane/` | PLATFORM | installer、driver、icons、store metadata |
 | `.info` | PRIMARY config | 跟踪的基础设施 endpoint 文件；高变更/泄露面 |
 

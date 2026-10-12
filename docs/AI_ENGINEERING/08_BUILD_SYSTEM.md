@@ -140,14 +140,15 @@ cargo build --release --features flutter
 
 ## 7. CI/CD 现状
 
-仓库的 GitHub Actions workflow 当前均只保留 `workflow_dispatch`，没有 push/PR 自动 gate。由此导致：
+2026-10-13 T001 用唯一 `.github/workflows/build-clients.yml` 替换 12 个旧上游 workflow，并删除空 submodule 对应、目标仍为 master 的 Dependabot 编排。仅 `workflow_dispatch`，选择 android/windows/both；Android 选择 aarch64/universal，默认 both + aarch64。Android native matrix 与 Windows x64 独立运行，APK 等待所选 ABI 完整。
 
-- 普通提交可能未经过格式、lint、unit test 或 platform build。
-- generated bridge 与 FFI drift 无自动检测。
-- dependency/supply-chain 检查无持续证据。
-- 发布 workflow 可见不等于已适配 AShell secrets、names 和 artifacts。
+CI 在 GitHub-hosted Ubuntu 22.04 / Windows 2022 上独立配置工具链，不运行本地 build.sh/env.sh/build.cmd 或 Android helper shell scripts。Android 直接调用 vcpkg/cargo-ndk/Flutter；Windows 调用 build.py 与 portable generate.py，只打包本次 Release。全部直接 Action 固定 SHA、contents: read、checkout 不保存凭据，没有自动 Git 写入、Release/tag/store 或生产签名 secret。
 
-恢复自动 CI 前要先最小化权限、固定 action revision、隔离 untrusted PR、清理上游发布目标，并由仓库所有者批准。
+Android Release APK 使用每次运行生成的临时测试 key，不能覆盖不同证书的安装。Windows 输出 unsigned EXE + ZIP；最终 artifacts 与 hash/provenance 保留 14 天，中间 JNI artifacts 1 天。tracked bridge 直接使用；不因删除 bridge workflow 而丢失 clean checkout 必需文件。旧 libadb.so 排除继续生效，8662f23 新增 local ADB 依赖保留。
+
+为解除旧 workflow 文件读取，build.sh 的 FRB 版本保持自身默认，vcpkg 读取 manifest baseline；历史 flutter/build_fdroid.sh 保留自身冻结版本。二者未在本轮运行，现有 Linux/Windows 本地构建入口继续保留。
+
+操作、完整版本表、签名/依赖限制见 [Actions 使用说明](../BUILD_CLIENTS_ACTIONS.md) 和 [CI baseline](../BASELINE/09_CLIENT_ACTIONS_BASELINE_2026-10-13.md)。只有 V0，GitHub runner V2 尚未执行；依然没有 push/PR 自动质量 gate、bridge drift 检测或正式发布证据。
 
 ## 8. 依赖与供应链
 

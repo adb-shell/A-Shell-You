@@ -162,6 +162,10 @@ process start
 
 ## 11. 《编译验证需求》
 
+### GitHub Actions 独立入口（2026-10-13 T001）
+
+在 GitHub Actions 手动运行 `build-clients.yml`，分别选 android+aarch64、android+universal、windows、both；环境由 workflow 配置，执行目录是 checkout 根目录。检查所选 jobs、三 ABI/单 ABI、apksigner、Windows EXE/ZIP、hash 和 Actions 下载；失败时不得出现最终成品上传。保留 run URL、commit、工具链和首次失败日志，排除测试 keystore/key.properties。当前仅 V0，四组 V2 均 NOT_RUN；下列本地构建机入口继续独立保留。详见 [使用说明](../BUILD_CLIENTS_ACTIONS.md)。
+
 本轮未执行任何下列命令。请在正式环境由项目负责人批准后执行并回传完整、已脱敏日志。
 
 ### 11.1 Rust workspace

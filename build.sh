@@ -386,14 +386,9 @@ bridge_android_files_missing() {
 }
 
 parse_bridge_tool_versions() {
-  local bridge_yml="$REPO_ROOT/.github/workflows/bridge.yml"
+  # Local build-host defaults are independent of GitHub Actions.
   BRIDGE_CARGO_EXPAND_VERSION="1.0.95"
   BRIDGE_FRB_VERSION="1.80.1"
-
-  if [[ -f "$bridge_yml" ]]; then
-    BRIDGE_CARGO_EXPAND_VERSION="$(grep -E 'CARGO_EXPAND_VERSION:' "$bridge_yml" | head -n1 | sed -E 's/.*"([^"]+)".*/\1/' || echo "1.0.95")"
-    BRIDGE_FRB_VERSION="$(grep -E 'FLUTTER_RUST_BRIDGE_VERSION:' "$bridge_yml" | head -n1 | sed -E 's/.*"([^"]+)".*/\1/' || echo "1.80.1")"
-  fi
 }
 
 guess_frb_inputs() {
@@ -527,19 +522,14 @@ target_to_libcpp_path() {
 
 # ===== vcpkg / deps =====
 sync_vcpkg_commit_if_needed() {
-  local target="$1"
-  local workflow_file="$REPO_ROOT/.github/workflows/flutter-build.yml"
+  local manifest_file="$REPO_ROOT/vcpkg.json"
   local desired_commit=""
 
   [[ -d "$VCPKG_ROOT/.git" ]] || { warn "VCPKG_ROOT 不是 git 仓库, 跳过 vcpkg commit 同步"; return 0; }
   ensure_git_safe_directory "$VCPKG_ROOT"
 
-  if [[ -f "$workflow_file" ]]; then
-    if [[ "$target" == "armv7-linux-androideabi" ]]; then
-      desired_commit="$(grep -E '^[[:space:]]*ARMV7_VCPKG_COMMIT_ID:' "$workflow_file" | head -n1 | sed -E 's/.*"([^"]+)".*/\1/' || true)"
-    else
-      desired_commit="$(grep -E '^[[:space:]]*VCPKG_COMMIT_ID:' "$workflow_file" | head -n1 | sed -E 's/.*"([^"]+)".*/\1/' || true)"
-    fi
+  if [[ -f "$manifest_file" ]]; then
+    desired_commit="$(sed -nE 's/^[[:space:]]*"baseline"[[:space:]]*:[[:space:]]*"([0-9a-f]{40})".*/\1/p' "$manifest_file" | head -n1)"
   fi
 
   [[ -n "$desired_commit" ]] || { warn "未读取到 vcpkg commit, 跳过同步"; return 0; }

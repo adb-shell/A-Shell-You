@@ -4,6 +4,7 @@
 > The upstream RustDesk README below is retained as inherited background only. Every AI or maintainer must start with `PROJECT_START_HERE.md`, then follow `.codex/AI_RULES.md` and `docs/AI_ENGINEERING/AI_TASK_EXECUTION_PROTOCOL.md`. Current domain truth lives in `docs/AI_ENGINEERING/`; the former `ENGINEERING_*` suite remains historical detail.
 
 <p align="center">
+  <a href="docs/BUILD_CLIENTS_ACTIONS.md">AShell Android / Windows builds in GitHub Actions</a><br>
   <img src="res/logo-header.svg" alt="RustDesk - Your remote desktop"><br>
   <a href="#raw-steps-to-build">Build</a> •
   <a href="#how-to-build-with-docker">Docker</a> •

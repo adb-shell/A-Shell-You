@@ -327,3 +327,19 @@ Mode：`append-only logical persisted-change events`
 - `flutter/lib/mobile/pages/adb_page.dart`
 - `flutter/lib/mobile/pages/home_page.dart`
 - `libs/hbb_common/protos/message.proto`
+
+## CE-20261013-T001-01：独立客户端 Actions 与旧编排清理
+
+- Date：2026-10-13（Asia/Tokyo）；Task：T-2026-10-13-001；Actor：Codex / ashell-release-engineer。
+- Authority：当前用户明确要求新增独立Android/Windows编排、删除无用GitHub编排、平台/ABI选择、默认测试签名与Actions-only下载；不继承历史Git/build权限。
+- Source：main/8662f2369a33f5286c20f9de4d640d2072175ca7；initial clean；当前HEAD新的local ADB保持。
+- Added：.github/workflows/build-clients.yml、docs/BUILD_CLIENTS_ACTIONS.md、docs/ADR/0016-independent-client-actions.md、docs/BASELINE/09_CLIENT_ACTIONS_BASELINE_2026-10-13.md、docs/tasks/T-2026-10-13-001-client-actions.md。
+- Deleted：.github/workflows下bridge.yml、ci.yml、clear-cache.yml、fdroid.yml、flutter-build.yml、flutter-ci.yml、flutter-nightly.yml、flutter-tag.yml、playground.yml、third-party-RustDeskTempTopMostWindow.yml、update_submodules.yml、winget.yml；.github/dependabot.yml。
+- Compatibility edits：build.sh、flutter/build_fdroid.sh，仅解除读取已删workflow元数据，版本沿用；build.cmd和产品/生成源码/manifest/锁文件保持。
+- Documentation：AGENTS.md、PROJECT_START_HERE.md、README.md、TEST_MATRIX.md、EXTERNAL_ASSET_REGISTRY.md、docs/AI_ENGINEERING/02_SOURCE_MAP.md、08_BUILD_SYSTEM.md、09_DEBUG_SYSTEM.md、10_SECURITY_MODEL.md、docs/ADR/README.md与0010 amendment、docs/BASELINE/BASELINE_INDEX.md、.agents/skills/ashell-release-engineer/SKILL.md。
+- Memory：.codex/PROJECT_STATE.md、PROJECT_MEMORY.md、CURRENT_WORK.md、TASK_HISTORY.md、CHANGELOG_AI.md、DECISION_LOG.md及本事件。
+- Delta：唯一手动工作流；platform both/android/windows，Android aarch64/universal；独立native matrix/Windows job；临时测试APK与unsigned Windows EXE/ZIP仅上传Actions，最终14天，中间1天；无自动Git/Release/production secrets。
+- Verification：V0 YAML/矩阵/9种Action SHA、11段Bash/1段Python AST/6段PowerShell与两份本地shell语法、引用/路径/权限/diff；runner V2 NOT_RUN。
+- Decision/Baseline/State：D-020 / ADR-0016；AS-BL-2026-10-13-8662f23-client-actions-worktree；STATE-20261013-001 / WORK-20261013-002。
+- Actual actions：删除13份旧编排；无Git写入、产品build/test/analyze/codegen、实际签名/打包、远端dispatch/上传/发布；全部变更未提交。
+- Recovery：按8662f23对应路径和本任务patch审阅恢复，不整仓reset或重写历史。运行签名/依赖/安装限制见任务与使用说明。

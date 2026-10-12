@@ -52,6 +52,7 @@ Record commit, branch, dirty state, version, platform/channel, source provenance
 
 ### 2. Select the canonical path
 
+- GitHub Actions: `.github/workflows/build-clients.yml` owns an independent hosted-runner environment, manual Android/Windows selection and test artifacts only. It does not invoke the local Bash/CMD entries below. See `docs/BUILD_CLIENTS_ACTIONS.md`; writing a workflow does not authorize dispatching it.
 - Android: repository-root `build.sh` on the formal Linux toolchain; modes 1/2 have different ABI outputs.
 - Windows: repository-root `build.cmd` on the `C:\DevEnv`/`C:\DevTool` environment.
 - Treat `PC-Build.md` and generic `build.py` branches as historical/contextual until verified.

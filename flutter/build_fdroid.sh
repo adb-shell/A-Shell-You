@@ -128,51 +128,23 @@ prebuild)
 	# prebuild: patch sources and do other stuff before the build
 
 	#
-	# Extract required versions for NDK, Rust, Flutter from
-	# '.github/workflows/flutter-build.yml'
+	# Historical F-Droid toolchain snapshot. Independent of client Actions.
 	#
 
-	CARGO_NDK_VERSION="$(yq -r \
-		.env.CARGO_NDK_VERSION \
-		.github/workflows/flutter-build.yml)"
+	CARGO_NDK_VERSION="3.1.2"
 
 	# Flutter used to compile main Rustdesk library
 
-	FLUTTER_VERSION="$(yq -r \
-		.env.ANDROID_FLUTTER_VERSION \
-		.github/workflows/flutter-build.yml)"
-
-	if [ -z "${FLUTTER_VERSION}" ]; then
-		FLUTTER_VERSION="$(yq -r \
-			.env.FLUTTER_VERSION \
-			.github/workflows/flutter-build.yml)"
-	fi
+	FLUTTER_VERSION="3.24.5"
 
 	# Flutter used to compile Flutter<->Rust bridge files
 
-	CARGO_EXPAND_VERSION="$(yq -r \
-		.env.CARGO_EXPAND_VERSION \
-		.github/workflows/bridge.yml)"
-
-	FLUTTER_BRIDGE_VERSION="$(yq -r \
-		.env.FLUTTER_VERSION \
-		.github/workflows/bridge.yml)"
-
-	FLUTTER_RUST_BRIDGE_VERSION="$(yq -r \
-		.env.FLUTTER_RUST_BRIDGE_VERSION \
-		.github/workflows/bridge.yml)"
-
-	NDK_VERSION="$(yq -r \
-		.env.NDK_VERSION \
-		.github/workflows/flutter-build.yml)"
-
-	RUST_VERSION="$(yq -r \
-		.env.RUST_VERSION \
-		.github/workflows/flutter-build.yml)"
-
-	VCPKG_COMMIT_ID="$(yq -r \
-		.env.VCPKG_COMMIT_ID \
-		.github/workflows/flutter-build.yml)"
+	CARGO_EXPAND_VERSION="1.0.95"
+	FLUTTER_BRIDGE_VERSION="3.22.3"
+	FLUTTER_RUST_BRIDGE_VERSION="1.80.1"
+	NDK_VERSION="r27c"
+	RUST_VERSION="1.75"
+	VCPKG_COMMIT_ID="6f29f12e82a8293156836ad81cc9bf5af41fe836"
 
 	if [ -z "${CARGO_NDK_VERSION}" ] || [ -z "${FLUTTER_VERSION}" ] ||
 		[ -z "${FLUTTER_BRIDGE_VERSION}" ] ||
@@ -393,25 +365,13 @@ build)
 	set -e
 
 	#
-	# Extract required versions for NDK, Rust, Flutter from
-	# '.github/workflows/flutter-build.yml'
+	# Keep the same frozen versions as the historical prebuild stage above.
 	#
 
 	# Flutter used to compile main Rustdesk library
 
-	FLUTTER_VERSION="$(yq -r \
-		.env.ANDROID_FLUTTER_VERSION \
-		.github/workflows/flutter-build.yml)"
-
-	if [ -z "${FLUTTER_VERSION}" ]; then
-		FLUTTER_VERSION="$(yq -r \
-			.env.FLUTTER_VERSION \
-			.github/workflows/flutter-build.yml)"
-	fi
-
-	NDK_VERSION="$(yq -r \
-		.env.NDK_VERSION \
-		.github/workflows/flutter-build.yml)"
+	FLUTTER_VERSION="3.24.5"
+	NDK_VERSION="r27c"
 
 	# Map NDK version to revision
 
