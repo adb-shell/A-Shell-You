@@ -18,6 +18,7 @@ class RemoteAdbController extends ChangeNotifier {
   bool _hasResult = false;
   Timer? _timer;
   String message = '正在获取 Android ADB 状态…';
+  String statusError = '';
   String output = '';
   int _refreshEpoch = 0;
 
@@ -52,21 +53,28 @@ class RemoteAdbController extends ChangeNotifier {
     if (start['ok'] == false) throw Exception(start['message'] ?? 'ADB 请求失败。');
     final id = start['id'] as String?;
     if (id == null || id.isEmpty) throw Exception('远程 ADB 请求无效。');
-    // Android accepts at most 8 operations; QR pairing waits at most 90s per item.
-    final deadline = DateTime.now().add(Duration(seconds: method == 'status' ? 8 : 740));
+    // Eight serialized operations of at most 35s, plus a reply margin.
+    final deadline = DateTime.now().add(Duration(
+        seconds: method == 'status' || method == 'cancel' ? 8 : 300));
     try {
       while (!_disposed && DateTime.now().isBefore(deadline)) {
         await Future<void>.delayed(const Duration(milliseconds: 200));
         if (_disposed) break;
-        if (stale && method != 'status' && method != 'cancel') {
-          throw Exception('与 Android 的 ADB 状态通信已中断，执行结果尚未确认。恢复连接后请先刷新状态；不会自动重复执行命令。');
-        }
+        // Status and execution have independent replies. A lost status probe must
+        // not orphan a queued command or discard a valid command result.
         final response = await bind.sessionGetCommon(sessionId: sessionId,
             key: 'remote_adb_poll', param: id);
         if (response == null) throw Exception('ADB 请求已失效，请刷新状态。');
         if (response.isNotEmpty) return Map<String, dynamic>.from(jsonDecode(response) as Map);
       }
-      throw Exception('Android 未返回 ADB 状态或结果。请确认手机和 PC 都已更新，并保持远控连接；可刷新重试。命令不会自动重放。');
+      throw Exception('Android 未返回 ADB 状态或结果，结果尚未确认。请保持远控连接并刷新状态；命令不会自动重放。');
+    } catch (_) {
+      if (!_disposed && method != 'status' && method != 'cancel') {
+        // Wait for the cancellation request before allowing this window to submit
+        // another operation, so a delayed owner cancellation cannot cancel it.
+        try { await _request('cancel'); } catch (_) { }
+      }
+      rethrow;
     } finally {
       await bind.sessionGetCommon(sessionId: sessionId, key: 'remote_adb_forget', param: id)
           .catchError((Object _) => null);
@@ -77,6 +85,7 @@ class RemoteAdbController extends ChangeNotifier {
     if (response['state'] is Map) {
       state = Map<String, dynamic>.from(response['state'] as Map);
       stale = false;
+      statusError = '';
       controlAllowed = response['controlAllowed'] != false;
     }
   }
@@ -84,17 +93,24 @@ class RemoteAdbController extends ChangeNotifier {
   Future<void> refresh() async {
     if (_disposed || refreshing) return;
     refreshing = true;
+    _notify();
     final epoch = _refreshEpoch;
     try {
       final response = await _request('status');
       if (_disposed || epoch != _refreshEpoch) return;
-      _apply(response);
       if (response['ok'] != true) throw Exception(response['message'] ?? '无法读取 ADB 状态。');
+      final remoteState = response['state'];
+      if (remoteState is! Map) throw Exception('Android 返回的 ADB 状态无效，请更新客户端后重试。');
+      final changed = stale || state['paired'] != remoteState['paired']
+          || state['connected'] != remoteState['connected'];
+      _apply(response);
+      if (changed && !busy) _hasResult = false;
       if (!busy && !_hasResult) message = supported ? summary : '远端不支持此无线调试模块（需要 Android 11+）。';
     } catch (error) {
       if (!_disposed && epoch == _refreshEpoch) {
         stale = true;
-        if (!busy) { _hasResult = false; message = _errorText(error); }
+        statusError = _errorText(error);
+        if (!busy) _hasResult = false;
       }
     } finally {
       refreshing = false;
@@ -104,6 +120,11 @@ class RemoteAdbController extends ChangeNotifier {
 
   Future<Map<String, dynamic>?> run(String method, [Map<String, dynamic> args = const {}]) async {
     if (_disposed || busy) return null;
+    if (!supported || !controlAllowed) {
+      message = !controlAllowed ? '当前为只读会话，不能操作 ADB。' : '请先刷新并确认 Android ADB 状态。';
+      _notify();
+      return null;
+    }
     busy = true;
     _hasResult = true;
     _refreshEpoch++;

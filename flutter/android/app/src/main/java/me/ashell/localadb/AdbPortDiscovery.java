@@ -46,9 +46,9 @@ final class AdbPortDiscovery {
         }
     }
 
-    // required: pair, connect or both. QR pairs additionally match an ephemeral service name.
+    // required: pair, connect or both.
     static Ports find(Context context, AtomicBoolean cancelled, String required,
-                      String serviceName, long waitMillis) throws InterruptedException {
+                      long waitMillis) throws InterruptedException {
         NsdManager nsd = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
         if (nsd == null) return new Ports(0, 0, false);
         class Scan {
@@ -63,7 +63,6 @@ final class AdbPortDiscovery {
             boolean pairing(NsdServiceInfo info) { return info.getServiceType().contains("_adb-tls-pairing."); }
             synchronized void add(NsdServiceInfo info) {
                 if (closed || cancelled.get() || present.size() >= 64 || pending.size() >= 32) return;
-                if (pairing(info) && !serviceName.isEmpty() && !serviceName.equals(info.getServiceName())) return;
                 if (present.add(key(info))) pending.add(info);
                 next();
             }
@@ -72,6 +71,9 @@ final class AdbPortDiscovery {
                 present.remove(key);
                 pair.remove(key);
                 connect.remove(key);
+                retries.remove(key);
+                pending.removeIf(value -> key(value).equals(key));
+                notifyAll();
             }
             synchronized void next() {
                 if (closed || cancelled.get() || resolving || pending.isEmpty()) return;
@@ -123,6 +125,7 @@ final class AdbPortDiscovery {
                         new HashSet<>(pair.values()).size() > 1 || new HashSet<>(connect.values()).size() > 1);
             }
             synchronized boolean ready() {
+                if (resolving || !pending.isEmpty()) return false;
                 Ports p = result();
                 return "pair".equals(required) ? p.pairPort != 0
                         : "connect".equals(required) ? p.connectPort != 0

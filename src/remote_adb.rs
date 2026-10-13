@@ -5,6 +5,7 @@ use serde_json::{json, Value};
 
 const MAX_REQUEST: usize = 32768;
 const MAX_REPLY: usize = 524288; // JSON escaping of a bounded 64 KiB shell result.
+const PENDING_TTL_SECS: u64 = 310; // Eight operations of at most 35s, plus reply margin.
 
 fn message(value: String) -> Message {
     let mut misc = Misc::new();
@@ -37,7 +38,7 @@ mod pc {
 
     pub fn controller(session_id: Uuid, key: &str, param: &str) -> Option<String> {
         let mut pending = PENDING.lock().ok()?;
-        pending.retain(|_, p| p.since.elapsed() < Duration::from_secs(750));
+        pending.retain(|_, p| p.since.elapsed() < Duration::from_secs(PENDING_TTL_SECS));
         if key == "remote_adb_poll" || key == "remote_adb_forget" {
             let p = pending.get(param)?;
             if p.session != session_id { return None; }
@@ -144,7 +145,7 @@ pub mod android {
         let token = uuid::Uuid::new_v4().to_string();
         {
             let Ok(mut replies) = REPLIES.lock() else { return Some(error(id, "busy", "ADB 模块忙。")); };
-            replies.retain(|_, r| r.since.elapsed() < Duration::from_secs(750));
+            replies.retain(|_, r| r.since.elapsed() < Duration::from_secs(PENDING_TTL_SECS));
             if replies.len() >= 64 || replies.values().filter(|r| r.owner == owner).count() >= 10 {
                 return Some(error(id, "busy", "ADB 请求过多，请稍后重试。"));
             }

@@ -24,6 +24,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
   LocalAdbStatus _status = const LocalAdbStatus();
   bool _loaded = false, _busy = false, _polling = false, _foreground = true;
   bool _automatic = true, _error = false;
+  bool _stale = true;
   String _message = '正在读取 ADB 状态…', _output = '';
   Timer? _timer;
 
@@ -49,16 +50,25 @@ class _LocalAdbPageState extends State<LocalAdbPage>
       final status = await _bridge.status();
       if (!mounted) return;
       setState(() {
-        if (!_loaded) _message = status.supported
-            ? '开启无线调试后，只需填写配对码，即可自动配对并连接。'
-            : '无线配对需要 Android 11 或以上版本。';
+        final changed = _status.paired != status.paired || _status.connected != status.connected;
+        if (!_loaded) {
+          _message = status.supported
+              ? '开启无线调试后，只需填写配对码，即可自动配对并连接。'
+              : '无线配对需要 Android 11 或以上版本。';
+          _error = false;
+        } else if (!_busy && (changed || _stale) && (!_error || _stale)) {
+          _message = status.connected ? 'ADB 已连接，Shell 已验证。'
+              : status.paired ? '已有配对记录，可直接连接 ADB。' : '当前没有本应用的配对记录。';
+          _error = false;
+        }
         _status = status;
         _loaded = true;
+        _stale = false;
       });
     } on PlatformException catch (e) {
-      if (mounted) _showError(e.message ?? '无法读取 ADB 状态。');
+      if (mounted) { _stale = true; _showError(e.message ?? '无法读取 ADB 状态。'); }
     } on MissingPluginException {
-      if (mounted) _showError('ADB 模块不可用，请更新 Android 安装包。');
+      if (mounted) { _stale = true; _showError('ADB 模块不可用，请更新 Android 安装包。'); }
     } finally { _polling = false; }
   }
 
@@ -75,7 +85,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
   }
 
   Future<void> _perform(String message, Future<String> Function() action) async {
-    if (_busy || _status.busy) return;
+    if (_busy || _status.busy || _stale || !_status.supported) return;
     FocusScope.of(context).unfocus();
     setState(() { _busy = true; _error = false; _message = message; });
     try {
@@ -183,7 +193,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
   @override Widget build(BuildContext context) {
     super.build(context);
     final busy = _busy || _status.busy;
-    final enabled = _loaded && _status.supported && !busy;
+    final enabled = _loaded && !_stale && _status.supported && !busy;
     return ListView(padding: const EdgeInsets.all(16), children: [
       Row(children: [
         const Icon(Icons.adb, size: 28), const SizedBox(width: 10),
@@ -191,7 +201,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
         IconButton(tooltip: '刷新状态', onPressed: _polling ? null : _refresh, icon: const Icon(Icons.refresh)),
       ]),
       const SizedBox(height: 10),
-      _card(_status.connected ? '已连接 · Shell 已验证' : _status.paired ? '已配对 · 等待连接' : '尚未配对', [
+      _card(_stale ? '状态未确认' : _status.connected ? '已连接 · Shell 已验证' : _status.paired ? '已配对 · 等待连接' : '尚未配对', [
         const Text('配对记录和连接由本手机保存，所有 PC 共用。每 3 秒同步状态。'),
         if (_status.connectPort != 0) Text('上次成功连接端口：' + _status.connectPort.toString()),
         const SizedBox(height: 8),
@@ -229,8 +239,6 @@ class _LocalAdbPageState extends State<LocalAdbPage>
         ElevatedButton.icon(onPressed: enabled ? _pair : null, icon: const Icon(Icons.link),
             label: const Text('配对并连接 ADB')),
         OutlinedButton(onPressed: enabled ? _connect : null, child: const Text('我已配对，连接并验证 Shell')),
-        const SizedBox(height: 8),
-        const Text('免手输码：在 PC 的 ADB 配对窗口选择“扫码免输码”，再用本机系统无线调试的二维码配对功能扫码。'),
       ]),
       _card('ADB Shell', [
         TextField(controller: _command, enabled: !busy, minLines: 2, maxLines: 5,

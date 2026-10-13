@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../common.dart';
 import 'remote_adb_controller.dart';
@@ -35,7 +34,6 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   late final RemoteAdbController adb = RemoteAdbController(widget.sessionId);
   String mode = 'auto';
   String validation = '';
-  String? qrData;
   Offset offset = Offset.zero;
 
   @override void initState() {
@@ -47,13 +45,12 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
     await adb.watch(true);
     if (mounted && widget.action == 'pair' && mode == 'auto'
         && pairPort.text.isEmpty && connectPort.text.isEmpty
-        && adb.ready && adb.discoverySupported) await _scan();
+        && adb.ready && !adb.connected && adb.discoverySupported) await _scan();
   }
 
   @override void dispose() {
     adb.dispose();
     pairPort.dispose(); pairCode.dispose(); connectPort.dispose(); command.dispose();
-    qrData = null;
     super.dispose();
   }
 
@@ -90,19 +87,6 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
     adb.run('pairConnect', {'port': port, 'connectPort': connection, 'code': code});
   }
 
-  Future<void> _qr() async {
-    final random = Random.secure();
-    final name = 'ashell-' + List.generate(16,
-        (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
-    final code = random.nextInt(1000000).toString().padLeft(6, '0');
-    setState(() {
-      validation = '';
-      qrData = 'WIFI:T:ADB;S:' + name + ';P:' + code + ';;';
-    });
-    await adb.run('pairConnect', {'port': 0, 'connectPort': 0, 'code': code, 'serviceName': name});
-    if (mounted) setState(() => qrData = null);
-  }
-
   Widget _portInput(TextEditingController value, String label) => TextField(
     controller: value, enabled: !adb.busy, readOnly: mode == 'auto',
     keyboardType: TextInputType.number, maxLength: 5,
@@ -114,44 +98,35 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
     const Text('手机开启“无线调试”。使用配对码时，请保持系统配对码窗口打开。'),
     const SizedBox(height: 10),
     Wrap(spacing: 8, runSpacing: 8, children: [
-      for (final item in const {'auto': '只填配对码', 'manual': '手动端口', 'qr': '扫码免输码'}.entries)
+      for (final item in const {'auto': '只填配对码', 'manual': '手动端口'}.entries)
         ChoiceChip(label: Text(item.value), selected: mode == item.key,
             onSelected: adb.busy ? null : (_) => setState(() { mode = item.key; validation = ''; })),
     ]),
     const SizedBox(height: 16),
     if (!adb.stale && !adb.discoverySupported)
       const Text('手机 ADB 模块版本较旧，请先更新 Android 安装包以使用端口扫描和一键配对。'),
-    if (mode == 'qr') ...[
-      const Text('手机在无线调试中选择“使用二维码配对设备”，扫描下方 PC 二维码。无需输入端口或六位码。'),
-      const SizedBox(height: 12),
-      if (qrData != null)
-        Center(child: QrImageView(data: qrData!, size: 220, backgroundColor: Colors.white)),
-      if (qrData == null)
-        OutlinedButton.icon(onPressed: adb.ready && adb.discoverySupported ? _qr : null,
-            icon: const Icon(Icons.qr_code), label: const Text('生成二维码并等待手机扫码')),
-      if (qrData != null) const Center(child: Text('正在等待扫码；最多等待 60 秒。')),
-    ] else ...[
-      Row(children: [
-        Expanded(child: _portInput(pairPort, '配对端口（留空自动）')),
-        const SizedBox(width: 12),
-        Expanded(child: _portInput(connectPort, '连接端口（留空自动）')),
-      ]),
-      Align(alignment: Alignment.centerRight, child: TextButton.icon(
-          onPressed: adb.ready && adb.discoverySupported ? _scan : null,
-          icon: const Icon(Icons.radar, size: 18), label: const Text('扫描并填充端口'))),
-      if (mode == 'auto') const Padding(padding: EdgeInsets.only(bottom: 10),
-          child: Text('端口由手机实时发现；扫描结果供参考。未发现时可切换手动端口。')),
-      TextField(controller: pairCode, enabled: !adb.busy, obscureText: true, maxLength: 6,
-          autocorrect: false, enableSuggestions: false, keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          onSubmitted: (_) { if (adb.ready && adb.discoverySupported) _pair(); },
-          decoration: const InputDecoration(labelText: '6 位配对码', border: OutlineInputBorder())),
-      ElevatedButton.icon(onPressed: adb.ready && adb.discoverySupported ? _pair : null,
-          icon: const Icon(Icons.link), label: const Text('配对并连接 ADB')),
-    ],
+    Row(children: [
+      Expanded(child: _portInput(pairPort, '配对端口（留空自动）')),
+      const SizedBox(width: 12),
+      Expanded(child: _portInput(connectPort, '连接端口（留空自动）')),
+    ]),
+    Align(alignment: Alignment.centerRight, child: TextButton.icon(
+        onPressed: adb.ready && adb.discoverySupported ? _scan : null,
+        icon: const Icon(Icons.radar, size: 18), label: const Text('扫描并填充端口'))),
+    if (mode == 'auto') const Padding(padding: EdgeInsets.only(bottom: 10),
+        child: Text('端口由手机实时发现；扫描结果供参考。未发现时可切换手动端口。')),
+    TextField(controller: pairCode, enabled: !adb.busy, obscureText: true, maxLength: 6,
+        autocorrect: false, enableSuggestions: false, keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        onSubmitted: (_) { if (adb.ready && adb.discoverySupported) _pair(); },
+        decoration: const InputDecoration(labelText: '6 位配对码', border: OutlineInputBorder())),
+    ElevatedButton.icon(onPressed: adb.ready && adb.discoverySupported ? _pair : null,
+        icon: const Icon(Icons.link), label: const Text('配对并连接 ADB')),
     const SizedBox(height: 12),
     const Divider(),
-    Text(adb.paired ? '手机已有本应用配对记录，可直接连接。' : '以前已配对过？可以尝试直接连接，无需重复输入配对码。'),
+    Text(adb.stale ? '正在确认手机配对状态，请刷新或等待状态同步。'
+        : adb.paired ? '手机已有本应用配对记录，可直接连接。'
+        : '以前已配对过？可以尝试直接连接，无需重复输入配对码。'),
     const SizedBox(height: 8),
     OutlinedButton.icon(onPressed: adb.ready ? () {
       final port = mode == 'manual' ? _port(connectPort) : 0;
@@ -202,7 +177,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
             child: const Text('确认断开 ADB')),
       ];
       default: return [
-        Text('配对记录：' + (adb.paired ? '已保存' : '无记录')),
+        Text('配对记录：' + (adb.stale ? '状态未确认' : adb.paired ? '已保存' : '无记录')),
         Text('Shell 状态：' + (adb.connected ? '连接并验证成功' : '尚未连接或状态失效')),
         Text('上次成功连接端口：' + (adb.state['connectPort'] ?? 0).toString()),
         const SizedBox(height: 12),
@@ -255,6 +230,8 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
                   Text((adb.state['phase'] ?? adb.state['operation'] ?? '处理中').toString()
                       + ' · 排队 ' + (adb.state['queued'] ?? 0).toString()),
                 SelectableText(adb.message),
+                if (adb.statusError.isNotEmpty) SelectableText(adb.statusError,
+                    style: TextStyle(color: Theme.of(context).colorScheme.error)),
                 if (validation.isNotEmpty) Text(validation, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                 if (adb.busy || adb.refreshing) const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8), child: LinearProgressIndicator()),

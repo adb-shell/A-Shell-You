@@ -47,9 +47,17 @@ public final class LocalAdbPlugin implements FlutterPlugin, ActivityAware, Metho
             return;
         }
         Map<String, Object> args = new HashMap<>();
-        for (String key : new String[]{"port", "connectPort", "serviceName", "code", "command"}) {
-            Object value = call.argument(key);
-            if (value != null) args.put(key, value);
+        if (call.arguments instanceof Map) {
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) call.arguments).entrySet()) {
+                if (!(entry.getKey() instanceof String)) {
+                    result.error("invalid", "无效 ADB 参数。", null);
+                    return;
+                }
+                args.put((String) entry.getKey(), entry.getValue());
+            }
+        } else if (call.arguments != null) {
+            result.error("invalid", "无效 ADB 参数。", null);
+            return;
         }
         manager.execute(owner, call.method, args, new LocalAdbManager.Reply() {
             @Override public void success(Object value) { if (attached) result.success(value); }
