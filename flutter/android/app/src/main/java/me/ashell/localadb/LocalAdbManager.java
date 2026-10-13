@@ -57,11 +57,12 @@ public final class LocalAdbManager {
     // Independent JNI entry; no long-running video operation occupies the shell queue.
     public void controlMirror(String action) {
         main.post(() -> {
-            if ("start".equals(action) || "screenshot".equals(action)) {
+            if ("start".equals(action) || "screenshot".equals(action) || "layout".equals(action)) {
                 if (current != null || !queue.isEmpty() || !client.isConnected()) {
                     mirror.unavailable();
                 } else {
-                    mirror.start(records.getInt("connectPort", 0), "screenshot".equals(action));
+                    mirror.start(records.getInt("connectPort", 0), "layout".equals(action) ? "layout"
+                            : "screenshot".equals(action) ? "jpeg" : "h264");
                 }
             } else if ("stop".equals(action)) mirror.stop("");
             else if ("black_on".equals(action)) privacy.start(records.getInt("connectPort", 0));

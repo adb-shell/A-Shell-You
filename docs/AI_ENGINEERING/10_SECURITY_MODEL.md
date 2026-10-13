@@ -1,5 +1,7 @@
 # AShell 安全模型 / Security Model
 
+2026-10-14 T004：ADB节点穿透只经原字段41认证/控制gate触发固定APK helper，不接收脚本；UiAutomation必须DONT_SUPPRESS，不改原无障碍。节点/图像仅内存，有数量/深度/尺寸/包大小/租约限制；密码节点遮盖。只标记自身黑色图层为trusted，未关闭全局遮挡防护。详见[当前ADB合同](14_ADB_MIRROR.md)/ADR0024；V0，平台注入和租约失效仍待V3/V4。
+
 2026-10-14 T002：新screenshot动作沿用字段41认证普通会话/控制权限gate；命令固定`screencap -p`，不接受peer路径或命令，不触碰原采集。PNG/JPEG/尺寸/超时均有上限，无截图落盘；只向声明能力的PC发送JPEG。系统保护内容仍受Android限制，不承诺绕过FLAG_SECURE。详见[当前合同](14_ADB_MIRROR.md)及ADR-0022；V0自审，V2—V4待验。
 
 接管基线：2026-07-12  

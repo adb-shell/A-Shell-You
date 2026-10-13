@@ -33,15 +33,15 @@ final class LocalAdbMirror {
     private Run active;
     private long generation;
     private boolean nativeReady;
-    private boolean screenshotMode;
+    private String mode = "h264";
     private int pendingPort;
-    private boolean pendingScreenshot;
+    private String pendingMode;
     private String phase = "idle";
 
     private static native void register(LocalAdbManager manager);
-    private static native void state(long generation, String phase, String error, boolean screenshot);
+    private static native void state(long generation, String phase, String error, String format);
     private static native void frame(long generation, int width, int height,
-                                     boolean config, boolean keyframe, byte[] data, boolean screenshot);
+                                     boolean config, boolean keyframe, byte[] data, boolean screenshot, int sourceWidth, int sourceHeight);
 
     LocalAdbMirror(Context context, ShellReady shellReady) {
         this.context = context.getApplicationContext();
@@ -60,19 +60,21 @@ final class LocalAdbMirror {
         publish(active == null ? "error" : phase, "请先完成 ADB 连接并验证 Shell，等待当前 ADB 操作结束。");
     }
 
-    synchronized void start(int port, boolean screenshot) {
+    synchronized void start(int port, String mode) {
         if (!nativeReady) return;
         if (!shellReady.get() || port <= 0 || port > 65535) { unavailable(); return; }
         if (active != null) {
-            if (!active.cancelled.get() && active.screenshot == screenshot) { publish(phase, ""); return; }
+            if (!active.cancelled.get() && active.mode.equals(mode)) { publish(phase, ""); return; }
             pendingPort = port;
-            pendingScreenshot = screenshot;
+            pendingMode = mode;
             stopCurrent("");
             return;
         }
-        screenshotMode = screenshot;
+        this.mode = mode;
         generation++;
-        Run run = new Run(generation, port, screenshot);
+        Run run;
+        try { run = new Run(generation, port, mode); }
+        catch (RuntimeException e) { publish("error", "无法读取安卓屏幕尺寸，请稍后重试。"); return; }
         active = run;
         publish("starting", "");
         run.watchdog = guard.scheduleWithFixedDelay(() -> checkHealth(run), 1, 1, TimeUnit.SECONDS);
@@ -107,11 +109,19 @@ final class LocalAdbMirror {
         if (!shellReady.get()) stop("ADB Shell 已断开，投屏已停止。");
         else if (SystemClock.elapsedRealtime() - active.lastPacket > 20000)
             stop("ADB 投屏启动或画面接收超时，请重试。");
+        else if ("h264".equals(run.mode)) {
+            try {
+                if (run.profile.maxSize() != AdbCaptureProfile.current(context).maxSize()) {
+                    // Ordinary capture recalculates its integer divisor on rotation; do the same independently.
+                    pendingPort = run.port; pendingMode = run.mode; stopCurrent("");
+                }
+            } catch (RuntimeException e) { stop("屏幕尺寸读取失败，请重新开启 ADB 画面。"); }
+        }
     }
 
     private void publish(String phase, String error) {
         this.phase = phase;
-        if (nativeReady) state(generation, phase, error, screenshotMode);
+        if (nativeReady) state(generation, phase, error, mode);
     }
 
     private synchronized void finish(Run run) {
@@ -121,16 +131,17 @@ final class LocalAdbMirror {
         publish(run.failure.isEmpty() ? "idle" : "error", run.failure);
         if (pendingPort > 0) {
             int port = pendingPort;
-            boolean screenshot = pendingScreenshot;
+            String mode = pendingMode;
             pendingPort = 0;
-            start(port, screenshot);
+            start(port, mode);
         }
     }
 
     private void capture(Run run) {
         try {
             run.client.connect(run.port, run.cancelled);
-            if (run.screenshot) { captureScreenshots(run); return; }
+            if (!"h264".equals(run.mode)) { captureScreenshots(run); return; }
+            int[] encoding = run.profile.encoding();
             String scid = String.format(Locale.US, "%08x", new SecureRandom().nextInt() & 0x7fffffff);
             // One bounded module cache: an old EXIT trap must never remove a replacement's jar.
             String path = "/data/local/tmp/ashell-scrcpy-5.0.1.jar";
@@ -138,7 +149,8 @@ final class LocalAdbMirror {
             // All arguments are fixed or generated locally. No peer-controlled shell interpolation.
             String command = "CLASSPATH=" + path + " app_process / com.genymobile.scrcpy.Server 5.0.1"
                     + " scid=" + scid + " tunnel_forward=true audio=false control=false"
-                    + " video_codec=h264 max_size=1280 max_fps=20 video_bit_rate=2000000"
+                    + " video_codec=h264 max_size=" + run.profile.maxSize() + " max_fps=" + encoding[1]
+                    + " video_bit_rate=" + encoding[0]
                     + " video_codec_options=i-frame-interval=1,repeat-previous-frame-after:long=100000"
                     + " send_device_meta=false send_dummy_byte=false power_on=false"
                     + " cleanup=true log_level=error";
@@ -162,8 +174,9 @@ final class LocalAdbMirror {
                 finally { output.interrupt(); }
             }
         } catch (Exception | LinkageError e) {
-            if (!run.cancelled.get()) run.failure = run.screenshot
-                    ? "ADB 系统截图失败，请确认无线调试及 Shell 连接。系统保护内容仍受截图限制。"
+            if (!run.cancelled.get()) run.failure = "layout".equals(run.mode)
+                    ? "ADB 穿透启动或读取失败；设备可能不支持独立界面节点读取，或已有其他 UI 自动化占用。"
+                    : "jpeg".equals(run.mode) ? "ADB 系统截图失败，请确认无线调试及 Shell 连接。系统保护内容仍受截图限制。"
                     : "ADB 投屏失败，请确认无线调试仍开启并重新连接。设备编码器可能不支持当前采集。";
         } catch (OutOfMemoryError e) {
             run.failure = "ADB 画面内存不足，已停止本次采集。";
@@ -177,16 +190,25 @@ final class LocalAdbMirror {
 
     private void captureScreenshots(Run run) throws Exception {
         boolean streaming = false;
-        while (!run.cancelled.get()) {
+        byte[] previous = null;
+        long lastSent = 0;
+        try (LocalAdbLayout layout = "layout".equals(run.mode) ? new LocalAdbLayout(context, run.client, run.cancelled) : null) {
+          while (!run.cancelled.get()) {
             long started = SystemClock.elapsedRealtime();
-            LocalAdbScreenshot.Frame screenshot = LocalAdbScreenshot.capture(run.client, run.cancelled);
+            LocalAdbScreenshot.Frame screenshot = layout == null ? LocalAdbScreenshot.capture(run.client, run.cancelled) : layout.read();
             synchronized (this) {
                 if (active != run || run.cancelled.get()) return;
                 run.lastPacket = SystemClock.elapsedRealtime();
                 if (!streaming) { publish("streaming", ""); streaming = true; }
-                frame(run.id, screenshot.width, screenshot.height, false, true, screenshot.jpeg, true);
+                // Static screens need no repeated payload; a one-second key frame admits new viewers.
+                if (!java.util.Arrays.equals(previous, screenshot.jpeg) || started - lastSent >= 1000) {
+                    frame(run.id, screenshot.width, screenshot.height, false, true, screenshot.jpeg, true,
+                            screenshot.sourceWidth, screenshot.sourceHeight);
+                    previous = screenshot.jpeg; lastSent = started;
+                }
             }
-            Thread.sleep(Math.max(1, 500 - (SystemClock.elapsedRealtime() - started)));
+            if (layout == null) Thread.sleep(Math.max(1, AdbCaptureProfile.FRAME_INTERVAL_MS - (SystemClock.elapsedRealtime() - started)));
+          }
         }
     }
 
@@ -239,7 +261,9 @@ final class LocalAdbMirror {
             synchronized (this) {
                 if (active != run || run.cancelled.get()) return;
                 if (!streaming && !config) { publish("streaming", ""); streaming = true; }
-                frame(run.id, width, height, config, key, data, false);
+                AdbCaptureProfile profile = AdbCaptureProfile.current(context);
+                if ((width > height) != (profile.sourceWidth > profile.sourceHeight)) continue;
+                frame(run.id, width, height, config, key, data, false, profile.sourceWidth, profile.sourceHeight);
             }
         }
     }
@@ -300,7 +324,8 @@ final class LocalAdbMirror {
     private final class Run {
         final long id;
         final int port;
-        final boolean screenshot;
+        final String mode;
+        final AdbCaptureProfile profile = AdbCaptureProfile.current(context);
         final LocalAdbClient client = new LocalAdbClient(context, true);
         final AtomicBoolean cancelled = new AtomicBoolean();
         volatile long lastPacket = SystemClock.elapsedRealtime();
@@ -308,6 +333,6 @@ final class LocalAdbMirror {
         long stopAt;
         Thread thread;
         ScheduledFuture<?> watchdog;
-        Run(long id, int port, boolean screenshot) { this.id = id; this.port = port; this.screenshot = screenshot; }
+        Run(long id, int port, String mode) { this.id = id; this.port = port; this.mode = mode; }
     }
 }

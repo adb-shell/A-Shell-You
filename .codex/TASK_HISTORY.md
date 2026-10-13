@@ -347,3 +347,12 @@
 - T8源码与记录交付；D028/ADR0023/Baseline18/STATE005/WORK007/CE-20261014-T003-01。未提交/推送/CI或生产操作；External Registry reviewed-no-change。
 
 - 同任务追加C3：用户要求提交推送并执行编排；当前30路径，main与远端均941b215。将stage/commit/push到main，触发一次Build AShell clients both/aarch64，不监控。CE-20261014-T003-02 / STATE006 / WORK008；实际SHA/接受结果见Git与最终回执，不表示构建/真机通过。
+
+## T-2026-10-14-004 — ADB样式/压缩/触摸/穿透
+
+- C2八项实现请求；main/404b199初始clean。前轮push成功/dispatch204，不监控；本轮无Git/CI/本地产品执行。
+- 按无障碍栏参数重做Shell栏、去整栏缩放，追加节点穿透；普通图像ADB光标响应能力变化；去ADB画面常驻标签。
+- 独立尺寸规则/物理几何/压缩档位、触摸恢复与本机序号、可信遮罩；UiAutomation DONT_SUPPRESS、4096节点/64层/2fps/10秒租约。原Android Kotlin/采集JNI/服务/输入路由/品牌依赖保持。
+- V0源码/协议/JNI/R8/有界资源/文本括号与diff检查；正式构建/真机/多PC仍NOT_RUN。详情docs/tasks/T-2026-10-14-004-adb-ui-and-input.md；D029/ADR0024/Baseline19/STATE007/CE-20261014-T004-01。
+
+- 当前用户追加C2补漏/C3提交推送编排：触摸重复stop保持首次期限、旧Run不能取走新队列事件、尺寸读取纳入守卫。31路径、本地/远端main404b199、Build AShell clients active。CE-20261014-T004-02 / STATE008 / WORK012；将commit/push后dispatch both/aarch64一次且不监控，实际回执见Git/交付。V0不升级为构建或真机通过。

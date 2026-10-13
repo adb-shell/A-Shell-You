@@ -294,3 +294,11 @@
 - 2026-10-14，accepted for implementation；用户明确要求遮罩而非熄屏。采用APK内独立app_process/shell UID color layer，Android11 WINDOW_TYPE_DONT_SCREENSHOT / 12+ setSkipScreenshot；不设FLAG_SECURE，不改亮度或原Accessibility。
 - 协议41增加17—19字段和black_on/black_off，设备所有权、多PC状态、控制权限gate、最后订阅离开与本机10秒租约清理。不新增资产/依赖；隐藏API不支持失败退出，OEM效果待验证。
 - ADR0023 / Baseline18 / STATE005 / CE-20261014-T003-01。V0；ADB-M13—M16 NOT_RUN；无Git/CI/产品执行。普通View与物理熄屏两方案均不满足本次明确要求。
+
+## D-029 — ADB节点穿透与同源显示几何
+
+- 2026-10-14 / T004 / 用户八项精确实现要求，C2；ADR0024 / Baseline19 / STATE007 / CE-20261014-T004-01。
+- 独立shell UiAutomation以DONT_SUPPRESS读取布局，绘制有界JPEG，作为第三种ADB源；原无障碍/采集不改。默认connect、落盘dump及修改原服务均不采用。
+- 普通宽度整数缩放作为ADB尺寸基准，画质档位只读，H.264/JPEG维持独立限额；真实屏幕几何与编码对齐分离。字段20—22能力兼容旧端。
+- 触摸私有有界清理/自动恢复/序号拒绝迟到调用；自身遮罩可信不代表关闭全局输入保护。节点/图像仅内存、密码遮盖、租约清理。
+- V0；ADB-M17—M20 NOT_RUN，无Git/CI/构建动作，不声称OEM注入/隐藏API已验证。

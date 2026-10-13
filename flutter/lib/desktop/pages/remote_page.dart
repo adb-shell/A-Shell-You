@@ -1027,7 +1027,8 @@ class _ImagePaintState extends State<ImagePaint> {
               cursor: cursorOverImage.isTrue
                   ? c.cursorEmbedded
                       ? SystemMouseCursors.none
-                      : keyboardEnabled.isTrue
+                      : keyboardEnabled.isTrue || (widget.ffi.inputModel.adbTouchAvailable.value &&
+                          widget.ffi.ffiModel.isPeerAndroid && !widget.ffi.ffiModel.viewOnly)
                           ? (() {
                               if (remoteCursorMoved.isTrue) {
                                 _lastRemoteCursorMoved = true;

@@ -5,7 +5,6 @@ import android.os.SystemClock;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
-import android.view.WindowManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -31,6 +30,9 @@ final class LocalAdbTouch {
     private boolean priority;
     private int port;
     private long retryAfter;
+    private long revision;
+    private int failures;
+    private final Handler main = new Handler(Looper.getMainLooper());
     private static native void status(boolean priority, boolean ready, String error);
 
     LocalAdbTouch(Context context, LocalAdbMirror.ShellReady shellReady) {
@@ -51,16 +53,24 @@ final class LocalAdbTouch {
                 synchronized (LocalAdbTouch.this) {
                     if (active != run) return;
                     long now = SystemClock.elapsedRealtime();
-                    if (run.stopAt > 0 && now - run.stopAt >= 500) { run.abort(); return; }
+                    if (run.stopAt > 0) {
+                        if (now - run.stopAt >= 500) run.abort();
+                        if (now - run.stopAt >= 2000) { finish(run, ""); return; }
+                        continue;
+                    }
+                    if (!shellReady.get()) { stop(); continue; }
                     if ((!run.ready && now - run.started > 15000)
                             || (run.busySince > 0 && now - run.busySince > 5000)) {
-                        run.failure = "ADB 触摸连接超时，请重新连接 ADB。";
-                        run.abort(); return;
+                        run.failure = "ADB 触摸连接超时，正在自动恢复…";
+                        run.abort();
+                        publish(false, run.failure);
                     }
                 }
             }
         }, "ashell-adb-touch-start-timeout");
         run.timeout = timeout;
+        run.thread.setDaemon(true);
+        timeout.setDaemon(true);
         run.thread.start();
         timeout.start();
     }
@@ -71,7 +81,8 @@ final class LocalAdbTouch {
         queue.clear();
         if (active != null) {
             active.cancelled.set(true);
-            active.stopAt = SystemClock.elapsedRealtime();
+            // Repeated stop requests must not extend the bounded teardown deadline.
+            if (active.stopAt == 0) active.stopAt = SystemClock.elapsedRealtime();
             if (!active.ready) active.abort();
             notifyAll(); // let the writer release DOWN before closing its socket
         }
@@ -116,6 +127,7 @@ final class LocalAdbTouch {
     synchronized void normalized(int owner, int action, int x, int y, int width, int height) {
         if (!shellReady.get() || width <= 0 || height <= 0 || action < 0 || action > 2) return;
         DisplayMetrics metrics = metrics();
+        // New peers send physical geometry. Legacy (<=1280) peers still map proportionally.
         if ((width > height) != (metrics.widthPixels > metrics.heightPixels)) { release(owner); return; }
         int px = (int) ((long) Math.max(0, Math.min(x, width - 1)) * metrics.widthPixels / width);
         int py = (int) ((long) Math.max(0, Math.min(y, height - 1)) * metrics.heightPixels / height);
@@ -143,10 +155,11 @@ final class LocalAdbTouch {
         notifyAll();
     }
 
-    @SuppressWarnings("deprecation")
     private DisplayMetrics metrics() {
+        AdbCaptureProfile profile = AdbCaptureProfile.current(context);
         DisplayMetrics metrics = new DisplayMetrics();
-        ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(metrics);
+        metrics.widthPixels = profile.sourceWidth;
+        metrics.heightPixels = profile.sourceHeight;
         return metrics;
     }
 
@@ -158,7 +171,8 @@ final class LocalAdbTouch {
             LocalAdbMirror.push(context, run.client, run.cancelled, path);
             String scid = String.format(Locale.US, "%08x", new SecureRandom().nextInt() & 0x7fffffff);
             try (AdbStream process = run.client.openMirrorStream("shell,v2,raw:sh")) {
-                String command = "trap 'rm -f " + path + "' EXIT; CLASSPATH=" + path
+                // Keep a bounded module cache: an old process must not unlink its replacement.
+                String command = "CLASSPATH=" + path
                         + " app_process / com.genymobile.scrcpy.Server 5.0.1 scid=" + scid
                         + " tunnel_forward=true video=false audio=false control=true send_device_meta=false"
                         + " send_dummy_byte=false clipboard_autosync=false power_on=false cleanup=true log_level=error\n";
@@ -173,11 +187,13 @@ final class LocalAdbTouch {
                     } catch (IOException ignored) { }
                     synchronized (LocalAdbTouch.this) {
                         if (active == run && !run.cancelled.get()) {
-                            run.failure = "scrcpy 触摸服务已退出，请重新连接 ADB。";
+                            run.failure = "ADB 触摸服务已退出，正在自动恢复…";
                             run.abort();
+                            publish(false, run.failure);
                         }
                     }
                 }, "ashell-adb-touch-output");
+                output.setDaemon(true);
                 output.start();
                 AdbStream control = null;
                 long deadline = SystemClock.elapsedRealtime() + 10000;
@@ -187,7 +203,11 @@ final class LocalAdbTouch {
                 }
                 if (control == null) throw new IOException("Input socket unavailable");
                 try (AdbStream stream = control) {
-                    synchronized (this) { run.ready = true; publish(true, ""); }
+                  try {
+                    synchronized (this) {
+                        if (active != run || run.cancelled.get()) return;
+                        run.ready = true; failures = 0; publish(true, "");
+                    }
                     Integer owner = null;
                     int lastX = 0, lastY = 0;
                     long lastEvent = SystemClock.elapsedRealtime();
@@ -196,11 +216,13 @@ final class LocalAdbTouch {
                         Event event;
                         synchronized (this) {
                             if (queue.isEmpty()) wait(200);
+                            // A retired writer must not consume the replacement run's events.
+                            if (active != run || run.cancelled.get() || !shellReady.get()) break;
                             event = queue.poll();
                         }
                         if (event == null && owner == null) continue;
-                        DisplayMetrics size = metrics();
                         run.busySince = SystemClock.elapsedRealtime();
+                        DisplayMetrics size = metrics();
                         boolean changed = rotationWidth != size.widthPixels || rotationHeight != size.heightPixels;
                         if (owner != null && (changed || SystemClock.elapsedRealtime() - lastEvent > 10000
                                 || event != null && event.action == 3)) {
@@ -232,29 +254,38 @@ final class LocalAdbTouch {
                         run.busySince = SystemClock.elapsedRealtime();
                         writeTouch(stream, 1, lastX, lastY, rotationWidth, rotationHeight);
                     }
+                  } finally {
+                    // Closing the underlying private socket first unblocks libadb stream.close.
+                    run.client.abort();
+                  }
                 }
             }
         } catch (Exception | LinkageError e) {
-            if (!run.cancelled.get()) failure = "ADB 触摸连接失败；保留 ADB 优先级，请重新连接 ADB 后重试。";
+            if (!run.cancelled.get()) failure = "ADB 触摸连接失败，正在自动恢复…";
         } finally {
-            if (run.timeout != null) run.timeout.interrupt();
+            run.abort();
             Thread.interrupted();
             run.client.disconnect();
-            synchronized (this) {
-                if (active == run) {
-                    active = null;
-                    queue.clear();
-                    retryAfter = SystemClock.elapsedRealtime() + 1000;
-                    priority = shellReady.get();
-                    publish(false, run.failure.isEmpty() ? failure : run.failure);
-                    if (run.cancelled.get() && run.failure.isEmpty() && priority && port > 0) {
-                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                            synchronized (LocalAdbTouch.this) { if (port > 0) enable(port); }
-                        }, 1200);
-                    }
-                }
-            }
+            finish(run, failure);
         }
+    }
+
+    private synchronized void finish(Run run, String failure) {
+        if (active != run) return;
+        if (run.timeout != null) run.timeout.interrupt();
+        run.abort();
+        active = null;
+        queue.clear();
+        failures = Math.min(5, failures + 1);
+        int delay = 1000 * failures;
+        retryAfter = SystemClock.elapsedRealtime() + delay;
+        priority = port > 0 && shellReady.get();
+        publish(false, run.failure.isEmpty() ? failure : run.failure);
+        if (priority) main.postDelayed(() -> {
+            synchronized (LocalAdbTouch.this) {
+                if (revision == run.id && active == null && port > 0 && shellReady.get()) enable(port);
+            }
+        }, delay + 100);
     }
 
     private static void writeTouch(AdbStream stream, int action, int x, int y, int width, int height) throws IOException {
@@ -265,15 +296,21 @@ final class LocalAdbTouch {
     }
 
     private final class Run {
+        final long id = ++revision;
         final int port = LocalAdbTouch.this.port;
         final AtomicBoolean cancelled = new AtomicBoolean();
-        final LocalAdbClient client = new LocalAdbClient(context);
+        final LocalAdbClient client = new LocalAdbClient(context, true);
         Thread thread, timeout;
         boolean ready;
         final long started = SystemClock.elapsedRealtime();
         volatile long stopAt, busySince;
         volatile String failure = "";
-        void abort() { cancelled.set(true); client.abort(); if (thread != null) thread.interrupt(); }
+        void abort() {
+            cancelled.set(true);
+            if (stopAt == 0) stopAt = SystemClock.elapsedRealtime();
+            client.abort();
+            if (thread != null) thread.interrupt();
+        }
     }
 
     private static final class Event {

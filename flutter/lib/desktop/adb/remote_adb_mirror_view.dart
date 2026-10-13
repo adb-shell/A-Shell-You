@@ -18,14 +18,15 @@ class RemoteAdbMirrorView extends StatelessWidget {
       return ColoredBox(color: kColorCanvas, child: Listener(behavior: HitTestBehavior.opaque,
         child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () {}, onPanUpdate: (_) {},
           child: Stack(fit: StackFit.expand, children: [
-            if (mirror.image != null) _AdbFrame(bytes: mirror.image!, mirror: mirror, alignment: alignment)
+            if (mirror.image != null) _AdbFrame(key: ValueKey(mirror.frameGeneration), bytes: mirror.image!, mirror: mirror,
+                sourceWidth: mirror.sourceWidth, sourceHeight: mirror.sourceHeight, alignment: alignment)
             else Center(child: Padding(padding: const EdgeInsets.all(24),
               child: Text(mirror.summary, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)))),
-            if (mirror.image != null) Positioned(left: 12, right: 12, bottom: 12,
+            if (mirror.image != null && error.isNotEmpty) Positioned(left: 12, right: 12, bottom: 12,
               child: IgnorePointer(child: Center(child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(6)),
-                child: Text(error.isNotEmpty ? error : mirror.screenshotMode ? 'ADB 连续截图' : 'ADB 投屏',
+                child: Text(error,
                   textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 11)),
               )))),
           ]))));
@@ -34,10 +35,12 @@ class RemoteAdbMirrorView extends StatelessWidget {
 
 /// At most one decode and one displayed image; bypass Flutter's still-image cache.
 class _AdbFrame extends StatefulWidget {
-  const _AdbFrame({required this.bytes, required this.mirror, required this.alignment});
+  const _AdbFrame({super.key, required this.bytes, required this.mirror, required this.alignment,
+    required this.sourceWidth, required this.sourceHeight});
   final Uint8List bytes;
   final RemoteAdbMirror mirror;
   final Alignment alignment;
+  final int sourceWidth, sourceHeight;
   @override
   State<_AdbFrame> createState() => _AdbFrameState();
 }
@@ -49,25 +52,48 @@ class _AdbFrameState extends State<_AdbFrame> {
   int? _pointer;
   Offset _last = Offset.zero;
   Size _box = Size.zero;
+  int _sourceWidth = 0, _sourceHeight = 0;
+  bool _physicalGeometry = false;
   DateTime _lastMove = DateTime.fromMillisecondsSinceEpoch(0);
+
+  Rect _imageRect() {
+    if (_image == null || _sourceWidth <= 0 || _sourceHeight <= 0 || _box.isEmpty) return Rect.zero;
+    // Match ordinary capture dimensions, then the ordinary canvas's selected view scale.
+    final divisor = math.max(1, _sourceWidth ~/ 350);
+    final captureScale = _physicalGeometry
+        ? math.min(1.0 / divisor, 1280.0 / math.max(_sourceWidth, _sourceHeight)) : 1.0;
+    final width = _sourceWidth * captureScale;
+    final height = _sourceHeight * captureScale;
+    final canvas = widget.mirror.ffi.canvasModel;
+    final adaptive = canvas.viewStyle.style == kRemoteViewStyleAdaptive;
+    final scale = adaptive ? math.min(_box.width / width, _box.height / height) *
+        (canvas.viewStyle.scale > 0 ? canvas.scale / canvas.viewStyle.scale : 1.0) : canvas.scale;
+    return widget.alignment.inscribe(Size(width * scale, height * scale), Offset.zero & _box);
+  }
 
   void _touch(int action, Offset local) {
     final image = _image;
     if (image == null || _box.isEmpty) return;
-    final scale = math.min(_box.width / image.width, _box.height / image.height);
-    final left = (_box.width - image.width * scale) * (widget.alignment.x + 1) / 2;
-    final top = (_box.height - image.height * scale) / 2;
-    final x = ((local.dx - left) / scale).round().clamp(0, image.width - 1).toInt();
-    final y = ((local.dy - top) / scale).round().clamp(0, image.height - 1).toInt();
-    widget.mirror.touch(action, x, y, image.width, image.height);
+    final rect = _imageRect();
+    if (rect.isEmpty) return;
+    final x = ((local.dx - rect.left) * _sourceWidth / rect.width).floor().clamp(0, _sourceWidth - 1).toInt();
+    final y = ((local.dy - rect.top) * _sourceHeight / rect.height).floor().clamp(0, _sourceHeight - 1).toInt();
+    widget.mirror.touch(action, x, y, _sourceWidth, _sourceHeight);
   }
 
   @override
-  void initState() { super.initState(); _decode(); }
+  void initState() {
+    super.initState();
+    widget.mirror.ffi.canvasModel.addListener(_canvasChanged);
+    _decode();
+  }
+
+  void _canvasChanged() { if (mounted) setState(() {}); }
 
   @override
   void didUpdateWidget(covariant _AdbFrame oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!widget.mirror.touchReady || widget.mirror.ffi.ffiModel.viewOnly) _pointer = null;
     if (!identical(oldWidget.bytes, widget.bytes)) _decode();
   }
 
@@ -75,13 +101,23 @@ class _AdbFrameState extends State<_AdbFrame> {
     if (_decoding || !mounted) return;
     _decoding = true;
     final bytes = widget.bytes;
+    final sourceWidth = widget.sourceWidth, sourceHeight = widget.sourceHeight;
     ui.Codec? codec;
     try {
       codec = await ui.instantiateImageCodec(bytes);
       final frame = await codec.getNextFrame();
       if (!mounted) { frame.image.dispose(); return; }
       final previous = _image;
-      setState(() { _image = frame.image; _failed = false; });
+      final width = sourceWidth > 0 ? sourceWidth : frame.image.width;
+      final height = sourceHeight > 0 ? sourceHeight : frame.image.height;
+      if (_pointer != null && (_sourceWidth != width || _sourceHeight != height)) {
+        _touch(1, _last); _pointer = null;
+      }
+      setState(() {
+        _image = frame.image; _failed = false;
+        _sourceWidth = width; _sourceHeight = height;
+        _physicalGeometry = sourceWidth > 0 && sourceHeight > 0;
+      });
       WidgetsBinding.instance.addPostFrameCallback((_) => previous?.dispose());
     } catch (_) {
       if (mounted) setState(() => _failed = true);
@@ -102,8 +138,7 @@ class _AdbFrameState extends State<_AdbFrame> {
             if (_pointer != null || !widget.mirror.touchReady || widget.mirror.ffi.ffiModel.viewOnly) return;
             final image = _image;
             if (image == null) return;
-            final scale = math.min(_box.width / image.width, _box.height / image.height);
-            final rect = widget.alignment.inscribe(Size(image.width * scale, image.height * scale), Offset.zero & _box);
+            final rect = _imageRect();
             if (!rect.contains(event.localPosition)) return;
             _pointer = event.pointer; _last = event.localPosition;
             _touch(0, _last);
@@ -123,13 +158,16 @@ class _AdbFrameState extends State<_AdbFrame> {
             if (_pointer != event.pointer) return;
             _touch(1, _last); _pointer = null;
           },
-          child: SizedBox.expand(child: RawImage(image: _image, fit: BoxFit.contain,
-              alignment: widget.alignment, filterQuality: FilterQuality.low)));
+          child: Stack(fit: StackFit.expand, children: [
+            Positioned.fromRect(rect: _imageRect(), child: RawImage(image: _image,
+                fit: BoxFit.fill, filterQuality: FilterQuality.low)),
+          ]));
       });
 
   @override
   void dispose() {
     if (_pointer != null) _touch(1, _last);
+    widget.mirror.ffi.canvasModel.removeListener(_canvasChanged);
     _image?.dispose(); _image = null; super.dispose();
   }
 }

@@ -55,6 +55,11 @@ public final class AdbPrivacyOverlay {
             surface = builderClass.getMethod("build").invoke(builder);
             transaction = tx.getConstructor().newInstance();
             if (skip != null) skip.invoke(transaction, surface, true);
+            if (Build.VERSION.SDK_INT >= 31) {
+                // Own color layer only: allow input below this overlay, without disabling the
+                // system-wide untrusted-touch protection or giving the layer an input channel.
+                tx.getMethod("setTrustedOverlay", sc, boolean.class).invoke(transaction, surface, true);
+            }
             tx.getMethod("setLayerStack", sc, int.class).invoke(transaction, surface, layerStack);
             tx.getMethod("setLayer", sc, int.class).invoke(transaction, surface, Integer.MAX_VALUE);
             tx.getMethod("setColor", sc, float[].class).invoke(transaction, surface, new float[]{0f, 0f, 0f});

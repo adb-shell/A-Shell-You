@@ -691,3 +691,19 @@ Mode：`append-only logical persisted-change events`
 - 本轮用户明确要求提交推送并执行编排；当前30路径均T003，目标adb-shell/A-Shell-You/main。核对本地/远端941b215、暂存区为空、V0 diff通过，Build AShell clients active。
 - 同步本任务/状态/记忆/日志执行边界，STATE006/WORK008；D028/ADR0023/Baseline18 reviewed-no-change。将commit/push后dispatch一次both/aarch64、不监控；本条为执行前记录，最终SHA/接受回执见Git与交付。
 - 无额外业务源码修改、本地产品构建/设备操作、Release/tag或生产变更；不将dispatch接受作为构建通过。
+
+## CE-20261014-T004-01 — ADB栏、几何、输入与节点穿透
+
+- Task：T-2026-10-14-004；权限C2用户当前八项请求；main/404b199初始clean；单次逻辑实施事件。
+- 源码：flutter/lib/desktop/adb/{remote_adb_sidebar,remote_adb_mirror,remote_adb_mirror_view}.dart；flutter/lib/desktop/pages/remote_page.dart；flutter/lib/models/input_model.dart；flutter/android/app/src/main/java/me/ashell/localadb/{AdbCaptureProfile,AdbLayoutCapture,LocalAdbLayout,AdbPrivacyOverlay,LocalAdbManager,LocalAdbMirror,LocalAdbScreenshot,LocalAdbTouch}.java；flutter/android/app/proguard-rules；src/remote_adb_video.rs；libs/hbb_common/protos/message.proto。
+- 记录：docs/tasks/T-2026-10-14-004-adb-ui-and-input.md；docs/ADR/0024-adb-layout-and-geometry.md与README；docs/BASELINE/19_ADB_LAYOUT_INPUT_BASELINE_2026-10-14.md与INDEX；docs/AI_ENGINEERING/{14_ADB_MIRROR,10_SECURITY_MODEL}.md；TEST_MATRIX.md；EXTERNAL_ASSET_REGISTRY.md；.codex/{PROJECT_STATE,CURRENT_WORK,DECISION_LOG,TASK_HISTORY,CHANGELOG_AI,CHANGE_EVENT_LOG}.md。
+- Delta：去整栏FittedBox、沿用原控件样式；三种ADB源/源几何/统一尺寸档位/限额；去常驻标签、ADB光标；有界触摸恢复/本机递增序号；自身可信遮罩；不抑制原服务的节点helper。
+- V0：跨层权限/协议字段/JNI/R8/旧端/资源生命周期/原链范围/差异与文本结构检查。未执行本地build/test/analyze/codegen、真机、多PC或CI；ADB-M17—M20 NOT_RUN。
+- 无Git写入/依赖变更/新外部binary/删除文件/版本/发布/生产操作。D029/ADR0024/Baseline19/STATE007；详细证据及正式验证命令见任务文件。
+
+## CE-20261014-T004-02 — 触摸回收复核与授权推送编排
+
+- 用户当前授权查漏补缺、提交推送GitHub并执行编排；C2/C3同任务续接。31路径均T004，目标adb-shell/A-Shell-You/main；执行前本地/远端均404b199，workflow382599743 active。
+- LocalAdbTouch补首次stop期限保持、wait后旧Run检查、metrics纳入超时；同步任务及薄记忆。D029/ADR0024/Baseline19 reviewed-no-change，STATE008/WORK012。
+- V0复核调用链/JNI/R8/协议/资源回收/几何与原链差异；不运行本地产品构建/测试/分析/codegen。真机场景补ADB-M18，正式验证仍NOT_RUN。
+- 紧接stage/commit/push当前31路径，单次Build AShell clients both/aarch64、不监控。此为执行前记录，最终SHA与接受结果见Git/交付，不宣称构建通过；无Release/tag/依赖/生产变更。

@@ -852,7 +852,7 @@ message Misc {
 
 message RemoteAdbVideo {
   string token = 1;
-  string action = 2; // watch/unwatch/start/screenshot/stop/black_on/black_off/ack/nack/touch/state/frame
+  string action = 2; // watch/unwatch/start/screenshot/layout/stop/black_on/black_off/ack/nack/touch/state/frame
   uint64 sequence = 3;
   uint64 generation = 4;
   uint32 width = 5;
@@ -865,11 +865,14 @@ message RemoteAdbVideo {
   bool adb_priority = 12;
   bool touch_ready = 13;
   string input_error = 14;
-  string format = 15; // h264 (also the legacy empty default), or jpeg screenshot frames
+  string format = 15; // h264 (also the legacy empty default), jpeg screenshot, layout node-rendered JPEG
   bool screenshot_supported = 16; // capability sent in watch and state
   bool privacy_supported = 17;
   string privacy_state = 18; // idle/starting/on/stopping/error, independent of video
   string privacy_error = 19;
+  bool layout_supported = 20; // negotiated separately from screenshots
+  uint32 source_width = 21; // physical logical display geometry, separate from codec alignment
+  uint32 source_height = 22;
 }
 
 message VoiceCallRequest {

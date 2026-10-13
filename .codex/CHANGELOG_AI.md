@@ -255,3 +255,11 @@ Mode：`append-only task-level index`
 - 详情：[T003](../docs/tasks/T-2026-10-14-003-adb-controls-and-overlay.md)。外部资产/依赖无变化；前轮941b215推送与dispatch204仅为历史执行回执。
 
 - T003续接：用户授权提交/推送当前30路径并执行一次Build AShell clients both/aarch64，不监控。核对本地/远端main均941b215、workflow active；CE-20261014-T003-02 / STATE006 / WORK008。准确提交与接受结果以Git/交付回执为准，无本地产品验证。
+
+## 2026-10-14 / T-2026-10-14-004
+
+- ADB栏严格采用原栏样式参数，普通缩放规则/画质档位同步ADB，物理几何独立传递，去底部标签；普通ADB光标、黑屏触摸、间歇控制恢复；新增独立节点穿透与多PC开关。
+- 新helper/R8/JNI/协议20—22，原采集/无障碍/输入路由未修改。V0，未构建/真机/CI/提交；新测试ADB-M17—M20 NOT_RUN。
+- D029/ADR0024/Baseline19/STATE007/CE-20261014-T004-01；领域文档/安全/资产评估/任务薄记忆同步。当前源码为404b199上的未提交变更。
+
+- T004续接：复核并修正触摸关闭期限、旧writer隔离、尺寸读取超时；用户授权提交推送当前31路径到main，并执行一次Build AShell clients both/aarch64、不监控。CE-20261014-T004-02 / STATE008 / WORK012；本地/远端404b199、workflow active，V0，最终SHA与dispatch接受回执见Git/交付。

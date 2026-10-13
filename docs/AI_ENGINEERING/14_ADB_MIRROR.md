@@ -1,5 +1,20 @@
 # AShell ADB 投屏与触摸优先级
 
+2026-10-14 T004当前：main/404b199初始clean，源码修改未提交；[任务](../tasks/T-2026-10-14-004-adb-ui-and-input.md)、[ADR0024](../ADR/0024-adb-layout-and-geometry.md)、[Baseline19](../BASELINE/19_ADB_LAYOUT_INPUT_BASELINE_2026-10-14.md)。下方T001—T003段落保留实施时点；涉及固定1280/2Mbps/触摸EXIT trap的旧值由本段取代。V0，正式编译/真机待验。
+
+## 当前样式、尺寸、触摸与节点穿透（T004）
+
+- Shell栏直接采用无障碍栏的70×scale宽度、45×12×scale高度约束、同一缩放上限、Card/15×scale圆角、24×scale图标、12×scale文字、12像素按钮内距、6像素按钮圆角、固定4阴影和同款分隔线/spaceAround；移除整栏FittedBox导致的额外缩放。追加开穿透/关穿透，保留已有导航/视频/截图/黑屏。
+- `AdbCaptureProfile`对齐MainService/无障碍截图的当前宽度÷350整数缩放规则（下限1），最长边安全上限1280；例如1080×2400对应360×800。H.264仍须8像素对齐，但显示/点击使用随帧携带的真实source geometry，跟随普通画布的自适应/原比例与缩放；不再用编码对齐尺寸推测物理比例。截图先检查原PNG大小，再缩到该尺寸。
+- 通过新增只读JNI读取原`VIDEO_QOS.latest_quality/fps`：视频开启时沿用当前画质档位、FPS上限30，码率按传输像素/档位计算并限制200kbps—1Mbps；JPEG按低/均衡/最佳使用60/75/85，自定义50—90。截图每帧读档位，节点helper启动时读档位。**原源为动态视频编码，不能与JPEG宣称完全相同的压缩结果**；这里统一尺寸基准/画质选择并限制ADB附加带宽，没有改动原QoS状态或编码器。截图/节点最多2fps，相同内容每秒最多补一张以支持新PC加入。PC本机H264→JPEG85不参与网络带宽。
+- 底部不再常驻“ADB 投屏/ADB 连续截图”水印，只显示真实错误。普通画面禁用光标结合会话ADB能力响应更新，不借此开放键盘/只读会话控制。
+- 触摸私有连接使用有界close、15秒启动/5秒写入守卫、2秒强制回收与1—5秒自动退避重建。旧Run不修改新Run；触摸jar也改为固定单份缓存，避免旧EXIT trap删掉新服务。PC队列32项、相邻MOVE合并、2秒桥调用超时后补UP；递增本机sequence丢弃迟到旧调用。旋转/模式切换释放旧手势。ADB始终优先，不同时向无障碍注入。
+- Android12+遮罩在显示前设置自身`setTrustedOverlay(true)`，解决自身不透明层触发的触摸遮挡路径；仍排除自身截图/镜像。未关闭系统全局触摸保护、未改原无障碍黑屏。隐藏API/OEM效果须真机验证。
+- 新layout模式由APK内`AdbLayoutCapture.main`作为shell UID运行，UiAutomation以`FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES`连接，读取默认显示的可用节点，绘制边框及文字，密码文字遮盖。4096节点/64层上限、仅内存、10秒stdin租约；不调用原AccessibilityService，不落盘dump。没有节点的内容不能重建，其他UiAutomation占用会单独报错。`LocalAdbLayout`有界解析shell-v2 stdout，复用JPEG帧/ACK/背压。
+- 三种ADB源互斥，任一PC切换/关闭设备全局ADB源；普通视频/无障碍源独立继续。字段20能力协商、21/22真实几何，旧PC收到可解析更新提示；新PC接旧Android回落编码几何。源尺寸<=16384、编码尺寸<=1280、JPEG<=2MiB，原字段/生成桥/构建依赖保持。
+
+V0已核对跨层调用/权限/有界输入/R8/资源与原链差异；正式ADB-M17—M20全部NOT_RUN。本轮未运行本地编译/测试/分析/生成、Git或CI。
+
 2026-10-14 T003当前增量：main/941b215初始clean；布局向中线靠拢、状态悬浮移到全主界面右上、ADB控件/私有连接恢复、独立黑色遮罩。见[本轮任务](../tasks/T-2026-10-14-003-adb-controls-and-overlay.md)、[ADR-0023](../ADR/0023-adb-private-overlay.md)、[Baseline18](../BASELINE/18_ADB_OVERLAY_BASELINE_2026-10-14.md)。本轮V0未提交/未编译/未真机验证。前轮941b215已推送并dispatch获204，未监控。下段T002为当时快照。
 
 ## 黑色遮罩与控件恢复（T003）

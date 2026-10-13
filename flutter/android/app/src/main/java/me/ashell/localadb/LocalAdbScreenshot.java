@@ -18,10 +18,11 @@ final class LocalAdbScreenshot {
     private LocalAdbScreenshot() { }
 
     static final class Frame {
-        final int width, height;
+        final int width, height, sourceWidth, sourceHeight;
         final byte[] jpeg;
-        Frame(int width, int height, byte[] jpeg) {
+        Frame(int width, int height, int sourceWidth, int sourceHeight, byte[] jpeg) {
             this.width = width; this.height = height; this.jpeg = jpeg;
+            this.sourceWidth = sourceWidth; this.sourceHeight = sourceHeight;
         }
     }
 
@@ -64,6 +65,7 @@ final class LocalAdbScreenshot {
         BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
         if (options.outWidth <= 0 || options.outHeight <= 0 || options.outWidth > 8192 || options.outHeight > 8192
                 || (long) options.outWidth * options.outHeight > 32L * 1024 * 1024) throw new IOException("Invalid screenshot dimensions");
+        AdbCaptureProfile profile = new AdbCaptureProfile(options.outWidth, options.outHeight);
         options.inSampleSize = 1;
         while (Math.max(options.outWidth, options.outHeight) / options.inSampleSize > 2560) options.inSampleSize *= 2;
         options.inJustDecodeBounds = false;
@@ -72,15 +74,14 @@ final class LocalAdbScreenshot {
         if (source == null) throw new IOException("Screenshot decode failed");
         Bitmap resized = source;
         try {
-            double scale = Math.min(1.0, 1280.0 / Math.max(source.getWidth(), source.getHeight()));
-            int width = Math.max(1, (int) Math.round(source.getWidth() * scale));
-            int height = Math.max(1, (int) Math.round(source.getHeight() * scale));
+            int width = profile.width;
+            int height = profile.height;
             if (width != source.getWidth() || height != source.getHeight()) resized = Bitmap.createScaledBitmap(source, width, height, true);
             if (cancelled.get()) throw new IOException("Stopped");
             ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
-            if (!resized.compress(Bitmap.CompressFormat.JPEG, 82, jpeg) || jpeg.size() > 2 * 1024 * 1024)
+            if (!resized.compress(Bitmap.CompressFormat.JPEG, profile.encoding()[2], jpeg) || jpeg.size() > 2 * 1024 * 1024)
                 throw new IOException("Screenshot encode failed");
-            return new Frame(width, height, jpeg.toByteArray());
+            return new Frame(width, height, profile.sourceWidth, profile.sourceHeight, jpeg.toByteArray());
         } finally {
             if (resized != source) resized.recycle();
             source.recycle();

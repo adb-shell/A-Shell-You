@@ -125,12 +125,14 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
           if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) {
             return const SizedBox.shrink();
           }
-          final scale = math.min(
-              math.max(widget.ffi.canvasModel.scale * 2.0, 0.85),
-              math.min(constraints.maxWidth / 70,
-                  constraints.maxHeight * 0.9 / (45 * 14)));
+          // Same geometry and per-control scaling as makeMobileActionsOverlayEntry.
+          final screen = MediaQuery.of(context).size;
+          final availableHeight = math.max(45.0,
+              screen.height - kDesktopRemoteTabBarHeight - screen.height * 0.1);
+          final scale = math.min(math.max(widget.ffi.canvasModel.scale * 2.0, 0.85),
+              availableHeight / (45 * 12));
           final width = 70.0 * scale;
-          final height = 470.0 * scale;
+          final height = 45.0 * 12 * scale;
           Offset clamp(Offset value) => Offset(
               value.dx.clamp(0.0, math.max(0.0, constraints.maxWidth - width)).toDouble(),
               value.dy.clamp(0.0, math.max(0.0, constraints.maxHeight - height)).toDouble());
@@ -143,7 +145,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
               color: Colors.white,
               disabledColor: Colors.white38,
               splashRadius: kDesktopIconButtonSplashRadius,
-              icon: Icon(icon), iconSize: 24,
+              icon: Icon(icon), iconSize: 24 * scale,
               onPressed: enabled ? () => _navigate(keyCode) : null);
           return Stack(children: [
             Positioned(left: position.dx, top: position.dy, width: width, height: height,
@@ -151,52 +153,59 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                 onPanUpdate: (event) => setState(() {
                   _position = clamp(clamp(_position ?? position) + event.delta);
                 }),
-                child: FittedBox(child: SizedBox(width: 70, height: 470,
-                  child: Card(
+                child: Card(
                     color: Colors.transparent,
                     shadowColor: Colors.transparent,
                     child: Container(
                       decoration: BoxDecoration(
                         color: MyTheme.accent.withOpacity(0.4),
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(15 * scale),
                       ),
-                      child: Column(
+                      child: LayoutBuilder(builder: (context, box) => SingleChildScrollView(
+                        primary: false,
+                        child: ConstrainedBox(constraints: BoxConstraints(minHeight: box.maxHeight),
+                          child: IntrinsicHeight(child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4 * scale),
                             child: FittedBox(fit: BoxFit.scaleDown,
                               child: Text('Shell栏', style: TextStyle(
-                                  color: Colors.white, fontSize: 12))),
+                                  color: Colors.white, fontSize: 12 * scale))),
                           ),
                           button(Icons.arrow_back, 'ADB 返回', 4),
                           button(Icons.home, 'ADB 主页', 3),
                           button(Icons.more_horiz, 'ADB 多任务', 187),
                           _divider(),
-                          _modeButton('开投屏', Colors.blue, widget.mirror.canStart,
+                          _modeButton(scale, '开投屏', Colors.blue, widget.mirror.canStart,
                               () => widget.mirror.setEnabled(true), '开启 ADB 视频；正在截图时切换为视频模式'),
-                          _modeButton('关投屏', Colors.red, widget.mirror.canStop && (!widget.mirror.screenshotMode || widget.mirror.busy),
+                          _modeButton(scale, '关投屏', Colors.red, widget.mirror.canStop && (widget.mirror.videoMode || widget.mirror.busy),
                               () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 视频'),
                           _divider(),
-                          _modeButton('开截图', Colors.blue, widget.mirror.canScreenshot,
+                          _modeButton(scale, '开截图', Colors.blue, widget.mirror.canScreenshot,
                               () => widget.mirror.setEnabled(true, screenshot: true),
                               widget.mirror.screenshotSupported
                                   ? 'ADB 强制连续系统截图，无需无障碍；系统保护内容仍受限制。开启后替换 ADB 视频。'
                                   : '请更新 Android 客户端以支持 ADB 连续截图'),
-                          _modeButton('关截图', Colors.red, widget.mirror.canStop && (widget.mirror.screenshotMode || widget.mirror.busy),
+                          _modeButton(scale, '关截图', Colors.red, widget.mirror.canStop && (widget.mirror.screenshotMode || widget.mirror.busy),
                               () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 连续截图'),
                           _divider(),
-                          _modeButton('开黑屏', Colors.blue, widget.mirror.canBlackOn,
+                          _modeButton(scale, '开黑屏', Colors.blue, widget.mirror.canBlackOn,
                               () => widget.mirror.setBlack(true), widget.mirror.privacySupported
                                   ? '${widget.mirror.privacySummary}；独立黑色遮罩，不关闭物理屏幕，不遮挡 PC 采集画面'
                                   : '请更新 Android 客户端以支持 ADB 黑屏遮罩', privacy: true),
-                          _modeButton('关黑屏', Colors.red, widget.mirror.canBlackOff,
+                          _modeButton(scale, '关黑屏', Colors.red, widget.mirror.canBlackOff,
                               () => widget.mirror.setBlack(false), '${widget.mirror.privacySummary}；任意 PC 均可关闭', privacy: true),
+                          _divider(),
+                          _modeButton(scale, '开穿透', Colors.blue, widget.mirror.canLayout,
+                              () => widget.mirror.setEnabled(true, layout: true),
+                              '通过 ADB 绘制界面节点的边框和文字；替换当前 ADB 画面，不影响普通画面和无障碍服务'),
+                          _modeButton(scale, '关穿透', Colors.red, widget.mirror.canStop && (widget.mirror.layoutMode || widget.mirror.busy),
+                              () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 穿透画面'),
                         ],
-                      ),
+                      ))))),
                     ),
-                  ),
-                )),
+                ),
               ),
             ),
           ]);
@@ -207,16 +216,21 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
 
   Widget _divider() => const Divider(height: 0, thickness: 2, indent: 10, endIndent: 10, color: Colors.white54);
 
-  Widget _modeButton(String label, Color color, bool enabled, VoidCallback action, String hint, {bool privacy = false}) => Tooltip(
+  Widget _modeButton(double scale, String label, Color color, bool enabled, VoidCallback action, String hint, {bool privacy = false}) => Tooltip(
     message: privacy ? hint : widget.mirror.inputError.isNotEmpty ? widget.mirror.inputError
         : widget.mirror.error.isNotEmpty ? widget.mirror.error
         : hint,
     child: ElevatedButton(onPressed: enabled ? action : null,
-      style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.black26, disabledForegroundColor: Colors.white70,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)), elevation: 4),
+      // Match AntiShakeButton's visual properties exactly; state remains owned by ADB.
+      style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith((states) =>
+              states.contains(MaterialState.disabled) ? Colors.black26 : color),
+          foregroundColor: MaterialStateProperty.resolveWith((states) =>
+              states.contains(MaterialState.disabled) ? Colors.white70 : Colors.white),
+          padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 12)),
+          textStyle: MaterialStateProperty.all(TextStyle(fontSize: 12 * scale, fontWeight: FontWeight.w500)),
+          shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+          elevation: MaterialStateProperty.all(4)),
       child: Text(label)),
   );
 }

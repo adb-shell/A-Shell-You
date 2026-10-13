@@ -24,7 +24,9 @@ class RemoteAdbMirror extends ChangeNotifier {
   bool _polling = false;
   int _epoch = 0;
   Future<void> _transition = Future<void>.value();
-  Future<void> _touchTransition = Future<void>.value();
+  final List<Map<String, dynamic>> _touchQueue = [];
+  bool _touchSending = false;
+  int _touchSequence = 0;
   DateTime? _commandAt;
   Timer? _commandDeadline;
   Timer? _privacyDeadline;
@@ -37,6 +39,8 @@ class RemoteAdbMirror extends ChangeNotifier {
   String get error => _requestError.isNotEmpty ? _requestError : _remoteError;
   bool supported = false;
   bool screenshotSupported = false;
+  bool layoutSupported = false;
+  int sourceWidth = 0, sourceHeight = 0;
   String format = '';
   bool privacySupported = false;
   String privacyPhase = 'idle';
@@ -49,13 +53,17 @@ class RemoteAdbMirror extends ChangeNotifier {
   String inputError = '';
   Uint8List? image;
   int _generation = 0;
+  int get frameGeneration => _generation;
   String _owner = Uuid().v4();
 
   bool get active => phase == 'starting' || phase == 'streaming' || phase == 'stopping';
   bool get busy => _commandAt != null || phase == 'starting' || phase == 'stopping';
   bool get screenshotMode => format == 'jpeg';
-  bool get canStart => _watching && supported && (!active || screenshotMode) && !busy && !_stopSending && !ffi.ffiModel.viewOnly;
+  bool get layoutMode => format == 'layout';
+  bool get videoMode => format == 'h264' || format.isEmpty;
+  bool get canStart => _watching && supported && (!active || !videoMode) && !busy && !_stopSending && !ffi.ffiModel.viewOnly;
   bool get canScreenshot => _watching && supported && screenshotSupported && (!active || !screenshotMode) && !busy && !_stopSending && !ffi.ffiModel.viewOnly;
+  bool get canLayout => _watching && supported && layoutSupported && (!active || !layoutMode) && !busy && !_stopSending && !ffi.ffiModel.viewOnly;
   // Stop must remain a recovery path while startup/teardown is pending.
   bool get canStop => _watching && supported && (active || _commandAt != null || error.isNotEmpty)
       && !_stopSending && !ffi.ffiModel.viewOnly;
@@ -66,10 +74,10 @@ class RemoteAdbMirror extends ChangeNotifier {
       : privacyPhase == 'on' ? '手机黑色遮罩已开启；PC 继续接收底层画面'
       : privacyPhase == 'starting' ? '正在建立手机黑色遮罩…'
       : privacyPhase == 'stopping' ? '正在移除手机黑色遮罩…' : '手机黑色遮罩未开启';
-  String get summary => error.isNotEmpty ? error : phase == 'starting' ? (screenshotMode ? '正在启动 ADB 连续截图…' : '正在启动 ADB 投屏…')
+  String get summary => error.isNotEmpty ? error : phase == 'starting' ? (layoutMode ? '正在读取界面布局…' : screenshotMode ? '正在启动连续截图…' : '正在启动投屏…')
       : phase == 'stopping' ? '正在关闭所有 PC 的 ADB 画面…'
-      : phase == 'streaming' ? (image == null ? '等待 ADB 画面…' : screenshotMode ? 'ADB 连续截图 · 多 PC 共享' : 'ADB 投屏 · 多 PC 共享')
-      : phase == 'waiting' ? '正在确认投屏能力…' : 'ADB 投屏未开启';
+      : phase == 'streaming' ? (image == null ? '等待画面…' : '画面传输中')
+      : phase == 'waiting' ? '正在确认画面能力…' : 'ADB 画面未开启';
 
   Future<String?> _call(String action, {String? owner}) => bind.sessionGetCommon(
       sessionId: ffi.sessionId, key: 'adb_video', param: jsonEncode({'action': action, 'owner': owner ?? _owner}))
@@ -98,6 +106,10 @@ class RemoteAdbMirror extends ChangeNotifier {
     _privacyRequestError = '';
     supported = false;
     screenshotSupported = false;
+    layoutSupported = false;
+    sourceWidth = 0; sourceHeight = 0;
+    _touchQueue.clear();
+    _touchSequence = 0;
     format = '';
     adbPriority = false;
     ffi.inputModel.adbTouchPriority = false;
@@ -151,6 +163,7 @@ class RemoteAdbMirror extends ChangeNotifier {
       final nextSupported = value['supported'] == true;
       final nextFormat = value['format'] as String? ?? '';
       final nextScreenshotSupported = value['screenshotSupported'] == true;
+      final nextLayoutSupported = value['layoutSupported'] == true;
       final nextPrivacySupported = value['privacySupported'] == true;
       final nextPrivacyPhase = value['privacyState'] as String? ?? 'idle';
       final nextPrivacyError = value['privacyError'] as String? ?? '';
@@ -159,7 +172,7 @@ class RemoteAdbMirror extends ChangeNotifier {
       final ready = value['touchReady'] == true;
       final touchError = value['inputError'] as String? ?? '';
       bool changed = next != phase || nextError != _remoteError || nextGeneration != _generation || supported != nextSupported
-          || format != nextFormat || screenshotSupported != nextScreenshotSupported;
+          || format != nextFormat || screenshotSupported != nextScreenshotSupported || layoutSupported != nextLayoutSupported;
       if (changed) { _commandAt = null; _commandDeadline?.cancel(); _requestError = ''; }
       changed = changed || priority != adbPriority || ready != touchReady || touchError != inputError;
       if (privacyPhase != nextPrivacyPhase || _privacyRemoteError != nextPrivacyError || privacySupported != nextPrivacySupported) {
@@ -182,7 +195,13 @@ class RemoteAdbMirror extends ChangeNotifier {
       supported = nextSupported;
       format = nextFormat;
       screenshotSupported = nextScreenshotSupported;
-      if (frame != null && phase == 'streaming') { image = base64Decode(frame); changed = true; }
+      layoutSupported = nextLayoutSupported;
+      if (frame != null && phase == 'streaming') {
+        image = base64Decode(frame);
+        sourceWidth = (value['sourceWidth'] as num? ?? 0).toInt();
+        sourceHeight = (value['sourceHeight'] as num? ?? 0).toInt();
+        changed = true;
+      }
       hasFrame.value = phase == 'streaming' && image != null;
       if (changed) notifyListeners();
     } catch (_) {
@@ -197,20 +216,53 @@ class RemoteAdbMirror extends ChangeNotifier {
 
   Future<void> touch(int event, int x, int y, int width, int height) async {
     if (_disposed || !_watching || !adbPriority || !touchReady || ffi.ffiModel.viewOnly) return;
-    final epoch = _epoch;
-    final owner = _owner;
-    // The async native bridge may use multiple workers. Preserve DOWN/MOVE/UP order.
-    _touchTransition = _touchTransition.then((_) async {
-      if (_disposed || epoch != _epoch || !_watching || !adbPriority || !touchReady || ffi.ffiModel.viewOnly) return;
-      await bind.sessionGetCommon(sessionId: ffi.sessionId, key: 'adb_video',
-        param: jsonEncode({'action': 'touch', 'owner': owner, 'event': event,
-          'x': x, 'y': y, 'width': width, 'height': height}));
-    }).catchError((Object _) {});
-    await _touchTransition;
+    final packet = <String, dynamic>{'action': 'touch', 'owner': _owner, 'sequence': ++_touchSequence, 'event': event,
+      'x': x, 'y': y, 'width': width, 'height': height};
+    // Coalesce adjacent MOVE only. An unbounded future chain made drags lag behind the screen.
+    if (event == 2 && _touchQueue.isNotEmpty && _touchQueue.last['event'] == 2) _touchQueue.removeLast();
+    if (_touchQueue.length >= 32) {
+      _touchQueue.clear();
+      packet['event'] = 1; // release instead of losing UP on overload
+    }
+    _touchQueue.add(packet);
+    await _drainTouches();
   }
 
-  Future<void> setEnabled(bool enabled, {bool screenshot = false}) async {
-    if (enabled ? (screenshot ? !canScreenshot : !canStart) : !canStop) return;
+  Future<void> _drainTouches() async {
+    if (_touchSending) return;
+    _touchSending = true;
+    final epoch = _epoch;
+    Map<String, dynamic>? sending;
+    try {
+      while (_touchQueue.isNotEmpty && !_disposed && epoch == _epoch) {
+        if (!_watching || !adbPriority || !touchReady || ffi.ffiModel.viewOnly) { _touchQueue.clear(); break; }
+        final next = _touchQueue.removeAt(0);
+        sending = next;
+        final result = await bind.sessionGetCommon(sessionId: ffi.sessionId, key: 'adb_video', param: jsonEncode(next))
+            .timeout(const Duration(seconds: 2));
+        if (result == null) throw StateError('touch unavailable');
+      }
+    } catch (_) {
+      if (!_disposed && epoch == _epoch) {
+        _touchQueue.clear();
+        if (sending != null && !ffi.ffiModel.viewOnly) {
+          // Higher sequence also rejects a late native DOWN after its timeout.
+          final release = {...sending, 'event': 1, 'sequence': ++_touchSequence};
+          try {
+            await bind.sessionGetCommon(sessionId: ffi.sessionId, key: 'adb_video', param: jsonEncode(release))
+                .timeout(const Duration(seconds: 2));
+          } catch (_) { }
+        }
+      }
+    } finally {
+      _touchSending = false;
+      // Reconnect may have enqueued an event while the old native call was completing.
+      if (!_disposed && _touchQueue.isNotEmpty) _drainTouches();
+    }
+  }
+
+  Future<void> setEnabled(bool enabled, {bool screenshot = false, bool layout = false}) async {
+    if (enabled ? (layout ? !canLayout : screenshot ? !canScreenshot : !canStart) : !canStop) return;
     final epoch = _epoch;
     _stopSending = !enabled;
     _commandAt = enabled || active ? DateTime.now() : null;
@@ -225,7 +277,7 @@ class RemoteAdbMirror extends ChangeNotifier {
     if (_commandAt == null) _commandDeadline?.cancel(); // idempotent stop of an already-idle source
     notifyListeners();
     try {
-      if (await _call(enabled ? (screenshot ? 'screenshot' : 'start') : 'stop') == null) throw StateError('offline');
+      if (await _call(enabled ? (layout ? 'layout' : screenshot ? 'screenshot' : 'start') : 'stop') == null) throw StateError('offline');
     } catch (_) {
       if (!_disposed && epoch == _epoch) {
         _commandAt = null;
@@ -269,6 +321,7 @@ class RemoteAdbMirror extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _touchQueue.clear();
     ffi.inputModel.adbTouchPriority = false;
     _epoch++;
     _timer?.cancel();

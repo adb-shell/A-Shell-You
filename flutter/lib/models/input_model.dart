@@ -332,7 +332,9 @@ class ToReleaseKeys {
 class InputModel {
   final WeakReference<FFI> parent;
   // Device-pushed ADB touch priority; never enables keyboard/text injection.
-  bool adbTouchPriority = false;
+  final adbTouchAvailable = false.obs;
+  bool get adbTouchPriority => adbTouchAvailable.value;
+  set adbTouchPriority(bool value) => adbTouchAvailable.value = value;
   String keyboardMode = '';
   static String Clipboard_Management = '';
   

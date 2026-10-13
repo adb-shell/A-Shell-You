@@ -1,13 +1,17 @@
 # AShell Project State
 
 Schema Version：`1.0`  
-State Revision：`STATE-20261014-006`
+State Revision：`STATE-20261014-008`
 
-Last Updated：2026-10-14（Asia/Tokyo；ADB控件恢复与独立遮罩）
+Last Updated：2026-10-14（Asia/Tokyo；ADB样式/几何/触摸/节点穿透）
 
 Observed At：2026-10-14（Asia/Tokyo）
 
 Evidence Scope：`repository-observed / V0 / external and runtime verification pending`
+
+T004续接复核/C3：补齐LocalAdbTouch重复停止期限、旧writer隔离、尺寸读取超时；31路径均本任务。本地/远端main同为404b199，Build AShell clients active；用户授权提交推送main并dispatch一次both/aarch64，不监控。CE-20261014-T004-02 / WORK012；此为执行前快照，实际提交及接受结果见Git/交付。V0；未本地产品验证，下方“无本轮Git/CI”为此前时点。
+
+当前T004：[ADB样式/画面/输入完善](../docs/tasks/T-2026-10-14-004-adb-ui-and-input.md)，main/404b199初始clean；本轮源码与记录未提交，D029/ADR0024/Baseline19/CE-20261014-T004-01。无本轮Git/CI/产品执行，仅V0；ADB-M17—M20待正式验证。前轮404b199已推送，dispatch204且未监控；下方T003/T002执行前段落均为历史记录。
 
 T003续接C3：用户明确要求提交、推送并执行编排；范围为当前30路径，GitHub adb-shell/A-Shell-You/main，Build AShell clients both/aarch64一次、不监控。只读核对本地/远端main同为941b215、workflow active、diff检查通过。CE-20261014-T003-02 / WORK008；本条为执行前快照，提交SHA与dispatch回执见Git/最终交付；不宣称构建通过，下方“无授权/未提交”为此前时点。
 
@@ -31,10 +35,10 @@ T002续接：用户明确授权提交/推送当前35路径到GitHub main，并�
 |---|---|---|
 | Product/runtime | `A Shell You` / `AShell`；crate ashell；Android me.ashell；Flutter内部flutter_hbb | source + ADR-0014 |
 | Rust / Flutter version | `5.2.1` / `5.2.1+59` | manifests + Baseline |
-| Baseline ID | `AS-BL-2026-10-14-941b215-adb-overlay-worktree` | Baseline18；旧基线冻结 |
+| Baseline ID | `AS-BL-2026-10-14-404b199-adb-layout-worktree` | Baseline19；旧基线冻结 |
 | Branch | `main` | read-only Git observation |
-| HEAD | `941b2156531baacafd16e343452a9de8fc2b8bdb` | 本轮只读观察；前轮分栏/截图已提交 |
-| Worktree | 初始clean；本轮布局/ADB恢复/遮罩源码与记录未提交，无新外部资产 | T-2026-10-14-003 / CE-20261014-T003-01 |
+| HEAD | `404b1991157308ebf700108dac3196f9d2889f91` | 本轮只读观察；前轮已提交推送 |
+| Worktree | 初始clean；本轮ADB栏/压缩/触摸/节点穿透源码与记录未提交，无新外部资产 | T-2026-10-14-004 / CE-20261014-T004-01 |
 | History mapping | a036f31提交前轮记忆；6fb0aa6初始化的975 blobs与历史源匹配是迁移前证据，准确RustDesk fork未知 | 历史接管报告；不能用该一致性描述当前dirty tree |
 | Highest completed verification | `V0` repository/document/schema checks | `TEST_MATRIX.md` + task records |
 | Formal build/runtime evidence | 当前工作树未取得新包/正式构建/真机结果；本轮未触发或监控CI | ADB-M01—M12全部NOT_RUN；旧矩阵继续适用，不宣称构建成功 |
