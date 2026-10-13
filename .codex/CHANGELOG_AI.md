@@ -197,3 +197,11 @@ Mode：`append-only task-level index`
 - Evidence：V0静态；ADB-R01—07的V2/V3/V4待正式环境，无Git/构建/设备/发布。
 - Decision / event / state：D-022 / ADR-0018；CE-20261013-T004-01；STATE-20261013-004 / WORK-20261013-008。
 - Detailed record：docs/tasks/T-2026-10-13-004-remote-adb.md；docs/AI_ENGINEERING/13_REMOTE_ADB.md。
+
+## T-2026-10-13-005：修复远程 ADB Dart 编译失败
+
+- Source：main/de8bc76，initial clean；当前修复未提交。
+- Evidence / fix：Android用户job日志三处bind未定义；controller补platform_model.dart显式导入，产品代码仅一行。
+- Verification：V0，修复前CI FAIL、修复后NOT_RUN；无Git/build/test/device/dispatch/release。
+- Decision / Event：D-022 reviewed-no-change；CE-20261013-T005-01 / STATE-20261013-005 / WORK-20261013-010。
+- Detail：docs/tasks/T-2026-10-13-005-adb-bind-import.md。

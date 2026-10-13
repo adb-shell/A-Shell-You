@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import '../../common.dart';
+import '../../models/platform_model.dart' show bind;
 
 /// Session-scoped consumer; pairing records and the ADB transport belong to Android.
 class RemoteAdbController extends ChangeNotifier {

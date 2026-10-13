@@ -1,7 +1,7 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261013-008`
+Registry Revision：`WORK-20261013-010`
 
 Last Updated：2026-10-13
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-无活动任务。T004仓库实现已交付，正式两端编译/多PC验收待用户在正式环境提供结果；见Last Closed Task。
+无活动任务。T005缺失导入已修复，待提交修复后在新SHA正式编译；见Last Closed Task。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ Active Task Count：0
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-13-004`
-- Result：独立PC ADB菜单/专用协议/JNI与Android共享manager、有限队列、配对记录/连接/shell/撤销已实现；相关文档/记忆已同步。
+- Task ID：`T-2026-10-13-005`
+- Result：用户Android CI的三处bind未定义已定位，ADB controller补一行platform_model直接导入；原链/CI/依赖未改。
 - Closed At：2026-10-13（Asia/Tokyo）
-- Final T-State：`T8 — complete repository implementation`（V0；V2/V3/V4待验证，非运行验收完成）
-- State / Event：`STATE-20261013-004` / `CE-20261013-T004-01`
-- Decision：D-022 / ADR-0018；Baseline12。旧退役、产品身份与CI边界保持。
-- Verification：V0跨层合同/字段/JNI/权限/所有权与取消、保护路径diff、文档链接/空白；原无障碍/视频/输入源码未改，session仅新增ADB钩子。
-- Next Gate：正式两端构建/Release JNI与多PC验收；ADB投屏仍未实现。本轮无Git写入/build/test/device/dispatch/sign/package/release。
+- Final T-State：`T8 — source fix complete`（V0；修复前CI FAIL，修复后V2待验证）
+- State / Event：`STATE-20261013-005` / `CE-20261013-T005-01`
+- Decision：D-022 / ADR-0018 reviewed-no-change；引用Baseline12，T004已由de8bc76固化。
+- Verification：V0日志/符号声明与import/export/ADB同类调用/FRB合同/差异与文档检查；未执行项目命令。
+- Next Gate：提交修复后发起新SHA Android构建；重跑旧commit不带修复。无本轮Git写入/build/test/device/dispatch/release。
 - Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md 中同 ID。
-- Detailed record：docs/tasks/T-2026-10-13-004-remote-adb.md；观察main/917e661，initial clean，本任务代码/文档留工作树未提交。
+- Detailed record：docs/tasks/T-2026-10-13-005-adb-bind-import.md；观察main/de8bc76，initial clean，一行代码修复与记录未提交。

@@ -6,6 +6,8 @@
 
 ## 0. Latest Recovery Snapshot
 
+最新：`T-2026-10-13-005`，[ADB bind导入修复](../docs/tasks/T-2026-10-13-005-adb-bind-import.md)。main/de8bc76已固化T004；用户Android CI报remote_adb_controller.dart三处bind未定义，compileFlutterBuildRelease失败。补直接import platform_model.dart show bind，源码仅一行；修复后未重编/提交/dispatch，需新SHA构建。STATE-20261013-005 / CE-20261013-T005-01；D-022/ADR-0018 reviewed-no-change。以下状态保留历史时点。
+
 最新：`T-2026-10-13-004`，[PC远程ADB](../docs/tasks/T-2026-10-13-004-remote-adb.md)。main/917e661初始clean，独立PC菜单/Misc.remote_adb(40)/JNI与Android共享manager已在未提交工作树实现。各PC查询Android同一配对记录、连接和队列；回执只给origin；revoke清App身份，系统列表仍手动忘记。无ADB投屏，原无障碍/视频/输入处理保持。V0，正式构建/多PC/权限验收待验证；无Git/产品执行。D-022 / ADR-0018 / STATE-20261013-004 / CE-20261013-T004-01；以下全部“最新”仅指各段历史时点。
 
 最新：`T-2026-10-13-003`，[本机 ADB 文档同步](../docs/tasks/T-2026-10-13-003-local-adb-docs.md)。观察 main/f84a78f，initial clean；8662f23 的独立模块保持，当前主页 ServerPage → LocalAdbPage，API 30+ 手动配对/连接/id验证/shell。无 PC ADB/ADB 投屏；旧 LADB 仍退役。当前事实见 [12_LOCAL_ADB.md](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)。本轮仅 Markdown/V0；V2/V3 结果未提供，未执行 Git 写入、构建、设备或发布。D-021 / ADR-0017 / STATE-20261013-003 / CE-20261013-T003-01；以下为各任务当时快照，不覆盖当前 HEAD。

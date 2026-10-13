@@ -471,3 +471,28 @@ Mode：`append-only logical persisted-change events`
 - `src/lib.rs`
 - `src/remote_adb.rs`
 - `src/server/connection.rs`
+
+## CE-20261013-T005-01 — 修复ADB controller缺少bind导入
+
+- Date / Owner：2026-10-13 / Codex；Release定位日志，Flutter符号可见性修复。
+- Task / Authority：T-2026-10-13-005，当前用户反馈GitHub Android失败；C2修复/C1记录，无C3。
+- Source：main/de8bc768f0a71cab3f60e93f321ae0f65d74c658，initial clean；前序T004已提交，本轮未提交。
+- Evidence：用户job日志显示remote_adb_controller.dart原44/57/64行getter bind未定义，compileFlutterBuildRelease失败；不保存临时签名URL或完整日志。
+- Delta：一行import platform_model.dart show bind；不改原功能、协议、JNI/Java、依赖/CI或生成文件。
+- Verification：V0声明/import/export、ADB调用、SessionID/FRB合同、diff空白/范围/链接；修复前CI FAIL，修复后V2 NOT_RUN，功能V3/V4待验。
+- Decision / State / Registry：D-022 / ADR-0018 reviewed-no-change；STATE-20261013-005 / WORK-20261013-010；Baseline12引用与当前de8bc76关系见任务。
+- Recovery：审阅本事件一行导入与文档diff回退，不整仓reset；去掉导入会恢复已知编译错误，无数据迁移。
+- Actions：10路径（一个源码，其余记录），零删除；未stage/commit/push/build/test/analyze/codegen/device/dispatch/sign/release。
+
+修改/新增路径：
+
+- `.codex/CHANGELOG_AI.md`
+- `.codex/CHANGE_EVENT_LOG.md`
+- `.codex/CURRENT_WORK.md`
+- `.codex/DECISION_LOG.md`
+- `.codex/PROJECT_MEMORY.md`
+- `.codex/PROJECT_STATE.md`
+- `.codex/TASK_HISTORY.md`
+- `docs/AI_ENGINEERING/13_REMOTE_ADB.md`
+- `docs/tasks/T-2026-10-13-005-adb-bind-import.md`
+- `flutter/lib/desktop/adb/remote_adb_controller.dart`

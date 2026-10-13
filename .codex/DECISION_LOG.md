@@ -239,3 +239,7 @@
 - Revoke：清本App身份/记录和libadb固定版本SSL缓存，系统配对列表仍须手动忘记。无ADB投屏，不改原视频/输入/Accessibility。
 - Related：ADR-0018扩展0017；T-2026-10-13-004 / CE-20261013-T004-01 / AS-BL-2026-10-13-917e661-remote-adb-worktree。
 - Verification：V0静态完成，ADB-R01—07的V2/V3/V4仍NOT_RUN；不构成Git/构建/设备/发布授权。
+
+### D-022 review — T-2026-10-13-005
+
+2026-10-13：reviewed-no-change。Android CI日志证明PC ADB controller缺少bind直接导入；仅补platform_model.dart导入，不改ADR-0018协议/权限/生命周期或外部依赖。修复后编译待验证；CE-20261013-T005-01。

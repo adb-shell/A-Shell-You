@@ -1,6 +1,6 @@
 # PC 远程 ADB / Android 共享状态
 
-最后核对：2026-10-13，`main/917e6612cdfd819b824626564478a3ff1d84eec4` 上的 T004 工作树。源码/V0，尚未编译或做多 PC 真机验证。决定：[ADR-0018](../ADR/0018-device-owned-remote-adb.md)；任务：[T004](../tasks/T-2026-10-13-004-remote-adb.md)。
+最后核对：2026-10-13，T004已由 `de8bc76` 固化。用户提供的Android CI日志显示Flutter编译失败：remote_adb_controller.dart缺少bind导入；[T005](../tasks/T-2026-10-13-005-adb-bind-import.md)已补显式导入，修复后尚未重编。多PC真机验证仍待完成。决定：[ADR-0018](../ADR/0018-device-owned-remote-adb.md)；原实现任务：[T004](../tasks/T-2026-10-13-004-remote-adb.md)。
 
 PC 通过现有已认证远控会话向 Android App 提交配对、连接和 shell 请求。ADB 私钥、配对记录和连接都在 Android；PC 不是 ADB host，也不保存 Android 的 ADB 私钥。没有加入 scrcpy、ADB 投屏、视频解码或 ADB 输入注入。原 Accessibility、MediaProjection、normal/SKL/ignore、terminal、ZEGO 和产品身份保持。
 
@@ -92,7 +92,7 @@ NSD 只解析本机 loopback/网络接口地址的服务，最多 5 秒、最多
 
 ## 验证需求
 
-当前仅 V0：跨层字符串、字段号、JNI/FRB 签名、权限分支、所有权/有界队列、敏感内容处理、受保护文件 diff 与文档链接检查。未运行 build/test/analyze/codegen、依赖安装、设备操作或工作流。
+本地仅V0静态检查。T005取得用户Android CI失败日志（Flutter 3.24.5 / compileFlutterBuildRelease）：三处bind未定义，根因是common.dart不会转导出它import的platform_model.dart。补 `import '../../models/platform_model.dart' show bind;` 后需正式重编；不能把这份失败日志或补导入的静态检查记为V2通过。本任务未执行build/test/analyze/codegen、依赖安装、设备或工作流。
 
 《编译验证需求》
 - 命令：Android Linux 仓库根 `./build.sh 1`、`./build.sh 2`；Windows 正式构建机仓库根 `build.cmd`。也可另行授权独立 `build-clients.yml` 两端编译。

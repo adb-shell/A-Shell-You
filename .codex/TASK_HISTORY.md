@@ -278,3 +278,14 @@
 - Decision / Baseline / Event：D-022 / ADR-0018 / Baseline12 / CE-20261013-T004-01。
 - Actions：无stage/commit/push、产品build/test/analyze/codegen、依赖更新、设备、版本/签名/发布或文件删除。
 - Detail：[T004](../docs/tasks/T-2026-10-13-004-remote-adb.md)、[接口与验收](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)；下一步正式两端构建/多PC结果回填。
+
+## T-2026-10-13-005：ADB controller 缺少 bind 导入
+
+- Date / State：2026-10-13 / T8源码修复完成，正式重编待验证。
+- Source / Authority：main/de8bc768f0a71cab3f60e93f321ae0f65d74c658、initial clean；用户反馈Android CI失败，C2针对性修复/C1记录，无本轮C3。
+- Evidence：用户job日志三处getter bind未定义，compileFlutterBuildRelease失败；common.dart未export platform_model.dart的getter。
+- Outcome：controller增加一行直接import；核对同类调用/SessionID/FRB合同，原链/CI/依赖无改动。
+- Verification：V0检查完成；用户证据为修复前FAIL，修复后V1/V2/V3/V4 NOT_RUN。
+- Records：CE-20261013-T005-01 / STATE-20261013-005 / WORK-20261013-010；Baseline12引用当前de8bc76固化状态，D-022/ADR-0018 reviewed-no-change。
+- Actions：无Git写入、build/test/analyze/codegen、设备、dispatch/发布；临时签名日志URL未落仓。
+- Detail：[T005](../docs/tasks/T-2026-10-13-005-adb-bind-import.md)，提交修复后需新SHA构建，重跑旧commit不带修复。
