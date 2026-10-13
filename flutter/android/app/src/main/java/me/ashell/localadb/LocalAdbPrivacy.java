@@ -18,6 +18,7 @@ final class LocalAdbPrivacy {
     private Run active;
     private String phase = "idle";
     private String error = "";
+    private int pendingPort;
     private static native void state(String phase, String error);
 
     LocalAdbPrivacy(Context context, LocalAdbMirror.ShellReady shellReady) {
@@ -26,7 +27,11 @@ final class LocalAdbPrivacy {
     }
 
     synchronized void start(int port) {
-        if (active != null) { publish(phase, error); return; }
+        if (active != null) {
+            if (active.cancelled.get()) pendingPort = port;
+            publish(phase, error);
+            return;
+        }
         if (!shellReady.get() || port <= 0 || port > 65535) {
             publish("error", "请先连接 ADB 并验证 Shell。"); return;
         }
@@ -45,7 +50,7 @@ final class LocalAdbPrivacy {
                     if (!shellReady.get() && !run.cancelled.get()) stop();
                     if (!run.cancelled.get() && !run.ready && now - run.started > 15000) {
                         run.failure = "ADB 黑屏遮罩启动超时，请重试。";
-                        stop();
+                        stopCurrent();
                     }
                     if (run.cancelled.get() && now - run.stopAt > 3000) {
                         if (!run.aborted) {
@@ -58,14 +63,22 @@ final class LocalAdbPrivacy {
                 }
             }
         }, "ashell-adb-privacy-guard");
+        run.guard = guard;
         guard.setDaemon(true);
         guard.start();
     }
 
     synchronized void stop() {
+        pendingPort = 0;
+        stopCurrent();
+    }
+
+    private void stopCurrent() {
         Run run = active;
         if (run == null) { publish("idle", ""); return; }
         if (run.cancelled.compareAndSet(false, true)) run.stopAt = SystemClock.elapsedRealtime();
+        synchronized (run.signal) { run.signal.notifyAll(); }
+        if (run.writer == null) { run.client.abort(); run.thread.interrupt(); }
         publish("stopping", run.failure);
     }
 
@@ -76,8 +89,12 @@ final class LocalAdbPrivacy {
 
     private synchronized void finish(Run run) {
         if (active != run) return;
+        if (run.guard != null) run.guard.interrupt();
         active = null;
         publish(run.failure.isEmpty() ? "idle" : "error", run.failure);
+        int port = pendingPort;
+        pendingPort = 0;
+        if (port > 0 && shellReady.get()) start(port);
     }
 
     private void control(Run run) {
@@ -97,10 +114,13 @@ final class LocalAdbPrivacy {
                             byte[] packet = {0, 1, 0, 0, 0, (byte) (stop ? 0 : 1)}; // shell-v2 stdin
                             process.write(packet, 0, packet.length); process.flush();
                             if (stop) return;
-                            Thread.sleep(1000);
+                            synchronized (run.signal) {
+                                if (!run.cancelled.get()) run.signal.wait(1000);
+                            }
                         } while (true);
                     } catch (Exception ignored) { run.client.abort(); }
                 }, "ashell-adb-privacy-lease");
+                run.writer = writer;
                 writer.setDaemon(true);
                 writer.start();
                 byte[] header = new byte[5];
@@ -129,7 +149,7 @@ final class LocalAdbPrivacy {
                             if (active == run) {
                                 if (!run.cancelled.get() && run.failure.isEmpty())
                                     run.failure = "ADB 黑屏遮罩进程已退出。";
-                                stop();
+                                stopCurrent();
                             }
                         }
                         break;
@@ -140,7 +160,7 @@ final class LocalAdbPrivacy {
                     if (active == run) {
                         if (!run.cancelled.get() && !run.off && run.failure.isEmpty())
                             run.failure = "ADB 黑屏遮罩连接中断，正在移除遮罩。";
-                        stop();
+                        stopCurrent();
                     }
                 }
                 run.client.abort(); // unblock AdbStream.close before leaving the resource scope
@@ -154,7 +174,7 @@ final class LocalAdbPrivacy {
             Thread.interrupted();
             run.client.disconnect();
             // An acknowledged OFF/process exit releases the layer. Unexpected transport loss uses its lease.
-            if (!run.off) {
+            if (!run.off && writer != null) {
                 synchronized (this) {
                     if (active == run) publish("stopping", run.failure);
                 }
@@ -175,10 +195,10 @@ final class LocalAdbPrivacy {
             if (!run.cancelled.get()) publish("on", "");
         } else if ("ASHELL_OVERLAY_ERROR".equals(line)) {
             run.failure = "系统不支持此黑屏遮罩；未使用会遮挡 PC 画面的普通遮罩替代。";
-            stop();
+            stopCurrent();
         } else if ("ASHELL_OVERLAY_OFF".equals(line)) {
             run.off = true;
-            stop();
+            stopCurrent();
         }
     }
 
@@ -196,12 +216,14 @@ final class LocalAdbPrivacy {
         final long started = SystemClock.elapsedRealtime();
         final LocalAdbClient client = new LocalAdbClient(context, true);
         final AtomicBoolean cancelled = new AtomicBoolean();
+        final Object signal = new Object();
         volatile String failure = "";
         volatile boolean off;
         boolean ready;
         boolean aborted;
         long stopAt;
-        Thread thread;
+        Thread thread, guard;
+        volatile Thread writer;
         Run(int port) { this.port = port; }
     }
 }

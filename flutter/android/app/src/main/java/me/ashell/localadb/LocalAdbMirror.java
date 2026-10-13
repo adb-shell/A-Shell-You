@@ -88,6 +88,14 @@ final class LocalAdbMirror {
         stopCurrent(reason);
     }
 
+    synchronized void stopMode(String target) {
+        // A delayed close from another PC must not tear down a different source.
+        // Preserve a replacement mode already requested while the old one exits.
+        if (pendingPort > 0 && target.equals(pendingMode)) pendingPort = 0;
+        if (active != null && target.equals(active.mode)) stopCurrent("");
+        else publish(phase, "");
+    }
+
     private void stopCurrent(String reason) {
         Run run = active;
         if (run == null) { publish("idle", reason); return; }

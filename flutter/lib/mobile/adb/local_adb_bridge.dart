@@ -4,6 +4,7 @@ class LocalAdbStatus {
   final bool supported;
   final bool connected;
   final bool busy;
+  final bool connectionBusy;
   final bool paired;
   final int connectPort;
   final String phase;
@@ -12,6 +13,7 @@ class LocalAdbStatus {
     this.supported = false,
     this.connected = false,
     this.busy = false,
+    this.connectionBusy = false,
     this.paired = false,
     this.connectPort = 0,
     this.phase = '',
@@ -21,6 +23,7 @@ class LocalAdbStatus {
         supported: value['supported'] == true,
         connected: value['connected'] == true,
         busy: value['busy'] == true,
+        connectionBusy: (value['connectionBusy'] ?? value['busy']) == true,
         paired: value['paired'] == true,
         connectPort: (value['connectPort'] as num?)?.toInt() ?? 0,
         phase: value['phase'] as String? ?? '',

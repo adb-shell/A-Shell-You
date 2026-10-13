@@ -7,7 +7,7 @@ const MAX_REQUEST: usize = 32768;
 const MAX_REPLY: usize = 524288; // JSON escaping of a bounded 64 KiB shell result.
 const PENDING_TTL_SECS: u64 = 310; // Eight operations of at most 35s, plus reply margin.
 
-fn message(value: String) -> Message {
+pub(crate) fn message(value: String) -> Message {
     let mut misc = Misc::new();
     misc.set_remote_adb(value);
     let mut msg = Message::new();
@@ -69,6 +69,11 @@ mod pc {
     pub fn receive(peer: &str, payload: &str) {
         if payload.len() > MAX_REPLY { return; }
         let Ok(value) = serde_json::from_str::<Value>(payload) else { return; };
+        if value["v"] == 1 && value["kind"] == "state" {
+            #[cfg(all(feature = "flutter", not(any(target_os = "android", target_os = "ios"))))]
+            crate::remote_adb_video::pc::receive_adb_state(peer, value);
+            return;
+        }
         if value["v"] != 1 || !value["ok"].is_boolean() { return; }
         let Some(id) = value["id"].as_str() else { return; };
         if let Ok(mut pending) = PENDING.lock() {
@@ -157,6 +162,17 @@ pub mod android {
             return Some(error(id, "unavailable", "Android ADB 模块尚未初始化。"));
         }
         None
+    }
+
+    #[no_mangle]
+    pub extern "system" fn Java_me_ashell_localadb_RemoteAdbNative_state(
+        mut env: JNIEnv, _class: JClass, payload: JString,
+    ) {
+        let Ok(payload) = env.get_string(&payload).map(|s| s.to_string_lossy().into_owned()) else { return; };
+        if payload.len() > MAX_REQUEST { return; }
+        let Ok(state) = serde_json::from_str::<Value>(&payload) else { return; };
+        if !state["supported"].is_boolean() || !state["connected"].is_boolean() { return; }
+        crate::remote_adb_video::android::publish_adb_state(state);
     }
 
     #[no_mangle]

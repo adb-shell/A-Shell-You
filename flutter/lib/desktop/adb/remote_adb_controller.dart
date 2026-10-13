@@ -11,7 +11,10 @@ class RemoteAdbController extends ChangeNotifier {
   final SessionID sessionId;
   final RemoteAdbSessionState? sessionState;
   RemoteAdbController(this.sessionId, {this.sessionState})
-      : assert(sessionState == null || sessionState?.sessionId == sessionId);
+      : assert(sessionState == null || sessionState?.sessionId == sessionId) {
+    sessionState?.addListener(_onSharedState);
+    _onSharedState();
+  }
 
   Map<String, dynamic> state = {};
   bool busy = false;
@@ -23,6 +26,9 @@ class RemoteAdbController extends ChangeNotifier {
   String statusError = '';
   String output = '';
   int _refreshEpoch = 0;
+  String? _activeRequestId;
+  bool _cancelPending = false;
+  Map<String, dynamic>? _sharedSnapshot;
 
   bool get paired => state['paired'] == true;
   bool get connected => !stale && state['connected'] == true;
@@ -31,10 +37,25 @@ class RemoteAdbController extends ChangeNotifier {
   bool get ready => supported && controlAllowed && !busy;
   bool get discoverySupported => (state['apiVersion'] as num? ?? 1) >= 2;
   String get summary => stale ? '状态未确认' : connected
-      ? 'ADB 已连接，Shell 已验证' : paired
+      ? 'ADB 已连接，Shell 已验证' : state['recovering'] == true
+          ? 'ADB 连接中断，正在恢复 Shell' : paired
           ? 'Android 有配对记录，尚未连接' : 'Android 暂无配对记录';
 
   void _notify() { if (!_disposed) notifyListeners(); }
+
+  void _onSharedState() {
+    final snapshot = sessionState?.snapshot;
+    if (_disposed || identical(snapshot, _sharedSnapshot)) return;
+    _sharedSnapshot = snapshot;
+    if (snapshot == null) {
+      _refreshEpoch++;
+      stale = true;
+    } else {
+      _apply({'state': snapshot, 'controlAllowed': controlAllowed});
+      if (!busy && !_hasResult) message = summary;
+    }
+    _notify();
+  }
 
   Future<Map<String, dynamic>> _request(String method, [Map<String, dynamic> args = const {}]) async {
     final raw = await bind.sessionGetCommon(sessionId: sessionId,
@@ -45,10 +66,17 @@ class RemoteAdbController extends ChangeNotifier {
     if (start['ok'] == false) throw Exception(start['message'] ?? 'ADB 请求失败。');
     final id = start['id'] as String?;
     if (id == null || id.isEmpty) throw Exception('远程 ADB 请求无效。');
+    final operation = method != 'status' && method != 'cancel';
+    if (operation) _activeRequestId = id;
     // Eight serialized operations of at most 35s, plus a reply margin.
     final deadline = DateTime.now().add(Duration(
         seconds: method == 'status' || method == 'cancel' ? 8 : 300));
     try {
+      if ((_disposed || _cancelPending) && operation) {
+        _cancelPending = false;
+        await _cancelRequest(id);
+        if (_disposed) throw StateError('ADB controller disposed');
+      }
       while (!_disposed && DateTime.now().isBefore(deadline)) {
         await Future<void>.delayed(const Duration(milliseconds: 200));
         if (_disposed) break;
@@ -61,26 +89,40 @@ class RemoteAdbController extends ChangeNotifier {
       }
       throw Exception('Android 未返回 ADB 状态或结果，结果尚未确认。请保持远控连接并刷新状态；命令不会自动重放。');
     } catch (_) {
-      if (!_disposed && method != 'status' && method != 'cancel') {
-        // Wait for the cancellation request before allowing this window to submit
-        // another operation, so a delayed owner cancellation cannot cancel it.
-        try { await _request('cancel'); } catch (_) { }
+      if (!_disposed && operation) {
+        try { await _cancelRequest(id); } catch (_) { }
       }
       rethrow;
     } finally {
+      if (_activeRequestId == id) _activeRequestId = null;
       await bind.sessionGetCommon(sessionId: sessionId, key: 'remote_adb_forget', param: id)
           .timeout(const Duration(seconds: 5))
           .catchError((Object _) => null);
     }
   }
 
+  Future<void> _cancelRequest(String id) async {
+    // New Android endpoints scope cancellation to this request, not every dialog
+    // and sidebar using the same PC session. Disconnect still cancels its owner.
+    await _request('cancel', (state['apiVersion'] as num? ?? 1) >= 3
+        ? {'requestId': id} : const {});
+  }
+
   bool _apply(Map<String, dynamic> response, {int? expectedEpoch}) {
     final snapshot = response['state'];
     if (snapshot is Map && snapshot['supported'] is bool && snapshot['connected'] is bool) {
+      if (expectedEpoch != null && expectedEpoch != sessionState?.epoch && _sharedSnapshot != null
+          && snapshot['instance'] != _sharedSnapshot!['instance']) return true;
+      controlAllowed = response['controlAllowed'] != false;
+      // A delayed reply must not overwrite a newer device-pushed connection state.
+      if (!stale && snapshot['instance'] == state['instance']
+          && (snapshot['revision'] as num? ?? 0) < (state['revision'] as num? ?? 0)) {
+        sessionState?.apply(state, controlAllowed, expectedEpoch: expectedEpoch);
+        return true;
+      }
       state = Map<String, dynamic>.from(snapshot);
       stale = false;
       statusError = '';
-      controlAllowed = response['controlAllowed'] != false;
       sessionState?.apply(state, controlAllowed, expectedEpoch: expectedEpoch);
       return true;
     }
@@ -128,12 +170,13 @@ class RemoteAdbController extends ChangeNotifier {
       return null;
     }
     busy = true;
+    _cancelPending = false;
     _hasResult = true;
     _refreshEpoch++;
     sessionState?.advanceEpoch();
     final sessionEpoch = sessionState?.epoch;
     bool receivedState = false;
-    message = '请求已发送，Android 将按顺序处理；其他 PC 共用同一 ADB 状态。';
+    message = '请求已发送；所有 PC 共用 Android 的 ADB 状态，命令使用独立通道。';
     if (method == 'shell') output = '';
     _notify();
     try {
@@ -178,22 +221,27 @@ class RemoteAdbController extends ChangeNotifier {
       }
     } finally {
       busy = false;
+      _cancelPending = false;
       _notify();
     }
     return null;
   }
 
   Future<void> cancel() async {
-    try { await _request('cancel'); }
+    final id = _activeRequestId;
+    if (id == null) { _cancelPending = busy; return; }
+    try { await _cancelRequest(id); }
     catch (error) { if (!_disposed) { message = _errorText(error); _notify(); } }
   }
 
   String _errorText(Object error) => error.toString().replaceFirst(RegExp(r'^Exception: '), '');
 
   @override void dispose() {
-    if (busy) {
+    sessionState?.removeListener(_onSharedState);
+    final id = _activeRequestId;
+    if (busy && id != null) {
       // Fire only a cancellation request; never replay commands or disconnect an idle shared ADB.
-      unawaited(_request('cancel').then<void>((_) {}).catchError((Object _) {}));
+      unawaited(_cancelRequest(id).catchError((Object _) {}));
     }
     _disposed = true;
     super.dispose();

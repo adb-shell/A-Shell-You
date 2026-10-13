@@ -224,13 +224,14 @@ final class LocalAdbTouch {
                         run.busySince = SystemClock.elapsedRealtime();
                         DisplayMetrics size = metrics();
                         boolean changed = rotationWidth != size.widthPixels || rotationHeight != size.heightPixels;
+                        boolean expired = event != null && SystemClock.elapsedRealtime() - event.at > 1500;
                         if (owner != null && (changed || SystemClock.elapsedRealtime() - lastEvent > 10000
-                                || event != null && event.action == 3)) {
+                                || expired || event != null && event.action == 3)) {
                             writeTouch(stream, 1, lastX, lastY, rotationWidth, rotationHeight);
                             owner = null;
                         }
                         rotationWidth = size.widthPixels; rotationHeight = size.heightPixels;
-                        if (event == null || event.action == 3) { run.busySince = 0; continue; }
+                        if (event == null || expired || event.action == 3) { run.busySince = 0; continue; }
                         if (owner != null && owner != event.owner) { run.busySince = 0; continue; } // one drag lease across PCs
                         if (event.action == 0) {
                             if (owner != null) writeTouch(stream, 1, lastX, lastY, rotationWidth, rotationHeight);
@@ -314,6 +315,7 @@ final class LocalAdbTouch {
     }
 
     private static final class Event {
+        final long at = SystemClock.elapsedRealtime();
         final int owner, action, x, y, dx, dy;
         Event(int owner, int action, int x, int y) { this(owner, action, x, y, 0, 0); }
         Event(int owner, int action, int x, int y, int dx, int dy) {

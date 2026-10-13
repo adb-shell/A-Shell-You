@@ -157,7 +157,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
     ElevatedButton.icon(onPressed: adb.ready && adb.connected ? () {
       if (command.text.trim().isNotEmpty) adb.run('shell', {'command': command.text.trim()});
     } : null, icon: const Icon(Icons.play_arrow), label: const Text('执行命令')),
-    const Text('所有 PC 共用手机 ADB，请求按顺序执行。命令最长 20 秒，输出上限 64 KiB。'),
+    const Text('所有 PC 共用手机 ADB；新版手机端最多并行执行 2 条命令，其余有界排队。单条命令最长 20 秒，输出上限 64 KiB；取消仅影响本次命令。'),
     const SizedBox(height: 10),
     Container(constraints: const BoxConstraints(minHeight: 120, maxHeight: 280),
         padding: const EdgeInsets.all(12),

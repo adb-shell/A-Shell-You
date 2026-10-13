@@ -15,4 +15,5 @@ public final class RemoteAdbNative {
 
     private static native void register(LocalAdbManager manager);
     static native void complete(String token, String payload);
+    static native void state(String payload);
 }

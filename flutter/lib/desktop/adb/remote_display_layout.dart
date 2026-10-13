@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../common.dart' show sessionRefreshVideo;
 import '../../consts.dart';
 import '../../models/model.dart';
 import 'remote_adb_mirror.dart';
@@ -22,43 +21,6 @@ class RemoteDisplayLayout extends StatefulWidget {
 class _RemoteDisplayLayoutState extends State<RemoteDisplayLayout> {
   bool _ordinaryVisible = false;
   bool? _ordinaryEnabled;
-  bool _adbWasActive = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _adbWasActive = widget.mirror.active;
-    widget.mirror.addListener(_onAdbState);
-  }
-
-  void _onAdbState() {
-    final stopped = _adbWasActive && !widget.mirror.active;
-    _adbWasActive = widget.mirror.active;
-    if (!stopped) return;
-    final peer = widget.ffi.ffiModel.pi;
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted || !identical(peer, widget.ffi.ffiModel.pi) ||
-          !peer.isSet.value || widget.mirror.active) return;
-      final status = widget.ffi.ashellStatusModel.data;
-      if (status.video != true && status.screenshot != true && status.penetrate != true) return;
-      // ADB teardown/recentering must leave the ordinary decoder and its frame
-      // notification alive. Refresh only an already-running source, never start capture.
-      try {
-        await widget.ffi.canvasModel.updateViewStyle(refreshMousePos: false);
-        final current = widget.ffi.ashellStatusModel.data;
-        if (mounted && identical(peer, widget.ffi.ffiModel.pi) && peer.isSet.value && !widget.mirror.active &&
-            (current.video == true || current.screenshot == true || current.penetrate == true)) {
-          await sessionRefreshVideo(widget.ffi.sessionId, peer);
-        }
-      } catch (_) { }
-    });
-  }
-
-  @override
-  void dispose() {
-    widget.mirror.removeListener(_onAdbState);
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(

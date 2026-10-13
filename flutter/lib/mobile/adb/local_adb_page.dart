@@ -85,7 +85,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
   }
 
   Future<void> _perform(String message, Future<String> Function() action) async {
-    if (_busy || _status.busy || _stale || !_status.supported) return;
+    if (_busy || _status.connectionBusy || _stale || !_status.supported) return;
     FocusScope.of(context).unfocus();
     setState(() { _busy = true; _error = false; _message = message; });
     try {
@@ -129,7 +129,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
     _perform('正在配对，成功后将自动连接并验证 Shell…', () async {
       final identity = await _bridge.pairAndConnect(port, code, connection);
       if (mounted) setState(() => _output = identity);
-      return '配对成功，ADB 已连接，Shell 已验证。PC 可刷新状态查看结果。';
+      return '配对成功，ADB 已连接，Shell 已验证。支持状态同步的 PC 会自动更新，也可手动刷新。';
     });
   }
 
@@ -193,7 +193,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
   @override Widget build(BuildContext context) {
     super.build(context);
     final busy = _busy || _status.busy;
-    final enabled = _loaded && !_stale && _status.supported && !busy;
+    final enabled = _loaded && !_stale && _status.supported && !_busy && !_status.connectionBusy;
     return ListView(padding: const EdgeInsets.all(16), children: [
       Row(children: [
         const Icon(Icons.adb, size: 28), const SizedBox(width: 10),
@@ -202,7 +202,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
       ]),
       const SizedBox(height: 10),
       _card(_stale ? '状态未确认' : _status.connected ? '已连接 · Shell 已验证' : _status.paired ? '已配对 · 等待连接' : '尚未配对', [
-        const Text('配对记录和连接由本手机保存，所有 PC 共用。本页每 3 秒查询状态，PC 可手动刷新。'),
+        const Text('配对记录和连接由本手机保存，所有 PC 共用。本页每 3 秒查询状态；新版 PC 会接收状态变化，也可手动刷新。'),
         if (_status.connectPort != 0) Text('上次成功连接端口：' + _status.connectPort.toString()),
         const SizedBox(height: 8),
         Text(_message, style: TextStyle(color: _error ? Theme.of(context).colorScheme.error : null)),

@@ -210,7 +210,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                           _divider(),
                           _modeButton(scale, '开投屏', Colors.blue, widget.mirror.canStart,
                               () => widget.mirror.setEnabled(true), '开启 ADB 视频；正在截图时切换为视频模式'),
-                          _modeButton(scale, '关投屏', Colors.red, widget.mirror.canStop && (widget.mirror.videoMode || widget.mirror.busy),
+                          _modeButton(scale, '关投屏', Colors.red, widget.mirror.canStopVideo,
                               () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 视频'),
                           _divider(),
                           _modeButton(scale, '开无视', Colors.blue, widget.mirror.canScreenshot,
@@ -218,8 +218,8 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                               widget.mirror.screenshotSupported
                                   ? 'ADB 强制连续系统截图，无需无障碍；系统保护内容仍受限制。开启后替换 ADB 视频。'
                                   : '请更新 Android 客户端以支持 ADB 连续截图'),
-                          _modeButton(scale, '关无视', Colors.red, widget.mirror.canStop && (widget.mirror.screenshotMode || widget.mirror.busy),
-                              () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 连续截图'),
+                          _modeButton(scale, '关无视', Colors.red, widget.mirror.canStopScreenshot,
+                              () => widget.mirror.setEnabled(false, screenshot: true), '关闭所有 PC 的 ADB 连续截图'),
                           _divider(),
                           _modeButton(scale, '开黑屏', Colors.blue, widget.mirror.canBlackOn,
                               () => widget.mirror.setBlack(true), widget.mirror.privacySupported
@@ -231,8 +231,8 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                           _modeButton(scale, '开穿透', Colors.blue, widget.mirror.canLayout,
                               () => widget.mirror.setEnabled(true, layout: true),
                               '通过 ADB 绘制界面节点的边框和文字；替换当前 ADB 画面，不影响普通画面和无障碍服务'),
-                          _modeButton(scale, '关穿透', Colors.red, widget.mirror.canStop && (widget.mirror.layoutMode || widget.mirror.busy),
-                              () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 穿透画面'),
+                          _modeButton(scale, '关穿透', Colors.red, widget.mirror.canStopLayout,
+                              () => widget.mirror.setEnabled(false, layout: true), '关闭所有 PC 的 ADB 穿透画面'),
                           _divider(),
                           Container(
                             margin: const EdgeInsets.symmetric(vertical: 4),

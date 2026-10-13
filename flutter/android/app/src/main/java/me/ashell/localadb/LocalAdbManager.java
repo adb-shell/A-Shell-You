@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 
 import org.json.JSONObject;
 
@@ -35,13 +36,37 @@ public final class LocalAdbManager {
     private final LocalAdbMirror mirror;
     private final LocalAdbTouch touch;
     private final LocalAdbPrivacy privacy;
+    private final LocalAdbCommands commands;
     private final SharedPreferences records;
     private final ExecutorService worker = Executors.newSingleThreadExecutor(
             task -> new Thread(task, "ashell-local-adb"));
     private final ArrayDeque<Operation> queue = new ArrayDeque<>();
     private Operation current;
     private long revision;
+    private final String instanceId = java.util.UUID.randomUUID().toString();
+    private Map<String, Object> lastPublished;
     private volatile Map<String, Object> discovered = new HashMap<>();
+    private static final String RECOVERY_OWNER = "adb-recovery";
+    private boolean keepConnection, observedConnected;
+    private int recoveryAttempts;
+    private long nextRecoveryAt;
+    // One process-owned health loop, independent of every local/PC page and frame source.
+    private final Runnable health = new Runnable() {
+        @Override public void run() {
+            reconcileConnection();
+            changed();
+            if (keepConnection && !client.isConnected() && current == null && queue.isEmpty()
+                    && recoveryAttempts < 3 && SystemClock.elapsedRealtime() >= nextRecoveryAt) {
+                recoveryAttempts++;
+                nextRecoveryAt = SystemClock.elapsedRealtime() + Math.min(10000, 2000L << recoveryAttempts);
+                execute(RECOVERY_OWNER, "connect", new HashMap<>(), new Reply() {
+                    @Override public void success(Object value) { }
+                    @Override public void failure(String code, String message) { }
+                });
+            }
+            main.postDelayed(this, 1000);
+        }
+    };
 
     private LocalAdbManager(Context context) {
         this.context = context;
@@ -50,21 +75,40 @@ public final class LocalAdbManager {
         mirror = new LocalAdbMirror(context, client::isConnected);
         touch = new LocalAdbTouch(context, client::isConnected);
         privacy = new LocalAdbPrivacy(context, client::isConnected);
+        commands = new LocalAdbCommands(context, main, client::isConnected, this::changed);
         RemoteAdbNative.attach(this);
         mirror.attach(this);
+        changed();
+        main.postDelayed(health, 1000);
+    }
+
+    private void reconcileConnection() {
+        boolean connected = client.isConnected();
+        if (!connected && observedConnected && !transportChanging()) {
+            mirror.stop("ADB Shell 已断开，画面已停止。");
+            privacy.stop();
+            touch.stop();
+            commands.cancel(null, null);
+            nextRecoveryAt = SystemClock.elapsedRealtime() + 2000;
+        }
+        observedConnected = connected;
+        if (connected && !transportChanging()) touch.enable(records.getInt("connectPort", 0));
     }
 
     // Independent JNI entry; no long-running video operation occupies the shell queue.
     public void controlMirror(String action) {
         main.post(() -> {
             if ("start".equals(action) || "screenshot".equals(action) || "layout".equals(action)) {
-                if (current != null || !queue.isEmpty() || !client.isConnected()) {
+                if (transportChanging() || !client.isConnected()) {
                     mirror.unavailable();
                 } else {
                     mirror.start(records.getInt("connectPort", 0), "layout".equals(action) ? "layout"
                             : "screenshot".equals(action) ? "jpeg" : "h264");
                 }
             } else if ("stop".equals(action)) mirror.stop("");
+            else if ("stop_video".equals(action)) mirror.stopMode("h264");
+            else if ("stop_screenshot".equals(action)) mirror.stopMode("jpeg");
+            else if ("stop_layout".equals(action)) mirror.stopMode("layout");
             else if ("black_on".equals(action)) privacy.start(records.getInt("connectPort", 0));
             else if ("black_off".equals(action)) privacy.stop();
             else if ("stop_all".equals(action)) { mirror.stop(""); privacy.stop(); }
@@ -84,33 +128,47 @@ public final class LocalAdbManager {
     Map<String, Object> status() {
         Map<String, Object> value = new HashMap<>();
         value.put("supported", Build.VERSION.SDK_INT >= 30);
-        value.put("apiVersion", 2);
-        value.put("mirrorVersion", 1);
+        value.put("apiVersion", 3);
+        value.put("mirrorVersion", 2);
         value.put("connected", client.isConnected());
         value.put("paired", Build.VERSION.SDK_INT >= 30
                 && records.getBoolean("paired", false) && AdbIdentity.exists(context));
         value.put("pairedAt", records.getLong("pairedAt", 0));
         value.put("connectPort", records.getInt("connectPort", 0));
-        value.put("busy", current != null);
-        value.put("queued", queue.size());
-        value.put("operation", current == null ? "" : current.kind);
+        value.put("busy", current != null || commands.running() != 0);
+        value.put("connectionBusy", transportChanging());
+        value.put("queued", queue.size() + commands.queued());
+        value.put("runningCommands", commands.running());
+        value.put("recovering", keepConnection && !client.isConnected() && recoveryAttempts < 3);
+        value.put("operation", current == null ? commands.running() == 0 ? "" : "shell" : current.kind);
         value.put("revision", revision);
+        value.put("instance", instanceId);
         value.put("phase", current == null ? "" : current.phase);
         value.put("discovery", discovered);
         return value;
     }
 
     void execute(String owner, String kind, Map<String, Object> args, Reply reply) {
+        execute(owner, "", kind, args, reply);
+    }
+
+    private void execute(String owner, String requestId, String kind, Map<String, Object> args, Reply reply) {
         for (String key : args.keySet()) {
             if (!("port".equals(key) || "connectPort".equals(key)
-                    || "code".equals(key) || "command".equals(key))) {
+                    || "code".equals(key) || "command".equals(key)
+                    || "cancel".equals(kind) && "requestId".equals(key))) {
                 reply.failure("invalid", "ADB 请求包含不支持的参数，请更新客户端后使用配对码连接。");
                 return;
             }
         }
-        if ("status".equals(kind)) { reply.success(status()); return; }
+        if ("status".equals(kind)) { changed(); reply.success(status()); return; }
         if ("cancel".equals(kind)) {
-            cancelOwner(owner);
+            Object target = args.get("requestId");
+            if (target != null && (!(target instanceof String) || ((String) target).isEmpty()
+                    || ((String) target).length() > 64)) {
+                reply.failure("invalid", "无效取消请求。"); return;
+            }
+            cancelOwner(owner, (String) target);
             reply.success(null);
             return;
         }
@@ -159,19 +217,35 @@ public final class LocalAdbManager {
             }
             text = (String) command;
         }
-        if ("revoke".equals(kind)) {
+        if ("shell".equals(kind)) {
+            if (transportChanging()) {
+                reply.failure("busy", "ADB 正在配对、连接或断开，请稍后执行命令。"); return;
+            }
+            commands.submit(owner, requestId, records.getInt("connectPort", 0), text, reply);
+            return;
+        }
+        if (!RECOVERY_OWNER.equals(owner) && !"discover".equals(kind)) {
+            // Explicit connection actions supersede recovery. Never auto-reconnect after
+            // disconnect/revoke/cancel, and never replay pairing codes or shell commands.
+            keepConnection = false;
+            recoveryAttempts = 0;
+            Iterator<Operation> pending = queue.iterator();
+            while (pending.hasNext()) if (RECOVERY_OWNER.equals(pending.next().owner)) pending.remove();
+            if (current != null && RECOVERY_OWNER.equals(current.owner)) cancelCurrent("cancelled");
+        }
+        if ("revoke".equals(kind) || "disconnect".equals(kind)) {
             // Global device action: cancel all queued work before invalidating the shared identity.
             while (!queue.isEmpty()) {
                 Operation pending = queue.remove();
                 pending.text = "";
-                pending.reply.failure("cancelled", "ADB 身份正在撤销，排队请求已取消。");
+                pending.reply.failure("cancelled", "ADB 正在断开或撤销，排队请求已取消。");
             }
             if (current != null) cancelCurrent("cancelled");
         } else if (queue.size() >= 7) {
             reply.failure("busy", "Android ADB 队列已满，请稍后重试。"); return;
         }
-        queue.add(new Operation(owner, kind, port, connectPort, text, reply));
-        revision++;
+        queue.add(new Operation(owner, requestId, kind, port, connectPort, text, reply));
+        changed();
         startNext();
     }
 
@@ -179,16 +253,21 @@ public final class LocalAdbManager {
         if (current != null || queue.isEmpty()) return;
         Operation operation = queue.remove();
         if ("pair".equals(operation.kind) || "pairConnect".equals(operation.kind)
-                || "disconnect".equals(operation.kind) || "revoke".equals(operation.kind)) {
+                || "disconnect".equals(operation.kind) || "revoke".equals(operation.kind)
+                || "connect".equals(operation.kind) && (!client.isConnected()
+                    || operation.port != 0 && operation.port != records.getInt("connectPort", 0))) {
             mirror.stop("");
             touch.stop();
             privacy.stop();
+            commands.cancel(null, null);
         }
-        if ("connect".equals(operation.kind)) privacy.stop();
         current = operation;
+        changed();
         operation.timeout = () -> { if (current == operation) cancelCurrent("timeout"); };
         // At most 8 operations, each <=35s. PC routes retain results for 310s.
-        main.postDelayed(operation.timeout, "pairConnect".equals(operation.kind) ? 35000 : 20000);
+        long timeout = "pairConnect".equals(operation.kind) ? 35000 : 20000;
+        operation.deadline = SystemClock.elapsedRealtime() + timeout;
+        main.postDelayed(operation.timeout, timeout);
         worker.execute(() -> {
             Object value = null;
             boolean failed = false;
@@ -217,22 +296,22 @@ public final class LocalAdbManager {
                             records.edit().putBoolean("paired", true)
                                     .putLong("pairedAt", System.currentTimeMillis()).apply();
                             operation.pairCompleted = true;
+                            main.post(this::changed);
                         }
                         operation.text = "";
                         if ("pairConnect".equals(operation.kind)) {
                             operation.phase = "配对成功，正在连接并验证 Shell";
                             try { value = connect(operation, operation.connectPort); }
                             catch (Exception | LinkageError e) {
-                                throw new AdbFailure("配对已成功，但连接或 Shell 验证失败。保留配对记录；请关闭系统配对窗口后点击“我已配对，连接”，或手填无线调试首页的连接端口。");
+                                String detail = e instanceof LocalAdbClient.ConnectionFailure || e instanceof AdbFailure
+                                        ? e.getMessage() : "连接或 Shell 验证未完成。";
+                                throw new AdbFailure("配对已成功，记录已保留。" + detail
+                                        + "可点击“我已配对，连接”重试，或手填无线调试首页的连接端口。");
                             }
                         }
                         break;
                     }
                     case "connect": value = connect(operation, operation.port); break;
-                    case "shell":
-                        operation.claimTransport();
-                        value = client.runShell(operation.text, operation.cancelled);
-                        break;
                     case "disconnect":
                         operation.claimTransport();
                         client.disconnect();
@@ -248,7 +327,8 @@ public final class LocalAdbManager {
                 }
             } catch (Exception | LinkageError error) {
                 failed = true;
-                if (error instanceof AdbFailure) operation.failure = error.getMessage();
+                if (error instanceof AdbFailure || error instanceof LocalAdbClient.ConnectionFailure)
+                    operation.failure = error.getMessage();
                 if (operation.usesTransport) client.disconnect();
             } finally {
                 operation.text = "";
@@ -262,14 +342,21 @@ public final class LocalAdbManager {
                 main.removeCallbacks(operation.timeout);
                 if (current != operation) return;
                 current = null;
-                revision++;
-                if (client.isConnected()) touch.enable(records.getInt("connectPort", 0));
-                else touch.stop();
+                if (!operation.cancelled.get() && !error && client.isConnected()
+                        && ("connect".equals(operation.kind) || "pairConnect".equals(operation.kind))) {
+                    // A later explicit disconnect already in the queue retains precedence.
+                    if (!transportChanging()) { keepConnection = true; recoveryAttempts = 0; }
+                }
+                reconcileConnection();
+                changed();
+                if (!client.isConnected()) touch.stop();
                 if (operation.cancelled.get()) operation.reply.failure(operation.cancelReason,
                         operation.pairCompleted ? "配对已成功，后续连接已取消或超时。可点击“我已配对”重新连接。"
                                 : "timeout".equals(operation.cancelReason) ? "ADB 操作超时，请查看当前配对/连接状态后重试。" : "ADB 操作已取消。");
                 else if (error) operation.reply.failure("adb_failed", operation.failure.isEmpty()
                         ? failureMessage(operation.kind) : operation.failure);
+                else if (("connect".equals(operation.kind) || "pairConnect".equals(operation.kind)) && !client.isConnected())
+                    operation.reply.failure("disconnected", "配对记录已保留，但 ADB 连接在验证后断开，请保持无线调试开启后重新连接。");
                 else operation.reply.success(result);
                 startNext();
             });
@@ -287,20 +374,56 @@ public final class LocalAdbManager {
     }
 
     private String connect(Operation operation, int port) throws Exception {
-        if (client.isConnected() && port == 0) return "ADB 已连接，Shell 已验证。";
-        operation.phase = "正在发现连接端口";
-        if (port == 0) {
-            AdbPortDiscovery.Ports ports = discover(operation, "connect", 6500);
-            if (ports.ambiguous) throw new AdbFailure("发现多个本机连接端口，请手动填写无线调试首页的连接端口。");
-            port = ports.connectPort;
-            if (port == 0) port = records.getInt("connectPort", 0);
+        if (client.isConnected() && (port == 0 || port == records.getInt("connectPort", 0)))
+            return "ADB 已连接，Shell 已验证。";
+        final boolean automatic = port == 0;
+        Exception last = null;
+        for (int attempt = 0; attempt < 2; attempt++) {
+            if (operation.cancelled.get() || Thread.currentThread().isInterrupted()) throw new InterruptedException();
+            long remaining = operation.deadline - SystemClock.elapsedRealtime();
+            if (remaining < 1000) break;
+            if (automatic) {
+                operation.phase = attempt == 0 ? "正在发现连接端口" : "正在重新发现无线调试连接端口";
+                AdbPortDiscovery.Ports ports = discover(operation, "connect", Math.min(remaining - 500, attempt == 0 ? 3500 : 1500));
+                if (ports.ambiguous) throw new AdbFailure("发现多个本机连接端口，请手动填写无线调试首页的连接端口。");
+                port = ports.connectPort;
+                if (port == 0) port = records.getInt("connectPort", 0);
+            }
+            if (port > 0) {
+                operation.phase = "正在连接并验证 Shell";
+                operation.claimTransport();
+                try {
+                    remaining = operation.deadline - SystemClock.elapsedRealtime();
+                    if (remaining < 1000) break;
+                    String result = client.connect(port, operation.cancelled, Math.min(7000, remaining - 250));
+                    if (!operation.cancelled.get()) records.edit().putInt("connectPort", port).putBoolean("paired", true).apply();
+                    return result;
+                } catch (Exception error) {
+                    last = error;
+                    if (operation.cancelled.get() || Thread.currentThread().isInterrupted()) throw error;
+                }
+            }
+            // Only connection/id probes are retried. Never replay a user's shell command or pairing code.
+            if (attempt == 0) Thread.sleep(350);
         }
-        if (port == 0) throw new AdbFailure("没有发现连接端口。请确认无线调试已开启，或手动填写无线调试首页的连接端口。");
-        operation.phase = "正在连接并验证 Shell";
-        operation.claimTransport();
-        String result = client.connect(port, operation.cancelled);
-        if (!operation.cancelled.get()) records.edit().putInt("connectPort", port).putBoolean("paired", true).apply();
-        return result;
+        if (last != null) throw last;
+        throw new AdbFailure("没有发现可用连接端口。请确认无线调试已开启，或手动填写无线调试首页的连接端口。");
+    }
+
+    private boolean transportChanging() {
+        if (current != null && !"discover".equals(current.kind)) return true;
+        for (Operation operation : queue) if (!"discover".equals(operation.kind)) return true;
+        return false;
+    }
+
+    private void changed() {
+        Map<String, Object> snapshot = status();
+        snapshot.remove("revision");
+        if (snapshot.equals(lastPublished)) return;
+        lastPublished = new HashMap<>(snapshot);
+        snapshot.put("revision", ++revision);
+        try { RemoteAdbNative.state(new JSONObject(snapshot).toString()); }
+        catch (Exception | LinkageError ignored) { }
     }
 
     private static final class AdbFailure extends Exception {
@@ -328,17 +451,23 @@ public final class LocalAdbManager {
     }
 
     void cancelOwner(String owner) {
+        cancelOwner(owner, null);
+    }
+
+    private void cancelOwner(String owner, String requestId) {
+        commands.cancel(owner, requestId);
         Iterator<Operation> pending = queue.iterator();
         while (pending.hasNext()) {
             Operation operation = pending.next();
-            if (operation.owner.equals(owner)) {
+            if (operation.owner.equals(owner) && (requestId == null || requestId.equals(operation.requestId))) {
                 pending.remove();
                 operation.text = "";
                 operation.reply.failure("cancelled", "请求已取消。");
             }
         }
-        if (current != null && current.owner.equals(owner)) cancelCurrent("cancelled");
-        revision++;
+        if (current != null && current.owner.equals(owner)
+                && (requestId == null || requestId.equals(current.requestId))) cancelCurrent("cancelled");
+        changed();
     }
 
     // Called from the isolated JNI bridge, on arbitrary native threads. No work runs there.
@@ -367,7 +496,7 @@ public final class LocalAdbManager {
                         args.put(key, request.isNull(key) ? null : request.get(key));
                     }
                 }
-                execute("remote:" + owner, request.getString("method"), args, reply);
+                execute("remote:" + owner, request.optString("id", ""), request.getString("method"), args, reply);
             } catch (Exception ignored) { reply.failure("invalid", "无效 ADB 请求。"); }
         });
     }
@@ -378,6 +507,7 @@ public final class LocalAdbManager {
 
     private static final class Operation {
         final String owner;
+        final String requestId;
         final String kind;
         final int port;
         final int connectPort;
@@ -391,8 +521,9 @@ public final class LocalAdbManager {
         volatile Thread thread;
         String cancelReason = "cancelled";
         Runnable timeout;
-        Operation(String owner, String kind, int port, int connectPort, String text, Reply reply) {
-            this.owner = owner; this.kind = kind; this.port = port; this.connectPort = connectPort;
+        long deadline;
+        Operation(String owner, String requestId, String kind, int port, int connectPort, String text, Reply reply) {
+            this.owner = owner; this.requestId = requestId; this.kind = kind; this.port = port; this.connectPort = connectPort;
             this.text = text; this.reply = reply;
         }
         void claimTransport() throws InterruptedException {

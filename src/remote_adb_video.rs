@@ -19,7 +19,7 @@ pub fn dispatch(owner: i32, normal: bool, control: bool, packet: RemoteAdbVideo,
         || packet.action.len() > 16 || !packet.error.is_empty() || !packet.state.is_empty()
         || !packet.input_error.is_empty() || !packet.format.is_empty()
         || !packet.privacy_state.is_empty() || !packet.privacy_error.is_empty() { return; }
-    if !normal || (!control && matches!(packet.action.as_str(), "start" | "screenshot" | "layout" | "stop" | "touch" | "black_on" | "black_off")) { return; }
+    if !normal || (!control && matches!(packet.action.as_str(), "start" | "screenshot" | "layout" | "stop" | "stop_video" | "stop_screenshot" | "stop_layout" | "touch" | "black_on" | "black_off")) { return; }
     #[cfg(target_os = "android")]
     android::dispatch(owner, packet, tx);
     #[cfg(not(target_os = "android"))]
@@ -40,11 +40,11 @@ pub mod android {
     use std::{collections::{HashMap, VecDeque}, sync::{Arc, Mutex}};
 
     struct Bridge { vm: JavaVM, manager: GlobalRef }
-    struct Viewer { token: String, tx: Sender, pending: VecDeque<(u64, usize)>, need_key: bool, screenshots: bool, layouts: bool }
-    struct Hub { viewers: HashMap<i32, Viewer>, state: RemoteAdbVideo, config: Vec<u8>, sequence: u64 }
+    struct Viewer { token: String, tx: Sender, pending: VecDeque<(u64, usize)>, need_key: bool, screenshots: bool, layouts: bool, command_sequence: u64, privacy_sequence: u64, touch_sequence: u64 }
+    struct Hub { viewers: HashMap<i32, Viewer>, state: RemoteAdbVideo, adb_state: Option<serde_json::Value>, config: Vec<u8>, sequence: u64 }
     lazy_static::lazy_static! {
         static ref BRIDGE: Mutex<Option<Bridge>> = Mutex::new(None);
-        static ref HUB: Mutex<Hub> = Mutex::new(Hub { viewers: HashMap::new(), config: Vec::new(), sequence: 0,
+        static ref HUB: Mutex<Hub> = Mutex::new(Hub { viewers: HashMap::new(), adb_state: None, config: Vec::new(), sequence: 0,
             state: RemoteAdbVideo { action: "state".into(), state: "idle".into(), supported: true,
                 format: "h264".into(), screenshot_supported: true, layout_supported: true,
                 privacy_supported: true, privacy_state: "idle".into(), ..Default::default() } });
@@ -90,17 +90,31 @@ pub mod android {
         viewer.tx.send((hbb_common::tokio::time::Instant::now(), Arc::new(message(packet)))).is_ok()
     }
 
+    fn send_adb_state(viewer: &Viewer, state: &serde_json::Value) {
+        let payload = serde_json::json!({"v":1,"kind":"state","subscription":viewer.token,"state":state});
+        let _ = viewer.tx.send((hbb_common::tokio::time::Instant::now(), Arc::new(crate::remote_adb::message(payload.to_string()))));
+    }
+
+    pub fn publish_adb_state(state: serde_json::Value) {
+        if let Ok(mut hub) = HUB.lock() {
+            for viewer in hub.viewers.values() { send_adb_state(viewer, &state); }
+            hub.adb_state = Some(state);
+        }
+    }
+
     pub fn dispatch(owner: i32, packet: RemoteAdbVideo, tx: Sender) {
         let action = packet.action.as_str();
         let Ok(mut hub) = HUB.lock() else { return; };
         if action == "watch" {
             if hub.viewers.len() >= 32 && !hub.viewers.contains_key(&owner) { return; }
             let snapshot = hub.state.clone();
+            let adb_state = hub.adb_state.clone();
             let viewer = hub.viewers.entry(owner).or_insert_with(|| Viewer {
-                token: packet.token.clone(), tx: tx.clone(), pending: VecDeque::new(), need_key: true, screenshots: packet.screenshot_supported, layouts: packet.layout_supported });
+                token: packet.token.clone(), tx: tx.clone(), pending: VecDeque::new(), need_key: true, screenshots: packet.screenshot_supported, layouts: packet.layout_supported, command_sequence: 0, privacy_sequence: 0, touch_sequence: 0 });
             if viewer.token != packet.token {
-                *viewer = Viewer { token: packet.token, tx, pending: VecDeque::new(), need_key: true, screenshots: packet.screenshot_supported, layouts: packet.layout_supported };
+                *viewer = Viewer { token: packet.token, tx, pending: VecDeque::new(), need_key: true, screenshots: packet.screenshot_supported, layouts: packet.layout_supported, command_sequence: 0, privacy_sequence: 0, touch_sequence: 0 };
             }
+            if let Some(state) = adb_state { send_adb_state(viewer, &state); }
             send(viewer, snapshot);
             return;
         }
@@ -108,12 +122,21 @@ pub mod android {
         if viewer.token != packet.token { return; }
         if action == "screenshot" && !viewer.screenshots { return; }
         if action == "layout" && !viewer.layouts { return; }
+        if matches!(action, "start" | "screenshot" | "layout" | "stop" | "stop_video" | "stop_screenshot" | "stop_layout" | "black_on" | "black_off") && packet.sequence != 0 {
+            let sequence = if matches!(action, "black_on" | "black_off") { &mut viewer.privacy_sequence } else { &mut viewer.command_sequence };
+            if packet.sequence <= *sequence { return; }
+            *sequence = packet.sequence;
+        }
         if action == "touch" {
             if packet.data.len() != 20 { return; }
             let values: Vec<i32> = packet.data.chunks_exact(4)
                 .map(|b| i32::from_be_bytes([b[0], b[1], b[2], b[3]])).collect();
             if !(0..=2).contains(&values[0]) || !(1..=16384).contains(&values[3])
                 || !(1..=16384).contains(&values[4]) { return; }
+            if packet.sequence != 0 {
+                if packet.sequence <= viewer.touch_sequence { return; }
+                viewer.touch_sequence = packet.sequence;
+            }
             drop(hub);
             invoke_ints("injectMirrorTouch", "(IIIIII)V", &[owner, values[0], values[1], values[2], values[3], values[4]]);
             return;
@@ -128,7 +151,7 @@ pub mod android {
         let stop = if action == "unwatch" {
             hub.viewers.remove(&owner);
             hub.viewers.is_empty()
-        } else { action == "stop" };
+        } else { matches!(action, "stop" | "stop_video" | "stop_screenshot" | "stop_layout") };
         drop(hub);
         if action == "unwatch" { release_touch(owner); }
         if !matches!(action, "start" | "screenshot" | "layout" | "black_on" | "black_off") && !stop { return; }
@@ -293,12 +316,13 @@ pub mod pc {
     use std::{collections::HashMap, sync::{Arc, Mutex, mpsc::{sync_channel, SyncSender}, atomic::{AtomicBool, Ordering}}, time::{Duration, Instant}};
     use uuid::Uuid;
 
-    struct View { generation: u64, state: String, error: String, image: Option<String>, supported: bool,
+    struct View { generation: u64, revision: u64, adb_state: Option<Value>, state: String, error: String, image: Option<String>, supported: bool,
         adb_priority: bool, touch_ready: bool, input_error: String, format: String, screenshot_supported: bool,
         privacy_supported: bool, privacy_state: String, privacy_error: String,
         layout_supported: bool, source_width: u32, source_height: u32, rgba_width: u32, rgba_height: u32 }
     struct Entry { peer: String, token: String, queue: SyncSender<RemoteAdbVideo>, view: Arc<Mutex<View>>,
-        resync: Arc<AtomicBool>, live: Arc<AtomicBool>, since: Instant, touch_sequence: u64 }
+        resync: Arc<AtomicBool>, live: Arc<AtomicBool>, since: Instant, last_receive: Instant, last_watch: Instant,
+        touch_sequence: u64, command_sequence: u64, privacy_sequence: u64 }
     lazy_static::lazy_static! { static ref ENTRIES: Mutex<HashMap<Uuid, Entry>> = Mutex::new(HashMap::new()); }
 
     fn send(session_id: Uuid, packet: RemoteAdbVideo) -> bool {
@@ -324,14 +348,15 @@ pub mod pc {
             let session = sessions::get_session_by_session_id(&session_id)?;
             let token = owner.to_owned();
             let (tx, rx) = sync_channel::<RemoteAdbVideo>(8);
-            let view = Arc::new(Mutex::new(View { generation: 0, state: "waiting".into(), error: String::new(), image: None, supported: false,
+            let view = Arc::new(Mutex::new(View { generation: 0, revision: 0, adb_state: None, state: "waiting".into(), error: String::new(), image: None, supported: false,
                 adb_priority: false, touch_ready: false, input_error: String::new(), format: String::new(), screenshot_supported: false,
                 privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(),
                 layout_supported: false, source_width: 0, source_height: 0, rgba_width: 0, rgba_height: 0 }));
             let resync = Arc::new(AtomicBool::new(true));
             let live = Arc::new(AtomicBool::new(true));
             entries.insert(session_id, Entry { peer: session.get_id(), token: token.clone(), queue: tx,
-                view: view.clone(), resync: resync.clone(), live: live.clone(), since: Instant::now(), touch_sequence: 0 });
+                view: view.clone(), resync: resync.clone(), live: live.clone(), since: Instant::now(),
+                last_receive: Instant::now(), last_watch: Instant::now(), touch_sequence: 0, command_sequence: 0, privacy_sequence: 0 });
             let thread_token = token.clone();
             if std::thread::Builder::new().name("adb-video-decode".into()).spawn(move || {
                 let mut decoder: Option<Decoder> = None;
@@ -441,12 +466,19 @@ pub mod pc {
         }
         let entry = entries.get_mut(&session_id)?;
         if action == "poll" {
+            // A reconnect can preserve the Flutter PeerInfo/native entry while Android
+            // removes its old viewer. Restore only this subscription; never restart a source.
+            if entry.last_receive.elapsed() >= Duration::from_secs(15) && entry.last_watch.elapsed() >= Duration::from_secs(15) {
+                entry.last_watch = Instant::now();
+                send(session_id, RemoteAdbVideo { token: entry.token.clone(), action: "watch".into(),
+                    screenshot_supported: true, layout_supported: true, ..Default::default() });
+            }
             let mut view = entry.view.lock().ok()?;
             if view.state == "waiting" && entry.since.elapsed() > Duration::from_secs(8) {
                 view.state = "error".into();
                 view.error = "远端未响应 ADB 投屏订阅，请确认两端均已更新并保持连接。".into();
             }
-            let snapshot = json!({"state":view.state,"error":view.error,"generation":view.generation,"image":view.image.take(),"supported":view.supported,
+            let snapshot = json!({"state":view.state,"error":view.error,"generation":view.generation,"revision":view.revision,"adbState":view.adb_state,"image":view.image.take(),"supported":view.supported,
                 "adbPriority":view.adb_priority,"touchReady":view.touch_ready,"inputError":view.input_error,
                 "format":view.format,"screenshotSupported":view.screenshot_supported,"layoutSupported":view.layout_supported,
                 "sourceWidth":view.source_width,"sourceHeight":view.source_height,
@@ -458,7 +490,7 @@ pub mod pc {
         }
         if action == "touch" {
             let view = entry.view.lock().ok()?;
-            if !view.adb_priority || !view.touch_ready { return None; }
+            if !view.adb_priority && !view.adb_state.as_ref().map(|v| v["connected"] == true).unwrap_or(false) { return None; }
             if let Some(sequence) = request["sequence"].as_u64() {
                 if sequence <= entry.touch_sequence { return None; }
                 entry.touch_sequence = sequence;
@@ -468,15 +500,48 @@ pub mod pc {
             let values = values?;
             if !(0..=2).contains(&values[0]) || !(1..=16384).contains(&values[3]) || !(1..=16384).contains(&values[4]) { return None; }
             let data: Vec<u8> = values.iter().flat_map(|value| value.to_be_bytes()).collect();
-            if !send(session_id, RemoteAdbVideo { token: entry.token.clone(), action: "touch".into(), data: data.into(), ..Default::default() }) { return None; }
+            if !send(session_id, RemoteAdbVideo { token: entry.token.clone(), action: "touch".into(), sequence: entry.touch_sequence, data: data.into(), ..Default::default() }) { return None; }
             return Some("{}".into());
         }
-        if !matches!(action, "start" | "screenshot" | "layout" | "stop" | "black_on" | "black_off") { return None; }
+        if !matches!(action, "start" | "screenshot" | "layout" | "stop" | "stop_video" | "stop_screenshot" | "stop_layout" | "black_on" | "black_off") { return None; }
         if action == "screenshot" && !entry.view.lock().ok()?.screenshot_supported { return None; }
         if action == "layout" && !entry.view.lock().ok()?.layout_supported { return None; }
         if matches!(action, "black_on" | "black_off") && !entry.view.lock().ok()?.privacy_supported { return None; }
-        if !send(session_id, RemoteAdbVideo { token: entry.token.clone(), action: action.into(), ..Default::default() }) { return None; }
+        let sequence = request["sequence"].as_u64().unwrap_or(0);
+        if sequence != 0 {
+            let last = if matches!(action, "black_on" | "black_off") { &mut entry.privacy_sequence } else { &mut entry.command_sequence };
+            if sequence <= *last { return Some("{}".into()); }
+            *last = sequence;
+        }
+        if !send(session_id, RemoteAdbVideo { token: entry.token.clone(), action: action.into(), sequence, ..Default::default() }) { return None; }
         Some("{}".into())
+    }
+
+    pub fn receive_adb_state(peer: &str, value: Value) {
+        let Some(token) = value["subscription"].as_str().filter(|s| s.len() == 36) else { return; };
+        let state = &value["state"];
+        if !state.is_object() || !state["supported"].is_boolean() || !state["connected"].is_boolean()
+            || state["revision"].as_u64().is_none() { return; }
+        let Ok(mut entries) = ENTRIES.lock() else { return; };
+        let Some(entry) = entries.values_mut().find(|e| e.peer == peer && e.token == token) else { return; };
+        entry.last_receive = Instant::now();
+        if let Ok(mut view) = entry.view.lock() {
+            let restarted = view.adb_state.as_ref().map(|s| s["instance"] != state["instance"])
+                .unwrap_or(view.generation != 0);
+            if restarted {
+                view.generation = 0;
+                view.state = "waiting".into();
+                view.error.clear();
+                view.image = None;
+                view.adb_priority = false;
+                view.touch_ready = false;
+                view.privacy_state = "idle".into();
+                view.privacy_error.clear();
+                entry.resync.store(true, Ordering::Release);
+            } else if view.adb_state.as_ref().and_then(|s| s["revision"].as_u64()).unwrap_or(0)
+                > state["revision"].as_u64().unwrap_or(0) { return; }
+            view.adb_state = Some(state.clone());
+        };
     }
 
     pub fn receive(peer: &str, packet: RemoteAdbVideo) {
@@ -487,10 +552,12 @@ pub mod pc {
             || (packet.source_width == 0) != (packet.source_height == 0) { return; }
         let Ok(mut entries) = ENTRIES.lock() else { return; };
         let Some((session_id, entry)) = entries.iter_mut().find(|(_, entry)| entry.peer == peer && entry.token == packet.token) else { return; };
+        entry.last_receive = Instant::now();
         if packet.action == "state" {
             if !packet.data.is_empty() { return; }
             if let Ok(mut view) = entry.view.lock() {
                 if packet.generation < view.generation { return; }
+                view.revision = view.revision.wrapping_add(1);
                 if packet.state != "streaming" || packet.generation != view.generation {
                     view.image = None;
                     entry.resync.store(true, Ordering::Release);

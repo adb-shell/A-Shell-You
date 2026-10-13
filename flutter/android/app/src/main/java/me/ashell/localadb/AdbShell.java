@@ -25,7 +25,7 @@ final class AdbShell {
         boolean truncated = false;
         // Read to the explicit exit packet. libadb 3.1.1's legacy shell EOF path may wait
         // indefinitely or discard buffered bytes when CLSE races with the final output.
-        try (AdbStream stream = connection.open("shell,v2,raw:sh")) {
+        try (AdbStream stream = AdbStreamCompat.open(connection, "shell,v2,raw:sh")) {
             // A short ASCII OPEN avoids libadb 3.1.1's multi-byte destination allocation bug.
             // Send the user's UTF-8 script over stdin, followed by shell-v2 CLOSE_STDIN.
             byte[] script = (command + "\n").getBytes(StandardCharsets.UTF_8);

@@ -14,3 +14,6 @@
     public void releaseTouchOwner(int);
 }
 -keep class io.github.muntashirakon.adb.SslUtils { *; }
+# Pinned 3.1.1 OPEN readiness adapter; preserve reflected stream/connection members.
+-keepclassmembers class io.github.muntashirakon.adb.AdbConnection { *; }
+-keepclassmembers class io.github.muntashirakon.adb.AdbStream { *; }

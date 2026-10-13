@@ -129,7 +129,7 @@ class _RemotePageState extends State<RemotePage>
     super.initState();
     _ffi = FFI(widget.sessionId);
     _remoteAdbState = RemoteAdbSessionState(_ffi.sessionId);
-    _remoteAdbMirror = RemoteAdbMirror(_ffi);
+    _remoteAdbMirror = RemoteAdbMirror(_ffi, sessionState: _remoteAdbState);
     _remoteAdbMirror.hasFrame.addListener(_onAdbFrameAvailability);
     _ffi.zegoVoiceCallModel.addListener(_handleZegoVoiceCallPanelState);
     Get.put<FFI>(_ffi, tag: widget.id);

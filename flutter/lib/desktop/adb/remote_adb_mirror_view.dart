@@ -96,7 +96,7 @@ class _AdbFrameState extends State<_AdbFrame> {
   @override
   void didUpdateWidget(covariant _AdbFrame oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!widget.mirror.touchReady || widget.mirror.ffi.ffiModel.viewOnly) _pointer = null;
+    if (!widget.mirror.adbPriority || widget.mirror.ffi.ffiModel.viewOnly) _pointer = null;
     if (!identical(oldWidget.bytes, widget.bytes)) _decode();
   }
 
@@ -152,7 +152,7 @@ class _AdbFrameState extends State<_AdbFrame> {
         _box = constraints.biggest;
         return Listener(behavior: HitTestBehavior.opaque,
           onPointerDown: (event) {
-            if (_pointer != null || !widget.mirror.touchReady || widget.mirror.ffi.ffiModel.viewOnly) return;
+            if (_pointer != null || !widget.mirror.adbPriority || widget.mirror.ffi.ffiModel.viewOnly) return;
             final image = _image;
             if (image == null) return;
             final rect = _imageRect();
