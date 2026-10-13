@@ -6,6 +6,10 @@
 
 ## 0. Latest Recovery Snapshot
 
+T003续接授权：提交/推送当前30路径到GitHub main，并单次执行Build AShell clients both/aarch64，不监控。核对本地/远端941b215，workflow active，V0 diff通过；STATE006/WORK008/CE-20261014-T003-02。此为执行前记录，准确SHA与dispatch回执见Git/最终交付；下方未提交/无授权为旧快照，不推断构建通过。
+
+T003最新：[ADB控件与遮罩](../docs/tasks/T-2026-10-14-003-adb-controls-and-overlay.md)。main/941b215初始clean；全窗口右上状态浮层、双图向中线靠近、停止/本机桥超时恢复；新增独立shell UID黑色图层（Android11元数据/12+setSkipScreenshot），不熄屏、不改原无障碍/采集/输入实现。多PC共用开关，断链/最后订阅退出自动清理。D028/ADR0023/Baseline18/STATE005/WORK007/CE-20261014-T003-01；V0，源码和记录未提交，ADB-M13—M16未构建/真机验证，无本轮Git/CI。前轮941b215已推送并dispatch204且未监控；下方为旧任务历史。
+
 T002续接交付：用户明确授权推送并执行编排；本地/远端main均a0e46b1，35个待交付路径全部属于本任务。将提交/推送main并单次触发Build AShell clients both/aarch64，沿用不监控边界。STATE004 / WORK005 / CE-20261014-T002-02；此记录在执行前，最终SHA和接受回执见Git/会话交付，不提升V0为构建/真机通过。
 
 当前T-2026-10-14-002：[主界面ADB与连续截图](../docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)。main/a0e46b1初始clean，本轮未提交代码/文档；单源居中，双源左普通/右ADB带中心竖线。Shell栏同款蓝/红按钮，视频与独立系统截图互斥切换，多PC共享/全局停止。截图最多2fps、最长边1280，不绕过Android保护内容。原采集/Accessibility/触摸优先级与工具链保持，PC仅增加视口与ADB替代waiting提示的适配。D027/ADR0022/Baseline17/STATE003/WORK004/CE-20261014-T002-01；V0，正式构建/真机ADB-M01—M12待验证，无本轮Git/CI。

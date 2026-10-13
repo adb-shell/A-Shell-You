@@ -38,7 +38,8 @@ class RemoteAdbController extends ChangeNotifier {
 
   Future<Map<String, dynamic>> _request(String method, [Map<String, dynamic> args = const {}]) async {
     final raw = await bind.sessionGetCommon(sessionId: sessionId,
-        key: 'remote_adb_request', param: jsonEncode({'method': method, ...args}));
+        key: 'remote_adb_request', param: jsonEncode({'method': method, ...args}))
+        .timeout(const Duration(seconds: 5));
     if (raw == null || raw.isEmpty) throw Exception('远程 ADB 不可用，请确认双方安装支持此功能的版本并保持会话连接。');
     final start = Map<String, dynamic>.from(jsonDecode(raw) as Map);
     if (start['ok'] == false) throw Exception(start['message'] ?? 'ADB 请求失败。');
@@ -54,7 +55,7 @@ class RemoteAdbController extends ChangeNotifier {
         // Status and execution have independent replies. A lost status probe must
         // not orphan a queued command or discard a valid command result.
         final response = await bind.sessionGetCommon(sessionId: sessionId,
-            key: 'remote_adb_poll', param: id);
+            key: 'remote_adb_poll', param: id).timeout(const Duration(seconds: 5));
         if (response == null) throw Exception('ADB 请求已失效，请刷新状态。');
         if (response.isNotEmpty) return Map<String, dynamic>.from(jsonDecode(response) as Map);
       }
@@ -68,6 +69,7 @@ class RemoteAdbController extends ChangeNotifier {
       rethrow;
     } finally {
       await bind.sessionGetCommon(sessionId: sessionId, key: 'remote_adb_forget', param: id)
+          .timeout(const Duration(seconds: 5))
           .catchError((Object _) => null);
     }
   }

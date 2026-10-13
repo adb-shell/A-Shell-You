@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261014-005`
+Registry Revision：`WORK-20261014-008`
 
-Last Updated：2026-10-14（主界面ADB分栏与连续截图）
+Last Updated：2026-10-14（ADB控件恢复与独立遮罩）
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none。T-2026-10-14-002源码与文档交付完成；V0，不代表正式构建/真机已通过，待用户后续验证。
+none。T-2026-10-14-003源码与记录交付；用户现已授权当前30路径提交/推送main、单次Build AShell clients both/aarch64且不监控，紧接执行。STATE006 / CE-20261014-T003-02；最终SHA/接受结果见Git与会话交付，V0不升级为构建通过。
 
 ## 2. Concurrent Session Rules
 
@@ -26,6 +26,10 @@ none。T-2026-10-14-002源码与文档交付完成；V0，不代表正式构建/
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+- 当前：T-2026-10-14-003 / T8，布局、ADB控件恢复、独立黑色遮罩；STATE005/WORK007/CE-20261014-T003-01/D028/ADR0023/Baseline18。
+- main/941b215初始clean，工作树本任务改动未提交；无本轮Git/CI/产品执行。见docs/tasks/T-2026-10-14-003-adb-controls-and-overlay.md，V0；ADB-M13—M16待正式环境。
+- 以下T002为此前关闭记录。
 
 - Task ID：`T-2026-10-14-002`
 - Result：主界面单/双源居中、Shell栏同款按钮、独立ADB连续截图和格式协商；原Android采集/无障碍/触摸优先级保持，PC最小视口/弹窗适配。

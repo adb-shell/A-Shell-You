@@ -288,3 +288,9 @@
 - 采用独立分栏视口和系统screencap源，不将ADB帧送进原采集/VideoFrame。固定shell-v2命令、有界PNG/JPEG、最多2fps；视频/截图互斥，原触摸优先级、多PC共享/任一控制PC停止继续有效。
 - 追加format15/screenshot_supported16能力，旧PC隔离JPEG；不增依赖/资产/工具链，不修改原Android无障碍/采集/输入链。强制截图不绕过Android保护内容。
 - ADR0022替代0021浮动UI部分；Baseline17 / STATE003 / CE-20261014-T002-01。V0，ADB-M01—M12 NOT_RUN，未Git/CI或产品构建/设备验证。
+
+## D-028：ADB黑色遮罩独立且排除采集
+
+- 2026-10-14，accepted for implementation；用户明确要求遮罩而非熄屏。采用APK内独立app_process/shell UID color layer，Android11 WINDOW_TYPE_DONT_SCREENSHOT / 12+ setSkipScreenshot；不设FLAG_SECURE，不改亮度或原Accessibility。
+- 协议41增加17—19字段和black_on/black_off，设备所有权、多PC状态、控制权限gate、最后订阅离开与本机10秒租约清理。不新增资产/依赖；隐藏API不支持失败退出，OEM效果待验证。
+- ADR0023 / Baseline18 / STATE005 / CE-20261014-T003-01。V0；ADB-M13—M16 NOT_RUN；无Git/CI/产品执行。普通View与物理熄屏两方案均不满足本次明确要求。

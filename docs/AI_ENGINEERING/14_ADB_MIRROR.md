@@ -1,5 +1,17 @@
 # AShell ADB 投屏与触摸优先级
 
+2026-10-14 T003当前增量：main/941b215初始clean；布局向中线靠拢、状态悬浮移到全主界面右上、ADB控件/私有连接恢复、独立黑色遮罩。见[本轮任务](../tasks/T-2026-10-14-003-adb-controls-and-overlay.md)、[ADR-0023](../ADR/0023-adb-private-overlay.md)、[Baseline18](../BASELINE/18_ADB_OVERLAY_BASELINE_2026-10-14.md)。本轮V0未提交/未编译/未真机验证。前轮941b215已推送并dispatch获204，未监控。下段T002为当时快照。
+
+## 黑色遮罩与控件恢复（T003）
+
+Shell栏新增“开黑屏 / 关黑屏”。Android已验证ADB Shell后，独立`LocalAdbPrivacy`通过私有ADB连接运行APK内`AdbPrivacyOverlay.main`，创建手机上层不透明黑色color layer。**不关闭物理显示、不修改亮度、不依赖或复用无障碍黑屏**。Android11采用`WINDOW_TYPE_DONT_SCREENSHOT`创建元数据，12+采用`setSkipScreenshot`；按AOSP语义从截图、屏幕录制和镜像排除这层遮罩，底层真实内容仍由原来的各采集源接收。接口缺失则报错退出，不用普通遮罩/FLAG_SECURE兜底。平台依据及ROM限制见ADR0023；源码实现不能代替真机可用性结论，受保护内容仍受系统限制。
+
+新增协议41字段privacy_supported(17)、privacy_state(18)、privacy_error(19)，动作black_on/black_off；普通已认证且有控制权限的会话方可操作。状态由Android推送，多PC共用一个遮罩，任一控制PC可关闭。遮罩与视频/截图模式独立；最后一个订阅离开、ADB断开/撤销/重新连接时清理。helper的本机stdin租约10秒无心跳就退出，进程死亡释放图层；应用异常退出也有清理途径。PC没有新增远程定时status查询。退出确认或租约过期前保持stopping，避免失败立即被当作已关闭。
+
+静态发现并修补：原私有连接close无限join可能留在stopping；PC原canStop又排除了stopping和在途请求。现有私有连接有界close、停止3秒守卫、Run隔离、停止期间允许再次关闭；PC桥接5秒超时与独立操作超时，旧epoch不覆盖新会话，导航命令的request/poll/forget也有本机桥超时。拒绝/重复操作返回状态，采集新generation清旧在途帧额度。未在本机复现用户故障，以上是源码可确认的失效路径修复。
+
+PC单源仍居中；双源时普通图右对齐、ADB图左对齐，中间仅1逻辑像素分界。同步修正ADB命中区域/触摸换算和普通画布/滚动条偏移。状态悬浮从普通子画布移到主界面的右上。原Android MainService/Accessibility/采集JNI/输入分流未改动。
+
 2026-10-14，T-2026-10-14-002，main/a0e46b1上的未提交扩展；V0，**未编译、未真机验证**。见[本轮任务](../tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)、[ADR-0022](../ADR/0022-inline-adb-screenshot.md)、[Baseline17](../BASELINE/17_ADB_INLINE_SCREENSHOT_BASELINE_2026-10-14.md)。前轮独立投屏/触摸由a0e46b1提交推送，Build AShell clients both/aarch64获HTTP204且未监控；接受请求不表示编译通过。本轮没有新的Git/CI动作。
 
 ## 使用与边界
@@ -59,12 +71,14 @@ PC使用现有`hwcodec` RAM解码器的独立实例。跨FRB本地桥暂用JPEG+
 
 固定官方[scrcpy v5.0.1](https://github.com/Genymobile/scrcpy/releases/tag/v5.0.1)，733930字节，SHA256 `764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536`，Apache-2.0。APK资产目录`flutter/android/app/src/main/assets/adb-mirror/`同时含LICENSE/NOTICE；文件哈希已与官方发布元数据比对，运行前再次校验。没有验证发布签名或重建上游二进制。
 
-推送到两个模块专用固定临时路径，避免反复失败积累随机文件；scrcpy cleanup及shell EXIT trap清理成功启动的文件。中途取消上传可能留下固定临时文件，下次覆盖。正常视频/控制资源各自关闭，不使用killall、不关闭adbd、不关闭原屏幕共享。
+推送到两个模块专用固定路径。T003将视频jar保留为一份约734KB的模块缓存、下次校验资产后覆盖，避免旧进程EXIT trap误删刚重启的视频jar；不会积累每次运行的随机文件。触摸模块仍使用原EXIT trap，未改动；中途取消上传的固定文件下次覆盖。视频/控制资源各自关闭，不使用killall、不关闭adbd、不关闭原屏幕共享。遮罩直接运行已安装APK，不再上传二进制。
 
 Android沿用Java8/minSDK21，但此无线ADB功能仍需Android11+；不升级Gradle/NDK/Kotlin。Windows正式入口与CI已有`--hwcodec --flutter --vram`；现有image crate提供本地JPEG，无新增Cargo依赖。官方server单独打包，未恢复旧libadb.so或PC adb.exe。
 
 ## 待验证
 
 TEST_MATRIX的ADB-M01—M12均NOT_RUN：原有ARM64/universal和Windows构建、多PC/背压、旋转/重连、触摸优先级与原链回归，加上分栏中心/点击坐标、只有ADB时菜单弹窗、跨PC切模式/停止、截图异常及新旧版本矩阵。ADB shell验证和控制socket建立不证明所有ROM允许InputManager注入；部分厂商额外调试授权及编码器并发限制需真机确认。不同PC可在下一关键帧/截图加入，不能承诺帧级严格同时显示。
+
+T003追加ADB-M13—M16，全部NOT_RUN：全宽状态悬浮/窄间隔/原比例滚动坐标、反复开关/取消/卡住清理、多PC遮罩与所有采集源/旋转/隐藏API不支持、新协议与R8构建/旧版本/只读/断链恢复。原无障碍黑屏若由用户单独开启仍按其原逻辑工作，新增排除标记只属于ADB遮罩，不能自动排除其他遮罩。
 
 《编译验证需求》：Android正式Linux构建机仓库根`./build.sh 1`；Windows正式环境`C:\Code\A-Shell-You`执行`build.cmd`。目标为新协议字段自动生成、Java JNI参数一致、Flutter分栏与JPEG接收可编译；随后Android11+与两PC执行上述矩阵。本轮未执行本地build/test/analyze/codegen、真机或CI，不能宣称编译/运行通过。

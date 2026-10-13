@@ -1,13 +1,19 @@
 # AShell Project State
 
 Schema Version：`1.0`  
-State Revision：`STATE-20261014-004`
+State Revision：`STATE-20261014-006`
 
-Last Updated：2026-10-14（Asia/Tokyo；主界面ADB分栏与连续截图）
+Last Updated：2026-10-14（Asia/Tokyo；ADB控件恢复与独立遮罩）
 
 Observed At：2026-10-14（Asia/Tokyo）
 
 Evidence Scope：`repository-observed / V0 / external and runtime verification pending`
+
+T003续接C3：用户明确要求提交、推送并执行编排；范围为当前30路径，GitHub adb-shell/A-Shell-You/main，Build AShell clients both/aarch64一次、不监控。只读核对本地/远端main同为941b215、workflow active、diff检查通过。CE-20261014-T003-02 / WORK008；本条为执行前快照，提交SHA与dispatch回执见Git/最终交付；不宣称构建通过，下方“无授权/未提交”为此前时点。
+
+当前T003：[布局/控件/独立黑屏遮罩](../docs/tasks/T-2026-10-14-003-adb-controls-and-overlay.md)，main/941b215初始clean，源码与相关记录未提交；D028/ADR0023/Baseline18/CE-20261014-T003-01。V0，未编译/真机；原Android采集/Accessibility/输入实现、品牌/依赖不变。无本轮Git/CI授权或动作。
+
+前轮执行回执：941b215已提交推送，Build AShell clients both/aarch64获204，遵照用户要求未监控。以下T002执行前段落为历史快照，不代表当前HEAD，也不代表编译通过。
 
 T002续接：用户明确授权提交/推送当前35路径到GitHub main，并触发一次Build AShell clients both/aarch64，不监控。本地/远端main均a0e46b1，V0 diff通过；CE-20261014-T002-02。此快照先于执行，实际提交SHA/dispatch回执见Git与最终交付，不能推断构建通过；下方未提交/无CI为执行前事实。
 
@@ -25,10 +31,10 @@ T002续接：用户明确授权提交/推送当前35路径到GitHub main，并�
 |---|---|---|
 | Product/runtime | `A Shell You` / `AShell`；crate ashell；Android me.ashell；Flutter内部flutter_hbb | source + ADR-0014 |
 | Rust / Flutter version | `5.2.1` / `5.2.1+59` | manifests + Baseline |
-| Baseline ID | `AS-BL-2026-10-14-a0e46b1-adb-inline-worktree` | Baseline17；旧基线冻结 |
+| Baseline ID | `AS-BL-2026-10-14-941b215-adb-overlay-worktree` | Baseline18；旧基线冻结 |
 | Branch | `main` | read-only Git observation |
-| HEAD | `a0e46b10c27c7e6a407c5a61d9e7012b785f99c6` | 本轮只读观察；前轮投屏/触摸已提交 |
-| Worktree | 初始clean；本轮ADB布局/截图源码与文档未提交，无新资产 | T-2026-10-14-002 / CE-20261014-T002-01 |
+| HEAD | `941b2156531baacafd16e343452a9de8fc2b8bdb` | 本轮只读观察；前轮分栏/截图已提交 |
+| Worktree | 初始clean；本轮布局/ADB恢复/遮罩源码与记录未提交，无新外部资产 | T-2026-10-14-003 / CE-20261014-T003-01 |
 | History mapping | a036f31提交前轮记忆；6fb0aa6初始化的975 blobs与历史源匹配是迁移前证据，准确RustDesk fork未知 | 历史接管报告；不能用该一致性描述当前dirty tree |
 | Highest completed verification | `V0` repository/document/schema checks | `TEST_MATRIX.md` + task records |
 | Formal build/runtime evidence | 当前工作树未取得新包/正式构建/真机结果；本轮未触发或监控CI | ADB-M01—M12全部NOT_RUN；旧矩阵继续适用，不宣称构建成功 |

@@ -34,6 +34,7 @@ public final class LocalAdbManager {
     private final LocalAdbClient client;
     private final LocalAdbMirror mirror;
     private final LocalAdbTouch touch;
+    private final LocalAdbPrivacy privacy;
     private final SharedPreferences records;
     private final ExecutorService worker = Executors.newSingleThreadExecutor(
             task -> new Thread(task, "ashell-local-adb"));
@@ -48,6 +49,7 @@ public final class LocalAdbManager {
         records = context.getSharedPreferences("local_adb_record_v1", Context.MODE_PRIVATE);
         mirror = new LocalAdbMirror(context, client::isConnected);
         touch = new LocalAdbTouch(context, client::isConnected);
+        privacy = new LocalAdbPrivacy(context, client::isConnected);
         RemoteAdbNative.attach(this);
         mirror.attach(this);
     }
@@ -62,6 +64,9 @@ public final class LocalAdbManager {
                     mirror.start(records.getInt("connectPort", 0), "screenshot".equals(action));
                 }
             } else if ("stop".equals(action)) mirror.stop("");
+            else if ("black_on".equals(action)) privacy.start(records.getInt("connectPort", 0));
+            else if ("black_off".equals(action)) privacy.stop();
+            else if ("stop_all".equals(action)) { mirror.stop(""); privacy.stop(); }
         });
     }
 
@@ -176,7 +181,9 @@ public final class LocalAdbManager {
                 || "disconnect".equals(operation.kind) || "revoke".equals(operation.kind)) {
             mirror.stop("");
             touch.stop();
+            privacy.stop();
         }
+        if ("connect".equals(operation.kind)) privacy.stop();
         current = operation;
         operation.timeout = () -> { if (current == operation) cancelCurrent("timeout"); };
         // At most 8 operations, each <=35s. PC routes retain results for 310s.

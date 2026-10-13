@@ -1,5 +1,14 @@
 # AShell Commercial Test Matrix
 
+2026-10-14 T003新增（V0；下列尚未执行）：
+
+| Case | 验证目标 | Level | Result |
+|---|---|---|---|
+| ADB-M13 | 单/双源、窗口缩放、原比例/滚动条：状态浮层全窗口右上；中间窄分界；普通/ADB各自点击、拖动、旋转坐标准确 | V3 | NOT_RUN |
+| ADB-M14 | 启动中关闭、反复关闭、跨PC切模式；私有close/read/open卡住和本机桥超时后不必重连整个会话；旧Run不回写/误删新视频jar；新generation额度清空 | V3/V4 | NOT_RUN |
+| ADB-M15 | Android11/12+/OEM黑色遮罩，普通normal/ignore/SKL与ADB视频/截图仍收到真实画面；旋转/折叠；A开B关、单PC离开保持/最后订阅离开关闭；断ADB/杀应用/撤销后租约清理 | V3/V4 | NOT_RUN |
+| ADB-M16 | Android/Windows正式编译生成17—19字段；R8保留APK内main/JNI；新旧端能力隔离、只读拒绝、缺少隐藏API失败且无黑层残留；不改电源/亮度/FLAG_SECURE与原黑屏逻辑 | V2/V3/V4 | NOT_RUN |
+
 2026-10-14 T002新增ADB-M09—M12，主界面双源/独立连续截图；本轮仅V0，以下产品用例均NOT_RUN。
 
 | Case | 验证目标 | Level | Result |

@@ -40,6 +40,7 @@ class _RemoteDisplayLayoutState extends State<RemoteDisplayLayout> {
       // Unknown/stale status preserves the last picture during the original reconnect window.
       final adb = widget.mirror.hasFrame.value;
       final both = adb && _ordinaryVisible;
+      widget.ffi.canvasModel.setDesktopAlignRight(both);
       return LayoutBuilder(builder: (context, constraints) {
         final width = constraints.maxWidth;
         final dividerWidth = width.clamp(0.0, 1.0).toDouble();
@@ -52,7 +53,8 @@ class _RemoteDisplayLayoutState extends State<RemoteDisplayLayout> {
             child: Offstage(offstage: !adb && _ordinaryVisible,
               child: ClipRect(child: AnimatedBuilder(animation: widget.mirror, builder: (context, _) =>
                 adb || widget.mirror.active || widget.mirror.error.isNotEmpty
-                    ? RemoteAdbMirrorView(mirror: widget.mirror) : const SizedBox.expand())))),
+                    ? RemoteAdbMirrorView(mirror: widget.mirror, alignment: both ? Alignment.centerLeft : Alignment.center)
+                    : const SizedBox.expand())))),
           if (both) Positioned(left: ordinaryWidth, top: 0, bottom: 0, width: dividerWidth,
             child: ColoredBox(color: Theme.of(context).dividerColor.withOpacity(0.65))),
         ]));

@@ -128,9 +128,9 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
           final scale = math.min(
               math.max(widget.ffi.canvasModel.scale * 2.0, 0.85),
               math.min(constraints.maxWidth / 70,
-                  constraints.maxHeight * 0.9 / (45 * 12)));
+                  constraints.maxHeight * 0.9 / (45 * 14)));
           final width = 70.0 * scale;
-          final height = 370.0 * scale;
+          final height = 470.0 * scale;
           Offset clamp(Offset value) => Offset(
               value.dx.clamp(0.0, math.max(0.0, constraints.maxWidth - width)).toDouble(),
               value.dy.clamp(0.0, math.max(0.0, constraints.maxHeight - height)).toDouble());
@@ -151,7 +151,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                 onPanUpdate: (event) => setState(() {
                   _position = clamp(clamp(_position ?? position) + event.delta);
                 }),
-                child: FittedBox(child: SizedBox(width: 70, height: 370,
+                child: FittedBox(child: SizedBox(width: 70, height: 470,
                   child: Card(
                     color: Colors.transparent,
                     shadowColor: Colors.transparent,
@@ -175,7 +175,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                           _divider(),
                           _modeButton('开投屏', Colors.blue, widget.mirror.canStart,
                               () => widget.mirror.setEnabled(true), '开启 ADB 视频；正在截图时切换为视频模式'),
-                          _modeButton('关投屏', Colors.red, widget.mirror.canStop && !widget.mirror.screenshotMode,
+                          _modeButton('关投屏', Colors.red, widget.mirror.canStop && (!widget.mirror.screenshotMode || widget.mirror.busy),
                               () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 视频'),
                           _divider(),
                           _modeButton('开截图', Colors.blue, widget.mirror.canScreenshot,
@@ -183,8 +183,15 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                               widget.mirror.screenshotSupported
                                   ? 'ADB 强制连续系统截图，无需无障碍；系统保护内容仍受限制。开启后替换 ADB 视频。'
                                   : '请更新 Android 客户端以支持 ADB 连续截图'),
-                          _modeButton('关截图', Colors.red, widget.mirror.canStop && widget.mirror.screenshotMode,
+                          _modeButton('关截图', Colors.red, widget.mirror.canStop && (widget.mirror.screenshotMode || widget.mirror.busy),
                               () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 连续截图'),
+                          _divider(),
+                          _modeButton('开黑屏', Colors.blue, widget.mirror.canBlackOn,
+                              () => widget.mirror.setBlack(true), widget.mirror.privacySupported
+                                  ? '${widget.mirror.privacySummary}；独立黑色遮罩，不关闭物理屏幕，不遮挡 PC 采集画面'
+                                  : '请更新 Android 客户端以支持 ADB 黑屏遮罩', privacy: true),
+                          _modeButton('关黑屏', Colors.red, widget.mirror.canBlackOff,
+                              () => widget.mirror.setBlack(false), '${widget.mirror.privacySummary}；任意 PC 均可关闭', privacy: true),
                         ],
                       ),
                     ),
@@ -200,8 +207,8 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
 
   Widget _divider() => const Divider(height: 0, thickness: 2, indent: 10, endIndent: 10, color: Colors.white54);
 
-  Widget _modeButton(String label, Color color, bool enabled, VoidCallback action, String hint) => Tooltip(
-    message: widget.mirror.inputError.isNotEmpty ? widget.mirror.inputError
+  Widget _modeButton(String label, Color color, bool enabled, VoidCallback action, String hint, {bool privacy = false}) => Tooltip(
+    message: privacy ? hint : widget.mirror.inputError.isNotEmpty ? widget.mirror.inputError
         : widget.mirror.error.isNotEmpty ? widget.mirror.error
         : hint,
     child: ElevatedButton(onPressed: enabled ? action : null,

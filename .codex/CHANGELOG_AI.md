@@ -247,3 +247,11 @@ Mode：`append-only task-level index`
 - Detail：[T002](../docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)、[当前合同](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 
 - T002续接：用户授权提交/推送当前main并单次触发Build AShell clients both/aarch64，不监控。本地/远端a0e46b1、35路径均本任务，diff检查通过；CE-20261014-T002-02 / STATE004 / WORK005。实际SHA/接受回执见Git/交付，不将dispatch当成构建成功。
+
+## T-2026-10-14-003 — ADB控件与独立黑色遮罩
+
+- main/941b215，初始clean；全窗口状态浮层/双图窄间隔、ADB停止与本机桥超时恢复、独立排除采集的黑色遮罩。原Android采集/无障碍/输入实现保持。
+- D028/ADR0023/Baseline18/STATE005/WORK007/CE-20261014-T003-01；V0，源码与记录未提交，构建/真机ADB-M13—M16 NOT_RUN，无Git/CI。
+- 详情：[T003](../docs/tasks/T-2026-10-14-003-adb-controls-and-overlay.md)。外部资产/依赖无变化；前轮941b215推送与dispatch204仅为历史执行回执。
+
+- T003续接：用户授权提交/推送当前30路径并执行一次Build AShell clients both/aarch64，不监控。核对本地/远端main均941b215、workflow active；CE-20261014-T003-02 / STATE006 / WORK008。准确提交与接受结果以Git/交付回执为准，无本地产品验证。

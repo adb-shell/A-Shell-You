@@ -16,12 +16,18 @@ import io.github.muntashirakon.adb.PairingConnectionCtx;
 /** Worker-thread owner of a local ADB connection. No product JNI, services or peer protocol. */
 final class LocalAdbClient {
     private final Context context;
+    private final boolean boundedClose;
     private volatile AdbLocalSocket socket;
     private volatile AdbConnection connection;
     private volatile boolean shellVerified;
 
     LocalAdbClient(Context context) {
+        this(context, false);
+    }
+
+    LocalAdbClient(Context context, boolean boundedClose) {
         this.context = context.getApplicationContext();
+        this.boundedClose = boundedClose;
     }
 
     boolean isConnected() {
@@ -127,7 +133,19 @@ final class LocalAdbClient {
         connection = null;
         socket = null;
         if (value != null) {
-            try { value.close(); } catch (Exception ignored) { }
+            if (!boundedClose) {
+                try { value.close(); } catch (Exception ignored) { }
+                return;
+            }
+            // Private media transports must not pin their state machine on libadb's unbounded join.
+            Thread cleanup = new Thread(() -> {
+                try { value.close(); } catch (Exception ignored) { }
+            }, "ashell-adb-private-close");
+            cleanup.setDaemon(true);
+            cleanup.start();
+            try { cleanup.join(1000); }
+            catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }
+            if (cleanup.isAlive()) cleanup.interrupt();
         }
     }
 

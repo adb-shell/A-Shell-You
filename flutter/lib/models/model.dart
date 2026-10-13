@@ -1981,7 +1981,18 @@ class ViewStyle {
 class CanvasModel with ChangeNotifier {
   // Optional PC image pane, with the same origin as the original full-width canvas.
   Size? _desktopViewportSize;
-  void setDesktopViewportSize(Size? size) { _desktopViewportSize = size; }
+  bool _desktopAlignRight = false;
+  bool get desktopAlignRight => _desktopAlignRight;
+  bool _desktopAlignmentChanged = false;
+  void setDesktopAlignRight(bool value) {
+    if (_desktopAlignRight == value) return;
+    _desktopAlignRight = value;
+    _desktopAlignmentChanged = true;
+  }
+  void setDesktopViewportSize(Size? size) {
+    _desktopViewportSize = size;
+    if (size == null) setDesktopAlignRight(false);
+  }
   // image offset of canvas
   double _x = 0;
   // image offset of canvas
@@ -2093,9 +2104,10 @@ class CanvasModel with ChangeNotifier {
       displayWidth: displayWidth,
       displayHeight: displayHeight,
     );
-    if (_lastViewStyle == viewStyle) {
+    if (_lastViewStyle == viewStyle && !_desktopAlignmentChanged) {
       return;
     }
+    _desktopAlignmentChanged = false;
     if (_lastViewStyle.style != viewStyle.style) {
       _resetScroll();
     }
@@ -2119,6 +2131,7 @@ class CanvasModel with ChangeNotifier {
 
   _resetCanvasOffset(int displayWidth, int displayHeight) {
     _x = (size.width - displayWidth * _scale) / 2;
+    if (isDesktop && _desktopAlignRight && _x > 0) _x *= 2;
     _y = (size.height - displayHeight * _scale) / 2;
     if (isMobile) {
       _moveToCenterCursor();
@@ -2287,6 +2300,8 @@ class CanvasModel with ChangeNotifier {
 
   clear() {
     _desktopViewportSize = null;
+    _desktopAlignRight = false;
+    _desktopAlignmentChanged = false;
     _x = 0;
     _y = 0;
     _scale = 1.0;

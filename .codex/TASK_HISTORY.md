@@ -338,3 +338,12 @@
 - D027 / ADR0022 / Baseline17 / STATE003 / WORK004 / CE-20261014-T002-01；T8源码与文档完成、未提交，无本轮Git/CI。详见[任务](../docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)。
 
 - 续接授权：用户要求推送并执行编排；核对本地与远端main均a0e46b1，35路径均本任务。提交/推送main后仅触发一次Build AShell clients both/aarch64，不监控；CE-20261014-T002-02 / STATE004 / WORK005。本文为执行前记录，Git/最终回执记录真实SHA和接受结果；无本地产品构建/设备验证。
+
+## T-2026-10-14-003 — 布局、ADB关闭恢复、独立黑色遮罩
+
+- 用户C2授权并补充遮罩要求；main/941b215初始clean。完成全主界面右上浮层/双源贴近中线、ADB按钮关闭重试/私有close守卫/本机请求超时、新采集generation流控清理。
+- 新建APK内shell UID遮罩及独立管理器，排除其自身截图/镜像，设备单例多PC状态；最后订阅退出与ADB断开/异常清理。不熄屏、不改原Android无障碍/采集/输入实现。
+- V0静态检查；未复现用户故障、未编译/真机验证；ADB-M13—M16 NOT_RUN。详细[任务](../docs/tasks/T-2026-10-14-003-adb-controls-and-overlay.md)含正式编译验证需求。
+- T8源码与记录交付；D028/ADR0023/Baseline18/STATE005/WORK007/CE-20261014-T003-01。未提交/推送/CI或生产操作；External Registry reviewed-no-change。
+
+- 同任务追加C3：用户要求提交推送并执行编排；当前30路径，main与远端均941b215。将stage/commit/push到main，触发一次Build AShell clients both/aarch64，不监控。CE-20261014-T003-02 / STATE006 / WORK008；实际SHA/接受结果见Git与最终回执，不表示构建/真机通过。

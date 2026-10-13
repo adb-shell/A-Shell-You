@@ -368,6 +368,9 @@ class _RemotePageState extends State<RemotePage>
                   child: !isWeb && _ffi.connType == ConnType.defaultConn && _ffi.ffiModel.isPeerAndroid
                       ? RemoteDisplayLayout(ffi: _ffi, mirror: _remoteAdbMirror, ordinary: getBodyForDesktop(context))
                       : getBodyForDesktop(context))),
+          Positioned(top: 10, right: 10,
+            child: IgnorePointer(child:
+              RemoteStatusMonitors(_ffi.qualityMonitorModel, _ffi.ashellStatusModel))),
           Stack(
             children: [
               _ffi.ffiModel.pi.isSet.isTrue &&
@@ -951,18 +954,6 @@ class _RemotePageState extends State<RemotePage>
                   zoomCursor: _zoomCursor,
                 )));
     }
-    paints.add(
-      Positioned(
-        top: 10,
-        right: 10,
-        child: _buildRawTouchAndPointerRegion(
-          RemoteStatusMonitors(
-              _ffi.qualityMonitorModel, _ffi.ashellStatusModel),
-          null,
-          null,
-        ),
-      ),
-    );
     return Stack(
       children: paints,
     );
@@ -1188,7 +1179,9 @@ class _ImagePaintState extends State<ImagePaint> {
       widget = Row(
         children: [
           Container(
-            width: ((layoutSize.width - size.width) ~/ 2).toDouble(),
+            width: this.widget.ffi.canvasModel.desktopAlignRight
+                ? layoutSize.width - size.width
+                : ((layoutSize.width - size.width) ~/ 2).toDouble(),
           ),
           widget,
         ],

@@ -1,5 +1,7 @@
 # AShell Engineering Baseline Index
 
+当前：[AS-BL-2026-10-14-941b215-adb-overlay-worktree](18_ADB_OVERLAY_BASELINE_2026-10-14.md)，T003布局/ADB恢复/独立遮罩，V0未提交。Baseline17已由941b215提交推送并触发编排（204，不监控）；下方旧状态保持历史含义。
+
 当前工作树快照：[AS-BL-2026-10-14-a0e46b1-adb-inline-worktree](17_ADB_INLINE_SCREENSHOT_BASELINE_2026-10-14.md)：主界面单双画面、Shell栏样式与独立ADB连续截图；本轮未提交，仅V0。
 
 前轮快照：[AS-BL-2026-10-14-a1486ee-adb-mirror-worktree](16_ADB_MIRROR_BASELINE_2026-10-14.md)已由a0e46b1提交推送，编排204接受但未监控；快照保持冻结，不代表构建通过。

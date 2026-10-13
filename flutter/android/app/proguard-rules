@@ -9,6 +9,10 @@
     public static void checkNotNull(java.lang.Object);
 }
 
+# Standalone shell entry and its independent JNI state callback.
+-keep class me.ashell.localadb.AdbPrivacyOverlay { *; }
+-keep class me.ashell.localadb.LocalAdbPrivacy { native <methods>; }
+
 # Keep ZEGO public SDK classes stable when Android release minification is enabled.
 -keep class **.zego.** { *; }
 -keep class im.zego.** { *; }

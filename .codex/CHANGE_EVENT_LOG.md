@@ -676,3 +676,18 @@ Mode：`append-only logical persisted-change events`
 - 当前用户明确要求推送并执行编排；范围为本任务35个代码/文档路径，目标adb-shell/A-Shell-You的main，Build AShell clients / platform=both / android_arch=aarch64，单次dispatch、不监控。
 - 核对本地HEAD和远端main均a0e46b1，暂存区为空，V0差异空白检查通过，无额外业务代码修改或本地构建/设备操作。
 - 同步任务与状态/记忆/日志执行边界，STATE004 / WORK005；D027/ADR0022/Baseline17不变。此事件为执行前记录，准确提交SHA与接受结果见Git/最终回执；不宣称构建成功，不创建Release/tag。
+
+## CE-20261014-T003-01 — 布局/ADB控件恢复与独立黑屏遮罩
+
+- Task T-2026-10-14-003；main/941b215初始clean；用户授权本轮四项代码修改，追加明确遮罩而非熄屏。无本轮Git/CI授权或执行。
+- 新增Java AdbPrivacyOverlay/LocalAdbPrivacy；修改独立LocalAdbClient/Mirror/Manager、R8、协议41、Rust独立媒体模块；PC mirror/controller/sidebar/layout/view与remote_page/CanvasModel最小显示适配。
+- 恢复：有界私有close、停止守卫/旧Run隔离、PC桥接及操作超时、关闭可重试、旧帧额度清理；视频固定jar缓存避免旧trap误删新运行文件。
+- 新黑层排除采集、Android11/12+分支、独立租约、设备单例与多PC状态；原Android采集/Accessibility/输入实现无差异，未改工具链/依赖/品牌。
+- Docs：14_ADB_MIRROR、任务、ADR0023/D028、Baseline18、TEST_MATRIX与入口/记忆；STATE005/WORK007。External Registry reviewed-no-change，无新外部资产。
+- Verification：V0源码/边界/接口/权限/生命周期/坐标/文档链接/diff；ADB-M13—M16 NOT_RUN。未build/test/analyze/codegen/设备/生产操作。
+
+## CE-20261014-T003-02 — 用户授权提交推送与单次编排
+
+- 本轮用户明确要求提交推送并执行编排；当前30路径均T003，目标adb-shell/A-Shell-You/main。核对本地/远端941b215、暂存区为空、V0 diff通过，Build AShell clients active。
+- 同步本任务/状态/记忆/日志执行边界，STATE006/WORK008；D028/ADR0023/Baseline18 reviewed-no-change。将commit/push后dispatch一次both/aarch64、不监控；本条为执行前记录，最终SHA/接受回执见Git与交付。
+- 无额外业务源码修改、本地产品构建/设备操作、Release/tag或生产变更；不将dispatch接受作为构建通过。

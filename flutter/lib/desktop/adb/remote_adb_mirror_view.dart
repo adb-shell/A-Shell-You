@@ -7,8 +7,9 @@ import 'remote_adb_mirror.dart';
 
 /// Inline ADB surface. Its pointer events never enter the ordinary image canvas.
 class RemoteAdbMirrorView extends StatelessWidget {
-  const RemoteAdbMirrorView({super.key, required this.mirror});
+  const RemoteAdbMirrorView({super.key, required this.mirror, this.alignment = Alignment.center});
   final RemoteAdbMirror mirror;
+  final Alignment alignment;
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: mirror,
@@ -17,7 +18,7 @@ class RemoteAdbMirrorView extends StatelessWidget {
       return ColoredBox(color: kColorCanvas, child: Listener(behavior: HitTestBehavior.opaque,
         child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () {}, onPanUpdate: (_) {},
           child: Stack(fit: StackFit.expand, children: [
-            if (mirror.image != null) _AdbFrame(bytes: mirror.image!, mirror: mirror)
+            if (mirror.image != null) _AdbFrame(bytes: mirror.image!, mirror: mirror, alignment: alignment)
             else Center(child: Padding(padding: const EdgeInsets.all(24),
               child: Text(mirror.summary, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)))),
             if (mirror.image != null) Positioned(left: 12, right: 12, bottom: 12,
@@ -33,9 +34,10 @@ class RemoteAdbMirrorView extends StatelessWidget {
 
 /// At most one decode and one displayed image; bypass Flutter's still-image cache.
 class _AdbFrame extends StatefulWidget {
-  const _AdbFrame({required this.bytes, required this.mirror});
+  const _AdbFrame({required this.bytes, required this.mirror, required this.alignment});
   final Uint8List bytes;
   final RemoteAdbMirror mirror;
+  final Alignment alignment;
   @override
   State<_AdbFrame> createState() => _AdbFrameState();
 }
@@ -53,7 +55,7 @@ class _AdbFrameState extends State<_AdbFrame> {
     final image = _image;
     if (image == null || _box.isEmpty) return;
     final scale = math.min(_box.width / image.width, _box.height / image.height);
-    final left = (_box.width - image.width * scale) / 2;
+    final left = (_box.width - image.width * scale) * (widget.alignment.x + 1) / 2;
     final top = (_box.height - image.height * scale) / 2;
     final x = ((local.dx - left) / scale).round().clamp(0, image.width - 1).toInt();
     final y = ((local.dy - top) / scale).round().clamp(0, image.height - 1).toInt();
@@ -101,8 +103,7 @@ class _AdbFrameState extends State<_AdbFrame> {
             final image = _image;
             if (image == null) return;
             final scale = math.min(_box.width / image.width, _box.height / image.height);
-            final rect = Rect.fromCenter(center: Offset(_box.width / 2, _box.height / 2),
-                width: image.width * scale, height: image.height * scale);
+            final rect = widget.alignment.inscribe(Size(image.width * scale, image.height * scale), Offset.zero & _box);
             if (!rect.contains(event.localPosition)) return;
             _pointer = event.pointer; _last = event.localPosition;
             _touch(0, _last);
@@ -122,7 +123,8 @@ class _AdbFrameState extends State<_AdbFrame> {
             if (_pointer != event.pointer) return;
             _touch(1, _last); _pointer = null;
           },
-          child: SizedBox.expand(child: RawImage(image: _image, fit: BoxFit.contain, filterQuality: FilterQuality.low)));
+          child: SizedBox.expand(child: RawImage(image: _image, fit: BoxFit.contain,
+              alignment: widget.alignment, filterQuality: FilterQuality.low)));
       });
 
   @override

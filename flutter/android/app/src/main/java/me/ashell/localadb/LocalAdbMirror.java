@@ -36,6 +36,7 @@ final class LocalAdbMirror {
     private boolean screenshotMode;
     private int pendingPort;
     private boolean pendingScreenshot;
+    private String phase = "idle";
 
     private static native void register(LocalAdbManager manager);
     private static native void state(long generation, String phase, String error, boolean screenshot);
@@ -56,14 +57,14 @@ final class LocalAdbMirror {
     }
 
     synchronized void unavailable() {
-        if (active == null) publish("error", "请先完成 ADB 连接并验证 Shell，等待当前 ADB 操作结束。");
+        publish(active == null ? "error" : phase, "请先完成 ADB 连接并验证 Shell，等待当前 ADB 操作结束。");
     }
 
     synchronized void start(int port, boolean screenshot) {
         if (!nativeReady) return;
         if (!shellReady.get() || port <= 0 || port > 65535) { unavailable(); return; }
         if (active != null) {
-            if (!active.cancelled.get() && active.screenshot == screenshot) return;
+            if (!active.cancelled.get() && active.screenshot == screenshot) { publish(phase, ""); return; }
             pendingPort = port;
             pendingScreenshot = screenshot;
             stopCurrent("");
@@ -74,8 +75,9 @@ final class LocalAdbMirror {
         Run run = new Run(generation, port, screenshot);
         active = run;
         publish("starting", "");
-        run.watchdog = guard.scheduleWithFixedDelay(this::checkHealth, 1, 1, TimeUnit.SECONDS);
+        run.watchdog = guard.scheduleWithFixedDelay(() -> checkHealth(run), 1, 1, TimeUnit.SECONDS);
         run.thread = new Thread(() -> capture(run), "ashell-adb-video");
+        run.thread.setDaemon(true);
         run.thread.start();
     }
 
@@ -87,7 +89,8 @@ final class LocalAdbMirror {
     private void stopCurrent(String reason) {
         Run run = active;
         if (run == null) { publish("idle", reason); return; }
-        if (!run.cancelled.compareAndSet(false, true)) return;
+        if (!run.cancelled.compareAndSet(false, true)) { publish("stopping", run.failure); return; }
+        run.stopAt = SystemClock.elapsedRealtime();
         run.failure = reason;
         publish("stopping", reason);
         // Abort only this private ADB transport; its close unblocks every pending stream.
@@ -95,15 +98,33 @@ final class LocalAdbMirror {
         if (run.thread != null) run.thread.interrupt();
     }
 
-    private synchronized void checkHealth() {
-        if (active == null || active.cancelled.get()) return;
+    private synchronized void checkHealth(Run run) {
+        if (active != run) return;
+        if (run.cancelled.get()) {
+            if (SystemClock.elapsedRealtime() - run.stopAt >= 3000) finish(run);
+            return;
+        }
         if (!shellReady.get()) stop("ADB Shell 已断开，投屏已停止。");
         else if (SystemClock.elapsedRealtime() - active.lastPacket > 20000)
             stop("ADB 投屏启动或画面接收超时，请重试。");
     }
 
     private void publish(String phase, String error) {
+        this.phase = phase;
         if (nativeReady) state(generation, phase, error, screenshotMode);
+    }
+
+    private synchronized void finish(Run run) {
+        if (run.watchdog != null) run.watchdog.cancel(false);
+        if (active != run) return;
+        active = null;
+        publish(run.failure.isEmpty() ? "idle" : "error", run.failure);
+        if (pendingPort > 0) {
+            int port = pendingPort;
+            boolean screenshot = pendingScreenshot;
+            pendingPort = 0;
+            start(port, screenshot);
+        }
     }
 
     private void capture(Run run) {
@@ -111,7 +132,7 @@ final class LocalAdbMirror {
             run.client.connect(run.port, run.cancelled);
             if (run.screenshot) { captureScreenshots(run); return; }
             String scid = String.format(Locale.US, "%08x", new SecureRandom().nextInt() & 0x7fffffff);
-            // A fixed module-owned path bounds leftovers even if upload is interrupted.
+            // One bounded module cache: an old EXIT trap must never remove a replacement's jar.
             String path = "/data/local/tmp/ashell-scrcpy-5.0.1.jar";
             push(context, run.client, run.cancelled, path);
             // All arguments are fixed or generated locally. No peer-controlled shell interpolation.
@@ -122,12 +143,13 @@ final class LocalAdbMirror {
                     + " send_device_meta=false send_dummy_byte=false power_on=false"
                     + " cleanup=true log_level=error";
             try (AdbStream process = run.client.openMirrorStream("shell,v2,raw:sh")) {
-                byte[] script = ("trap 'rm -f " + path + "' EXIT; " + command + "\n").getBytes(StandardCharsets.US_ASCII);
+                byte[] script = (command + "\n").getBytes(StandardCharsets.US_ASCII);
                 byte[] input = ByteBuffer.allocate(script.length + 10).order(ByteOrder.LITTLE_ENDIAN)
                         .put((byte) 0).putInt(script.length).put(script).put((byte) 4).putInt(0).array();
                 process.write(input, 0, input.length);
                 process.flush();
                 Thread output = new Thread(() -> drainProcess(run, process), "ashell-scrcpy-output");
+                output.setDaemon(true);
                 output.start();
                 AdbStream video = null;
                 long deadline = SystemClock.elapsedRealtime() + 10000;
@@ -146,22 +168,10 @@ final class LocalAdbMirror {
         } catch (OutOfMemoryError e) {
             run.failure = "ADB 画面内存不足，已停止本次采集。";
         } finally {
-            if (run.watchdog != null) run.watchdog.cancel(false);
             // Clear interruption before joining the private ADB reader during close.
             Thread.interrupted();
             run.client.disconnect();
-            synchronized (this) {
-                if (active == run) {
-                    active = null;
-                    publish(run.failure.isEmpty() ? "idle" : "error", run.failure);
-                    if (pendingPort > 0) {
-                        int port = pendingPort;
-                        boolean screenshot = pendingScreenshot;
-                        pendingPort = 0;
-                        start(port, screenshot);
-                    }
-                }
-            }
+            finish(run);
         }
     }
 
@@ -291,10 +301,11 @@ final class LocalAdbMirror {
         final long id;
         final int port;
         final boolean screenshot;
-        final LocalAdbClient client = new LocalAdbClient(context);
+        final LocalAdbClient client = new LocalAdbClient(context, true);
         final AtomicBoolean cancelled = new AtomicBoolean();
         volatile long lastPacket = SystemClock.elapsedRealtime();
         volatile String failure = "";
+        long stopAt;
         Thread thread;
         ScheduledFuture<?> watchdog;
         Run(long id, int port, boolean screenshot) { this.id = id; this.port = port; this.screenshot = screenshot; }
