@@ -38,14 +38,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
 
   @override void initState() {
     super.initState();
-    _initialize();
-  }
-
-  Future<void> _initialize() async {
-    await adb.watch(true);
-    if (mounted && widget.action == 'pair' && mode == 'auto'
-        && pairPort.text.isEmpty && connectPort.text.isEmpty
-        && adb.ready && !adb.connected && adb.discoverySupported) await _scan();
+    adb.refresh();
   }
 
   @override void dispose() {
@@ -88,34 +81,43 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   }
 
   Widget _portInput(TextEditingController value, String label) => TextField(
-    controller: value, enabled: !adb.busy, readOnly: mode == 'auto',
+    key: ObjectKey(value), controller: value, enabled: !adb.busy,
     keyboardType: TextInputType.number, maxLength: 5,
     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
     decoration: InputDecoration(labelText: label, counterText: '', border: const OutlineInputBorder()),
   );
 
   List<Widget> _pairing() => [
-    const Text('手机开启“无线调试”。使用配对码时，请保持系统配对码窗口打开。'),
+    const Text('首次配对：手机开启“无线调试”，选择“使用配对码配对设备”，并保持系统配对码窗口打开。'),
     const SizedBox(height: 10),
     Wrap(spacing: 8, runSpacing: 8, children: [
       for (final item in const {'auto': '只填配对码', 'manual': '手动端口'}.entries)
         ChoiceChip(label: Text(item.value), selected: mode == item.key,
-            onSelected: adb.busy ? null : (_) => setState(() { mode = item.key; validation = ''; })),
+            onSelected: adb.busy ? null : (_) {
+              FocusScope.of(context).unfocus();
+              setState(() { mode = item.key; validation = ''; });
+            }),
     ]),
     const SizedBox(height: 16),
     if (!adb.stale && !adb.discoverySupported)
       const Text('手机 ADB 模块版本较旧，请先更新 Android 安装包以使用端口扫描和一键配对。'),
-    Row(children: [
-      Expanded(child: _portInput(pairPort, '配对端口（留空自动）')),
-      const SizedBox(width: 12),
-      Expanded(child: _portInput(connectPort, '连接端口（留空自动）')),
-    ]),
-    Align(alignment: Alignment.centerRight, child: TextButton.icon(
-        onPressed: adb.ready && adb.discoverySupported ? _scan : null,
-        icon: const Icon(Icons.radar, size: 18), label: const Text('扫描并填充端口'))),
-    if (mode == 'auto') const Padding(padding: EdgeInsets.only(bottom: 10),
-        child: Text('端口由手机实时发现；扫描结果供参考。未发现时可切换手动端口。')),
-    TextField(controller: pairCode, enabled: !adb.busy, obscureText: true, maxLength: 6,
+    if (mode == 'auto')
+      const Text('输入 6 位配对码后点击“配对并连接 ADB”。手机会自动发现端口、配对并连接；发现失败时可切换“手动端口”。')
+    else ...[
+      const Text('配对端口见系统配对码窗口，连接端口见无线调试首页。填写的端口会直接使用，留空则自动发现；也可扫描填充后核对。'),
+      const SizedBox(height: 12),
+      Row(children: [
+        Expanded(child: _portInput(pairPort, '配对端口（留空自动）')),
+        const SizedBox(width: 12),
+        Expanded(child: _portInput(connectPort, '连接端口（留空自动）')),
+      ]),
+      Align(alignment: Alignment.centerRight, child: TextButton.icon(
+          onPressed: adb.ready && adb.discoverySupported ? _scan : null,
+          icon: const Icon(Icons.radar, size: 18), label: const Text('扫描并填充端口'))),
+    ],
+    const SizedBox(height: 12),
+    TextField(key: const ValueKey('pairCode'), controller: pairCode,
+        enabled: !adb.busy, obscureText: true, maxLength: 6,
         autocorrect: false, enableSuggestions: false, keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         onSubmitted: (_) { if (adb.ready && adb.discoverySupported) _pair(); },
@@ -124,11 +126,11 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
         icon: const Icon(Icons.link), label: const Text('配对并连接 ADB')),
     const SizedBox(height: 12),
     const Divider(),
-    Text(adb.stale ? '正在确认手机配对状态，请刷新或等待状态同步。'
-        : adb.paired ? '手机已有本应用配对记录，可直接连接。'
+    Text(adb.stale ? '手机配对状态尚未确认，请点击刷新按钮查询。'
+        : adb.paired ? '手机已有本应用配对记录。保持无线调试开启即可直接连接，无需填写配对码或打开配对码窗口。'
         : '以前已配对过？可以尝试直接连接，无需重复输入配对码。'),
     const SizedBox(height: 8),
-    OutlinedButton.icon(onPressed: adb.ready ? () {
+    ElevatedButton.icon(onPressed: adb.ready ? () {
       final port = mode == 'manual' ? _port(connectPort) : 0;
       if (port != null) adb.run('connect', {'port': port});
     } : null, icon: const Icon(Icons.check_circle_outline),
@@ -181,7 +183,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
         Text('Shell 状态：' + (adb.connected ? '连接并验证成功' : '尚未连接或状态失效')),
         Text('上次成功连接端口：' + (adb.state['connectPort'] ?? 0).toString()),
         const SizedBox(height: 12),
-        const Text('此状态来自 Android，每 3 秒刷新一次。手机本地或其他 PC 的操作会同步到这里。配对记录不代表系统尚未撤销授权，连接时会重新验证。'),
+        const Text('打开弹窗时查询状态，本次操作返回后更新。手机本地或其他 PC 操作后，请点击刷新按钮查询最新状态。配对记录不代表系统尚未撤销授权，连接时会重新验证。'),
       ];
     }
   }

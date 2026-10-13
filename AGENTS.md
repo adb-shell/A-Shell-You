@@ -1,6 +1,8 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
-2026-10-13 T006：main/504adea基线新增ADB独立权限gate、配对/连接双NSD、一键配对并验证Shell、PC系统二维码配对及独立可拖动弹窗。此前T004远程模块已由de8bc76固化，T005导入由504adea修复；下文“无PC ADB”为T003历史时点。当前见13_REMOTE_ADB、ADR-0019、Baseline13；仅V0。用户授权提交后运行Build AShell clients both/aarch64，不监控，执行结果见Git/交付回执。原无障碍/视频/输入链保持。
+2026-10-13 T007：交付前观察main/efb2599 + 三份未提交Dart修改。二维码已在efb2599移除；工作树进一步取消PC每3秒刷新，两端“只填配对码”隐藏端口及扫描按钮、“手动端口”显示它们，PC连接按钮改主题色。Android本机3秒查询保持；其他PC的变化需手动刷新或重开弹窗。见13_REMOTE_ADB、ADR-0020、Baseline14、T007文档同步；仅V0。efb2599已推送且both/aarch64 CI dispatch获HTTP204，不监控、无构建成功证据；未提交UI不在该次构建内。本次仅同步文档、不追加源码修改；用户随后授权提交全部待交付改动并单次构建，执行回执见最终交付，不监控。
+
+2026-10-13 T006历史：main/504adea上实现独立ADB gate、双NSD、一键连接、PC二维码及可拖动弹窗，随后由feac956固化。二维码、PC周期刷新和相关时限已由T007记录的后续变更取代，其他隔离边界保持。此前T004由de8bc76固化、T005由504adea修复；下文“无PC ADB”为T003历史时点。
 
 2026-10-13 T004：main/917e661工作树新增PC顶栏远程ADB，专用Misc.remote_adb(40)与独立JNI接入Android共享manager，支持配对/连接/shell/撤销/刷新与多PC状态。见 `docs/AI_ENGINEERING/13_REMOTE_ADB.md` / ADR-0018；仅V0，编译/真机待验证，未提交。无ADB投屏，原无障碍/视频/输入处理保持。
 

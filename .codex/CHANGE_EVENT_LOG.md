@@ -539,3 +539,42 @@ Mode：`append-only logical persisted-change events`
 - `flutter/lib/mobile/adb/local_adb_page.dart`
 - `src/remote_adb.rs`
 - `src/server/connection.rs`
+
+## CE-20261013-T007-01 — ADB code-pairing and UI documentation sync
+
+- Date/Owner：2026-10-13 / Codex，T-2026-10-13-007；用户先允许同步文档，再明确追加提交代码/文档、推送与单次Build AShell clients both/aarch64，不监控。
+- Source：main/efb2599d05ba5b3a08a9c63ee00bec20e2ce9c5b，initial三份Dart dirty；源码SHA-256见Baseline14，本轮仅Markdown同步、不追加源码修改。
+- Delta：当前文档去除QR正向能力/PC三秒同步承诺；说明两端模式显示、PC按钮主题色、刷新/参数拒绝/请求取消/时限。新ADR0020/D024/Baseline14/测试R12—15与恢复记忆；旧QR R10=N/A，旧Baseline13保持。
+- Evidence：V0源码与文档对照、diff空白/本地链接/hash保护。efb2599历史push及HTTP204 dispatch已确认，未监控、无V2/V3/V4 PASS；本轮交付回执待执行后由最终答复确认。
+- Boundaries：无本地build/test/analyze/codegen、设备、原链/工具链/依赖修改、删除/版本/发布/生产动作。文档回退只限下列路径，不能抹去后续或其他任务记录。
+- Related：STATE007 / WORK014 / D024 / ADR0020 / T007；准确交付SHA以Git回执为准，不冒充提交后的实时状态。
+
+本轮文档路径：
+
+- `AGENTS.md`
+- `PROJECT_START_HERE.md`
+- `EXTERNAL_ASSET_REGISTRY.md`
+- `TEST_MATRIX.md`
+- `docs/AI_ENGINEERING/08_BUILD_SYSTEM.md`
+- `docs/AI_ENGINEERING/10_SECURITY_MODEL.md`
+- `docs/AI_ENGINEERING/12_LOCAL_ADB.md`
+- `docs/AI_ENGINEERING/13_REMOTE_ADB.md`
+- `docs/ADR/0019-adb-discovery-and-independent-control.md`
+- `docs/ADR/0020-adb-code-pairing-and-explicit-refresh.md`
+- `docs/ADR/README.md`
+- `docs/BASELINE/14_ADB_CODE_PAIRING_BASELINE_2026-10-13.md`
+- `docs/BASELINE/BASELINE_INDEX.md`
+- `docs/tasks/T-2026-10-13-007-adb-docs-sync.md`
+- `.codex/PROJECT_STATE.md`
+- `.codex/PROJECT_MEMORY.md`
+- `.codex/CURRENT_WORK.md`
+- `.codex/DECISION_LOG.md`
+- `.codex/TASK_HISTORY.md`
+- `.codex/CHANGELOG_AI.md`
+- `.codex/CHANGE_EVENT_LOG.md`
+
+交付一并包含先前用户授权的三份源码改动（本轮未重写）：
+
+- `flutter/lib/desktop/adb/remote_adb_controller.dart`
+- `flutter/lib/desktop/adb/remote_adb_menu.dart`
+- `flutter/lib/mobile/adb/local_adb_page.dart`

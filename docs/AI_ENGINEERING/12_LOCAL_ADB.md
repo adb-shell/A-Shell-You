@@ -1,6 +1,6 @@
 # AShell 本机 ADB / Local ADB
 
-最后核对：2026-10-13；T006 基于 main/504adea 增加双端口发现与配对后自动连接，并重做本机页面。远程共享与二维码配对见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。首次本机实现提交仍为8662f23。
+交付前核对：2026-10-13，main/efb2599 + 三份待提交 Dart 修改；二维码已移除，两端自动/手动配对界面已分开显示。首次本机实现为8662f23，双端口发现和一键连接由feac956固化。当前文档同步见 [T007](../tasks/T-2026-10-13-007-adb-docs-sync.md)，远程共享见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)；本轮交付SHA以Git最终回执为准。
 
 当前实现是 Android App 内的独立无线调试客户端：配对、连接、验证 shell 身份和执行单次命令。主页向左滑到右侧 ADB 页，向右滑返回。采用 `libadb-android:3.1.1`；没有恢复旧 LADB 进程、`libadb.so`、旧通道或无障碍自动配对。T004 增加 PC 远程 ADB 请求，Android 共享身份/连接；scrcpy/ADB 投屏与视频接收仍未接入。
 
@@ -10,13 +10,13 @@
 
 1. 使用 Android 11 / API 30 或以上设备，连接 Wi-Fi。Android 10 及以下仍可安装原产品，但本模块的配对和 shell 操作不可用。
 2. 在 Android 主页向左滑进入“本机 ADB”，点击“打开开发者选项”，手动开启系统“无线调试”。此按钮仅打开设置，不自动授权或启用调试。
-3. 用系统分屏或小窗同时显示 App 和系统“使用配对码配对设备”窗口。默认“只填配对码”，点击“配对并连接 ADB”会自动发现端口、配对并连接/id验证；保持系统窗口打开。
-4. “手动端口”可填写配对端口与码，连接端口留空仍自动发现；“扫描并填充端口”同时扫描本机两类端口。已有配对记录直接点击“我已配对，连接并验证 Shell”。两个端口通常不同，模块只连接本机127.0.0.1。PC还可显示系统ADB二维码，实现手机扫码免手输码；本机页面不声称能读取系统六位码。
+3. 首次配对用系统分屏或小窗同时显示 App 和系统“使用配对码配对设备”窗口。默认“只填配对码”只展示六位码输入框，隐藏两个端口框及扫描按钮。保持系统窗口打开，点击“配对并连接 ADB”，在执行时自动发现端口、配对、连接并验证 Shell。
+4. “手动端口”展示配对端口、连接端口、配对码和扫描按钮。配对端口见系统配对码窗口，连接端口见无线调试首页；填写值直接使用，任一端口留空则自动发现。扫描填入本机唯一发现值，未发现的旧值清空；调试开关或系统窗口变化后重新核对。切模式解除焦点，手动值可保留但自动模式不消费隐藏端口。模块只连接本机127.0.0.1，不读取系统六位码，不再支持二维码配对。
 5. 连接会先运行 `id`，退出码为 0 且包含 `uid=2000(` 或 `uid=0(` 才显示已连接。普通设备预期为 shell 身份；模块不会替设备获取 root。
 6. 在 Shell 区直接填写 `id` 等命令，不加 `adb shell` 前缀。界面显示输出和真实退出码；命令非零退出码不等于 ADB 传输失败。
-7. 点击“断开”关闭共享连接，所有 PC 也会看到 disconnected，系统配对仍保留。PC ADB 菜单可撤销本 App 身份/记录；系统无线调试的已配对设备列表旧条目仍须手动忘记。
+7. 点击“断开”关闭共享连接，系统配对仍保留；其他 PC 手动刷新或重开弹窗后看到 disconnected。PC ADB 菜单可撤销本 App 身份/记录；系统无线调试的已配对设备列表旧条目仍须手动忘记。
 
-已配对且身份文件仍有效时可直接用当前连接端口连接。无线调试重开、网络变化或设备重启后端口可能变化，需要重新查看。ROM 的分屏、开发者选项入口及 loopback 调试能力须真机确认。
+已配对时保持无线调试开启，点击“我已配对，连接并验证 Shell”，无需配对码或打开系统配对码窗口。自动模式发现连接端口，手动模式使用填写的连接端口（留空自动）；不使用配对端口。App 的记录不保证系统授权仍有效，连接时重新验证。无线调试重开、网络变化或设备重启后端口可能变化；ROM 的分屏、设置入口及 loopback 能力须真机确认。
 
 ## 2. 源码与隔离边界
 
@@ -41,7 +41,7 @@ flowchart LR
 | `flutter/lib/mobile/adb/local_adb_page.dart` | 页面、输入校验、输出、生命周期与 3 秒状态轮询 |
 | `flutter/lib/mobile/adb/local_adb_bridge.dart` | 类型化 MethodChannel consumer；status/output/exitCode |
 | `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbPlugin.java` | FlutterPlugin + ActivityAware，本机 owner 的 MethodChannel adapter |
-| `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbManager.java` | 共享状态/记录、有限串行队列、默认20秒/一键配对35秒/QR90秒 watchdog、owner取消 |
+| `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbManager.java` | 共享状态/记录、有限串行队列、默认20秒/一键配对35秒 watchdog、按owner及是否使用transport取消 |
 | `flutter/android/app/src/main/java/me/ashell/localadb/RemoteAdbNative.java` / `AdbPortDiscovery.java` | 独立远端JNI / 本机NSD配对与连接端口发现，见13_REMOTE_ADB |
 | `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbClient.java` | 配对/连接 owner，运行 `id` 验证后才置 connected |
 | `flutter/android/app/src/main/java/me/ashell/localadb/AdbLocalSocket.java` | 仅 loopback 的可关闭 socket 转发，让超时/取消中断上游阻塞 I/O |
@@ -61,7 +61,7 @@ flowchart LR
 
 | 方法 | 参数 | 成功返回 | 语义 |
 |---|---|---|---|
-| `status` | 无 | `{supported, connected, paired, pairedAt, connectPort, busy, queued, operation, revision}` | 只读共享状态；paired只是记录，不查询系统配对列表 |
+| `status` | 无 | `{supported, apiVersion, connected, paired, pairedAt, connectPort, busy, queued, operation, phase, revision, discovery}` | 只读共享状态；paired只是记录，不查询系统配对列表 |
 | `openSettings` | 无 | null | 打开开发者选项；失败时提示手动打开 |
 | `pair` | `port: int`、`code: String` | null | 断开旧连接，使用系统配对码建立信任；配对成功不等于已连接 |
 | `connect` | `port: int` | `id` 输出字符串 | 0/省略尝试NSD与上次端口；本机页面默认自动发现，可手工覆盖 |
@@ -72,16 +72,16 @@ flowchart LR
 | `cancel` | 无 | null | 取消该Plugin owner的排队/当前操作；不取消其他PC请求 |
 | `revoke` | 无 | null | manager支持清本App身份/记录，PC提供确认入口；本机页无此按钮 |
 
-端口范围 1–65535，配对码为 6 位数字；命令非空、无 NUL，native 长度不超过 4096（Java UTF-16 code units）。界面同样限制输入长度。错误码包括 `invalid`、`unsupported`、`busy`、`settings`、`unavailable`、`adb_failed`、`cancelled`、`timeout`；异常细节不会直接返回或记录日志。
+端口范围 1–65535，0/省略表示自动发现；配对码为 6 位数字。业务参数仅接受 port/connectPort/code/command，未知参数（含已移除 serviceName）返回invalid。命令非空、无 NUL，native 长度不超过 4096（Java UTF-16 code units）。错误码包括 `invalid`、`unsupported`、`busy`、`settings`、`unavailable`、`adb_failed`、`cancelled`、`timeout`；异常细节不会直接返回或记录日志。
 
 ## 4. 生命周期与协议细节
 
-- `LocalAdbManager` 单worker执行discover/pair/pairConnect/connect/shell/disconnect/revoke。默认20秒watchdog，一键配对35秒、QR90秒；普通NSD最多6.5秒、QR发现最多60秒。socket目标连接超时3秒，上游connect等待8秒，临时listener accept为10秒。
-- `AdbLocalSocket` 只监听/连接127.0.0.1。取消操作关闭socket再中断worker；取消纯discover仅停止发现，保留共享连接。最终回调依赖worker退出，watchdog为取消触发点，不是已验证的严格返回时限。
+- `LocalAdbManager` 单worker执行discover/pair/pairConnect/connect/shell/disconnect/revoke。默认20秒watchdog，一键配对35秒；NSD最多6.5秒。socket目标连接超时3秒，上游connect等待8秒，临时listener accept为10秒；没有二维码专用等待。
+- `AdbLocalSocket` 只监听/连接127.0.0.1。任务声明使用transport后，取消可关闭socket并中断worker；纯discover及配对/连接尚处于发现阶段时的失败/取消保留已有连接。最终回调依赖worker退出，watchdog不是已验证的严格返回时限。配对已确认成功而连接失败/超时/取消时，保留记录并提示直接连接。
 - `AdbShell` 打开固定 ASCII `shell,v2,raw:sh`，将 UTF-8 命令加换行经 stdin 发送，再发送 CLOSE_STDIN；读取退出帧，避免上游旧 shell EOF 竞态和多字节 OPEN 长度问题。
 - 合并输出最多 65536 字节（64 KiB），超限会关闭命令 stream、标记 `truncated=true`，此时 `exitCode` 可为 null，不伪造成功。单次包长度上限 1 MiB；不提供 PTY、交互输入或持续终端会话。每次执行的 `cd`、环境变量不跨命令保留。
-- 页面 keep-alive；App 在前台且本页不忙时每 3 秒查询状态，返回前台也查询；只是查询 transport，并非持续执行 `id` 的健康探针。左右切页不会自动断开。后台停止轮询，但不会自动撤权或强制断开已建立连接。
-- 页面dispose释放timer/controllers并取消自身工作，engine detach取消本机owner；共享连接和worker归Android进程，不因一个页面/PC离开而销毁。执行中任务失败/取消/超时会清共享transport；仅取消排队任务不关闭其他owner的当前连接。没有自动重连。
+- 页面 keep-alive；App 在前台每 3 秒查询状态，返回前台也查询；上一次查询未结束时跳过，执行任务期间仍可查询。只是查询 transport，并非持续执行 `id`。左右切页不会自动断开；后台停止轮询，不自动撤权。PC已取消周期刷新，本机页保持此行为。
+- 页面dispose释放timer/controllers并取消自身工作，engine detach取消本机owner；共享连接和worker归Android进程，不因一个页面/PC离开而销毁。已经使用transport的任务失败/取消/超时会清共享transport；仅取消排队任务不关闭其他owner的当前连接。没有自动重连。
 - 关闭连接/命令 stream 不回滚命令已经造成的系统变化，也不保证终止命令另行派生的后台进程。
 
 ## 5. 身份与安全边界

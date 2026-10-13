@@ -1,7 +1,7 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261013-012`
+Registry Revision：`WORK-20261013-014`
 
 Last Updated：2026-10-13
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-无活动源码任务。T006实现和记录完成；本文件为提交前快照，随后按用户授权stage/commit/push并单次dispatch，实际回执见会话最终交付，不监控构建。
+无活动源码任务。T007同步ADB文档，保护先前未提交的三份Dart修改；本文件为交付前快照，随后按本轮追加授权提交/推送全部待交付改动并单次dispatch，实际回执见最终答复，不监控构建。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ Active Task Count：0
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-13-006`
-- Result：独立ADB权限修复、双NSD、一键配对连接、PC系统QR与分窗拖动、Android UI；原链/CI/依赖不变。
+- Task ID：`T-2026-10-13-007`
+- Result：文档对齐efb2599及未提交UI：无QR、PC显式刷新、两端模式分离与PC主题色连接按钮；请求/取消/时限合同、测试与记忆同步，原链/CI/依赖不变。
 - Closed At：2026-10-13（Asia/Tokyo）
-- Final T-State：`T8 — source complete / delivery`（V0；正式V2/V3/V4待验证）
-- State / Event：`STATE-20261013-006` / `CE-20261013-T006-01`
-- Decision：D-023 / ADR-0019 / Baseline13；旧决定按历史保存。
-- Verification：V0合同/参数/权限/NSD与取消/窗口/差异空白/保护路径/新文档链接；无本地工具链，未执行本地项目命令。
-- Next Gate：本次已授权提交推送与both/aarch64 CI dispatch，准确结果见最终回执，不监控；后续用户提供新包验证结果。无删除/版本/发布/生产操作。
+- Final T-State：`T8 — documentation complete / delivery`（V0；正式V2/V3/V4待验证）
+- State / Event：`STATE-20261013-007` / `CE-20261013-T007-01`
+- Decision：D-024 / ADR-0020 / Baseline14；旧决定按历史保存。
+- Verification：V0源码与文档对照、差异空白/本地链接、三份源码hash保护；无本地项目build/test/analyze/codegen或真机验证。
+- Next Gate：用户本轮已追加授权提交推送与both/aarch64 CI单次dispatch，准确结果见最终回执，不监控；正式构建/真机结果由后续提供。无删除/版本/发布/生产操作。
 - Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md 中同 ID。
-- Detailed record：docs/tasks/T-2026-10-13-006-adb-usability.md；观察main/504adea，initial clean；提交前快照。
+- Detailed record：docs/tasks/T-2026-10-13-007-adb-docs-sync.md；观察main/efb2599，initial三份Dart dirty；交付前快照。

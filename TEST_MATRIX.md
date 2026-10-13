@@ -74,23 +74,27 @@ These are coverage facts, not pass results.
 
 ADB 详细步骤、限制和取证项见 [本机 ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)。至少覆盖 Android 10 的拒绝路径、Android 11/13/14/15 与目标 ROM；pair 和 connect 两种端口必须分开测。以无副作用查询验证原 AND-01/02/04/05/07/08、FLT-04/05/06；不要把用户主动修改系统的 shell 副作用当成实现自动改动。取消只是关闭传输，不以后台子进程一定被终止作为当前实现保证。
 
-### PC 远程 ADB 增量（T004 / 全部 NOT_RUN）
+### PC 远程 ADB 增量（T004—T007 / 当前用例 NOT_RUN，旧QR用例N/A）
 
 源码与步骤：[13_REMOTE_ADB.md](docs/AI_ENGINEERING/13_REMOTE_ADB.md)。本机AND-09—13继续验证；engine销毁仅取消本机owner，共享manager/worker归进程，不能以仍存在的共享worker判泄漏。以下V2/V3/V4须正式环境取证。
 
 | ID | P | 场景 | Pass oracle | Level / Owner | Result |
 |---|---|---|---|---|---|
 | ADB-R01 | P0 | PC菜单打开先取状态；A正确/错误/过期码配对但不connect；B打开同一Android | 输入提交前状态确认；B看到Android记录，可我已配对直接连接，id成功才connected；顶栏自动隐藏不销毁弹窗请求 | V3 / Flutter+Android | NOT_RUN |
-| ADB-R02 | P0 | A/B/C同时shell/刷新；队列达到8项；每端不同可辨识无副作用输出 | 有限串行、超额busy、不交叉回执；状态共享3秒轮询；非零exit/Unicode/64KiB结果真实 | V3+V4 / Network+Android | NOT_RUN |
+| ADB-R02 | P0 | A/B/C同时shell/手动刷新；队列达到8项；每端不同可辨识无副作用输出 | 有限串行、超额busy、不交叉回执；查询同一Android状态、无PC周期status；非零exit/Unicode/64KiB结果真实 | V3+V4 / Network+Android | NOT_RUN |
 | ADB-R03 | P0 | 断线、弹窗关闭/ESC、PC切只读；排队/执行中取消；手机keyboard开关切换 | 仅owner未完成任务取消；空闲连接/取消扫描保留共享ADB；手机keyboard不影响独立ADB；不重放命令 | V3+V4 / Flutter+Network | NOT_RUN |
 | ADB-R04 | P0 | 有排队请求时revoke；再刷新/进程重启/重新配对；模拟清理失败 | 旧任务取消、App身份/记录失效；R8后SSLContext不复用旧key；失败不虚报；系统列表手动忘记提示正确；原会话保留 | V3+V4 / Android+Security | NOT_RUN |
 | ADB-R05 | P1 | NSD先收到其他设备广告；发现被限制、端口变化、多本机广告、服务丢失 | 仅选本机唯一端口，普通发现6.5秒；清旧值，可手工回退；paired不冒充有效shell | V3 / Android | NOT_RUN |
 | ADB-R06 | P0 | 新旧PC/Android组合；非Android；未认证/关闭控制/文件/terminal/camera；坏JSON/超大/未知方法 | 旧端status超时清本地等待；非Androidunsupported；受控端拒绝越权，reply仅发起者；原字段行为不变 | V2+V4 / Network+Security | NOT_RUN |
 | ADB-R07 | P0 | Android Release各目标ABI与PC build.cmd；JNI/protobuf；本机回归及原链并行查询 | 两端字段40可用，FRB未变；JNI/R8加载和撤销重配通过；AND-01/02/04/05/07/08、FLT-04/05/06保持 | V2+V3 / Release+domains | NOT_RUN |
-| ADB-R08 | P0 | 手机本地配对连接；A/B两PC打开ADB弹窗；手机keyboard=N/无Accessibility | 正常认证会话3秒内同步记录/真实连接；view-only能看状态但操作被server拒绝；原输入逻辑保持 | V3+V4 / Android+Network | NOT_RUN |
+| ADB-R08 | P0 | 手机本地配对连接；A/B两PC打开ADB弹窗或手动刷新；手机keyboard=N/无Accessibility | 本次查询返回手机记录/真实连接；不承诺自动推送；view-only能看状态但操作被server拒绝；原输入逻辑保持 | V3+V4 / Android+Network | NOT_RUN |
 | ADB-R09 | P0 | 两端只填码、手填配对端口且连接留空；错码/关闭系统窗/配对后关闭调试 | 自动发现两类端口并pair-connect-id一步完成；部分成功保留paired/显示连接失败；无假connected | V3 / Android+Flutter | NOT_RUN |
-| ADB-R10 | P1 | PC生成QR，手机系统扫码；错手机/他人广告/未扫码超时/关闭窗口/队列等待 | 仅本机且匹配随机serviceName；成功自动连接；60秒扫描/90秒watchdog；秘密不落盘或广播 | V3+V4 / Android+Security | NOT_RUN |
+| ADB-R10 | P1 | 历史PC二维码正例（T006） | efb2599已移除该功能，本用例退役；不以移除视为测试通过，拒绝旧参数转ADB-R14 | V3+V4 / Android+Security | N/A |
 | ADB-R11 | P1 | PC各菜单、标题栏拖动/缩小窗口、toolbar自动隐藏、断线重连、旧Android | 图标样式一致，配对无shell页签；窗口可见、输入可填写、状态失败明确；旧API提示更新，不重放shell | V3 / Flutter | NOT_RUN |
+| ADB-R12 | P1 | 两端默认自动模式；输入手动端口后切回自动再切回手动；扫描期间尝试切换 | 自动仅配对码框，无端口框/扫描按钮，提交端口0；手动显示全部并使用填写值、留空自动；焦点不串框、配对码不被端口覆盖，执行中不可切换 | V3 / Flutter+Android | NOT_RUN |
+| ADB-R13 | P1 | PC开窗后闲置30秒、手动刷新、执行命令；其他PC改状态；本机前后台 | PC无周期status/进度条闪动；开窗/手动/操作回执更新，其他PC变化需再次查询；保留请求回执等待，本机前台3秒查询不变 | V3+V4 / Flutter+Network | NOT_RUN |
+| ADB-R14 | P0 | 两端UI检查；旧PC发送serviceName（含null）、其他未知参数及正常六位码；本机MethodChannel同类请求 | 无二维码入口/生成/专用等待；退役或未知参数返回invalid、无配对副作用；正常手动/自动配对仍可用 | V3+V4 / Android+Security | NOT_RUN |
+| ADB-R15 | P0 | 已配对可控会话/只读/状态失败/忙；有在途shell时手动状态查询失败；已有ADB下取消配对扫描；配对成功后连接失败 | PC连接按钮可操作时主题色、不依赖配对码；真实禁用条件保持；状态失败不丢命令结果，不重放；未使用transport的扫描取消保留连接，部分成功保留记录并说明 | V3+V4 / Flutter+Android+Network | NOT_RUN |
 
 ## 6. Windows Suite
 

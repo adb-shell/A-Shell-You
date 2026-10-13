@@ -1,10 +1,10 @@
 # AShell External Asset Registry
 
-2026-10-13 T006：仅研究 [LADB](https://github.com/tytydraco/LADB/tree/60f48029cf9d8e0bc848ca41a7bd76694d4ab796) 与 [aShellYou](https://github.com/DP-Hridayan/aShellYou/tree/0fa5da1846b9b589c3d7f4993fb2d65b35b462ac) 的NSD源码、AOSP AdbQrCode schema；独立适配双发现逻辑，没有复制整包代码或新增运行依赖。EXT-LIB-ADB-004—007固定版本保持；原EXT-REF-ADB-002/003退休资产不恢复。QR复用现有qr_flutter4.1.0；许可证研究不替代发布SBOM/NOTICE，详见13_REMOTE_ADB与Baseline13。
+2026-10-13 T007：ADB二维码消费已在efb2599移除，ADB不再导入qr_flutter；该库仍供其他产品页面使用，未移除全局依赖。双NSD沿用T006已登记的 [LADB](https://github.com/tytydraco/LADB/tree/60f48029cf9d8e0bc848ca41a7bd76694d4ab796) 与 [aShellYou](https://github.com/DP-Hridayan/aShellYou/tree/0fa5da1846b9b589c3d7f4993fb2d65b35b462ac) 研究来源；AOSP AdbQrCode仅历史研究，不是当前实现。EXT-LIB-ADB-004—007版本不变，原EXT-REF-ADB-002/003仍退役；本轮不新增/下载/变更依赖、binary或外部服务。见13_REMOTE_ADB与Baseline14；hash/NOTICE/SBOM和正式产物证据仍待补。
 
 2026-10-13 T004：新增PC ADB沿用EXT-LIB-ADB-004—007固定依赖，不添加外部服务/库。libadb3.1.1 SslUtils缓存重置为版本绑定反射兼容点，Release keep/撤销重配待验证，见 [远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)。T003记录的hash/ABI/NOTICE/SBOM缺口保持；旧EXT-BIN-ADB-001与EXT-REF-ADB-002/003仍RETIRED。
 
-最后更新：2026-10-12
+最后更新：2026-10-13（ADB条目与消费状态；其他资产保留原观察日期）
 
 状态：repository-side inventory complete；owner/provenance onboarding incomplete  
 范围：不在 Git tracked source 中，或不能由 clean clone 独立复现的 service、database、driver、binary、signing/build/release infrastructure 和历史 provenance

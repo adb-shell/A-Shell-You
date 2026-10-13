@@ -111,10 +111,10 @@ class _LocalAdbPageState extends State<LocalAdbPage>
       _pairPort.text = (ports['pairPort'] ?? 0) == 0 ? '' : ports['pairPort'].toString();
       _connectPort.text = (ports['connectPort'] ?? 0) == 0 ? '' : ports['connectPort'].toString();
     }
-    if (ports['ambiguous'] == true) return '发现多个本机端口，请使用手动模式核对系统显示的端口。';
+    if (ports['ambiguous'] == true) return '发现多个本机端口，请核对系统显示的端口并手动填写。';
     if ((ports['pairPort'] ?? 0) == 0 && (ports['connectPort'] ?? 0) == 0)
       return '未发现端口。请开启无线调试，并保持系统配对窗口打开；也可手动输入端口。';
-    return '已填入扫描结果。自动模式会在操作时重新发现当前端口。';
+    return '已填入扫描结果，请核对后操作。系统配对窗口或无线调试开关变化后，请重新扫描。';
   });
 
   void _pair() {
@@ -129,7 +129,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
     _perform('正在配对，成功后将自动连接并验证 Shell…', () async {
       final identity = await _bridge.pairAndConnect(port, code, connection);
       if (mounted) setState(() => _output = identity);
-      return '配对成功，ADB 已连接，Shell 已验证。已连接 PC 会同步此状态。';
+      return '配对成功，ADB 已连接，Shell 已验证。PC 可刷新状态查看结果。';
     });
   }
 
@@ -184,7 +184,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
   );
 
   Widget _portField(TextEditingController controller, String label, bool enabled) => TextField(
-    controller: controller, enabled: enabled, readOnly: _automatic,
+    key: ObjectKey(controller), controller: controller, enabled: enabled,
     keyboardType: TextInputType.number, maxLength: 5,
     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
     decoration: InputDecoration(labelText: label, counterText: '', border: const OutlineInputBorder()),
@@ -202,7 +202,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
       ]),
       const SizedBox(height: 10),
       _card(_stale ? '状态未确认' : _status.connected ? '已连接 · Shell 已验证' : _status.paired ? '已配对 · 等待连接' : '尚未配对', [
-        const Text('配对记录和连接由本手机保存，所有 PC 共用。每 3 秒同步状态。'),
+        const Text('配对记录和连接由本手机保存，所有 PC 共用。本页每 3 秒查询状态，PC 可手动刷新。'),
         if (_status.connectPort != 0) Text('上次成功连接端口：' + _status.connectPort.toString()),
         const SizedBox(height: 8),
         Text(_message, style: TextStyle(color: _error ? Theme.of(context).colorScheme.error : null)),
@@ -215,29 +215,45 @@ class _LocalAdbPageState extends State<LocalAdbPage>
         ],
       ]),
       _card('配对与连接', [
-        const Text('开启无线调试，选择“使用配对码配对设备”。请用分屏或小窗保持系统配对窗口与本页同时打开。'),
+        const Text('首次配对：开启无线调试，选择“使用配对码配对设备”。请用分屏或小窗保持系统配对码窗口与本页同时打开。'),
         Align(alignment: Alignment.centerLeft, child: TextButton.icon(
             onPressed: _openSettings, icon: const Icon(Icons.settings), label: const Text('打开开发者选项'))),
         Wrap(spacing: 8, children: [
           ChoiceChip(label: const Text('只填配对码'), selected: _automatic,
-              onSelected: busy ? null : (_) => setState(() => _automatic = true)),
+              onSelected: busy ? null : (_) {
+                FocusScope.of(context).unfocus();
+                setState(() => _automatic = true);
+              }),
           ChoiceChip(label: const Text('手动端口'), selected: !_automatic,
-              onSelected: busy ? null : (_) => setState(() => _automatic = false)),
+              onSelected: busy ? null : (_) {
+                FocusScope.of(context).unfocus();
+                setState(() => _automatic = false);
+              }),
         ]),
         const SizedBox(height: 12),
-        _portField(_pairPort, '配对端口（留空自动）', !busy),
+        if (_automatic)
+          const Text('输入 6 位配对码后点击“配对并连接 ADB”。手机会自动发现端口、配对并连接；发现失败时可切换“手动端口”。')
+        else ...[
+          const Text('配对端口见系统配对码窗口，连接端口见无线调试首页。填写的端口会直接使用，留空则自动发现；也可扫描填充后核对。'),
+          const SizedBox(height: 12),
+          _portField(_pairPort, '配对端口（留空自动）', !busy),
+          const SizedBox(height: 12),
+          _portField(_connectPort, '连接端口（留空自动）', !busy),
+          Align(alignment: Alignment.centerRight, child: TextButton.icon(
+              onPressed: enabled ? _scan : null, icon: const Icon(Icons.radar, size: 18),
+              label: const Text('扫描并填充端口'))),
+        ],
         const SizedBox(height: 12),
-        _portField(_connectPort, '连接端口（留空自动）', !busy),
-        Align(alignment: Alignment.centerRight, child: TextButton.icon(
-            onPressed: enabled ? _scan : null, icon: const Icon(Icons.radar, size: 18),
-            label: const Text('扫描并填充端口'))),
-        TextField(controller: _pairCode, enabled: !busy, keyboardType: TextInputType.number,
+        TextField(key: const ValueKey('pairCode'), controller: _pairCode,
+            enabled: !busy, keyboardType: TextInputType.number,
             obscureText: true, maxLength: 6, autocorrect: false, enableSuggestions: false,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             onSubmitted: (_) { if (enabled) _pair(); },
             decoration: const InputDecoration(labelText: '6 位配对码', border: OutlineInputBorder())),
         ElevatedButton.icon(onPressed: enabled ? _pair : null, icon: const Icon(Icons.link),
             label: const Text('配对并连接 ADB')),
+        const SizedBox(height: 8),
+        const Text('已有配对记录时，保持无线调试开启即可直接连接，无需填写配对码或打开配对码窗口。'),
         OutlinedButton(onPressed: enabled ? _connect : null, child: const Text('我已配对，连接并验证 Shell')),
       ]),
       _card('ADB Shell', [

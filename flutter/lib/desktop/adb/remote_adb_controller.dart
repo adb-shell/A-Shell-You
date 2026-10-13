@@ -16,7 +16,6 @@ class RemoteAdbController extends ChangeNotifier {
   bool stale = true;
   bool _disposed = false;
   bool _hasResult = false;
-  Timer? _timer;
   String message = '正在获取 Android ADB 状态…';
   String statusError = '';
   String output = '';
@@ -31,17 +30,6 @@ class RemoteAdbController extends ChangeNotifier {
   String get summary => stale ? '状态未确认' : connected
       ? 'ADB 已连接，Shell 已验证' : paired
           ? 'Android 有配对记录，尚未连接' : 'Android 暂无配对记录';
-
-  Future<void> watch(bool enabled) async {
-    _timer?.cancel();
-    if (enabled) {
-      stale = true;
-      _hasResult = false;
-      if (!busy) message = '正在获取 Android ADB 状态…';
-      _timer = Timer.periodic(const Duration(seconds: 3), (_) => refresh());
-      await refresh();
-    }
-  }
 
   void _notify() { if (!_disposed) notifyListeners(); }
 
@@ -176,7 +164,6 @@ class RemoteAdbController extends ChangeNotifier {
   String _errorText(Object error) => error.toString().replaceFirst(RegExp(r'^Exception: '), '');
 
   @override void dispose() {
-    _timer?.cancel();
     if (busy) {
       // Fire only a cancellation request; never replay commands or disconnect an idle shared ADB.
       unawaited(_request('cancel').then<void>((_) {}).catchError((Object _) {}));

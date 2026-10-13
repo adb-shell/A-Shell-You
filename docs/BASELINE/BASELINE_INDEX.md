@@ -1,6 +1,8 @@
 # AShell Engineering Baseline Index
 
-T006当前快照：[AS-BL-2026-10-13-504adea-adb-usability](13_ADB_USABILITY_BASELINE_2026-10-13.md)，独立ADB权限/双端口发现/一键连接/扫码；V0。用户授权提交后运行both/aarch64 CI，不监控；下列“最新”保留各历史时点含义。
+当前交付前快照：[AS-BL-2026-10-13-efb2599-adb-ui-worktree](14_ADB_CODE_PAIRING_BASELINE_2026-10-13.md)，efb2599已移除二维码；未提交工作树取消PC周期刷新、分开显示两种配对模式并突出连接按钮。仅V0，历史CI只确认dispatch接受；本轮追加获准提交推送/单次构建，不监控，结果见最终交付。下列“最新”保留各历史时点含义。
+
+T006历史快照：[AS-BL-2026-10-13-504adea-adb-usability](13_ADB_USABILITY_BASELINE_2026-10-13.md)，独立ADB权限/双端口发现/一键连接/扫码；保持冻结。当前功能由Baseline14补充，不改写旧快照。
 
 最新ADB工作树快照：[AS-BL-2026-10-13-917e661-remote-adb-worktree](12_REMOTE_ADB_BASELINE_2026-10-13.md)。T004新增PC请求与Android共享状态，仅V0，V2—V4待验证，未提交。此前 [Baseline11](11_LOCAL_ADB_BASELINE_2026-10-13.md) 与以下旧基线继续冻结。
 

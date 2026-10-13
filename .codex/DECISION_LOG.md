@@ -252,3 +252,12 @@
 - Compatibility：字段40/JSON v1/FRB/identity保持，status.apiVersion=2；旧pair/connect保留；无新依赖，研究LADB/aShellYou并独立适配，未移植其settings自动化/adb binary。
 - Verification：V0；本地无工具链，正式V2/V3/V4待证；CI授权仅触发非监控。普通认证会话通用shell仍是高权限面，不修复原认证问题。
 - ADR-0019更新0018权限/发现/时限；Baseline13 / STATE006 / CE-20261013-T006-01。回滚限事件路径，无存储迁移；代码回退不能撤销shell副作用。
+
+## D-024：ADB 六位码配对与 PC 显式刷新
+
+- 2026-10-13 / accepted for implementation，按本会话用户后续明确指令补录；本轮允许同步文档并追加提交/推送/单次CI、不监控。
+- QR UI/生成/serviceName/专用等待由efb2599移除，未知参数拒绝；不移除其他页面使用的qr_flutter。
+- PC工作树取消三秒status及开窗预扫描，保留开窗/手动/回执更新；Android本机三秒查询保持。多PC共享Android状态，变化需各PC主动查询。
+- 两端自动模式只显示配对码并提交端口0；手动模式显示两个端口和扫描、填值优先/留空自动。切换解除焦点与稳定控件key；PC“我已配对”主题色，不改变真实启用条件与服务端gate。
+- 配对成功后连接失败保留记录；状态查询失败不放弃在途结果；未接触transport的扫描失败/取消不误断已有连接。PC8/300秒、路由310秒、Android20/35秒预算；不重放命令，不保证回滚副作用。
+- ADR-0020部分取代0019，其他隔离/固定依赖/协议身份合同保持。Baseline14 / STATE007 / CE-20261013-T007-01；V0，当前V2/V3/V4待证，旧QR用例N/A。

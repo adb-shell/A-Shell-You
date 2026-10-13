@@ -168,7 +168,7 @@ Accessibility、overlay、全文件、录音、系统设置、MediaProjection �
 
 - 历史 Local ADB UI/shell/pm grant 路径已在 T009 删除；不代表既有设备的配对、系统设置或历史授权已撤销。
 - 新 localadb 接受本机页面主动输入的任意 shell，不带命令 allowlist、二次批准或持久审计。RSA 身份以 AndroidKeyStore AES-GCM 包装后写 noBackupFilesDir，进程内仍有解密 key；disconnect 不撤权/清零身份。配对码不落盘，不记录命令/异常敏感 payload；20 秒 watchdog/64 KiB 上限降低阻塞和输出风险，但关闭 stream 不回滚系统副作用。
-- T004新增专用Misc.remote_adb/独立JNI；T006将误用的手机keyboard gate改为authorized普通会话，status可读，操作另拒绝PC disable_keyboard只读模式。ADB不依赖Accessibility，原输入/terminal处理不改。回执只返回origin，断线/PC切只读取消owner请求；取消扫描保留共享连接。扫码仅匹配本机随机serviceName，秘密短期内存持有；完整边界见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md) 与ADR-0019。既有认证问题、SPAKE2未审计、hash/NOTICE/ROM/ABI验证仍未解决。
+- T004新增专用Misc.remote_adb/独立JNI；T006将误用的手机keyboard gate改为authorized普通会话，status可读，操作另拒绝PC disable_keyboard只读模式。ADB不依赖Accessibility，原输入/terminal处理不改。回执只返回origin，断线/PC切只读取消owner请求；任务尚未使用transport时的扫描失败/取消保留已有连接。efb2599移除二维码并拒绝旧serviceName及其他未知业务参数。当前PC显式刷新与按钮主题色不改变服务端授权；状态查询失败不放弃在途命令，结果不确定时尽力取消、不重放。完整边界见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)、ADR-0019及[ADR-0020](../ADR/0020-adb-code-pairing-and-explicit-refresh.md)。既有认证问题、SPAKE2未审计、hash/NOTICE/ROM/ABI验证仍未解决。
 - ZEGO token client credential 可提取；Android incoming call 自动接受，取消/返回也进入接受语义，缺少明确拒绝。
 
 要求：voice仍须明确接受、麦克风可见。ADB的T004设计沿用已有远程控制授权与通用shell语义，未增加shell命令白名单/逐条批准/持久审计；专用方法白名单不是shell内容限制。新增权限面、取消和全局撤销见ADR-0018；不能把此前候选约束描述为已实现。

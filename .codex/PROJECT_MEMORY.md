@@ -6,7 +6,9 @@
 
 ## 0. Latest Recovery Snapshot
 
-最新T006：[ADB可用性](../docs/tasks/T-2026-10-13-006-adb-usability.md)。main/504adea已含T005修复；独立ADB gate修复mobile keyboard=N导致status被拒，双NSD/一键pair-connect/PC系统QR/分窗拖动/手机UI；Android仍单一owner。V0，用户授权随后提交推送与both/aarch64 CI dispatch，不监控；实际回执见会话最终交付，不假定编译成功。D-023/ADR-0019/STATE006/CE-20261013-T006-01/Baseline13；以下“最新”均为历史快照。
+最新T007：[ADB文档同步](../docs/tasks/T-2026-10-13-007-adb-docs-sync.md)。观察main/efb2599，初始三份Dart dirty；二维码与旧serviceName已在efb2599移除，后续工作树取消PC三秒刷新、两端自动模式只显示配对码/手动模式显示端口与扫描、PC连接按钮主题色。Android本机3秒查询保持；多PC共享状态需各自开窗/手动查询，操作回执更新当前窗口。V0；efb2599已推送且both/aarch64 dispatch获HTTP204，未监控，无构建成功证据。本轮仅同步文档并保护源码hash；用户追加授权提交全部待交付改动、推送并再触发单次编排，不监控，实际结果见最终回执。D-024/ADR-0020/STATE007/CE-20261013-T007-01/Baseline14。
+
+历史T006：[ADB可用性](../docs/tasks/T-2026-10-13-006-adb-usability.md)。main/504adea上实现独立ADB gate、双NSD/一键连接/PC系统QR/分窗拖动/手机UI，随后由feac956固化。二维码与PC轮询已由T007记录的新决定取代；D-023/ADR-0019/STATE006/CE-20261013-T006-01/Baseline13保持历史。以下“最新”均为各任务当时快照。
 
 最新：`T-2026-10-13-005`，[ADB bind导入修复](../docs/tasks/T-2026-10-13-005-adb-bind-import.md)。main/de8bc76已固化T004；用户Android CI报remote_adb_controller.dart三处bind未定义，compileFlutterBuildRelease失败。补直接import platform_model.dart show bind，源码仅一行；修复后未重编/提交/dispatch，需新SHA构建。STATE-20261013-005 / CE-20261013-T005-01；D-022/ADR-0018 reviewed-no-change。以下状态保留历史时点。
 

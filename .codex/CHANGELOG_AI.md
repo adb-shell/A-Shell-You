@@ -211,3 +211,11 @@ Mode：`append-only task-level index`
 - 2026-10-13 / source-complete / V0。main/504adea initial clean；mobile keyboard=N导致ADB被拒已通过独立gate修正；双NSD/一键连接/PC系统QR/独立拖动弹窗/Android UI。
 - Source与文档完成；C3提交推送及both/aarch64 CI dispatch已授权，实际回执见本会话最终交付；不监控，不声称V2/V3通过。
 - STATE006 / WORK012 / CE-20261013-T006-01 / D-023 / ADR-0019 / Baseline13；Task History与docs/tasks/T-2026-10-13-006-adb-usability.md。无原无障碍/画面/输入/身份/版本/依赖或构建脚本变更。
+
+## T-2026-10-13-007 — 同步 ADB 配对与刷新交互文档
+
+- Source：main/efb2599 + 三份Dart dirty；二维码已在该提交移除，后续UI待交付。本轮不追加源码变更，保护hash。
+- Docs：PC无三秒刷新/无预扫描、两端模式控件分离、连接按钮主题色；六位码/手动端口步骤、参数拒绝、取消和时限与多PC快照语义同步。
+- Evidence：V0；历史efb2599 push/HTTP204 dispatch已确认，未监控，无新包成功结果。用户本轮追加提交推送/单次both/aarch64构建授权，实际回执见最终答复。
+- Records：ADR0020/D024/Baseline14、STATE007/WORK014/CE-20261013-T007-01；R10=N/A，R12—15 NOT_RUN。原链/工具链/依赖保持。
+- Detail：docs/tasks/T-2026-10-13-007-adb-docs-sync.md。

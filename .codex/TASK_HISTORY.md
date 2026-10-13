@@ -299,3 +299,12 @@
 - 文档：domain12/13、安全/构建、ADR0019/D023、Baseline13、TEST_MATRIX ADB-R08—11、外部来源与memory齐备。No delete/version/release/production；原capture/input链保持。
 - 提交前T8记录：源码与记录完成；stage/commit/push及GitHub both/aarch64 dispatch已明确授权，将紧接执行；准确SHA与接受回执以本会话最终交付为准，不能把计划记成完成或构建PASS。按用户要求不监控。
 - STATE-20261013-006 / WORK-20261013-012 / CE-20261013-T006-01；详见docs/tasks/T-2026-10-13-006-adb-usability.md。
+
+## T-2026-10-13-007 — ADB 后续代码事实与文档同步
+
+- 2026-10-13，观察main/efb2599，初始dirty为PC controller/menu及Android local_adb_page；均为本会话先前已获准实现，文档曾按用户要求延后。
+- 历史交付：feac956固化T006；efb2599移除QR/未知参数入口、修正发现及取消/状态请求，已推送，both/aarch64 dispatch获HTTP204，按要求未监控。没有新包成功证据。
+- 本轮仅Markdown：文档对齐无QR、PC显式刷新、两端模式显示、PC连接按钮主题色，以及当前请求/超时/取消合同；三份源码hash保护。ADR0020/D024/Baseline14、R12—15与记忆同步，R10退役N/A。
+- 当前用户追加明确授权提交所有待交付代码/文档、推送GitHub main、单次Build AShell clients both/aarch64，不监控。本文为执行前记录，准确新SHA与接受回执由最终交付确认。
+- V0源码对照/空白/本地链接/hash；无本地build/test/analyze/codegen、设备、删除/版本/发布/生产操作；原产品链不变。
+- STATE-20261013-007 / WORK-20261013-014 / CE-20261013-T007-01；详见[任务记录](../docs/tasks/T-2026-10-13-007-adb-docs-sync.md)。

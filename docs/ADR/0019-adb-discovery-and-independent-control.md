@@ -1,6 +1,7 @@
 # ADR-0019 — ADB discovery and independent control
 
 - Status：accepted for implementation，V0；T-2026-10-13-006 / D-023，2026-10-13。
+- 后续关系：以下保留T006决定原貌；二维码/serviceName、PC三秒轮询和相关时限已由[ADR-0020](0020-adb-code-pairing-and-explicit-refresh.md)取代。独立权限、Android owner、NSD与原链隔离仍有效。
 - Approver：当前用户要求可用的PC远程ADB、自动配对连接、独立于原链；明确授权提交/推送/单次CI dispatch不监控。
 - Owner：Codex ashell-master；Android/Flutter/Network/Rust/Security/Release静态自审。
 - Supersedes：ADR-0018中keyboard gate、单连接端口发现及统一20秒等待部分；Android单一owner、原字段40和通道隔离不变。ADR-0015退役/0017固定依赖仍成立。
