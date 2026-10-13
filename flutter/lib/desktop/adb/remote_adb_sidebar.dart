@@ -31,6 +31,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
   bool _peerUpdateScheduled = false;
   bool? _pushedPriority;
   Offset? _position;
+  final TextEditingController _url = TextEditingController();
 
   @override
   void initState() {
@@ -44,13 +45,21 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
   void _applyTouchState() {
     if (!mounted) return;
     if (!widget.mirror.supported) { _pushedPriority = null; return; }
-    if (_pushedPriority != widget.mirror.adbPriority) {
-      _pushedPriority = widget.mirror.adbPriority;
-      // An older in-flight status reply must not overwrite the device push.
-      widget.state.advanceEpoch();
+    final priority = widget.mirror.adbPriority;
+    // Mirror also notifies for local button progress, not just remote capability changes.
+    // Never replay a cached touch value over a newer status/shell reply.
+    if (_pushedPriority == priority) return;
+    _pushedPriority = priority;
+    _adb.stale = true;
+    widget.state.advanceEpoch();
+    if (priority) {
+      widget.state.apply({'supported': true, 'connected': true},
+          !widget.ffi.ffiModel.viewOnly);
+    } else {
+      // Touch startup/recovery is not proof that the shared shell disconnected.
+      _probePending = true;
+      _schedulePeerUpdate();
     }
-    widget.state.apply({'supported': true, 'connected': widget.mirror.adbPriority},
-        !widget.ffi.ffiModel.viewOnly);
   }
 
   void _schedulePeerUpdate() {
@@ -65,6 +74,8 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
       final shouldRefresh = ready &&
           (!_peerReady || newPeer || (_viewOnly && !model.viewOnly));
       if (newPeer) {
+        _pushedPriority = null;
+        _adb.stale = true;
         widget.state.updatePeer(ready: false, viewOnly: model.viewOnly);
       }
       _peer = model.pi;
@@ -80,21 +91,40 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
     });
   }
 
-  Future<void> _navigate(int keyCode) async {
+  Future<void> _navigate(int keyCode) => _executeShell('input keyevent $keyCode');
+
+  Future<void> _openUrl() async {
+    final text = _url.text.trim();
+    final uri = Uri.tryParse(text.contains('://') ? text : 'https://$text');
+    if (text.isEmpty || text.length > 2048 || RegExp(r'[\x00-\x1f\x7f]').hasMatch(text) ||
+        uri == null || !uri.hasAuthority || uri.host.isEmpty || uri.userInfo.isNotEmpty ||
+        (uri.scheme != 'http' && uri.scheme != 'https')) {
+      showToast('请输入有效的 HTTP 或 HTTPS 网址。');
+      return;
+    }
+    // One shell argument: quotes, $, &, backticks and substitutions stay literal.
+    final escaped = uri.toString().replaceAll("'", "'\\''");
+    final command = "am start -a android.intent.action.VIEW -d '$escaped'";
+    if (command.length > 4096) { showToast('网址过长，请缩短后重试。'); return; }
+    await _executeShell(command);
+  }
+
+  Future<void> _executeShell(String command) async {
     if (_sending || _adb.busy || _adb.refreshing || !widget.state.available ||
         widget.ffi.ffiModel.viewOnly) return;
+    final peer = widget.ffi.ffiModel.pi;
     setState(() => _sending = true);
     try {
-      // Confirm the transport before sending a key; never pair/reconnect here.
-      await _adb.refresh();
-      if (!mounted) return;
+      // Reuse a confirmed connection; query only when this controller is stale.
+      // The Android endpoint still authorizes and checks every shell command.
+      if (_adb.stale) await _adb.refresh();
+      if (!mounted || !identical(peer, widget.ffi.ffiModel.pi)) return;
       if (!_adb.connected || !_adb.ready) {
         showToast(_adb.statusError.isNotEmpty ? _adb.statusError : _adb.summary);
         return;
       }
-      if (!widget.state.visible || widget.ffi.ffiModel.viewOnly ||
-          ModalRoute.of(context)?.isCurrent == false) return;
-      final result = await _adb.run('shell', {'command': 'input keyevent $keyCode'});
+      if (!widget.state.available || widget.ffi.ffiModel.viewOnly) return;
+      final result = await _adb.run('shell', {'command': command});
       if (!mounted) return;
       if (result == null || result['exitCode'] != 0) showToast(_adb.message);
     } finally {
@@ -107,6 +137,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
     widget.ffi.ffiModel.removeListener(_schedulePeerUpdate);
     widget.mirror.removeListener(_applyTouchState);
     _adb.dispose();
+    _url.dispose();
     super.dispose();
   }
 
@@ -182,12 +213,12 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                           _modeButton(scale, '关投屏', Colors.red, widget.mirror.canStop && (widget.mirror.videoMode || widget.mirror.busy),
                               () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 视频'),
                           _divider(),
-                          _modeButton(scale, '开截图', Colors.blue, widget.mirror.canScreenshot,
+                          _modeButton(scale, '开无视', Colors.blue, widget.mirror.canScreenshot,
                               () => widget.mirror.setEnabled(true, screenshot: true),
                               widget.mirror.screenshotSupported
                                   ? 'ADB 强制连续系统截图，无需无障碍；系统保护内容仍受限制。开启后替换 ADB 视频。'
                                   : '请更新 Android 客户端以支持 ADB 连续截图'),
-                          _modeButton(scale, '关截图', Colors.red, widget.mirror.canStop && (widget.mirror.screenshotMode || widget.mirror.busy),
+                          _modeButton(scale, '关无视', Colors.red, widget.mirror.canStop && (widget.mirror.screenshotMode || widget.mirror.busy),
                               () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 连续截图'),
                           _divider(),
                           _modeButton(scale, '开黑屏', Colors.blue, widget.mirror.canBlackOn,
@@ -202,6 +233,45 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                               '通过 ADB 绘制界面节点的边框和文字；替换当前 ADB 画面，不影响普通画面和无障碍服务'),
                           _modeButton(scale, '关穿透', Colors.red, widget.mirror.canStop && (widget.mirror.layoutMode || widget.mirror.busy),
                               () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 穿透画面'),
+                          _divider(),
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 4),
+                            width: 70.0 * scale,
+                            child: TextField(
+                              controller: _url,
+                              style: TextStyle(fontSize: 13 * scale),
+                              decoration: InputDecoration(
+                                hintText: 'Enter URL',
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              onSubmitted: enabled ? (_) => _openUrl() : null,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: enabled ? _openUrl : null,
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              textStyle: TextStyle(fontSize: 16 * scale, fontWeight: FontWeight.w500),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                            ),
+                            child: const Text('搜索'),
+                          ),
+                          _divider(),
+                          IconButton(
+                            tooltip: '收起 Shell栏',
+                            color: Colors.white,
+                            onPressed: widget.state.toggle,
+                            splashRadius: kDesktopIconButtonSplashRadius,
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            iconSize: 24 * scale,
+                          ),
                         ],
                       ))))),
                     ),

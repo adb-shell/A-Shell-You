@@ -48,10 +48,12 @@ class RemoteAdbMirror extends ChangeNotifier {
   String _privacyRequestError = '';
   String get privacyError => _privacyRequestError.isNotEmpty ? _privacyRequestError : _privacyRemoteError;
   final ValueNotifier<bool> hasFrame = ValueNotifier(false);
+  final ValueNotifier<int> frameUpdates = ValueNotifier(0);
   bool adbPriority = false;
   bool touchReady = false;
   String inputError = '';
   Uint8List? image;
+  int rgbaWidth = 0, rgbaHeight = 0;
   int _generation = 0;
   int get frameGeneration => _generation;
   String _owner = Uuid().v4();
@@ -138,7 +140,7 @@ class RemoteAdbMirror extends ChangeNotifier {
       } else {
         _watching = true;
         // This drains the local native frame slot; it sends NO remote status queries.
-        _timer = Timer.periodic(const Duration(milliseconds: 50), (_) => _poll(epoch));
+        _schedulePoll(epoch);
       }
       if (!_disposed) notifyListeners();
     }).catchError((Object _) {
@@ -147,6 +149,13 @@ class RemoteAdbMirror extends ChangeNotifier {
         _requestError = 'ADB 投屏订阅失败，请重新连接。';
         notifyListeners();
       }
+    });
+  }
+
+  void _schedulePoll(int epoch) {
+    _timer = Timer(Duration(milliseconds: phase == 'streaming' ? 16 : 100), () async {
+      await _poll(epoch);
+      if (!_disposed && epoch == _epoch && _watching) _schedulePoll(epoch);
     });
   }
 
@@ -198,12 +207,15 @@ class RemoteAdbMirror extends ChangeNotifier {
       layoutSupported = nextLayoutSupported;
       if (frame != null && phase == 'streaming') {
         image = base64Decode(frame);
+        rgbaWidth = (value['rgbaWidth'] as num? ?? 0).toInt();
+        rgbaHeight = (value['rgbaHeight'] as num? ?? 0).toInt();
         sourceWidth = (value['sourceWidth'] as num? ?? 0).toInt();
         sourceHeight = (value['sourceHeight'] as num? ?? 0).toInt();
-        changed = true;
       }
       hasFrame.value = phase == 'streaming' && image != null;
       if (changed) notifyListeners();
+      // Frame delivery must not rebuild the sidebar, URL field or other controls.
+      else if (frame != null && phase == 'streaming') frameUpdates.value++;
     } catch (_) {
       if (!_disposed && epoch == _epoch && error.isEmpty) {
         _requestError = 'ADB 画面读取失败，请关闭投屏后重试。';
@@ -329,6 +341,7 @@ class RemoteAdbMirror extends ChangeNotifier {
     _privacyDeadline?.cancel();
     ffi.ffiModel.removeListener(_peerChanged);
     hasFrame.dispose();
+    frameUpdates.dispose();
     final owner = _owner;
     _transition.then((_) => _call('unwatch', owner: owner)).catchError((Object _) => null);
     super.dispose();

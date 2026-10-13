@@ -174,7 +174,7 @@ final class LocalAdbMirror {
                 finally { output.interrupt(); }
             }
         } catch (Exception | LinkageError e) {
-            if (!run.cancelled.get()) run.failure = "layout".equals(run.mode)
+            if (!run.cancelled.get()) run.failure = e instanceof LocalAdbLayout.Failure ? e.getMessage() : "layout".equals(run.mode)
                     ? "ADB 穿透启动或读取失败；设备可能不支持独立界面节点读取，或已有其他 UI 自动化占用。"
                     : "jpeg".equals(run.mode) ? "ADB 系统截图失败，请确认无线调试及 Shell 连接。系统保护内容仍受截图限制。"
                     : "ADB 投屏失败，请确认无线调试仍开启并重新连接。设备编码器可能不支持当前采集。";
@@ -207,7 +207,11 @@ final class LocalAdbMirror {
                     previous = screenshot.jpeg; lastSent = started;
                 }
             }
-            if (layout == null) Thread.sleep(Math.max(1, AdbCaptureProfile.FRAME_INTERVAL_MS - (SystemClock.elapsedRealtime() - started)));
+            if (layout == null) {
+                AdbCaptureProfile profile = new AdbCaptureProfile(screenshot.sourceWidth, screenshot.sourceHeight);
+                long interval = profile.screenshotIntervalMs(screenshot.jpeg.length);
+                Thread.sleep(Math.max(1, interval - (SystemClock.elapsedRealtime() - started)));
+            }
           }
         }
     }

@@ -57,11 +57,6 @@ class RemoteAdbSessionState extends ChangeNotifier {
     });
   }
 
-  void invalidate({int? expectedEpoch}) {
-    if (expectedEpoch != null && expectedEpoch != _epoch) return;
-    _update(() => _shellReady = false);
-  }
-
   void toggle() {
     if (_disposed || !available) return;
     _visible = !_visible;

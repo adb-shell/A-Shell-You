@@ -40,7 +40,7 @@ pub mod android {
     use std::{collections::{HashMap, VecDeque}, sync::{Arc, Mutex}};
 
     struct Bridge { vm: JavaVM, manager: GlobalRef }
-    struct Viewer { token: String, tx: Sender, pending: VecDeque<u64>, need_key: bool, screenshots: bool, layouts: bool }
+    struct Viewer { token: String, tx: Sender, pending: VecDeque<(u64, usize)>, need_key: bool, screenshots: bool, layouts: bool }
     struct Hub { viewers: HashMap<i32, Viewer>, state: RemoteAdbVideo, config: Vec<u8>, sequence: u64 }
     lazy_static::lazy_static! {
         static ref BRIDGE: Mutex<Option<Bridge>> = Mutex::new(None);
@@ -119,7 +119,7 @@ pub mod android {
             return;
         }
         if action == "ack" || action == "nack" {
-            if let Some(index) = viewer.pending.iter().position(|seq| *seq == packet.sequence) {
+            if let Some(index) = viewer.pending.iter().position(|(seq, _)| *seq == packet.sequence) {
                 viewer.pending.remove(index);
                 if action == "nack" { viewer.need_key = true; }
             }
@@ -267,10 +267,15 @@ pub mod android {
             width: width as u32, height: height as u32, keyframe, data: payload.into(),
             format: hub.state.format.clone(), source_width: source_width as u32, source_height: source_height as u32, ..Default::default() };
         for viewer in hub.viewers.values_mut() {
-            if viewer.pending.len() >= 4 { viewer.need_key = true; continue; }
+            // Allow normal relay RTT without dropping every fourth frame and
+            // waiting for another keyframe. Bound bytes as well as frame count.
+            let pending_bytes: usize = viewer.pending.iter().map(|(_, size)| *size).sum();
+            if viewer.pending.len() >= 8 || pending_bytes + packet.data.len() > 8 * 1024 * 1024 {
+                viewer.need_key = true; continue;
+            }
             if viewer.need_key && !keyframe { continue; }
             if send(viewer, packet.clone()) {
-                viewer.pending.push_back(sequence);
+                viewer.pending.push_back((sequence, packet.data.len()));
                 viewer.need_key = false;
             }
         }
@@ -291,7 +296,7 @@ pub mod pc {
     struct View { generation: u64, state: String, error: String, image: Option<String>, supported: bool,
         adb_priority: bool, touch_ready: bool, input_error: String, format: String, screenshot_supported: bool,
         privacy_supported: bool, privacy_state: String, privacy_error: String,
-        layout_supported: bool, source_width: u32, source_height: u32 }
+        layout_supported: bool, source_width: u32, source_height: u32, rgba_width: u32, rgba_height: u32 }
     struct Entry { peer: String, token: String, queue: SyncSender<RemoteAdbVideo>, view: Arc<Mutex<View>>,
         resync: Arc<AtomicBool>, live: Arc<AtomicBool>, since: Instant, touch_sequence: u64 }
     lazy_static::lazy_static! { static ref ENTRIES: Mutex<HashMap<Uuid, Entry>> = Mutex::new(HashMap::new()); }
@@ -322,7 +327,7 @@ pub mod pc {
             let view = Arc::new(Mutex::new(View { generation: 0, state: "waiting".into(), error: String::new(), image: None, supported: false,
                 adb_priority: false, touch_ready: false, input_error: String::new(), format: String::new(), screenshot_supported: false,
                 privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(),
-                layout_supported: false, source_width: 0, source_height: 0 }));
+                layout_supported: false, source_width: 0, source_height: 0, rgba_width: 0, rgba_height: 0 }));
             let resync = Arc::new(AtomicBool::new(true));
             let live = Arc::new(AtomicBool::new(true));
             entries.insert(session_id, Entry { peer: session.get_id(), token: token.clone(), queue: tx,
@@ -362,6 +367,7 @@ pub mod pc {
                             if let Ok(mut view) = view.lock() {
                                 if view.generation == packet.generation && view.state == "streaming" && live.load(Ordering::Acquire) {
                                     view.image = Some(STANDARD.encode(&packet.data));
+                                    view.rgba_width = 0; view.rgba_height = 0;
                                     view.source_width = packet.source_width;
                                     view.source_height = packet.source_height;
                                     view.error.clear();
@@ -390,15 +396,14 @@ pub mod pc {
                             if rgb.w == 0 || rgb.h == 0 || rgb.w > 1280 || rgb.h > 1280 || rgb.raw.len() != rgb.w * rgb.h * 4 {
                                 return Err("ADB 视频尺寸无效。".into());
                             }
-                            let mut pixels = Vec::with_capacity(rgb.w * rgb.h * 3);
-                            for rgba in rgb.raw.chunks_exact(4) { pixels.extend_from_slice(&rgba[..3]); }
-                            let mut jpeg = Vec::new();
-                            image::codecs::jpeg::JpegEncoder::new_with_quality(&mut jpeg, 85)
-                                .encode(&pixels, rgb.w as u32, rgb.h as u32, image::ColorType::Rgb8)
-                                .map_err(|_| "ADB 画面转换失败。".to_string())?;
+                            // ABGR's little-endian memory is RGBA. Pass the decoded
+                            // pixels locally instead of JPEG encoding/decoding again.
+                            // The network stream remains compressed H.264.
+                            let image = STANDARD.encode(&rgb.raw);
                             if let Ok(mut view) = view.lock() {
                                 if view.generation == generation && view.state == "streaming" && live.load(Ordering::Acquire) {
-                                    view.image = Some(STANDARD.encode(jpeg));
+                                    view.image = Some(image);
+                                    view.rgba_width = rgb.w as u32; view.rgba_height = rgb.h as u32;
                                     view.source_width = packet.source_width;
                                     view.source_height = packet.source_height;
                                     view.error.clear();
@@ -441,11 +446,15 @@ pub mod pc {
                 view.state = "error".into();
                 view.error = "远端未响应 ADB 投屏订阅，请确认两端均已更新并保持连接。".into();
             }
-            return Some(json!({"state":view.state,"error":view.error,"generation":view.generation,"image":view.image.take(),"supported":view.supported,
+            let snapshot = json!({"state":view.state,"error":view.error,"generation":view.generation,"image":view.image.take(),"supported":view.supported,
                 "adbPriority":view.adb_priority,"touchReady":view.touch_ready,"inputError":view.input_error,
                 "format":view.format,"screenshotSupported":view.screenshot_supported,"layoutSupported":view.layout_supported,
                 "sourceWidth":view.source_width,"sourceHeight":view.source_height,
-                "privacySupported":view.privacy_supported,"privacyState":view.privacy_state,"privacyError":view.privacy_error}).to_string());
+                "rgbaWidth":view.rgba_width,"rgbaHeight":view.rgba_height,
+                "privacySupported":view.privacy_supported,"privacyState":view.privacy_state,"privacyError":view.privacy_error});
+            drop(view);
+            drop(entries);
+            return Some(snapshot.to_string());
         }
         if action == "touch" {
             let view = entry.view.lock().ok()?;

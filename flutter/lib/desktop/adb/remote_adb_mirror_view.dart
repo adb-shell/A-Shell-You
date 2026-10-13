@@ -12,13 +12,14 @@ class RemoteAdbMirrorView extends StatelessWidget {
   final Alignment alignment;
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-    animation: mirror,
+    animation: Listenable.merge([mirror, mirror.frameUpdates]),
     builder: (context, _) {
       final error = mirror.error.isNotEmpty ? mirror.error : mirror.inputError;
       return ColoredBox(color: kColorCanvas, child: Listener(behavior: HitTestBehavior.opaque,
         child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () {}, onPanUpdate: (_) {},
           child: Stack(fit: StackFit.expand, children: [
             if (mirror.image != null) _AdbFrame(key: ValueKey(mirror.frameGeneration), bytes: mirror.image!, mirror: mirror,
+                rgbaWidth: mirror.rgbaWidth, rgbaHeight: mirror.rgbaHeight,
                 sourceWidth: mirror.sourceWidth, sourceHeight: mirror.sourceHeight, alignment: alignment)
             else Center(child: Padding(padding: const EdgeInsets.all(24),
               child: Text(mirror.summary, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)))),
@@ -36,8 +37,10 @@ class RemoteAdbMirrorView extends StatelessWidget {
 /// At most one decode and one displayed image; bypass Flutter's still-image cache.
 class _AdbFrame extends StatefulWidget {
   const _AdbFrame({super.key, required this.bytes, required this.mirror, required this.alignment,
+    required this.rgbaWidth, required this.rgbaHeight,
     required this.sourceWidth, required this.sourceHeight});
   final Uint8List bytes;
+  final int rgbaWidth, rgbaHeight;
   final RemoteAdbMirror mirror;
   final Alignment alignment;
   final int sourceWidth, sourceHeight;
@@ -102,9 +105,21 @@ class _AdbFrameState extends State<_AdbFrame> {
     _decoding = true;
     final bytes = widget.bytes;
     final sourceWidth = widget.sourceWidth, sourceHeight = widget.sourceHeight;
+    final rgbaWidth = widget.rgbaWidth, rgbaHeight = widget.rgbaHeight;
     ui.Codec? codec;
+    ui.ImmutableBuffer? buffer;
+    ui.ImageDescriptor? descriptor;
     try {
-      codec = await ui.instantiateImageCodec(bytes);
+      if (rgbaWidth != 0 || rgbaHeight != 0) {
+        if (rgbaWidth <= 0 || rgbaHeight <= 0 || rgbaWidth > 1280 || rgbaHeight > 1280 ||
+            bytes.length != rgbaWidth * rgbaHeight * 4) throw StateError('Invalid ADB pixels');
+        buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+        descriptor = ui.ImageDescriptor.raw(buffer, width: rgbaWidth, height: rgbaHeight,
+            rowBytes: rgbaWidth * 4, pixelFormat: ui.PixelFormat.rgba8888);
+        codec = await descriptor.instantiateCodec();
+      } else {
+        codec = await ui.instantiateImageCodec(bytes);
+      }
       final frame = await codec.getNextFrame();
       if (!mounted) { frame.image.dispose(); return; }
       final previous = _image;
@@ -123,6 +138,8 @@ class _AdbFrameState extends State<_AdbFrame> {
       if (mounted) setState(() => _failed = true);
     } finally {
       codec?.dispose();
+      descriptor?.dispose();
+      buffer?.dispose();
       _decoding = false;
       if (mounted && !identical(bytes, widget.bytes)) _decode();
     }

@@ -2,20 +2,24 @@ package me.ashell.localadb;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.UiAutomation;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
 /** Shell-only node renderer. Never starts, disables or reconfigures the product AccessibilityService. */
@@ -25,6 +29,8 @@ public final class AdbLayoutCapture {
 
     public static void main(String[] args) {
         UiAutomation automation = null;
+        int stage = 1;
+        DataOutputStream output = new DataOutputStream(System.out);
         HandlerThread callbacks = new HandlerThread("ashell-layout-callbacks");
         Thread lease = new Thread(() -> {
             try {
@@ -46,28 +52,40 @@ public final class AdbLayoutCapture {
             }, "ashell-layout-input");
             input.setDaemon(true);
             input.start();
-            Looper.prepareMainLooper();
+            if (Looper.myLooper() == null) Looper.prepareMainLooper();
+            // app_process has no ActivityThread/application context. Framework
+            // display and automation APIs on newer/OEM Android require one.
+            Class<?> activityThread = Class.forName("android.app.ActivityThread");
+            Object thread = activityThread.getMethod("systemMain").invoke(null);
+            Context systemContext = (Context) activityThread.getMethod("getSystemContext").invoke(thread);
             callbacks.start();
             Class<?> connection = Class.forName("android.app.IUiAutomationConnection");
             Object binder = Class.forName("android.app.UiAutomationConnection").getConstructor().newInstance();
-            automation = UiAutomation.class.getConstructor(Looper.class, connection)
-                    .newInstance(callbacks.getLooper(), binder);
+            try {
+                automation = UiAutomation.class.getConstructor(Looper.class, connection)
+                        .newInstance(callbacks.getLooper(), binder);
+            } catch (NoSuchMethodException unavailable) {
+                automation = UiAutomation.class.getConstructor(Context.class, connection)
+                        .newInstance(systemContext, binder);
+            }
+            stage = 2;
             UiAutomation.class.getMethod("connect", int.class).invoke(automation,
                     UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES);
             AccessibilityServiceInfo service = automation.getServiceInfo();
+            if (service == null) throw new IllegalStateException();
             service.flags |= AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
-                    | AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;
+                    | AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS
+                    | AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
             automation.setServiceInfo(service);
             Method clearCache = null;
             try { clearCache = UiAutomation.class.getMethod("clearCache"); } catch (NoSuchMethodException ignored) { }
-            Class<?> displays = Class.forName("android.hardware.display.DisplayManagerGlobal");
-            Object global = displays.getMethod("getInstance").invoke(null);
-            DataOutputStream output = new DataOutputStream(System.out);
+            WindowManager windowsManager = (WindowManager) systemContext.getSystemService(Context.WINDOW_SERVICE);
             while (true) {
+                stage = 3;
                 long started = SystemClock.elapsedRealtime();
-                Object info = displays.getMethod("getDisplayInfo", int.class).invoke(global, 0);
-                int width = info.getClass().getField("logicalWidth").getInt(info);
-                int height = info.getClass().getField("logicalHeight").getInt(info);
+                Point size = new Point();
+                windowsManager.getDefaultDisplay().getRealSize(size);
+                int width = size.x, height = size.y;
                 if (width <= 0 || height <= 0 || width > 16384 || height > 16384) throw new IllegalStateException();
                 AdbCaptureProfile profile = new AdbCaptureProfile(width, height);
                 Bitmap bitmap = Bitmap.createBitmap(profile.width, profile.height, Bitmap.Config.ARGB_8888);
@@ -78,26 +96,36 @@ public final class AdbLayoutCapture {
                     Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
                     paint.setStrokeWidth((float) width / profile.width);
                     paint.setTextSize(Math.max(24f, 11f * width / profile.width));
-                    if (clearCache != null) clearCache.invoke(automation);
+                    stage = 4;
+                    if (clearCache != null) {
+                        try { clearCache.invoke(automation); } catch (Exception ignored) { }
+                    }
                     int[] remaining = {4096};
-                    List<AccessibilityWindowInfo> windows = automation.getWindows();
+                    List<AccessibilityWindowInfo> windows;
+                    try { windows = automation.getWindows(); }
+                    catch (RuntimeException unavailable) { windows = Collections.emptyList(); }
                     boolean found = false;
                     try {
                         for (int i = windows.size() - 1; i >= 0; i--) {
                             AccessibilityWindowInfo window = windows.get(i);
                             if (android.os.Build.VERSION.SDK_INT >= 30 && window.getDisplayId() != 0) continue;
-                            AccessibilityNodeInfo root = window.getRoot();
-                            if (root != null) { draw(root, canvas, paint, remaining, 0); found = true; }
+                            try {
+                                AccessibilityNodeInfo root = window.getRoot();
+                                if (root != null) { draw(root, canvas, paint, remaining, 0); found = true; }
+                            } catch (RuntimeException ignored) { } // window may disappear between frames
                         }
                     } finally { for (AccessibilityWindowInfo window : windows) window.recycle(); }
                     if (!found) {
                         AccessibilityNodeInfo root = automation.getRootInActiveWindow();
+                        if (root == null) root = automation.findFocus(AccessibilityNodeInfo.FOCUS_INPUT);
+                        if (root == null) root = automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY);
                         if (root != null) draw(root, canvas, paint, remaining, 0);
                         else {
                             paint.setColor(Color.WHITE); paint.setStyle(Paint.Style.FILL);
                             canvas.drawText("当前界面未提供布局节点", 16, paint.getTextSize() * 2, paint);
                         }
                     }
+                    stage = 5;
                     ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
                     if (!bitmap.compress(Bitmap.CompressFormat.JPEG, quality, jpeg) || jpeg.size() > 2 * 1024 * 1024)
                         throw new IllegalStateException();
@@ -109,7 +137,8 @@ public final class AdbLayoutCapture {
                 Thread.sleep(Math.max(1, AdbCaptureProfile.FRAME_INTERVAL_MS - (SystemClock.elapsedRealtime() - started)));
             }
         } catch (Throwable ignored) {
-            // No node text, identifiers or raw exceptions in diagnostic output.
+            // Bounded stage code, never node text/identifiers/raw exceptions.
+            try { output.writeInt(0x4c415945); output.writeInt(stage); output.flush(); } catch (Exception closed) { }
         } finally {
             if (automation != null) {
                 try { UiAutomation.class.getMethod("disconnect").invoke(automation); } catch (Throwable ignored) { }
@@ -124,7 +153,9 @@ public final class AdbLayoutCapture {
         try {
             if (--remaining[0] < 0 || depth > 64) return;
             Rect bounds = new Rect(); node.getBoundsInScreen(bounds);
-            if (node.isVisibleToUser() && !bounds.isEmpty()) {
+            // Shell introspection also renders bounded nodes marked hidden by an
+            // overlay. Do not inherit Accessibility's visible-only restriction.
+            if (!bounds.isEmpty()) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setColor(node.isClickable() ? Color.GREEN : Color.LTGRAY);
                 canvas.drawRect(bounds, paint);
@@ -142,6 +173,8 @@ public final class AdbLayoutCapture {
                 AccessibilityNodeInfo child = node.getChild(i);
                 if (child != null) draw(child, canvas, paint, remaining, depth + 1);
             }
+        } catch (RuntimeException ignored) {
+            // A stale node must not terminate the entire device-owned source.
         } finally { node.recycle(); }
     }
 }

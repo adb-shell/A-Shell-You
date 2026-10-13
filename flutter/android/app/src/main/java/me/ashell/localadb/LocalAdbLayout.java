@@ -39,12 +39,24 @@ final class LocalAdbLayout implements AutoCloseable {
     }
 
     LocalAdbScreenshot.Frame read() throws IOException {
-        if (input.readInt() != 0x4c415931) throw new IOException("Invalid layout frame");
+        int magic = input.readInt();
+        if (magic == 0x4c415945) throw new Failure(input.readInt());
+        if (magic != 0x4c415931) throw new IOException("Invalid layout frame");
         int sw = input.readInt(), sh = input.readInt(), w = input.readInt(), h = input.readInt(), size = input.readInt();
         if (sw <= 0 || sh <= 0 || sw > 16384 || sh > 16384 || w <= 0 || h <= 0 || w > 1280 || h > 1280
                 || size <= 0 || size > 2 * 1024 * 1024) throw new IOException("Invalid layout bounds");
         byte[] jpeg = new byte[size]; input.readFully(jpeg);
         return new LocalAdbScreenshot.Frame(w, h, sw, sh, jpeg);
+    }
+
+    static final class Failure extends IOException {
+        Failure(int stage) {
+            super(stage == 1 ? "ADB 穿透无法初始化系统上下文，请更新客户端后重试。"
+                    : stage == 2 ? "ADB 穿透无法连接界面节点服务，请先结束其他 UI 自动化后重试。"
+                    : stage == 3 ? "ADB 穿透无法读取屏幕尺寸。"
+                    : stage == 4 ? "ADB 穿透无法读取当前界面节点。"
+                    : "ADB 穿透画面生成失败，请关闭后重试。");
+        }
     }
 
     @Override public void close() {

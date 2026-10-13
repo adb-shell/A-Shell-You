@@ -67,7 +67,9 @@ final class LocalAdbScreenshot {
                 || (long) options.outWidth * options.outHeight > 32L * 1024 * 1024) throw new IOException("Invalid screenshot dimensions");
         AdbCaptureProfile profile = new AdbCaptureProfile(options.outWidth, options.outHeight);
         options.inSampleSize = 1;
-        while (Math.max(options.outWidth, options.outHeight) / options.inSampleSize > 2560) options.inSampleSize *= 2;
+        // Decode near the transmission size, avoiding a full-resolution intermediate.
+        while (options.outWidth / (options.inSampleSize * 2) >= profile.width
+                && options.outHeight / (options.inSampleSize * 2) >= profile.height) options.inSampleSize *= 2;
         options.inJustDecodeBounds = false;
         options.inScaled = false;
         Bitmap source = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);

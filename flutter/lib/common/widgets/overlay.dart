@@ -696,21 +696,6 @@ class DraggableMobileActions extends StatelessWidget {
                     color: Colors.white54,
                   ),
 
-                   AntiShakeButton(
-                    text: "开防触",
-                    scale: scale,
-                    enabledBackgroundColor: Colors.blue,
-                    disabledBackgroundColor: Colors.black26,
-                    onPressed: () => onScreenTouchBlockPressed?.call('开'),
-                  ),
-
-                   AntiShakeButton(
-                    text: "关防触",
-                    scale: scale,
-                    enabledBackgroundColor: Colors.red,
-                    disabledBackgroundColor: Colors.black26,
-                    onPressed: () => onScreenTouchBlockPressed?.call('关'),
-                  ),
                   /*
                   ElevatedButton(
                   onPressed: () => onScreenAnalysisPressed?.call('开'),
@@ -753,13 +738,6 @@ class DraggableMobileActions extends StatelessWidget {
                   child: const Text("关穿"),
                 ),*/
 
-                    const Divider(
-                    height: 0,
-                    thickness: 2,
-                    indent: 10,
-                    endIndent: 10,
-                    color: Colors.white54,
-                  ),
                   //搜索
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 4),

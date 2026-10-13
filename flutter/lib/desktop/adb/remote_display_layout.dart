@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../common.dart' show sessionRefreshVideo;
 import '../../consts.dart';
 import '../../models/model.dart';
 import 'remote_adb_mirror.dart';
@@ -21,6 +22,43 @@ class RemoteDisplayLayout extends StatefulWidget {
 class _RemoteDisplayLayoutState extends State<RemoteDisplayLayout> {
   bool _ordinaryVisible = false;
   bool? _ordinaryEnabled;
+  bool _adbWasActive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _adbWasActive = widget.mirror.active;
+    widget.mirror.addListener(_onAdbState);
+  }
+
+  void _onAdbState() {
+    final stopped = _adbWasActive && !widget.mirror.active;
+    _adbWasActive = widget.mirror.active;
+    if (!stopped) return;
+    final peer = widget.ffi.ffiModel.pi;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || !identical(peer, widget.ffi.ffiModel.pi) ||
+          !peer.isSet.value || widget.mirror.active) return;
+      final status = widget.ffi.ashellStatusModel.data;
+      if (status.video != true && status.screenshot != true && status.penetrate != true) return;
+      // ADB teardown/recentering must leave the ordinary decoder and its frame
+      // notification alive. Refresh only an already-running source, never start capture.
+      try {
+        await widget.ffi.canvasModel.updateViewStyle(refreshMousePos: false);
+        final current = widget.ffi.ashellStatusModel.data;
+        if (mounted && identical(peer, widget.ffi.ffiModel.pi) && peer.isSet.value && !widget.mirror.active &&
+            (current.video == true || current.screenshot == true || current.penetrate == true)) {
+          await sessionRefreshVideo(widget.ffi.sessionId, peer);
+        }
+      } catch (_) { }
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.mirror.removeListener(_onAdbState);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -29,9 +67,9 @@ class _RemoteDisplayLayoutState extends State<RemoteDisplayLayout> {
       final model = widget.ffi.ffiModel;
       final status = widget.ffi.ashellStatusModel.data;
       final firstFrame = !model.waitForFirstImage.value;
-      final ordinaryOff = status.video == false && status.screenshot == false;
+      final ordinaryOff = status.video == false && status.screenshot == false && status.penetrate != true;
       if (ordinaryOff) _ordinaryEnabled = false;
-      else if (status.video == true || status.screenshot == true) _ordinaryEnabled = true;
+      else if (status.video == true || status.screenshot == true || status.penetrate == true) _ordinaryEnabled = true;
       if (_ordinaryEnabled == false) {
         _ordinaryVisible = false;
       } else if (firstFrame && model.pi.isSet.value) {
@@ -46,10 +84,10 @@ class _RemoteDisplayLayoutState extends State<RemoteDisplayLayout> {
         final dividerWidth = width.clamp(0.0, 1.0).toDouble();
         final ordinaryWidth = both ? (width - dividerWidth) / 2 : width;
         return ColoredBox(color: kColorCanvas, child: Stack(fit: StackFit.expand, children: [
-          Positioned(left: 0, top: 0, bottom: 0, width: ordinaryWidth,
+          Positioned(key: const ValueKey('ordinary-display'), left: 0, top: 0, bottom: 0, width: ordinaryWidth,
             child: Offstage(offstage: !_ordinaryVisible,
               child: ClipRect(child: widget.ordinary))),
-          Positioned(left: both ? ordinaryWidth + dividerWidth : 0, top: 0, right: 0, bottom: 0,
+          Positioned(key: const ValueKey('adb-display'), left: both ? ordinaryWidth + dividerWidth : 0, top: 0, right: 0, bottom: 0,
             child: Offstage(offstage: !adb && _ordinaryVisible,
               child: ClipRect(child: AnimatedBuilder(animation: widget.mirror, builder: (context, _) =>
                 adb || widget.mirror.active || widget.mirror.error.isNotEmpty

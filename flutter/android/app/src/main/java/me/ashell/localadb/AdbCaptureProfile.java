@@ -36,6 +36,16 @@ final class AdbCaptureProfile {
     }
 
     int maxSize() { return Math.max(8, Math.max(width, height) & ~7); }
+
+    long screenshotIntervalMs(int jpegBytes) {
+        int[] settings = encoding();
+        int fps = Math.max(1, Math.min(8, settings[1]));
+        int budget = Math.max(200000, Math.min(1000000, settings[0]));
+        // Responsive small frames; slow down large screenshots to preserve bandwidth.
+        // Bound deliberate sleep so a large frame cannot trip the no-frame watchdog.
+        long bandwidthInterval = (jpegBytes * 8000L + budget - 1) / budget;
+        return Math.max((1000L + fps - 1) / fps, Math.min(2000L, bandwidthInterval));
+    }
     private static native int[] quality(int width, int height);
 
     int[] encoding() {

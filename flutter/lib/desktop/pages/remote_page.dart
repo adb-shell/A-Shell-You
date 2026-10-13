@@ -307,16 +307,19 @@ class _RemotePageState extends State<RemotePage>
     });
   }
 
-  Widget emptyOverlay({bool adbPassThrough = false}) => BlockableOverlay(
+  Widget emptyOverlay() => BlockableOverlay(
         /// the Overlay key will be set with _blockableOverlayState in BlockableOverlay
         /// see override build() in [BlockableOverlay]
         state: _blockableOverlayState,
-        underlying: adbPassThrough
-            ? ValueListenableBuilder<bool>(
-                valueListenable: _remoteAdbMirror.hasFrame,
-                builder: (context, hasFrame, _) =>
-                    Container(color: hasFrame ? null : Colors.transparent))
-            : Container(color: Colors.transparent),
+        // Overlay keeps its initial entries when this key moves from connecting
+        // to waiting-for-image. Observe ADB frames from the very first entry.
+        underlying: ValueListenableBuilder<bool>(
+          valueListenable: _remoteAdbMirror.hasFrame,
+          builder: (context, hasFrame, _) => Obx(() => IgnorePointer(
+                ignoring: _ffi.ffiModel.pi.isSet.isTrue && hasFrame,
+                child: Container(color: Colors.transparent),
+              )),
+        ),
       );
 
   Widget buildBody(BuildContext context) {
@@ -375,7 +378,7 @@ class _RemotePageState extends State<RemotePage>
             children: [
               _ffi.ffiModel.pi.isSet.isTrue &&
                       _ffi.ffiModel.waitForFirstImage.isTrue
-                  ? emptyOverlay(adbPassThrough: true)
+                  ? emptyOverlay()
                   : () {
                       if (!_ffi.ffiModel.isPeerAndroid) {
                         return Offstage();
