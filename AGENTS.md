@@ -1,6 +1,8 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
-2026-10-13 T007：交付前观察main/efb2599 + 三份未提交Dart修改。二维码已在efb2599移除；工作树进一步取消PC每3秒刷新，两端“只填配对码”隐藏端口及扫描按钮、“手动端口”显示它们，PC连接按钮改主题色。Android本机3秒查询保持；其他PC的变化需手动刷新或重开弹窗。见13_REMOTE_ADB、ADR-0020、Baseline14、T007文档同步；仅V0。efb2599已推送且both/aarch64 CI dispatch获HTTP204，不监控、无构建成功证据；未提交UI不在该次构建内。本次仅同步文档、不追加源码修改；用户随后授权提交全部待交付改动并单次构建，执行回执见最终交付，不监控。
+2026-10-13 T008：当前观察main/aca7446，初始clean。980f254固化配对模式/无QR/PC显式刷新；aca7446新增PC Shell栏（三键经独立ADB shell）、“移动端操作”左侧开关与无障碍栏标题。RemotePage持有会话显示状态，确认ADB可用时自动显示，持续可用时保留手动关闭；无PC周期status，也无Android状态push。见13_REMOTE_ADB、D-025、Baseline15、T008；仅V0，当前构建/真机待证。本轮仅同步文档，无Git/构建操作。下一阶段ADB投屏传输待设计，未接入视频，不触碰原无障碍/采集/输入链。
+
+2026-10-13 T007历史：当时efb2599 + 三份Dart dirty的文档快照现已由980f254固化；Baseline14与T007保留原历史。两端自动/手动模式分离，Android本机3秒查询保持；历史CI dispatch接受不代表当前构建通过。
 
 2026-10-13 T006历史：main/504adea上实现独立ADB gate、双NSD、一键连接、PC二维码及可拖动弹窗，随后由feac956固化。二维码、PC周期刷新和相关时限已由T007记录的后续变更取代，其他隔离边界保持。此前T004由de8bc76固化、T005由504adea修复；下文“无PC ADB”为T003历史时点。
 
@@ -62,7 +64,7 @@
 6. Legacy desktop UI：`src/ui/`
 7. Account / HTTP / sync / upload：`src/hbbs_http/`
 8. Windows privacy mode / virtual display：`src/privacy_mode.rs` + `src/virtual_display_manager.rs`
-9. 旧Android本地ADB/LADB已退役；LocalAdbPage + me.ashell.localadb（8662f23 / ADR-0017）由T004扩展Android共享manager，PC经专用协议请求配对/连接/shell。与采集/输入/terminal独立，非ADB投屏。
+9. 旧Android本地ADB/LADB已退役；LocalAdbPage + me.ashell.localadb由T004扩展Android共享manager，PC经专用协议请求配对/连接/shell。aca7446的Shell栏仅通过该shell入口执行三键，RemoteAdbSessionState由RemotePage拥有；与原采集/输入/terminal独立，非ADB投屏。
 10. ZEGO voice call：Flutter RTC side path + Rust control-channel invitation state
 
 不要把项目误读成：

@@ -1,10 +1,12 @@
 # AShell Project Memory
 
-最后更新：2026-10-13
+最后更新：2026-10-14（T008跨日文档交付）
 
 用途：AI 会话的稳定入口，不替代源码和完整工程文档。
 
 ## 0. Latest Recovery Snapshot
+
+最新T008：[Shell栏与ADB交接文档同步](../docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。观察main/aca7446，初始clean；980f254固化前轮UI/文档，aca7446提交八份Dart侧栏代码。Shell栏在ADB确认可用时自动显示，顶栏“移动端操作”左侧开关可关/开且普通回执保留关闭；仅ADB返回/主页/多任务，原侧栏加无障碍栏标题，原链保持。无PC周期status，事件查询才更新Android共享状态，非实时push。D-025/STATE008/CE-20261013-T008-01/Baseline15；本轮仅Markdown，代码hash保护，V0，当前构建/真机未验证，未Git/CI操作。下一阶段[投屏传输](../docs/AI_ENGINEERING/11_ROADMAP.md)待设计，未选型/实现；不要把shell ready等同于视频ready。以下均为历史快照。
 
 最新T007：[ADB文档同步](../docs/tasks/T-2026-10-13-007-adb-docs-sync.md)。观察main/efb2599，初始三份Dart dirty；二维码与旧serviceName已在efb2599移除，后续工作树取消PC三秒刷新、两端自动模式只显示配对码/手动模式显示端口与扫描、PC连接按钮主题色。Android本机3秒查询保持；多PC共享状态需各自开窗/手动查询，操作回执更新当前窗口。V0；efb2599已推送且both/aarch64 dispatch获HTTP204，未监控，无构建成功证据。本轮仅同步文档并保护源码hash；用户追加授权提交全部待交付改动、推送并再触发单次编排，不监控，实际结果见最终回执。D-024/ADR-0020/STATE007/CE-20261013-T007-01/Baseline14。
 

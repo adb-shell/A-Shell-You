@@ -1,5 +1,7 @@
 # AShell Commercial Test Matrix
 
+2026-10-13 T008：[Baseline15](docs/BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md) 固定main/aca7446的PC Shell栏；新增ADB-R16—19。文档/V0复核不构成编译/真机结果，新增用例全部NOT_RUN；投屏传输尚未实现，不列已通过用例。
+
 2026-10-13 ADB 增量：8662f23 / [Baseline 11](docs/BASELINE/11_LOCAL_ADB_BASELINE_2026-10-13.md) 已接入独立本机模块。AND-06 继续验证旧组件退役；新增 AND-09—13 验证新实现。T003 仅文档/V0，所有新增 V2/V3 用例 `NOT_RUN`，没有从文档同步请求推定编译或真机 PASS。
 
 最后更新：2026-07-12  
@@ -92,9 +94,13 @@ ADB 详细步骤、限制和取证项见 [本机 ADB](docs/AI_ENGINEERING/12_LOC
 | ADB-R10 | P1 | 历史PC二维码正例（T006） | efb2599已移除该功能，本用例退役；不以移除视为测试通过，拒绝旧参数转ADB-R14 | V3+V4 / Android+Security | N/A |
 | ADB-R11 | P1 | PC各菜单、标题栏拖动/缩小窗口、toolbar自动隐藏、断线重连、旧Android | 图标样式一致，配对无shell页签；窗口可见、输入可填写、状态失败明确；旧API提示更新，不重放shell | V3 / Flutter | NOT_RUN |
 | ADB-R12 | P1 | 两端默认自动模式；输入手动端口后切回自动再切回手动；扫描期间尝试切换 | 自动仅配对码框，无端口框/扫描按钮，提交端口0；手动显示全部并使用填写值、留空自动；焦点不串框、配对码不被端口覆盖，执行中不可切换 | V3 / Flutter+Android | NOT_RUN |
-| ADB-R13 | P1 | PC开窗后闲置30秒、手动刷新、执行命令；其他PC改状态；本机前后台 | PC无周期status/进度条闪动；开窗/手动/操作回执更新，其他PC变化需再次查询；保留请求回执等待，本机前台3秒查询不变 | V3+V4 / Flutter+Network | NOT_RUN |
+| ADB-R13 | P1 | PC开窗后闲置30秒、手动刷新、执行命令；其他PC改状态；本机前后台；Shell栏会话就绪与导航点击 | PC无周期status/进度条闪动；开窗/手动/回执及侧栏事件查询更新；其他PC变化需再次查询，不假报实时推送；保留本地回执等待，本机前台3秒查询不变 | V3+V4 / Flutter+Network | NOT_RUN |
 | ADB-R14 | P0 | 两端UI检查；旧PC发送serviceName（含null）、其他未知参数及正常六位码；本机MethodChannel同类请求 | 无二维码入口/生成/专用等待；退役或未知参数返回invalid、无配对副作用；正常手动/自动配对仍可用 | V3+V4 / Android+Security | NOT_RUN |
 | ADB-R15 | P0 | 已配对可控会话/只读/状态失败/忙；有在途shell时手动状态查询失败；已有ADB下取消配对扫描；配对成功后连接失败 | PC连接按钮可操作时主题色、不依赖配对码；真实禁用条件保持；状态失败不丢命令结果，不重放；未使用transport的扫描取消保留连接，部分成功保留记录并说明 | V3+V4 / Flutter+Android+Network | NOT_RUN |
+| ADB-R16 | P1 | Android会话启动时ADB已连接/仅paired/未确认/unsupported；配对连接成功；手动关闭后刷新、重开弹窗和顶栏自动隐藏；断开后重新连接 | 开关位于“移动端操作”左侧；支持且connected/controlAllowed/非只读才自动显示Shell栏；普通回执保留手动关闭，可再次打开；无障碍栏标题/原默认设置和功能保持 | V3 / Flutter+Android | NOT_RUN |
+| ADB-R17 | P0 | Shell栏依次返回/主页/多任务；关闭Accessibility；视频尚无首帧；PC只读；状态失败与连续点击 | 仅经ADB发送一次input keyevent 4/3/187，点击前查询；只读/失效/处理中不发送，不自动配对或连接；无原输入回调/MediaProjection授权/命令重放 | V3+V4 / Flutter+Android+Security | NOT_RUN |
+| ADB-R18 | P1 | 查询与配对/连接/撤销回执乱序；断网/超时/非零退出码；命令进行中关闭弹窗或远控页；解除只读 | 旧查询不覆盖后续操作状态；未知结果使侧栏不可用，真实失败回执保持其state语义；mounted/epoch/dispose无异常和泄漏，不假报执行未发生；解除只读可重新查询 | V3+V4 / Flutter+Network | NOT_RUN |
+| ADB-R19 | P1 | 拖动到四边、窗口缩小/放大、DPI/字体缩放、顶栏显示隐藏；两个远控页及两PC连接同一Android | 栏不越可见区域，仅三键与标题；显示开关/位置归各页，不互相串改；共享Android状态按查询更新，关闭一侧空闲窗口不撤销手机身份；原侧栏/视频/输入可用 | V3+V4 / Flutter+Android | NOT_RUN |
 
 ## 6. Windows Suite
 

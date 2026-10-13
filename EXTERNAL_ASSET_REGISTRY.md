@@ -1,5 +1,7 @@
 # AShell External Asset Registry
 
+2026-10-13 T008：main/aca7446的Shell栏复用既有ADB shell接口，仅增加Flutter侧入口/状态，无新增库、服务、binary或工具链。ADB远程投屏传输为下一阶段待设计方向，尚未选定或引入scrcpy/其他媒体组件；后续确定选型时再登记固定来源、许可、hash/NOTICE等，不将计划登记为已安装资产。详见[当前ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)与[路线图](docs/AI_ENGINEERING/11_ROADMAP.md)。
+
 2026-10-13 T007：ADB二维码消费已在efb2599移除，ADB不再导入qr_flutter；该库仍供其他产品页面使用，未移除全局依赖。双NSD沿用T006已登记的 [LADB](https://github.com/tytydraco/LADB/tree/60f48029cf9d8e0bc848ca41a7bd76694d4ab796) 与 [aShellYou](https://github.com/DP-Hridayan/aShellYou/tree/0fa5da1846b9b589c3d7f4993fb2d65b35b462ac) 研究来源；AOSP AdbQrCode仅历史研究，不是当前实现。EXT-LIB-ADB-004—007版本不变，原EXT-REF-ADB-002/003仍退役；本轮不新增/下载/变更依赖、binary或外部服务。见13_REMOTE_ADB与Baseline14；hash/NOTICE/SBOM和正式产物证据仍待补。
 
 2026-10-13 T004：新增PC ADB沿用EXT-LIB-ADB-004—007固定依赖，不添加外部服务/库。libadb3.1.1 SslUtils缓存重置为版本绑定反射兼容点，Release keep/撤销重配待验证，见 [远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)。T003记录的hash/ABI/NOTICE/SBOM缺口保持；旧EXT-BIN-ADB-001与EXT-REF-ADB-002/003仍RETIRED。

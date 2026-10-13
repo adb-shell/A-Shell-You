@@ -1,6 +1,6 @@
 # AShell 本机 ADB / Local ADB
 
-交付前核对：2026-10-13，main/efb2599 + 三份待提交 Dart 修改；二维码已移除，两端自动/手动配对界面已分开显示。首次本机实现为8662f23，双端口发现和一键连接由feac956固化。当前文档同步见 [T007](../tasks/T-2026-10-13-007-adb-docs-sync.md)，远程共享见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)；本轮交付SHA以Git最终回执为准。
+当前核对：2026-10-13，main/aca7446，初始工作区clean。二维码移除、两端自动/手动模式与PC显式刷新已由980f254及其祖先固化；aca7446仅新增PC Shell栏和原侧栏标题，本机ADB能力保持。当前文档同步见 [T008](../tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)，远程共享与三键导航见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)；[T007](../tasks/T-2026-10-13-007-adb-docs-sync.md)保留原历史。
 
 当前实现是 Android App 内的独立无线调试客户端：配对、连接、验证 shell 身份和执行单次命令。主页向左滑到右侧 ADB 页，向右滑返回。采用 `libadb-android:3.1.1`；没有恢复旧 LADB 进程、`libadb.so`、旧通道或无障碍自动配对。T004 增加 PC 远程 ADB 请求，Android 共享身份/连接；scrcpy/ADB 投屏与视频接收仍未接入。
 

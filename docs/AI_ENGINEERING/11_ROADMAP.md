@@ -135,14 +135,28 @@
 
 只有 Phase 0/1 达到可接受基线后再评估：
 
-- PC远程ADB的正式构建与多PC验收（T004已实现源码/V0，见13_REMOTE_ADB）。
+- PC远程ADB及Shell栏三键的正式构建与多PC验收（main/aca7446源码/V0，见13_REMOTE_ADB与ADB-R16—19）。
 - 更完整的设备管理/分组能力。
 - terminal persistence。
 - 多平台正式支持扩展。
 - record upload。
 - 新 capture/virtual-display backend。
 
-旧本地LADB保持退役；8662f23本机模块由T004扩展专用PC ADB协议、Android共享manager与状态。见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md) / ADR-0018，V2/V3/V4仍待证据。scrcpy/ADB投屏、视频和输入桥仍未实现，需独立设计；不能把当前ADB shell等同于投屏。
+旧本地LADB保持退役；8662f23本机模块已扩展专用PC ADB协议、Android共享manager与状态，aca7446的Shell栏通过独立ADB命令实现返回/主页/多任务。见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)，V2/V3/V4仍待证据。ADB投屏与完整触摸/键盘控制仍未实现；不能把ADB shell可用等同于视频可用。
+
+### 下一阶段交接：ADB远程投屏传输（待设计、未实施）
+
+2026-10-13用户提出下一阶段集成方向；本次只同步当前文档。起点为main/aca7446与[Baseline15](../BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md)，尚未选定scrcpy或其他项目，也未下载/引入新的server binary、codec、协议或依赖。
+
+后续设计需要逐项明确：
+
+1. **采集与会话所有权**：Android侧ADB启动/停止何种视频服务、进程/连接由谁管理；手机本地与多个PC如何共存，单PC退出是否保留其他消费者。
+2. **独立媒体传输**：已有`Misc.remote_adb`是有界请求/回执与单次Shell输出接口，没有视频流合同。帧封装、背压、限流、丢帧、取消、清理及relay承载方式另行定义，不把当前JSON shell输出直接当作持续视频通道。
+3. **PC接收和显示**：解码器/渲染资源、窗口与session归属、分辨率/旋转、首帧/断流/重连与错误状态；ADB ready、视频进程ready、首帧ready应分别表达。
+4. **控制边界**：当前仅有三键与通用shell，后续触摸/键盘映射需单独设计；保留原Accessibility/MediaProjection/normal/SKL/ignore/输入/terminal/ZEGO能力，不自动切换或替换原链。
+5. **兼容与验证**：候选项目的固定版本、许可、来源/hash/NOTICE、Android版本/ROM、Windows编译和多PC资源竞争；补正式构建与真机证据，不把本轮V0提升为投屏已就绪。
+
+这些是下一任务的设计输入，不是已实现的接口或本次代码修改范围；继续工作前以新的HEAD和状态恢复上下文。
 
 ## 7. 决策门
 

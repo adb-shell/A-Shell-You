@@ -32,3 +32,9 @@ Misc.remote_adb字段40、JSON v1、status.apiVersion=2、FRB签名、local_adb_
 feac956、efb2599已提交；本次文档同步开始时，PC controller/menu和Android local_adb_page三份Dart修改尚未提交。efb2599推送后的both/aarch64 CI仅有HTTP204 dispatch接受回执，未监控、不等于构建通过。当前用户追加授权提交全部待交付改动并再触发一次构建；实际结果由最终交付回执确认，不预写成功。
 
 V0源码/差异/文档检查；正式ADB-R01—09、11—15及AND-09—13均待验证，旧QR正例R10为N/A。回退限本任务相关patch；不反向覆盖其他工作、不恢复旧ADB组件，不恢复已撤销身份或回滚shell副作用。详细当前合同见[13_REMOTE_ADB](../AI_ENGINEERING/13_REMOTE_ADB.md)。
+
+## Evidence / UI amendment — 2026-10-13 T008
+
+980f254已固化上述UI与文档，aca7446在用户明确要求下追加Shell栏、三键与顶栏开关。其会话就绪/恢复可控的一次性状态查询、导航点击前查询，以及弹窗回执共享，扩展第2项的事件来源，仍不恢复PC周期status或开窗自动扫描。会话级显示状态由RemotePage持有，普通可用回执保留手动关闭；服务端gate、字段40、Android身份/队列和原链隔离原则不变。
+
+本次为既有ADB能力的UI入口补录，无新增跨层协议或长期技术选型，不单列新ADR。D-025记录用户已确定的侧栏行为；[Baseline15](../BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md)与[T008](../tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)固定当前来源。仅V0，ADB-R16—19待正式验证；ADB投屏仍是下一阶段待设计事项。

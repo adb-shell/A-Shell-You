@@ -85,7 +85,7 @@ FRB 文件带 1.80.1 生成标记，且 Git 历史显示 Rust FFI 后续仍有�
 
 ### 独立本机 ADB 依赖（8662f23）
 
-T007核对：双端口NSD使用现有Android API；二维码已由efb2599移除，ADB不再消费qr_flutter，全局依赖为其他页面保留。依赖/SDK/工具链/生成桥/工作流未改。efb2599已推送main，随后Build AShell clients（both/aarch64）dispatch获HTTP204接受；按用户要求未监控，不代表V2通过。本文为交付前快照，三份未提交Dart UI修改不在该次dispatch内；本轮获追加授权提交推送后再dispatch一次，不监控，结果见最终交付。见[Baseline14](../BASELINE/14_ADB_CODE_PAIRING_BASELINE_2026-10-13.md)与[T007](../tasks/T-2026-10-13-007-adb-docs-sync.md)。
+T008核对：当前main/aca7446；980f254已固化配对UI和显式刷新，aca7446新增Shell栏的八份Dart改动，不改依赖/SDK/工具链/生成桥/工作流。双NSD使用Android API；ADB不再消费qr_flutter，全局依赖仍供其他页面使用。历史dispatch接受不代表当前源码V2通过；本轮只同步文档，未触发/监控CI，未取得对应安装包或成功日志。见[Baseline15](../BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md)与[T008](../tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。
 
 T004远程扩展不改依赖/工具链/脚本。local-adb.pro新增RemoteAdbNative JNI、manager回调与固定libadb SslUtils反射保留；protobuf字段40由正常hbb_common build生成，两端Rust都须重编，FRB签名未变、tracked bridge无需codegen。正式Android Release/R8/各ABI与Windows构建见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)，当前源码对应的成功结果尚未取得。
 

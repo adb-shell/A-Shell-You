@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261013-014`
+Registry Revision：`WORK-20261013-016`
 
-Last Updated：2026-10-13
+Last Updated：2026-10-14（T008跨日交付，ID沿用启动日期）
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-无活动源码任务。T007同步ADB文档，保护先前未提交的三份Dart修改；本文件为交付前快照，随后按本轮追加授权提交/推送全部待交付改动并单次dispatch，实际回执见最终答复，不监控构建。
+无活动任务。T008已同步main/aca7446的Shell栏、ADB合同、验证矩阵和恢复记忆；26份Markdown待提交，八份Dart源码hash保持。下一阶段ADB投屏传输待设计，尚未选型或实施；本轮没有Git写入、构建或CI操作。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ Active Task Count：0
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-13-007`
-- Result：文档对齐efb2599及未提交UI：无QR、PC显式刷新、两端模式分离与PC主题色连接按钮；请求/取消/时限合同、测试与记忆同步，原链/CI/依赖不变。
-- Closed At：2026-10-13（Asia/Tokyo）
-- Final T-State：`T8 — documentation complete / delivery`（V0；正式V2/V3/V4待验证）
-- State / Event：`STATE-20261013-007` / `CE-20261013-T007-01`
-- Decision：D-024 / ADR-0020 / Baseline14；旧决定按历史保存。
-- Verification：V0源码与文档对照、差异空白/本地链接、三份源码hash保护；无本地项目build/test/analyze/codegen或真机验证。
-- Next Gate：用户本轮已追加授权提交推送与both/aarch64 CI单次dispatch，准确结果见最终回执，不监控；正式构建/真机结果由后续提供。无删除/版本/发布/生产操作。
-- Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md 中同 ID。
-- Detailed record：docs/tasks/T-2026-10-13-007-adb-docs-sync.md；观察main/efb2599，initial三份Dart dirty；交付前快照。
+- Task ID：`T-2026-10-13-008`
+- Result：当前Shell栏开关/三键/生命周期、多PC快照与原链边界同步；R16—19及投屏待设计交接齐备。
+- Closed At：2026-10-14（Asia/Tokyo）
+- Final T-State：`T8 — documentation complete`（V0；正式V2/V3/V4待验证）
+- State / Event：`STATE-20261013-008` / `CE-20261013-T008-01`
+- Decision：D-025 / ADR-0020 UI补录 / Baseline15；旧记录保留历史。
+- Verification：26份Markdown、145个本地文件链接有效、diff空白通过、八份Dart SHA-256不变；无产品build/test/analyze/codegen或设备验证。
+- Next Step：用户后续启动ADB投屏传输设计；核对新HEAD/status，再明确独立媒体通道和多PC所有权。当前无投屏实现/新依赖，未Git/CI操作。
+- Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md中同ID。
+- Detailed record：docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md；main/aca7446、initial clean，文档待提交。

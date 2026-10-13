@@ -308,3 +308,12 @@
 - 当前用户追加明确授权提交所有待交付代码/文档、推送GitHub main、单次Build AShell clients both/aarch64，不监控。本文为执行前记录，准确新SHA与接受回执由最终交付确认。
 - V0源码对照/空白/本地链接/hash；无本地build/test/analyze/codegen、设备、删除/版本/发布/生产操作；原产品链不变。
 - STATE-20261013-007 / WORK-20261013-014 / CE-20261013-T007-01；详见[任务记录](../docs/tasks/T-2026-10-13-007-adb-docs-sync.md)。
+
+## T-2026-10-13-008 — Shell栏与投屏后续交接文档同步
+
+- 2026-10-13（Asia/Tokyo），main/aca7446，初始clean；980f254已固化T007改动，aca7446提交八份Dart侧栏代码，旧任务快照保留。
+- 用户授权C1同步当前文档；稍后集成ADB投屏传输。本次只改Markdown，不开始投屏或修改现有源码、不执行Git/构建/CI/设备操作。
+- 文档覆盖Shell栏自动显示/手动关闭与左侧顶栏开关、三键ADB调用、session state/epoch/teardown、多PC快照/无周期查询，原无障碍栏仅标题与布局。修正当前入口的未提交及无ADB输入等旧说法。
+- 新增Baseline15、D025、R16—19（NOT_RUN），ADR0020补充UI证据；路线图记录投屏采集/媒体传输/PC解码、所有权/多PC、隔离和兼容待设计，不预选组件。
+- V0检查：源码对照、Markdown引用/空白、仅文档范围、八份Dart SHA-256保护；正式构建/真机结果未取得，不提升为V2/V3/V4通过。
+- STATE008 / WORK016 / CE-20261013-T008-01；详见[任务记录](../docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。文档待提交，下一任务先重新核对HEAD/status。

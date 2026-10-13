@@ -1,6 +1,8 @@
 # AShell Engineering Baseline Index
 
-当前交付前快照：[AS-BL-2026-10-13-efb2599-adb-ui-worktree](14_ADB_CODE_PAIRING_BASELINE_2026-10-13.md)，efb2599已移除二维码；未提交工作树取消PC周期刷新、分开显示两种配对模式并突出连接按钮。仅V0，历史CI只确认dispatch接受；本轮追加获准提交推送/单次构建，不监控，结果见最终交付。下列“最新”保留各历史时点含义。
+当前源码快照：[AS-BL-2026-10-13-aca7446-adb-sidebar](15_ADB_SIDEBAR_BASELINE_2026-10-13.md)。980f254已固化配对UI/显式刷新，aca7446增加独立Shell栏与开关，初始工作区clean。T008仅文档/V0，无当前构建/真机结果；ADB投屏仍待设计，无新依赖。下列“最新”保留各历史时点含义。
+
+T007交付前历史：[AS-BL-2026-10-13-efb2599-adb-ui-worktree](14_ADB_CODE_PAIRING_BASELINE_2026-10-13.md)，当时三份Dart dirty、历史CI仅dispatch接受；该快照继续冻结，不覆盖当前Baseline15。
 
 T006历史快照：[AS-BL-2026-10-13-504adea-adb-usability](13_ADB_USABILITY_BASELINE_2026-10-13.md)，独立ADB权限/双端口发现/一键连接/扫码；保持冻结。当前功能由Baseline14补充，不改写旧快照。
 

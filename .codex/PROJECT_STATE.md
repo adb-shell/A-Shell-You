@@ -1,9 +1,9 @@
 # AShell Project State
 
 Schema Version：`1.0`  
-State Revision：`STATE-20261013-007`
+State Revision：`STATE-20261013-008`
 
-Last Updated：2026-10-13（Asia/Tokyo）
+Last Updated：2026-10-14（Asia/Tokyo；T008跨日文档交付）
 
 Observed At：2026-10-13（Asia/Tokyo）
 
@@ -11,7 +11,7 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 
 > 本文件是截至 `Observed At` 的当前状态快照，不是生产实时监控，也不替代源码、`docs/AI_ENGINEERING/`、ADR 或 Baseline。新会话必须用只读检查确认其新鲜度；发现漂移时记录 conflict/stale，不得用本文件覆盖源码事实或改写旧 Baseline。
 
-最新变更：[T007文档同步](../docs/tasks/T-2026-10-13-007-adb-docs-sync.md)。观察main/efb2599 + 三份先前已获准的未提交Dart修改：PC去除定时刷新、两端模式控件分离、PC连接按钮主题色；二维码/请求取消修复已由efb2599固化。本轮仅改文档并保护源码hash。V0；efb2599推送后的both/aarch64 dispatch有HTTP204接受回执但未监控，无构建/真机成功证据。用户现追加授权提交全部待交付改动、推送并单次触发同一编排，不监控。本文为交付前快照，实际SHA与外部动作以最终回执为准。
+最新变更：[T008文档同步](../docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。观察main/aca7446，初始clean；980f254已固化前轮UI/文档，aca7446增加独立Shell栏、顶栏开关及无障碍栏标题。状态按事件查询，可用时自动显示且普通回执保留手动关闭；无PC周期status、无投屏传输。当前仅Markdown/V0，八份Dart源码hash保护，无Git/构建/CI动作。下一阶段投屏待设计，当前SHA构建/真机证据未取得。
 
 2026-10-12 T003 历史补充：当时按用户要求统一品牌字段/路径与两处公共服务匹配。历史文档已标注名称规范化，原文字与真实源仓地址从a036f31恢复；当时的检索结果不代表本次重新扫描全仓品牌。
 
@@ -21,13 +21,13 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 |---|---|---|
 | Product/runtime | `A Shell You` / `AShell`；crate ashell；Android me.ashell；Flutter内部flutter_hbb | source + ADR-0014 |
 | Rust / Flutter version | `5.2.1` / `5.2.1+59` | manifests + Baseline |
-| Baseline ID | `AS-BL-2026-10-13-efb2599-adb-ui-worktree` | Baseline14；旧基线冻结 |
+| Baseline ID | `AS-BL-2026-10-13-aca7446-adb-sidebar` | Baseline15；旧基线冻结 |
 | Branch | `main` | read-only Git observation |
-| HEAD | `efb2599d05ba5b3a08a9c63ee00bec20e2ce9c5b` | T007文档同步开始观察；交付SHA另见最终回执 |
-| Worktree | 初始三份Dart dirty；本轮补ADB文档/测试矩阵/ADR/基线/恢复记忆，准备提交 | T007 / CE-20261013-T007-01；源码hash保护 |
+| HEAD | `aca74467a3f83392c6a440e6507a63508f9294f6` | T008只读观察；本地origin/main同SHA，未远端查询 |
+| Worktree | 初始clean；本轮仅Markdown文档待提交，未改源码 | T008 / CE-20261013-T008-01；八份Dart hash保护 |
 | History mapping | a036f31提交前轮记忆；6fb0aa6初始化的975 blobs与历史源匹配是迁移前证据，准确RustDesk fork未知 | 历史接管报告；不能用该一致性描述当前dirty tree |
 | Highest completed verification | `V0` repository/document/schema checks | `TEST_MATRIX.md` + task records |
-| Formal build/runtime evidence | efb2599 CI仅dispatch接受；当前UI尚无新包证据；本轮授权交付后再dispatch一次且不监控 | ADB-R01—09、11—15待验，旧R10为N/A；不宣称构建成功 |
+| Formal build/runtime evidence | 未取得aca7446的新包/正式构建/真机结果；本轮未触发或监控CI | ADB-R01—09、11—19待验，旧R10为N/A；不宣称构建成功 |
 | Release readiness | `BLOCKED` | security、external assets、V2—V4、signing/SBOM/rollback gaps |
 
 ## 2. Governance and Knowledge Readiness
@@ -60,18 +60,18 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 
 - Active task registry：`CURRENT_WORK.md`。
 - Detailed task history：`TASK_HISTORY.md`。
-- Latest documented changes：`T-2026-10-13-007`（补录二维码移除及UI简化，文档/V0；交付回执见最终答复）。
+- Latest documented changes：`T-2026-10-13-008`（Shell栏事实与下一阶段投屏待设计交接；仅文档/V0）。
 - Current active task：`none`；以 CURRENT_WORK 实时行和新会话只读复核为准。
-- Latest recorded modification event：`CE-20261013-T007-01`。
-- Latest decision：D-024 / ADR-0020；二维码移除、PC显式刷新、模式控件分离；ADR-0019独立权限/NSD仍有效。
+- Latest recorded modification event：`CE-20261013-T008-01`。
+- Latest decision：D-025补录Shell栏UI；D-024 / ADR-0020无二维码/显式刷新继续有效，ADR-0019独立权限/NSD保持。
 - Architecture decisions：`docs/ADR/README.md`；ADR-0018扩展0017远程能力，ADR-0015旧退役/0014产品身份保持。
 
 ## 5. Standing Authority State
 
 - There is no standing C2 or C3 authorization.
 - Historical approvals in memory、Task History、Decision Log or ADR never transfer to a new session.
-- T007当前用户授权同步文档，并追加提交待交付代码/文档、推送GitHub main、单次Build AShell clients both/aarch64，不监控；此记录不形成后续任务的持续授权。
-- 无本地build/test/analyze/codegen、设备、删除/版本/发布；提交前记录不预报本轮Git/dispatch成功。
+- T008用户仅要求更新当前文档，并提出稍后集成ADB投屏方向；本轮不开始代码实现或执行Git/CI操作。
+- 无本地build/test/analyze/codegen、设备、删除/版本/发布；先前任务的CI接受不是当前源码成功证据。
 
 ## 6. Freshness and Update Contract
 

@@ -1,8 +1,8 @@
 # AShell PC 远程 ADB
 
-交付前核对：2026-10-13，main/efb2599 + 三份待提交 Dart 修改。feac956 固化双端口发现等能力，efb2599 移除二维码并修正请求/取消逻辑；当前工作树进一步移除 PC 定时刷新、简化两端配对模式并突出 PC 连接按钮。本次只同步文档，证据仍为 V0，交付SHA以Git最终回执为准。详见 [T007](../tasks/T-2026-10-13-007-adb-docs-sync.md)、[ADR-0020](../ADR/0020-adb-code-pairing-and-explicit-refresh.md)、[Baseline14](../BASELINE/14_ADB_CODE_PAIRING_BASELINE_2026-10-13.md)。
+当前核对：2026-10-13（Asia/Tokyo），main/aca7446，文档同步开始时工作区clean。980f254已固化无二维码、PC显式刷新、两端配对模式与连接按钮调整；aca7446增加PC独立Shell栏及开关。本次仅同步文档，证据仍为V0。见 [T008](../tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)、[Baseline15](../BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md)；[T007](../tasks/T-2026-10-13-007-adb-docs-sync.md)和Baseline14保留原交付前历史。
 
-PC 通过已认证普通远控会话，把输入交给 Android App。ADB 私钥、配对记录、连接和操作队列均属于 Android 进程。没有加入 ADB 投屏、scrcpy 或输入注入；原 Accessibility、MediaProjection、normal/SKL/ignore、terminal、ZEGO、产品身份和传输策略保持。
+PC通过已认证普通远控会话，把ADB请求交给Android App。ADB私钥、配对记录、连接和操作队列均属于Android进程。当前支持通用Shell命令和Shell栏三键导航，未集成ADB投屏、scrcpy、视频接收或完整触摸/键盘控制。三键通过独立ADB命令执行；原Accessibility、MediaProjection、normal/SKL/ignore、输入协议、terminal、ZEGO、产品身份和传输策略保持。
 
 ## 使用
 
@@ -24,9 +24,32 @@ PC 的“我已配对，连接并验证 Shell”使用主题色 ElevatedButton�
 
 命令弹窗只执行 shell（不加 adb shell 前缀），显示真实退出码、输出和截断状态。断开保留身份；撤销弹窗要求点击明确确认按钮，清 App 共享身份/记录并取消队列，系统配对列表仍需手动忘记。
 
+## PC侧功能栏
+
+顶栏“移动端操作”左侧新增同款ADB图标开关，控制独立的“Shell栏”。原侧栏顶部增加“无障碍栏”标题及相应布局空间；其开关、默认行为、已有持久化设置和所有功能回调保持。
+
+| 当前条件 / 用户动作 | Shell栏行为 |
+|---|---|
+| Android普通远控会话，ADB状态尚未确认或不可用 | 不显示侧栏，顶栏开关禁用；可从原ADB菜单配对、连接或刷新 |
+| 已确认supported、connected、controlAllowed，且PC非只读 | 从不可用变为可用时自动启用开关并显示侧栏；paired记录本身不满足条件 |
+| 可用期间手动点击顶栏开关 | 关闭或重新打开；后续仍为可用的普通状态回执不会强制重开 |
+| 查询失败、ADB断开或PC切只读 | 隐藏并禁用；后续再次确认可用时自动显示 |
+| 关闭远控页后重新打开 | 建立新的会话级可见状态；不把某PC的开关状态保存到手机或同步给其他PC |
+
+Shell栏采用与无障碍栏一致的透明圆角、白色导航图标，可拖动并按可见区域约束位置和缩放。仅包含：
+
+| 按钮 | 独立ADB Shell命令 |
+|---|---|
+| ADB返回 | `input keyevent 4` |
+| ADB主页 | `input keyevent 3` |
+| ADB多任务 | `input keyevent 187` |
+
+每次点击先查询状态，确认连接与控制权限后仅发送一次对应命令；处理中禁止重复点击，失败显示结果，不自动重放。这里不会自动配对、连接、申请MediaProjection或回退到Accessibility。侧栏不以正常视频首帧到达为展示前提；ADB可用不代表已有画面。
+
 ## 状态与多 PC
 
-- PC 已取消每 3 秒自动刷新。打开弹窗查询一次；点击刷新按钮重新查询；本窗口配对/连接/命令等返回时，应用响应中的 Android 状态。手机或其他 PC 操作后的变化须手动刷新或重开弹窗，不能承诺 3 秒内推送同步。Android 本机页的前台 3 秒查询保持。
+- PC仍无每3秒自动刷新或后台status定时器。弹窗在打开、手动刷新、操作回执时更新；Shell栏在Android会话就绪、更换PeerInfo或由只读恢复可控时进行一次查询，导航点击前再次查询。这些是事件触发的查询，不是周期轮询。Android本机页的前台3秒查询保持。
+- 手机或其他PC操作后的变化须在当前PC手动刷新、重开弹窗或其他上述查询发生后才能反映；没有Android状态推送，也不保证即时发现ADB断开。每个RemotePage持有独立的显示开关，所有PC仍查询同一手机的ADB身份、连接与队列。
 - 配对记录不保证 shell 可用，connected 来自 transport 和 id 验证。状态是最近一次查询/操作的快照；状态失效显示原因并暂时禁止提交。没有命令自动重放。
 - 状态查询与命令结果独立：一次查询失败不会放弃已发送命令的结果；结果等待到期/失败时尽力请求 owner 取消，并说明结果尚未确认，不能把超时当作命令未执行。
 - Android 一项执行、最多七项排队；各 PC 结果只回到 origin，不广播其他人的命令、输出或码。
@@ -48,6 +71,19 @@ T006 把 ADB gate 与手机键盘能力分开：
 ## 调用链与合同
 
 PC showRemoteAdbDialog / RemoteAdbController → existing session_get_common keys → src/remote_adb.rs → Misc.remote_adb field40 → authenticated server branch → RemoteAdbNative 独立 JNI → LocalAdbManager → loopback adbd。LocalAdbPlugin 同时为 Android 本机页面服务。
+
+Shell栏入口为 `RemoteAdbSidebar._navigate` → `RemoteAdbController.refresh` → `run('shell', {'command': 'input keyevent …'})`，继续使用上面的同一专用ADB链，不调用InputModel的原导航方法。
+
+| Flutter owner / 文件 | 职责与生命周期 |
+|---|---|
+| `desktop/pages/remote_page.dart` | 创建并释放RemoteAdbSessionState，通过Provider供顶栏使用，挂载独立RemoteAdbSidebar |
+| `desktop/adb/remote_adb_session_state.dart` | 会话内共享可用性、可见性和epoch；只有不可用→可用时自动显示，普通回执保留手动关闭；无定时器/全局单例/持久化 |
+| `desktop/adb/remote_adb_sidebar.dart` | 独立位置、导航controller、一次性状态查询与固定三键；移除监听并释放controller，异步回调检查mounted |
+| `desktop/adb/remote_adb_controller.dart` | 弹窗/侧栏各自持有请求与输出，回执汇入同一会话状态；epoch防止较早状态查询覆盖后续操作，未知结果使侧栏失效 |
+| `desktop/adb/remote_adb_menu.dart` | 打开route前获取所属会话状态，弹窗保留独立controller，关闭空闲弹窗不重置侧栏开关 |
+| `desktop/widgets/remote_toolbar.dart` | `_AdbActionMenu`在`_MobileActionMenu`左侧，仅Android普通会话提供开关；不改原无障碍开关 |
+
+上述路径相对于`flutter/lib/`。controller忙时销毁仍尽力取消owner请求，侧栏状态延后失效以避开route卸载阶段通知；这不是撤销已执行导航。没有新增native、协议、FRB或Android依赖。
 
 请求保持 JSON v1：v、kind=request、id（PC Rust 生成）、method，及可选 port/code/connectPort/command。Android 拒绝未知业务参数，包括已退役 serviceName；本机 MethodChannel 同样保留并校验传入参数，不静默丢弃。状态 apiVersion=2；FRB 签名、protobuf 字段、identity/record schema 不变。新 PC 对旧 API 提示更新并禁用 discover/pairConnect，旧 pair/connect 仍兼容。
 
@@ -74,6 +110,10 @@ JNI 保持 Android 注册的 JVM + manager GlobalRef；native worker attach 线�
 
 ## 验证
 
-仅 V0 源码与文档复核，未取得新包的正式构建或真机结果。efb2599 已推送 main，随后 Build AShell clients 的 both/aarch64 dispatch 获 HTTP204 接受；按当时要求未监控，不能记为 V2 PASS。本文为本轮交付前快照，三份 Dart UI 修改尚未提交，也不在该次 dispatch 的代码中。用户本轮追加授权提交全部待交付改动、推送并再触发单次编排；实际SHA与接受回执见最终交付，不监控。
+仅V0源码与文档复核，未取得aca7446对应安装包的正式构建或真机结果。980f254和aca7446是已观察到的本地提交；本次文档任务未提交/推送、未触发或监控CI。历史dispatch接受不能证明当前源码构建通过。
 
-正式验证见 [TEST_MATRIX](../../TEST_MATRIX.md) ADB-R01—09、11—15；旧QR正例ADB-R10已标N/A，新负例覆盖退役参数拒绝。两端新包、Android11+、至少两台PC、Release/R8/JNI、不同ROM的NSD、模式切换/手动刷新/错码/端口变化、权限负例、取消/超时/撤销重配均待验证。保留 AND-01/02/04/05/07/08、FLT-04/05/06 原链回归；新PC对不含字段40的旧端status超时，对非Android新端明确unsupported。
+正式验证见 [TEST_MATRIX](../../TEST_MATRIX.md) ADB-R01—09、11—19；旧QR正例ADB-R10保持N/A。R16—19新增Shell栏自动显示/手动开关、三键独立执行、异步状态/生命周期、拖动/缩放/多会话验收，全部NOT_RUN。两端新包、Android11+、至少两台PC、Release/R8/JNI、NSD、配对模式、只读/取消/撤销和原链AND-01/02/04/05/07/08、FLT-04/05/06仍需正式验证；新PC对不含字段40的旧端status超时，对非Android新端明确unsupported。
+
+## 下一阶段：ADB远程投屏传输
+
+用户已提出后续集成方向，本轮只记录交接，不实施或选定技术方案。当前没有ADB视频启动/停止、编码帧传输、PC解码渲染或投屏控制协议；现有单次shell输出和请求预算不能当作视频通道合同。候选项目、独立媒体通道、会话/多PC所有权、退出清理、背压与首帧/重连边界须另行设计；已有ADB ready也不能等同于视频ready。详见 [路线图](11_ROADMAP.md)。

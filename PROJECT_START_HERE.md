@@ -1,10 +1,10 @@
 # AShell Project Start Here
 
-2026-10-13 T001：[独立客户端 Actions](docs/BUILD_CLIENTS_ACTIONS.md) 替换旧 GitHub 编排，仅手动 Android/Windows、测试签名和 Actions 下载；V0，runner 未运行。当前观察 main/8662f23（已含新的 local ADB 模块），下文 T009/其他任务为历史快照；新会话先核对 HEAD/status。
+2026-10-13 T001历史：[独立客户端 Actions](docs/BUILD_CLIENTS_ACTIONS.md) 替换旧 GitHub 编排，仅手动 Android/Windows、测试签名和 Actions 下载；当时观察main/8662f23，V0。下文旧任务为各自历史快照；新会话先核对HEAD/status。
 
-当前ADB（2026-10-13 T007）：[本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md) 与 [PC远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)。观察main/efb2599 + 三份未提交Dart修改；二维码已移除，PC改为打开时/手动/操作回执更新状态，两端自动模式只显示配对码、手动模式显示端口和扫描，PC连接按钮为主题色。Android仍单一owner，多PC读取同一状态，本机3秒查询保持。见[ADR-0020](docs/ADR/0020-adb-code-pairing-and-explicit-refresh.md)、[Baseline14](docs/BASELINE/14_ADB_CODE_PAIRING_BASELINE_2026-10-13.md)、[T007](docs/tasks/T-2026-10-13-007-adb-docs-sync.md)。仅V0；efb2599已推送且both/aarch64 dispatch获HTTP204，未监控、无结果证据；未提交UI不在该次构建内。无ADB投屏或原视频/输入/Accessibility链改造。
+当前ADB（2026-10-13 T008）：观察main/aca7446，初始clean；980f254固化无QR/两端模式/PC显式刷新，aca7446追加“移动端操作”左侧的ADB开关、可拖动Shell栏及ADB返回/主页/多任务，原侧栏仅加“无障碍栏”标题和布局空间。ADB确认可用时自动显示，持续可用时保留手动关闭；无PC周期status，各PC按事件查询Android共享状态。见[远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[Baseline15](docs/BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md)、[T008](docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。仅V0，构建/真机待证。本轮仅同步文档；下一阶段[ADB投屏传输](docs/AI_ENGINEERING/11_ROADMAP.md)待设计，未选型/集成，不改原视频/输入/Accessibility链。
 
-最后更新：2026-10-12
+最后更新：2026-10-14（T008跨日文档交付；下方历史观察日期保持）
 
 适用对象：所有 AI、sub-agent、人工开发者、审查者和发布负责人  
 定位：进入 AShell 仓库后的唯一第一入口

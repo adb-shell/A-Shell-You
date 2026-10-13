@@ -104,7 +104,7 @@
 | `flutter/lib/desktop/widgets/` | toolbar、tab、status、controls |
 | `flutter/lib/mobile/pages/` | server、connection、remote、file；Android 非 outgoing-only 主页装载 ServerPage 和右侧 LocalAdbPage |
 | `flutter/lib/mobile/adb/` | 独立本机ADB页面和bridge，见12_LOCAL_ADB.md |
-| `flutter/lib/desktop/adb/`、`src/remote_adb.rs` | PC ADB菜单/controller、专用请求/回执与独立JNI，见13_REMOTE_ADB.md |
+| `flutter/lib/desktop/adb/`、`src/remote_adb.rs` | PC ADB菜单/controller、Shell栏/session state、专用请求/回执与独立JNI，见13_REMOTE_ADB.md |
 | `flutter/lib/common/widgets/` | dialog、overlay、input、peer cards |
 | `flutter/lib/native/`, `utils/` | platform/FFI utilities |
 | `flutter/lib/web/` | web bridge；多处 TODO/DORMANT |
@@ -135,6 +135,8 @@
 | `p50.java`, `q50.java` | XOR/obfuscation helper |
 
 ### 本机 ADB module — active / 旧组件 retired
+
+PC侧aca7446新增`remote_adb_sidebar.dart`与`remote_adb_session_state.dart`：前者持有拖动位置/导航controller，后者由RemotePage创建释放并通过Provider供顶栏共享。`remote_toolbar.dart::_AdbActionMenu`在“移动端操作”左侧；dialog controller向同一session state提交查询/操作状态。`common/widgets/overlay.dart::DraggableMobileActions`仅增加无障碍栏标题和布局空间，原回调不变。
 
 8662f23新增 `flutter/android/app/src/main/java/me/ashell/localadb/` 五类；T004追加LocalAdbManager、RemoteAdbNative、AdbPortDiscovery，本机Plugin转为adapter。me.ashell/local_adb/v1与新独立JNI均不使用产品mChannel/采集JNI。职责和合同见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
 

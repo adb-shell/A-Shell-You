@@ -219,3 +219,11 @@ Mode：`append-only task-level index`
 - Evidence：V0；历史efb2599 push/HTTP204 dispatch已确认，未监控，无新包成功结果。用户本轮追加提交推送/单次both/aarch64构建授权，实际回执见最终答复。
 - Records：ADR0020/D024/Baseline14、STATE007/WORK014/CE-20261013-T007-01；R10=N/A，R12—15 NOT_RUN。原链/工具链/依赖保持。
 - Detail：docs/tasks/T-2026-10-13-007-adb-docs-sync.md。
+
+## T-2026-10-13-008 — 同步Shell栏与ADB投屏后续交接
+
+- Source：main/aca7446，初始clean；仅Markdown，侧栏八份Dart hash保护。
+- Docs：当前Shell栏开关/三键/可用性/生命周期与多PC查询限制；原链保持；投屏为下一阶段待设计，未实施。
+- Records：D025 / ADR0020补录 / Baseline15 / STATE008 / WORK016 / CE-20261013-T008-01；R16—19全部NOT_RUN。
+- Evidence：V0文档与源码对照/链接/差异/hash，未运行产品build/test/analyze/codegen或设备，不Git/CI操作。
+- Detail：[T008](../docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。

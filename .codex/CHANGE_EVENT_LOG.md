@@ -578,3 +578,41 @@ Mode：`append-only logical persisted-change events`
 - `flutter/lib/desktop/adb/remote_adb_controller.dart`
 - `flutter/lib/desktop/adb/remote_adb_menu.dart`
 - `flutter/lib/mobile/adb/local_adb_page.dart`
+
+## CE-20261013-T008-01 — Shell栏与ADB后续交接文档同步
+
+- Task/Owner：T-2026-10-13-008 / Codex；2026-10-13启动、2026-10-14完成（Asia/Tokyo）。用户本轮授权同步文档，下一阶段投屏待设计。
+- Source：main/aca74467a3f83392c6a440e6507a63508f9294f6，initial clean；980f254固化前轮记录，aca7446提交八份Dart侧栏代码。当前只改Markdown，源码hash见Baseline15。
+- Delta：Shell栏位置/开关/三键、会话状态/查询/生命周期、原链边界、正式验收R16—19；修正当前未提交/无ADB输入旧表述，历史基线与任务不重写。
+- Records：D025 / ADR0020 UI补录 / Baseline15 / STATE008 / WORK016；后续投屏采集/传输/解码与多PC所有权仅记待设计，无新选型或资产。
+- Verification：V0源码对照、Markdown链接/差异、范围及八份Dart SHA-256；正式V2/V3/V4 NOT_RUN。无Git写入、CI触发/监控、产品执行、设备、删除/版本/发布或生产操作。
+- Rollback：只限本批Markdown差异；不覆盖其他任务，不改变运行中的ADB身份/状态，不把文档同步当投屏实现。
+
+本轮文档路径（26份）：
+
+- `.codex/CHANGELOG_AI.md`
+- `.codex/CHANGE_EVENT_LOG.md`
+- `.codex/CURRENT_WORK.md`
+- `.codex/DECISION_LOG.md`
+- `.codex/PROJECT_MEMORY.md`
+- `.codex/PROJECT_STATE.md`
+- `.codex/TASK_HISTORY.md`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `EXTERNAL_ASSET_REGISTRY.md`
+- `PROJECT_START_HERE.md`
+- `TEST_MATRIX.md`
+- `docs/ADR/0020-adb-code-pairing-and-explicit-refresh.md`
+- `docs/ADR/README.md`
+- `docs/AI_ENGINEERING/00_PROJECT_OVERVIEW.md`
+- `docs/AI_ENGINEERING/01_ARCHITECTURE.md`
+- `docs/AI_ENGINEERING/02_SOURCE_MAP.md`
+- `docs/AI_ENGINEERING/03_MODULE_DESIGN.md`
+- `docs/AI_ENGINEERING/08_BUILD_SYSTEM.md`
+- `docs/AI_ENGINEERING/10_SECURITY_MODEL.md`
+- `docs/AI_ENGINEERING/11_ROADMAP.md`
+- `docs/AI_ENGINEERING/12_LOCAL_ADB.md`
+- `docs/AI_ENGINEERING/13_REMOTE_ADB.md`
+- `docs/BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md`
+- `docs/BASELINE/BASELINE_INDEX.md`
+- `docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md`

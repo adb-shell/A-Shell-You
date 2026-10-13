@@ -171,7 +171,9 @@ Accessibility、overlay、全文件、录音、系统设置、MediaProjection �
 - T004新增专用Misc.remote_adb/独立JNI；T006将误用的手机keyboard gate改为authorized普通会话，status可读，操作另拒绝PC disable_keyboard只读模式。ADB不依赖Accessibility，原输入/terminal处理不改。回执只返回origin，断线/PC切只读取消owner请求；任务尚未使用transport时的扫描失败/取消保留已有连接。efb2599移除二维码并拒绝旧serviceName及其他未知业务参数。当前PC显式刷新与按钮主题色不改变服务端授权；状态查询失败不放弃在途命令，结果不确定时尽力取消、不重放。完整边界见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)、ADR-0019及[ADR-0020](../ADR/0020-adb-code-pairing-and-explicit-refresh.md)。既有认证问题、SPAKE2未审计、hash/NOTICE/ROM/ABI验证仍未解决。
 - ZEGO token client credential 可提取；Android incoming call 自动接受，取消/返回也进入接受语义，缺少明确拒绝。
 
-要求：voice仍须明确接受、麦克风可见。ADB的T004设计沿用已有远程控制授权与通用shell语义，未增加shell命令白名单/逐条批准/持久审计；专用方法白名单不是shell内容限制。新增权限面、取消和全局撤销见ADR-0018；不能把此前候选约束描述为已实现。
+aca7446的Shell栏三键仅在明确点击后，通过现有ADB shell执行固定keyevent 4/3/187；点击前查询状态，受原authorized普通会话与disable_keyboard gate约束，不依赖Accessibility。会话级available/visible只是UI状态，不代替服务端权限，也不保证远端实时在线。无自动配对/连接、MediaProjection申请或原输入回退；ADB投屏传输尚未实现，不能把当前连接权限直接描述为视频授权合同。
+
+要求：voice仍须明确接受、麦克风可见。ADB的T004设计沿用已有远程控制授权与通用shell语义，未增加shell命令白名单/逐条批准/持久审计；专用方法白名单以及Shell栏的三个固定按钮都不限制命令弹窗的通用shell能力。新增权限面、取消和全局撤销见ADR-0018；不能把此前候选约束描述为已实现。
 
 ## 8. Update、Plugin 与 Supply Chain
 
@@ -256,7 +258,7 @@ Severity reflects static path and impact; except SEC-001, exploit success was no
 - Endpoint still retains password/click/2FA/trusted-device authentication code.
 - HTTP client did not show an explicit disable-TLS-verification option.
 - Android AccessibilityService is not exported; MediaProjection permission remains system-mediated.
-- Legacy ADB pairing/runner remains retired (T009). Commit 8662f23 added the isolated local client; T004 worktree adds dedicated PC requests and Android shared state (ADR-0018 / 13_REMOTE_ADB.md), with no mirroring integration. V0 only.
+- Legacy ADB pairing/runner remains retired (T009). The isolated local client and dedicated PC requests share the Android-owned state; aca7446 adds the Shell sidebar using existing ADB shell commands (13_REMOTE_ADB.md), with no mirroring integration. V0 only.
 - Workflows are manual-triggered today and repository has no GitHub Release observed at takeover time.
 
 These controls reduce some paths but do not close the P0/P1 findings.
