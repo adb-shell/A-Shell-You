@@ -404,3 +404,70 @@ Mode：`append-only logical persisted-change events`
 - `.codex/TASK_HISTORY.md`
 - `.codex/CHANGELOG_AI.md`
 - `.codex/CHANGE_EVENT_LOG.md`
+
+## CE-20261013-T004-01 — PC 独立远程 ADB
+
+- Date / Owner：2026-10-13 / Codex ashell-master，领域约束与Security/Release静态自审。
+- Task / Authority：T-2026-10-13-004；当前用户六项请求授权模块化PC ADB与多PC共享Android状态，C2实现/C1文档；无本轮C3。
+- Source：main/917e6612cdfd819b824626564478a3ff1d84eec4，initial clean；下列新增功能在未提交工作树，不属于917e661提交。
+- Delta：PC菜单与dialog-owned controller、Misc.remote_adb字段40、原FFI ABI新key、专用JNI、Android singleton/有限队列/配对记录/NSD/撤销。原session dispatcher只增加ADB分支与owner取消钩子。
+- Boundary：原产品身份、无障碍/采集JNI/视频/输入/terminal实现、构建脚本/CI/锁文件无改动；无ADB投屏；原会话加密/认证策略保持。
+- Verification：V0跨层接口/字段/JNI/权限/有界所有权/取消时序审查，保护路径diff、新增链接/空白和event清单核对；ADB-R01—07的V2/V3/V4 NOT_RUN。
+- Decision / State / Registry：D-022 / ADR-0018；STATE-20261013-004 / WORK-20261013-008；AS-BL-2026-10-13-917e661-remote-adb-worktree。
+- Recovery：未来经授权按本事件路径审阅回退独立模块/钩子并恢复旧local plugin生命周期，保留其他CI/产品改动；shell系统副作用或已撤销身份不能靠代码回退恢复。
+- Final actions：51个路径，零文件删除；未stage/commit/push、build/test/analyze/codegen、依赖更新、设备、版本/签名、上传或发布。
+- Detailed record：docs/tasks/T-2026-10-13-004-remote-adb.md。
+
+修改/新增路径（包含本事件文件）：
+
+- `.agents/skills/ashell-android-engineer/SKILL.md`
+- `.agents/skills/ashell-flutter-engineer/SKILL.md`
+- `.codex/ARCHITECTURE_MEMORY.md`
+- `.codex/CHANGELOG_AI.md`
+- `.codex/CHANGE_EVENT_LOG.md`
+- `.codex/CURRENT_WORK.md`
+- `.codex/DECISION_LOG.md`
+- `.codex/PROJECT_MEMORY.md`
+- `.codex/PROJECT_STATE.md`
+- `.codex/TASK_HISTORY.md`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `EXTERNAL_ASSET_REGISTRY.md`
+- `PROJECT_START_HERE.md`
+- `README.md`
+- `TEST_MATRIX.md`
+- `docs/ADR/0017-isolated-local-adb.md`
+- `docs/ADR/0018-device-owned-remote-adb.md`
+- `docs/ADR/README.md`
+- `docs/AI_ENGINEERING/00_PROJECT_OVERVIEW.md`
+- `docs/AI_ENGINEERING/01_ARCHITECTURE.md`
+- `docs/AI_ENGINEERING/02_SOURCE_MAP.md`
+- `docs/AI_ENGINEERING/03_MODULE_DESIGN.md`
+- `docs/AI_ENGINEERING/04_ANDROID_PIPELINE.md`
+- `docs/AI_ENGINEERING/06_NETWORK_PROTOCOL.md`
+- `docs/AI_ENGINEERING/08_BUILD_SYSTEM.md`
+- `docs/AI_ENGINEERING/09_DEBUG_SYSTEM.md`
+- `docs/AI_ENGINEERING/10_SECURITY_MODEL.md`
+- `docs/AI_ENGINEERING/11_ROADMAP.md`
+- `docs/AI_ENGINEERING/12_LOCAL_ADB.md`
+- `docs/AI_ENGINEERING/13_REMOTE_ADB.md`
+- `docs/BASELINE/12_REMOTE_ADB_BASELINE_2026-10-13.md`
+- `docs/BASELINE/BASELINE_INDEX.md`
+- `docs/tasks/T-2026-10-13-004-remote-adb.md`
+- `flutter/android/app/local-adb.pro`
+- `flutter/android/app/src/main/java/me/ashell/localadb/AdbIdentity.java`
+- `flutter/android/app/src/main/java/me/ashell/localadb/AdbPortDiscovery.java`
+- `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbManager.java`
+- `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbPlugin.java`
+- `flutter/android/app/src/main/java/me/ashell/localadb/RemoteAdbNative.java`
+- `flutter/lib/desktop/adb/remote_adb_controller.dart`
+- `flutter/lib/desktop/adb/remote_adb_menu.dart`
+- `flutter/lib/desktop/widgets/remote_toolbar.dart`
+- `flutter/lib/mobile/adb/local_adb_bridge.dart`
+- `flutter/lib/mobile/adb/local_adb_page.dart`
+- `libs/hbb_common/protos/message.proto`
+- `src/client/io_loop.rs`
+- `src/flutter_ffi.rs`
+- `src/lib.rs`
+- `src/remote_adb.rs`
+- `src/server/connection.rs`

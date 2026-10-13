@@ -1,6 +1,6 @@
 # AShell External Asset Registry
 
-2026-10-13 T003：8662f23 新模块依赖登记为 EXT-LIB-ADB-004—007，详见 [本机 ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)；固定版本/许可来源已记录，实际构建 hash、ABI、NOTICE/SBOM 与验证证据待补。T009 的 EXT-BIN-ADB-001、EXT-REF-ADB-002/003 继续 RETIRED，不是新模块来源；Gradle 仍排除旧 libadb.so。
+2026-10-13 T004：新增PC ADB沿用EXT-LIB-ADB-004—007固定依赖，不添加外部服务/库。libadb3.1.1 SslUtils缓存重置为版本绑定反射兼容点，Release keep/撤销重配待验证，见 [远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)。T003记录的hash/ABI/NOTICE/SBOM缺口保持；旧EXT-BIN-ADB-001与EXT-REF-ADB-002/003仍RETIRED。
 
 最后更新：2026-10-12
 

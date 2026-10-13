@@ -74,7 +74,8 @@ retrospective -> 只有 decision owner 重新批准才可 accepted
 | 0014 | AShell Product Identity | accepted | contemporaneous | D-015 | source edits / V0；formal build pending |
 | 0015 | Retire Legacy Local ADB | accepted | contemporaneous | D-019 | source removal / V0；V2/V3 pending |
 | 0016 | Independent Manual Client Actions | accepted | contemporaneous | D-020 | workflow source / V0；runner V2 pending |
-| 0017 | [Isolated Phone-local ADB Client](0017-isolated-local-adb.md) | accepted | backfill | D-021 | 8662f23 implemented / V0；V2/V3 evidence pending；补充0015 |
+| 0017 | [Isolated Phone-local ADB Client](0017-isolated-local-adb.md) | accepted | backfill | D-021 | 8662f23 / V0；由0018扩展远程能力 |
+| 0018 | [Device-owned Remote ADB](0018-device-owned-remote-adb.md) | accepted | current | D-022 | T004未提交工作树/V0；多PC与构建待验证 |
 
 ## 6. Responsibility Boundaries
 

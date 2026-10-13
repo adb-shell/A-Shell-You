@@ -266,3 +266,15 @@
 - Decision / State / Event：D-021 / ADR-0017；STATE-20261013-003 / WORK-20261013-006；CE-20261013-T003-01。
 - Final：34个Markdown文件（4新增、30修改）留工作树；无stage/commit/push、build/test/analyze/codegen、依赖安装、设备、删除、签名或发布。
 - Detail：[任务记录](../docs/tasks/T-2026-10-13-003-local-adb-docs.md)；后续按正式环境结果补证据，PC ADB/投屏另行设计。
+
+## T-2026-10-13-004：PC 独立远程 ADB
+
+- Date / state：2026-10-13 / T8 repository implementation complete；运行验收待验证。
+- Authority：当前六项用户指令授权模块化PC ADB及必要协议/独立JNI/Android共享状态；C1事实同步；无本轮C3。
+- Source：main/917e6612cdfd819b824626564478a3ff1d84eec4，initial clean；本轮修改未提交。
+- Outcome：PC菜单/弹窗、专用Misc字段40、既有FFI ABI新key、独立JNI、Android进程manager/有限队列/记录/NSD/撤销；本机页面与所有PC共用身份和状态。
+- Boundary：原产品信息/无障碍/输入/画面链处理保持，无ADB投屏；原会话认证/加密不改。ADB请求需控制权限，结果只给origin；App撤销不假报系统列表已清。
+- Verification：V0接口/所有权/取消/字段/保护路径diff/链接和空白检查；V2—V4 NOT_RUN。静态修正顶栏自动隐藏导致controller销毁、NSD丢发现、取消清理竞态和等待表回收。
+- Decision / Baseline / Event：D-022 / ADR-0018 / Baseline12 / CE-20261013-T004-01。
+- Actions：无stage/commit/push、产品build/test/analyze/codegen、依赖更新、设备、版本/签名/发布或文件删除。
+- Detail：[T004](../docs/tasks/T-2026-10-13-004-remote-adb.md)、[接口与验收](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)；下一步正式两端构建/多PC结果回填。

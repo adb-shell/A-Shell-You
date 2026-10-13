@@ -383,7 +383,7 @@ JNI 修改规则：
 
 ## 12. 独立本机 ADB 与旧组件退役
 
-当前新模块见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md)：API 30+，手动无线配对/连接，`id` 验证后才报告 connected，单次 shell-v2 命令、20 秒取消 watchdog、64 KiB 输出上限。独立 Java FlutterPlugin 和 MethodChannel，不进入 Rust/JNI/采集服务。配对不等于连接，连接不等于 screen share 或 PC 首帧；无自动重连、mDNS 或调试设置自动化。
+当前新模块见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)：API30+配对/连接、id验证、单次shell-v2、20秒取消watchdog、64KiB输出。T004本机Plugin与PC独立JNI共用LocalAdbManager，原采集JNI/服务不参与。配对不等于连接，连接不等于screen share或PC首帧；无自动重连/调试设置自动化，新NSD只发现本机连接端口。
 
 T009 删除的 AdbPage、AndroidAdbManager、11 个 ashell_adb_* 分支、四个 Kotlin 文件及 Accessibility 自动化仍不恢复。WRITE_SECURE_SETTINGS、CHANGE_WIFI_MULTICAST_STATE 仍不声明；旧 libadb.so 仍排除。远控输入、DevAutoSelectorController、正常/SKL/ignore、MediaProjection、ZEGO 和 terminal 未由本次 ADB 集成改动。旧配对/prefs/系统设置不自动清理，新身份不迁移旧 key；历史档案见 [旧集成记录](../ADB_LADB_INTEGRATION_MEMORY.md)。
 

@@ -3,6 +3,8 @@
 接管基线：2026-07-12  
 状态：`verified` + `verification-required`
 
+2026-10-13 T004：追加 `Misc.remote_adb = 40`，JSON v1通过既有认证peer stream传输，不增加二次加密、不关闭原加密/relay-only。受控端校验authorized与远控keyboard permission，独立JNI访问Android ADB manager；旧输入/terminal字段和处理保持。新旧端兼容、限额、owner取消和威胁模型见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。仅V0，V2—V4待验证。
+
 > 本文描述仓库内的端点协议实现。`hbbs`、`hbbr` 服务端源码不在本仓库，因此服务端部署、数据库和运营策略只能作为外部依赖记录，不能由本文推断。
 
 2026-10-12 默认配置更新（T004 / V0）：`libs/hbb_common/src/config.rs` 的 `RENDEZVOUS_SERVERS`、`PUBLIC_RS_PUB_KEY` 已替换为用户指定值；`RENDEZVOUS_PORT / RELAY_PORT / WS_RENDEZVOUS_PORT / WS_RELAY_PORT` 为 `10056 / 10057 / 10058 / 10059`。`src/rendezvous_mediator.rs` 与 `flutter/lib/mobile/pages/server_page.dart` 的显式 relay 地址同步。`src/lan.rs` 的 `RENDEZVOUS_PORT + 3` 随之变为10059，其他端口派生表达式未改。未发现10055对应的旧端口字面量，不据此推定服务用途。

@@ -843,6 +843,8 @@ message Misc {
     int32 follow_current_display = 38;
     // AShell: Android controlled-end feature status JSON push.
     string ashell_status = 39;
+    // Independent device-owned ADB request/reply JSON, versioned and bounded by endpoints.
+    string remote_adb = 40;
   }
 }
 

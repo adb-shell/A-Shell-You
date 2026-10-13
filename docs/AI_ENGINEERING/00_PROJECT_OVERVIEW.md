@@ -62,7 +62,7 @@ AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一�
 - 键鼠/触控输入、剪贴板、文件剪贴板、文件传输、端口转发、截图、录制、终端。
 - Flutter 桌面多窗口、移动端 UI、旧 Sciter UI 兼容面。
 - Android `MainService`、`MediaProjection`、Accessibility 输入、normal/SKL/ignore 三帧源、黑屏、防触、Dev 自动点选、状态监测和自动重连。
-- Android 独立本机 ADB 已由 8662f23 接入：API 30+ 手动配对、连接身份验证与单次 shell。旧 LADB、mDNS 和无线调试自动化保持退役；无 PC ADB/ADB 投屏。见 [本机 ADB](12_LOCAL_ADB.md)，源码/V0，运行待验证。
+- Android独立ADB由8662f23接入，T004扩展PC配对/连接/命令/撤销/状态，Android共享身份与有限串行队列；新NSD只发现本机连接端口。旧LADB/mDNS/自动化保持退役，无ADB投屏。见 [本机ADB](12_LOCAL_ADB.md) / [远程ADB](13_REMOTE_ADB.md)，源码/V0，编译与运行待验证。
 - Windows DXGI/GDI capture、privacy mode、Amyuni virtual display、输入注入与 portable service。
 - Flutter 产品账号、地址簿、设备组、Rust OIDC client、sync/heartbeat/downloader。
 - ZEGO 1v1 语音媒体；Rust 仅承载邀请/状态控制。

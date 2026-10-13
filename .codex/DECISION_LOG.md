@@ -230,3 +230,12 @@
 - Approved by：
 - Related task/commit/docs：
 ```
+
+## D-022：Android 拥有 ADB，PC 专用请求与共享状态
+
+- 日期：2026-10-13；状态：accepted for implementation / V0；当前用户明确要求PC菜单、远程配对/连接/命令/撤销/刷新和多PC共享Android能力。
+- Decision：Misc.remote_adb字段40承载JSON v1，沿用既有认证/加密peer stream，不额外加密、不改原transport。Android进程manager共享身份/记录/连接，有限串行队列，结果只返回origin，各PC轮询同一状态。
+- Authorization：受控端authorized + keyboard/control gate；连接断开/控制关闭取消owner。通用shell沿用本机语义，无shell内容白名单/逐条审批/持久审计；详见ADR威胁模型。
+- Revoke：清本App身份/记录和libadb固定版本SSL缓存，系统配对列表仍须手动忘记。无ADB投屏，不改原视频/输入/Accessibility。
+- Related：ADR-0018扩展0017；T-2026-10-13-004 / CE-20261013-T004-01 / AS-BL-2026-10-13-917e661-remote-adb-worktree。
+- Verification：V0静态完成，ADB-R01—07的V2/V3/V4仍NOT_RUN；不构成Git/构建/设备/发布授权。

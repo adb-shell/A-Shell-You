@@ -85,6 +85,8 @@ FRB 文件带 1.80.1 生成标记，且 Git 历史显示 Rust FFI 后续仍有�
 
 ### 独立本机 ADB 依赖（8662f23）
 
+T004远程扩展不改依赖/工具链/脚本。local-adb.pro新增RemoteAdbNative JNI、manager回调与固定libadb SslUtils反射保留；protobuf字段40由正常hbb_common build生成，两端Rust都须重编，FRB签名未变、tracked bridge无需codegen。正式Android Release/R8/各ABI与Windows构建见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)，尚未执行。
+
 `app/build.gradle` 加载 `local-adb.gradle`：固定 libadb-android 3.1.1、spake2-android 2.2.1、bcprov-jdk15to18 1.81、conscrypt-android 2.5.3；前两项关闭传递依赖，JitPack/Maven Central 各按指定 module/group 隔离。`local-adb.pro` 保留 Conscrypt 反射和 SPAKE2 JNI 类。未升级 SDK/AGP/Gradle/Java 或改变 Rust/Flutter 生成链。见 [当前模块](12_LOCAL_ADB.md)、[Baseline 11](../BASELINE/11_LOCAL_ADB_BASELINE_2026-10-13.md) 与 EXT-LIB-ADB-004—007。固定版本不代表构建已经通过，正式 Release 各 ABI 解析、R8、JNI 和产物 hash 尚待证据。
 
 ### 旧 ADB 打包依赖已退役（T009）

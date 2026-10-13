@@ -200,7 +200,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
   void dispose() {
     _timer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
-    // Engine teardown owns connection cleanup; leaving the page only cancels its in-flight work.
+    // The Android process owns the shared connection; this page only cancels its own work.
     if (_busy) unawaited(_bridge.cancel().catchError((Object _) {}));
     _pairPort.dispose();
     _pairCode.dispose();
@@ -250,13 +250,15 @@ class _LocalAdbPageState extends State<LocalAdbPage>
           Chip(label: Text(busy ? '处理中' : (_status.connected ? '已连接' : '未连接'))),
         ]),
         const Text('向右滑动返回主页。此页用于本机无线调试与 shell。'),
+        Text(_status.paired ? '本应用已有配对记录；所有 PC 共用此记录与 ADB 连接。' : '本应用暂无配对记录。'),
         const SizedBox(height: 12),
         Text(_message, style: TextStyle(color: _error ? Theme.of(context).colorScheme.error : null)),
         if (busy) ...[
           const SizedBox(height: 8),
           const LinearProgressIndicator(),
-          Align(alignment: Alignment.centerRight,
-              child: TextButton(onPressed: _cancel, child: const Text('取消操作并断开 ADB'))),
+          if (_busy) Align(alignment: Alignment.centerRight,
+              child: TextButton(onPressed: _cancel, child: const Text('取消本页操作')))
+          else const Text('其他客户端正在操作共享 ADB，请稍候。'),
         ],
         const SizedBox(height: 16),
         _section('1. 无线配对', [

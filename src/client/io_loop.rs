@@ -1922,6 +1922,10 @@ impl<T: InvokeUiSession> Remote<T> {
                     Some(misc::Union::AshellStatus(json)) => {
                         self.handler.update_ashell_status(json);
                     }
+                    Some(misc::Union::RemoteAdb(json)) => {
+                        #[cfg(any(target_os = "android", target_os = "ios", feature = "flutter"))]
+                        crate::remote_adb::receive(&self.handler.get_id(), &json);
+                    }
                     _ => {}
                 },
                 Some(message::Union::TestDelay(t)) => {

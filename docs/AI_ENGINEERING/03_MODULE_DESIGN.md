@@ -78,9 +78,9 @@ AShell 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、bro
 
 ## 9. Android local ADB — 独立新模块
 
-当前 `LocalAdbPage` → `LocalAdbBridge` → `me.ashell/local_adb/v1` → `LocalAdbPlugin`，串行 worker 由 `LocalAdbClient` 管理本机配对和连接。`AdbIdentity` 管独立加密身份，`AdbLocalSocket` 管可取消 loopback transport，`AdbShell` 管 shell-v2。完整状态/生命周期/合同见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md)。
+当前LocalAdbPage→LocalAdbBridge→me.ashell/local_adb/v1→LocalAdbPlugin→LocalAdbManager。T004的PC专用协议/独立JNI也进入该manager；它拥有进程共享状态和有限串行worker，由LocalAdbClient执行本机配对/连接。AdbIdentity管身份，AdbLocalSocket管loopback transport，AdbShell管shell-v2。见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
 
-T009 / ADR-0015 的旧 runner、bridge、mDNS、Accessibility 自动化及 libadb.so 保持退役。新模块没有 PC remote ADB protocol 或视频流；远程 terminal 等原有链路保持。ADR-0017 补记新集成的决定与边界。
+T009 / ADR-0015旧runner/bridge/mDNS/Accessibility自动化及libadb.so保持退役。T004新NSD只发现本机连接端口，无视频流；remote terminal等原链保持。ADR-0017记录本机集成，ADR-0018扩展多PC请求和共享状态边界。
 
 ## 10. Windows privacy/virtual display
 

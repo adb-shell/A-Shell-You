@@ -168,10 +168,10 @@ Accessibility、overlay、全文件、录音、系统设置、MediaProjection �
 
 - 历史 Local ADB UI/shell/pm grant 路径已在 T009 删除；不代表既有设备的配对、系统设置或历史授权已撤销。
 - 新 localadb 接受本机页面主动输入的任意 shell，不带命令 allowlist、二次批准或持久审计。RSA 身份以 AndroidKeyStore AES-GCM 包装后写 noBackupFilesDir，进程内仍有解密 key；disconnect 不撤权/清零身份。配对码不落盘，不记录命令/异常敏感 payload；20 秒 watchdog/64 KiB 上限降低阻塞和输出风险，但关闭 stream 不回滚系统副作用。
-- PC remote ADB 尚不存在，不能复用现有输入/terminal 协议直接开放；本机通道也没有新增对既有远控触控 UI 的隔离。SPAKE2 上游标未审计，依赖 hash/NOTICE/分发材料与 ROM/ABI 验证仍待补。
+- T004新增专用Misc.remote_adb/独立JNI，受控端强制authorized + keyboard/control gate，原输入/terminal协议不承载ADB。Android共享身份/连接，回执只返回发起PC，断线/控制权限关闭取消该owner请求，撤销清App身份而非系统配对列表。完整边界见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)；原认证问题、SPAKE2未审计和依赖hash/NOTICE/ROM/ABI验证仍未由本任务修复。
 - ZEGO token client credential 可提取；Android incoming call 自动接受，取消/返回也进入接受语义，缺少明确拒绝。
 
-要求：voice 必须当前用户明确接受，麦克风状态持续可见；ADB 远程化必须新协议、allowlist、consent、audit 和 kill switch。
+要求：voice仍须明确接受、麦克风可见。ADB的T004设计沿用已有远程控制授权与通用shell语义，未增加shell命令白名单/逐条批准/持久审计；专用方法白名单不是shell内容限制。新增权限面、取消和全局撤销见ADR-0018；不能把此前候选约束描述为已实现。
 
 ## 8. Update、Plugin 与 Supply Chain
 
@@ -256,7 +256,7 @@ Severity reflects static path and impact; except SEC-001, exploit success was no
 - Endpoint still retains password/click/2FA/trusted-device authentication code.
 - HTTP client did not show an explicit disable-TLS-verification option.
 - Android AccessibilityService is not exported; MediaProjection permission remains system-mediated.
-- Legacy local ADB pairing/runner was removed in T009. Commit 8662f23 added a separate local-only module; no dedicated PC remote ADB protocol or mirroring integration was added. See ADR-0017 and 12_LOCAL_ADB.md.
+- Legacy ADB pairing/runner remains retired (T009). Commit 8662f23 added the isolated local client; T004 worktree adds dedicated PC requests and Android shared state (ADR-0018 / 13_REMOTE_ADB.md), with no mirroring integration. V0 only.
 - Workflows are manual-triggered today and repository has no GitHub Release observed at takeover time.
 
 These controls reduce some paths but do not close the P0/P1 findings.

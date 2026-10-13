@@ -49,6 +49,28 @@ import javax.crypto.spec.GCMParameterSpec;
 final class AdbIdentity {
     private static final String ALIAS = "ashell.localadb.identity.v1";
     private static AdbIdentity cached;
+    static boolean exists(Context context) {
+        return new File(context.getNoBackupFilesDir(), "local-adb-identity.v1").exists();
+    }
+
+    /** Caller first disconnects every shared transport; no old key may be reused afterwards. */
+    static synchronized void revoke(Context context) throws Exception {
+        // libadb 3.1.1 has a process-wide SSLContext containing its first identity.
+        // Keep this pinned compatibility reset isolated; never reset product crypto providers.
+        Class<?> ssl = Class.forName("io.github.muntashirakon.adb.SslUtils");
+        java.lang.reflect.Field field = ssl.getDeclaredField("sslContext");
+        field.setAccessible(true);
+        field.set(null, null);
+        cached = null;
+        AtomicFile file = new AtomicFile(new File(context.getNoBackupFilesDir(), "local-adb-identity.v1"));
+        file.delete();
+        KeyStore store = KeyStore.getInstance("AndroidKeyStore");
+        store.load(null);
+        store.deleteEntry(ALIAS);
+        if (file.getBaseFile().exists() || store.containsAlias(ALIAS)) {
+            throw new IllegalStateException("Identity removal failed");
+        }
+    }
     final PrivateKey privateKey;
     final Certificate certificate;
 

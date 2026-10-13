@@ -2673,6 +2673,9 @@ pub fn session_get_common_sync(
 }
 
 pub fn session_get_common(session_id: SessionID, key: String, param: String) -> Option<String> {
+    if key == "remote_adb_request" || key == "remote_adb_poll" || key == "remote_adb_forget" {
+        return crate::remote_adb::controller(session_id, &key, &param);
+    }
     if let Some(s) = sessions::get_session_by_session_id(&session_id) {
         let v = if key == "is_screenshot_supported" {
             s.is_screenshot_supported().to_string()

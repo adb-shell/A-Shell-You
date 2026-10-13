@@ -1,6 +1,6 @@
 # AShell Architecture Memory
 
-最后更新：2026-10-13（独立本机 ADB 索引更新；V0，运行待验证）
+最后更新：2026-10-13（T004独立远程ADB；V0，编译/多PC运行待验证）
 用途：跨会话架构速记；详细设计只在 `docs/AI_ENGINEERING/` 维护。
 
 ## 1. Runtime Topology
@@ -30,7 +30,7 @@ Windows Rust core
   <-> Amyuni virtual display
 ```
 
-完整图：`docs/AI_ENGINEERING/01_ARCHITECTURE.md`；本机 ADB：`docs/AI_ENGINEERING/12_LOCAL_ADB.md`。localadb 不走产品 Rust/JNI，PC ADB/ADB 投屏未实现。
+完整图：`docs/AI_ENGINEERING/01_ARCHITECTURE.md`；本机ADB见12_LOCAL_ADB.md，T004远程扩展见13_REMOTE_ADB.md。Android共享manager被本机Plugin与专用Rust/JNI调用，不走产品采集JNI/输入/terminal，ADB投屏仍未实现。
 
 ## 2. Core Modules
 

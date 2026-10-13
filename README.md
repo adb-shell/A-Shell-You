@@ -6,6 +6,7 @@
 <p align="center">
   <a href="docs/BUILD_CLIENTS_ACTIONS.md">AShell Android / Windows builds in GitHub Actions</a><br>
   <a href="docs/AI_ENGINEERING/12_LOCAL_ADB.md">本机 ADB：无线配对、Shell、构建与验证说明</a><br>
+  <a href="docs/AI_ENGINEERING/13_REMOTE_ADB.md">PC 远程 ADB：配对、命令、多 PC 共享与验收（待编译验证）</a><br>
   <img src="res/logo-header.svg" alt="RustDesk - Your remote desktop"><br>
   <a href="#raw-steps-to-build">Build</a> •
   <a href="#how-to-build-with-docker">Docker</a> •

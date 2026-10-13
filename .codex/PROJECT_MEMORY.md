@@ -6,6 +6,8 @@
 
 ## 0. Latest Recovery Snapshot
 
+最新：`T-2026-10-13-004`，[PC远程ADB](../docs/tasks/T-2026-10-13-004-remote-adb.md)。main/917e661初始clean，独立PC菜单/Misc.remote_adb(40)/JNI与Android共享manager已在未提交工作树实现。各PC查询Android同一配对记录、连接和队列；回执只给origin；revoke清App身份，系统列表仍手动忘记。无ADB投屏，原无障碍/视频/输入处理保持。V0，正式构建/多PC/权限验收待验证；无Git/产品执行。D-022 / ADR-0018 / STATE-20261013-004 / CE-20261013-T004-01；以下全部“最新”仅指各段历史时点。
+
 最新：`T-2026-10-13-003`，[本机 ADB 文档同步](../docs/tasks/T-2026-10-13-003-local-adb-docs.md)。观察 main/f84a78f，initial clean；8662f23 的独立模块保持，当前主页 ServerPage → LocalAdbPage，API 30+ 手动配对/连接/id验证/shell。无 PC ADB/ADB 投屏；旧 LADB 仍退役。当前事实见 [12_LOCAL_ADB.md](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)。本轮仅 Markdown/V0；V2/V3 结果未提供，未执行 Git 写入、构建、设备或发布。D-021 / ADR-0017 / STATE-20261013-003 / CE-20261013-T003-01；以下为各任务当时快照，不覆盖当前 HEAD。
 
 最新：`T-2026-10-13-002`，见 [SDK 初始化修复](../docs/tasks/T-2026-10-13-002-android-sdk-setup.md)。main/c521601、initial clean；T001 已按同一会话“提交github”要求推送。用户报告 sdkmanager 缺失，native/APK 两 job 补固定 SDK setup / CLI 16.0；修复后 V0，运行待验证。STATE-20261013-002 / CE-20261013-T002-01，D-020 reviewed-no-change。本快照在修复提交前写入，后续提交/推送状态以 Git 回执为准；以下 T001 为当时历史快照。
@@ -95,7 +97,7 @@ T005历史：统一PC入口为build.cmd，直接打包本次清理后编译的Re
 - Android 真实 RGBA/Texture frame 必须清 PC waiting。
 - controller 当前强制 relay；受控端仍保留 rendezvous/direct/NAT compatibility code。
 - Windows 当前 virtual display implementation 是 Amyuni；RustDesk IDD 分支是 dormant。
-- 旧 Android 本地 ADB/LADB 已在 T009 移除；8662f23 新 localadb 模块独立提供本机 shell，尚无 PC remote ADB protocol 或视频集成，不能从历史档案恢复旧入口/自动化。完整合同见 12_LOCAL_ADB.md。
+- 旧Android本地ADB/LADB已在T009移除；8662f23本机模块由T004扩展PC专用请求与Android共享状态，详见12_LOCAL_ADB.md/13_REMOTE_ADB.md。无ADB投屏，不能恢复旧入口/自动化。
 - ZEGO 媒体不走原 RustDesk audio service；peer protocol 只传 invitation/control state。
 - `verify_login()` 的 legacy UI bypass 不等于产品 API、hbbs 或 endpoint authentication bypass。
 

@@ -135,14 +135,14 @@
 
 只有 Phase 0/1 达到可接受基线后再评估：
 
-- PC 远程 ADB command protocol。
+- PC远程ADB的正式构建与多PC验收（T004已实现源码/V0，见13_REMOTE_ADB）。
 - 更完整的设备管理/分组能力。
 - terminal persistence。
 - 多平台正式支持扩展。
 - record upload。
 - 新 capture/virtual-display backend。
 
-旧本地 LADB 已在 T009 移除；8662f23 的独立本机无线配对与 shell 已实现，见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md)，V2/V3 待证据。PC 远程 ADB 和 scrcpy/ADB 投屏仍是未实现方向，需要独立协议、受控端授权、command allowlist、用户确认、审计和退出机制；本轮文档同步不批准新视频或输入链路。
+旧本地LADB保持退役；8662f23本机模块由T004扩展专用PC ADB协议、Android共享manager与状态。见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md) / ADR-0018，V2/V3/V4仍待证据。scrcpy/ADB投屏、视频和输入桥仍未实现，需独立设计；不能把当前ADB shell等同于投屏。
 
 ## 7. 决策门
 

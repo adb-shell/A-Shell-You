@@ -24,6 +24,7 @@ import '../../models/platform_model.dart';
 import '../../common/shared_state.dart';
 import './popup_menu.dart';
 import './kb_layout_type_chooser.dart';
+import '../adb/remote_adb_menu.dart';
 
 class ToolbarState {
   late RxBool _pin;
@@ -484,6 +485,10 @@ class _RemoteToolbarState extends State<RemoteToolbar> {
       toolbarItems.add(_KeyboardMenu(id: widget.id, ffi: widget.ffi));
     }
     toolbarItems.add(_ChatMenu(id: widget.id, ffi: widget.ffi));
+    if (!isWeb && widget.ffi.connType == ConnType.defaultConn) {
+      toolbarItems.add(RemoteAdbMenu(key: ValueKey('adb-${widget.ffi.sessionId}'),
+          sessionId: widget.ffi.sessionId));
+    }
     if (!isWeb) {
       toolbarItems.add(_VoiceCallMenu(id: widget.id, ffi: widget.ffi));
     }

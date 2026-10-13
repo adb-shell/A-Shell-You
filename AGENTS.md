@@ -1,6 +1,6 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
-2026-10-13 T003：已同步 8662f23 独立本机 ADB 的文档，当前观察 main/f84a78f。Android 主页右侧为 LocalAdbPage，API 30+ 手动配对/连接/shell；无 PC ADB 或 ADB 投屏。详见 `docs/AI_ENGINEERING/12_LOCAL_ADB.md`、ADR-0017；旧组件保持退役，V2/V3 未提供结果。
+2026-10-13 T004：main/917e661工作树新增PC顶栏远程ADB，专用Misc.remote_adb(40)与独立JNI接入Android共享manager，支持配对/连接/shell/撤销/刷新与多PC状态。见 `docs/AI_ENGINEERING/13_REMOTE_ADB.md` / ADR-0018；仅V0，编译/真机待验证，未提交。无ADB投屏，原无障碍/视频/输入处理保持。
 
 2026-10-13 T001：GitHub CI 仅保留 build-clients.yml，独立配置 Android/Windows 手动编译、Android aarch64/universal、临时测试签名、Actions-only artifacts。见 docs/BUILD_CLIENTS_ACTIONS.md；本地 build.sh/build.cmd 仍独立。历史源码验证为 V0，runner 成功证据待补。
 
@@ -58,7 +58,7 @@
 6. Legacy desktop UI：`src/ui/`
 7. Account / HTTP / sync / upload：`src/hbbs_http/`
 8. Windows privacy mode / virtual display：`src/privacy_mode.rs` + `src/virtual_display_manager.rs`
-9. 旧 Android 本地 ADB/LADB 已移除（T009 / ADR-0015）；新 `LocalAdbPage` + `me.ashell.localadb` 已接入（8662f23 / ADR-0017），仅本机无线调试 shell，与采集/远控独立。
+9. 旧Android本地ADB/LADB已退役；LocalAdbPage + me.ashell.localadb（8662f23 / ADR-0017）由T004扩展Android共享manager，PC经专用协议请求配对/连接/shell。与采集/输入/terminal独立，非ADB投屏。
 10. ZEGO voice call：Flutter RTC side path + Rust control-channel invitation state
 
 不要把项目误读成：
@@ -85,7 +85,7 @@
 - `common.kt` = Android 全局状态
 - `KeyboardKeyEventMapper.kt` = 键盘映射
 - `VolumeController.kt` = 音量控制
-- 旧 ADB 的四个 Kotlin 模块和无线调试自动化已移除；DevAutoSelectorController、远控输入/采集保持。新 ADB 是 `flutter/android/app/src/main/java/me/ashell/localadb/` 下五个 Java 类；独立通道 `me.ashell/local_adb/v1`，不走产品 JNI。详见 `docs/AI_ENGINEERING/12_LOCAL_ADB.md`。
+- 旧ADB四个Kotlin模块和自动化已移除；DevAutoSelectorController、输入/采集保持。新ADB位于 `flutter/android/app/src/main/java/me/ashell/localadb/`，本机 `me.ashell/local_adb/v1` 和远端独立 `RemoteAdbNative` JNI共用LocalAdbManager，不走产品采集JNI。详见12_LOCAL_ADB.md与13_REMOTE_ADB.md。
 - `pkg2230.kt` = 主 JNI bridge
 - `ffi.kt` = 兼容 JNI bridge
 - `p50.java` + `q50.java` = XOR / 混淆辅助

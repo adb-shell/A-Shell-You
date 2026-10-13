@@ -74,6 +74,20 @@ These are coverage facts, not pass results.
 
 ADB 详细步骤、限制和取证项见 [本机 ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)。至少覆盖 Android 10 的拒绝路径、Android 11/13/14/15 与目标 ROM；pair 和 connect 两种端口必须分开测。以无副作用查询验证原 AND-01/02/04/05/07/08、FLT-04/05/06；不要把用户主动修改系统的 shell 副作用当成实现自动改动。取消只是关闭传输，不以后台子进程一定被终止作为当前实现保证。
 
+### PC 远程 ADB 增量（T004 / 全部 NOT_RUN）
+
+源码与步骤：[13_REMOTE_ADB.md](docs/AI_ENGINEERING/13_REMOTE_ADB.md)。本机AND-09—13继续验证；engine销毁仅取消本机owner，共享manager/worker归进程，不能以仍存在的共享worker判泄漏。以下V2/V3/V4须正式环境取证。
+
+| ID | P | 场景 | Pass oracle | Level / Owner | Result |
+|---|---|---|---|---|---|
+| ADB-R01 | P0 | PC菜单打开先取状态；A正确/错误/过期码配对但不connect；B打开同一Android | 输入提交前状态确认；B看到Android记录，可我已配对直接连接，id成功才connected；顶栏自动隐藏不销毁弹窗请求 | V3 / Flutter+Android | NOT_RUN |
+| ADB-R02 | P0 | A/B/C同时shell/刷新；队列达到8项；每端不同可辨识无副作用输出 | 有限串行、超额busy、不交叉回执；状态共享3秒轮询；非零exit/Unicode/64KiB结果真实 | V3+V4 / Network+Android | NOT_RUN |
+| ADB-R03 | P0 | 断线、弹窗关闭/ESC、控制权限关闭；排队与执行中分别取消；重连 | 仅owner未完成任务取消；空闲共享连接保留；执行中取消可关闭共享transport且状态真实；不自动重放命令 | V3+V4 / Flutter+Network | NOT_RUN |
+| ADB-R04 | P0 | 有排队请求时revoke；再刷新/进程重启/重新配对；模拟清理失败 | 旧任务取消、App身份/记录失效；R8后SSLContext不复用旧key；失败不虚报；系统列表手动忘记提示正确；原会话保留 | V3+V4 / Android+Security | NOT_RUN |
+| ADB-R05 | P1 | NSD先收到其他设备广告；发现被限制、端口变化、系统忘记记录 | 仅选本机服务，5秒后回退；可手工当前连接端口；paired记录不冒充有效shell | V3 / Android | NOT_RUN |
+| ADB-R06 | P0 | 新旧PC/Android组合；非Android；未认证/关闭控制/文件/terminal/camera；坏JSON/超大/未知方法 | 旧端status超时清本地等待；非Androidunsupported；受控端拒绝越权，reply仅发起者；原字段行为不变 | V2+V4 / Network+Security | NOT_RUN |
+| ADB-R07 | P0 | Android Release各目标ABI与PC build.cmd；JNI/protobuf；本机回归及原链并行查询 | 两端字段40可用，FRB未变；JNI/R8加载和撤销重配通过；AND-01/02/04/05/07/08、FLT-04/05/06保持 | V2+V3 / Release+domains | NOT_RUN |
+
 ## 6. Windows Suite
 
 | ID | P | Target | Positive + Negative / Compatibility / Recovery | Pass Oracle | Level / Env | Owners |

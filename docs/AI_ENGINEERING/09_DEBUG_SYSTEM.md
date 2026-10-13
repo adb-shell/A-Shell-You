@@ -213,7 +213,7 @@ flutter test
 
 执行目录：AShell 仓库根目录。
 
-验证目标：三 ABI packaging、签名、JNI linkage；MediaProjection one-shot；share loss 不杀 core；DirectBuffer ownership；旋转/折叠/小于 350px 边界；input permission enforcement；旧 ADB 页面/通道/libadb.so 残留为零（T009）；新 LocalAdbPage 的 AND-09—13 配对/连接/shell/取消/生命周期与依赖；ZEGO 明确接受/拒绝和麦克风行为。ADB 排查和证据边界见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md)，不要将新页面误判为旧组件残留。
+验证目标：目标ABI packaging、签名、JNI linkage；MediaProjection one-shot；share loss不杀core；DirectBuffer ownership；旋转/折叠/小于350px边界；input permission；旧ADB残留为零；AND-09—13本机ADB与ADB-R01—07远程多PC共享/权限/取消/撤销/旧端兼容；ZEGO接受/拒绝和麦克风。ADB证据见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)，本次未运行。
 
 ### 11.4 Windows release build 与系统验证
 

@@ -103,7 +103,8 @@
 | `flutter/lib/desktop/pages/` | connection、remote、file、terminal、settings |
 | `flutter/lib/desktop/widgets/` | toolbar、tab、status、controls |
 | `flutter/lib/mobile/pages/` | server、connection、remote、file；Android 非 outgoing-only 主页装载 ServerPage 和右侧 LocalAdbPage |
-| `flutter/lib/mobile/adb/` | 独立本机 ADB 页面和 bridge，见 12_LOCAL_ADB.md |
+| `flutter/lib/mobile/adb/` | 独立本机ADB页面和bridge，见12_LOCAL_ADB.md |
+| `flutter/lib/desktop/adb/`、`src/remote_adb.rs` | PC ADB菜单/controller、专用请求/回执与独立JNI，见13_REMOTE_ADB.md |
 | `flutter/lib/common/widgets/` | dialog、overlay、input、peer cards |
 | `flutter/lib/native/`, `utils/` | platform/FFI utilities |
 | `flutter/lib/web/` | web bridge；多处 TODO/DORMANT |
@@ -135,7 +136,7 @@
 
 ### 本机 ADB module — active / 旧组件 retired
 
-8662f23 新增 `flutter/android/app/src/main/java/me/ashell/localadb/`：LocalAdbPlugin、LocalAdbClient、AdbLocalSocket、AdbShell、AdbIdentity。Activity 注册插件，`me.ashell/local_adb/v1` 独立于产品 mChannel/JNI；`app/local-adb.gradle` 和 `local-adb.pro` 管理依赖/keep。完整文件职责、合同和验证见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md)。
+8662f23新增 `flutter/android/app/src/main/java/me/ashell/localadb/` 五类；T004追加LocalAdbManager、RemoteAdbNative、AdbPortDiscovery，本机Plugin转为adapter。me.ashell/local_adb/v1与新独立JNI均不使用产品mChannel/采集JNI。职责和合同见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
 
 T009 已删除 AdbPage、Dart wrapper、11 个 MethodChannel 分支、adb/ 四个 Kotlin 文件及无线调试自动化。Gradle 排除旧 libadb.so；不再存在此运行模块。历史位置和回滚基准见 [T009](../tasks/T-2026-10-12-009-remove-legacy-adb.md)。
 

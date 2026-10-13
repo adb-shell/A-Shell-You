@@ -1,7 +1,7 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261013-006`
+Registry Revision：`WORK-20261013-008`
 
 Last Updated：2026-10-13
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none；T-2026-10-13-003 文档/V0 交付完成，修改未提交；构建和设备验证待正式证据，不属于活动文档任务。
+无活动任务。T004仓库实现已交付，正式两端编译/多PC验收待用户在正式环境提供结果；见Last Closed Task。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ none；T-2026-10-13-003 文档/V0 交付完成，修改未提交；构建和设�
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-13-003`
-- Result：8662f23 独立本机 ADB 的使用/架构/依赖/验证、ADR/Baseline、入口/Skills 与记忆已同步；旧档案保持历史。
+- Task ID：`T-2026-10-13-004`
+- Result：独立PC ADB菜单/专用协议/JNI与Android共享manager、有限队列、配对记录/连接/shell/撤销已实现；相关文档/记忆已同步。
 - Closed At：2026-10-13（Asia/Tokyo）
-- Final T-State：`T8 — complete`（文档/V0；ADB V2/V3结果未提供）
-- State / Event：`STATE-20261013-003` / `CE-20261013-T003-01`
-- Decision：D-021 / ADR-0017 补记新模块；ADR-0015 旧退役与 D-020 / ADR-0016 CI 边界保持。
-- Verification：V0 源码/8662f23差异、34文件仅Markdown、39个新增相对链接、diff/新文件空白与事件路径清单检查通过；原产品代码无diff。
-- Next Gate：待正式构建/设备结果补证据；新 PC ADB/投屏需独立设计。本轮无Git写入/build/test/device/dispatch/sign/package/release。
+- Final T-State：`T8 — complete repository implementation`（V0；V2/V3/V4待验证，非运行验收完成）
+- State / Event：`STATE-20261013-004` / `CE-20261013-T004-01`
+- Decision：D-022 / ADR-0018；Baseline12。旧退役、产品身份与CI边界保持。
+- Verification：V0跨层合同/字段/JNI/权限/所有权与取消、保护路径diff、文档链接/空白；原无障碍/视频/输入源码未改，session仅新增ADB钩子。
+- Next Gate：正式两端构建/Release JNI与多PC验收；ADB投屏仍未实现。本轮无Git写入/build/test/device/dispatch/sign/package/release。
 - Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md 中同 ID。
-- Detailed record：docs/tasks/T-2026-10-13-003-local-adb-docs.md；观察main/f84a78f，initial clean，34份Markdown留工作树未提交。
+- Detailed record：docs/tasks/T-2026-10-13-004-remote-adb.md；观察main/917e661，initial clean，本任务代码/文档留工作树未提交。

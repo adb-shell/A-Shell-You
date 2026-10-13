@@ -187,3 +187,13 @@ Mode：`append-only task-level index`
 - Authority / verification：当前文档同步请求C1；仅Markdown/V0，无产品代码、Git写入、构建测试或设备操作。V2/V3未提供结果，不标PASS。
 - State / Event：STATE-20261013-003 / WORK-20261013-006 / CE-20261013-T003-01；文档交付complete，修改未提交。
 - Detail：[当前ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[任务](../docs/tasks/T-2026-10-13-003-local-adb-docs.md)。PC ADB与ADB投屏未实现；新依赖hash/NOTICE/JNI与ROM验证待补。
+
+## T-2026-10-13-004：PC 远程 ADB 与 Android 共享状态
+
+- Record Type / status：current / completed repository implementation；运行待验证。
+- Source：main/917e661初始clean，工作树未提交。
+- Change：PC顶栏配对/连接/命令/撤销/刷新/断开；专用Misc.remote_adb和独立JNI；Android共享身份/状态、有限队列与owner取消。
+- Scope boundary：不改原无障碍/画面/输入处理，不加入ADB投屏，不降低原会话加密；撤销只清App身份，系统列表需手工忘记。
+- Evidence：V0静态；ADB-R01—07的V2/V3/V4待正式环境，无Git/构建/设备/发布。
+- Decision / event / state：D-022 / ADR-0018；CE-20261013-T004-01；STATE-20261013-004 / WORK-20261013-008。
+- Detailed record：docs/tasks/T-2026-10-13-004-remote-adb.md；docs/AI_ENGINEERING/13_REMOTE_ADB.md。

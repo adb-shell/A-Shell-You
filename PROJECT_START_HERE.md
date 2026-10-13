@@ -2,7 +2,7 @@
 
 2026-10-13 T001：[独立客户端 Actions](docs/BUILD_CLIENTS_ACTIONS.md) 替换旧 GitHub 编排，仅手动 Android/Windows、测试签名和 Actions 下载；V0，runner 未运行。当前观察 main/8662f23（已含新的 local ADB 模块），下文 T009/其他任务为历史快照；新会话先核对 HEAD/status。
 
-当前 ADB（2026-10-13）：[本机 ADB 使用与架构](docs/AI_ENGINEERING/12_LOCAL_ADB.md)。8662f23 新增独立模块，Android 主页为 ServerPage → LocalAdbPage，支持 API 30+ 手动无线配对、连接验证和单次 shell；尚无 PC ADB/ADB 投屏。旧组件仍按 [T009](docs/tasks/T-2026-10-12-009-remove-legacy-adb.md) 退役，旧 libadb.so 仍排除。当前源码复核 f84a78f；文档/V0 已同步，V2/V3 结果未提供。
+当前ADB（2026-10-13）：[本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md) 与 [PC远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)。T004在main/917e661工作树新增PC菜单、专用协议/独立JNI、Android共享manager与多PC状态；仅V0，编译/真机待验证，未提交。Android右侧LocalAdbPage保持；旧组件仍退役、旧libadb.so排除，无ADB投屏或原视频/输入链改造。
 
 最后更新：2026-10-12
 
@@ -168,7 +168,7 @@ T003补齐所有文档品牌字段/路径/文件名及两处ashell.分类匹配�
 - JNI 改动以 `pkg2230.rs` 为 active source，并检查 `ffi.rs` compatibility drift。
 - Controller relay-only 不等于 endpoint direct/NAT code 已删除。
 - UI visibility、developer password、client validation 不是 server authorization。
-- T009 已移除旧本地 ADB/LADB；8662f23 的新 localadb 通过独立 MethodChannel 提供本机 shell，remote terminal/side-button 保持独立。见 ADR-0015 与 ADR-0017。
+- T009已移除旧本地ADB/LADB；8662f23新localadb由T004扩展为Android进程共享，PC走专用ADB协议；remote terminal/side-button保持独立。见ADR-0015/0017/0018。
 - ZEGO invitation、token authorization 和 microphone consent 是三个边界。
 - Windows privacy/injection/driver 变更必须有失败恢复和安全审查。
 - External asset 未登记 owner、version、hash、license 和获取方式时，不得宣称可复现或可发布。

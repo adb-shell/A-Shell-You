@@ -645,6 +645,8 @@ impl Connection {
                             log::info!("Change permission {} -> {}", name, enabled);
                             if &name == "keyboard" {
                                 conn.keyboard = enabled;
+                                #[cfg(target_os = "android")]
+                                if !enabled { crate::remote_adb::android::cancel_requests(conn.inner.id); }
                                 conn.send_permission(Permission::Keyboard, enabled).await;
                                 if let Some(s) = conn.server.upgrade() {
                                     s.write().unwrap().subscribe(
@@ -2998,6 +3000,15 @@ impl Connection {
                             self.send(msg_out).await;
                         }
                     }
+                    Some(misc::Union::RemoteAdb(json)) => {
+                        // This branch is inside the authenticated-session dispatcher.
+                        // Do not reuse input masks, terminal, capture or service commands.
+                        let allowed = self.peer_keyboard_enabled()
+                            && self.file_transfer.is_none() && !self.terminal && !self.view_camera;
+                        if let Some(tx) = self.inner.tx.as_ref() {
+                            crate::remote_adb::dispatch(self.inner.id, allowed, &json, tx.clone());
+                        }
+                    }
                     _ => {}
                 },
                 Some(message::Union::AudioFrame(frame)) => {
@@ -3603,6 +3614,8 @@ impl Connection {
         if let Ok(q) = o.disable_keyboard.enum_value() {
             if q != BoolOption::NotSet {
                 self.disable_keyboard = q == BoolOption::Yes;
+                #[cfg(target_os = "android")]
+                if self.disable_keyboard { crate::remote_adb::android::cancel_requests(self.inner.id); }
                 if let Some(s) = self.server.upgrade() {
                     s.write().unwrap().subscribe(
                         super::clipboard_service::NAME,
@@ -4485,6 +4498,8 @@ impl Default for PortableState {
 
 impl Drop for Connection {
     fn drop(&mut self) {
+        #[cfg(target_os = "android")]
+        crate::remote_adb::android::disconnect(self.inner.id);
         #[cfg(not(any(target_os = "android", target_os = "ios")))]
         self.release_pressed_modifiers();
 

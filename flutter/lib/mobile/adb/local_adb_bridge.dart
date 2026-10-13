@@ -4,17 +4,20 @@ class LocalAdbStatus {
   final bool supported;
   final bool connected;
   final bool busy;
+  final bool paired;
 
   const LocalAdbStatus({
     this.supported = false,
     this.connected = false,
     this.busy = false,
+    this.paired = false,
   });
 
   factory LocalAdbStatus.fromMap(Map<dynamic, dynamic> value) => LocalAdbStatus(
         supported: value['supported'] == true,
         connected: value['connected'] == true,
         busy: value['busy'] == true,
+        paired: value['paired'] == true,
       );
 }
 
