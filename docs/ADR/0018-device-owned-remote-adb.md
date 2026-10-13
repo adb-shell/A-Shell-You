@@ -1,5 +1,7 @@
 # ADR-0018: Device-owned ADB with Remote Session Requests
 
+T006更新：本文保留T004决策历史；keyboard gate、发现范围、UI和时限由 [ADR-0019](0019-adb-discovery-and-independent-control.md) 更新，当前合同见13_REMOTE_ADB。
+
 - Status：accepted for implementation；V0 only，V2/V3/V4 待验证。
 - Date / Approver：2026-10-13，当前用户明确要求 PC 顶栏配对/连接/命令/撤销/状态及多 PC 共用 Android 能力。
 - Record Type：current decision；Task T-2026-10-13-004 / D-022。

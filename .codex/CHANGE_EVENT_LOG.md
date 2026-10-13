@@ -496,3 +496,46 @@ Mode：`append-only logical persisted-change events`
 - `docs/AI_ENGINEERING/13_REMOTE_ADB.md`
 - `docs/tasks/T-2026-10-13-005-adb-bind-import.md`
 - `flutter/lib/desktop/adb/remote_adb_controller.dart`
+
+## CE-20261013-T006-01 — ADB discovery and remote usability
+
+- Date/Owner：2026-10-13 / Codex，T-2026-10-13-006；用户C1/C2与C3 stage/commit/push/Build AShell clients单次dispatch明确授权，不监控。
+- Source：main/504adea0119d9ff96d33a16cd27e559d1492a723 initial clean；旧T005已提交，本事件为当前任务。
+- Delta：独立ADB gate、NSD双端口、pairConnect/QR、分窗拖动与手机UI；原peer/FRB/identity合同兼容扩展，state apiVersion=2。文档同步ADR0019/D023/Baseline13/TEST_MATRIX/外部研究来源与memory。
+- V0：静态caller/type/API/权限/NSD取消/窗口生命周期、diff whitespace、新文档相对链接、保护路径范围；本机无正式工具链。V1/V2/V3/V4未在本地执行；用户只授权CI触发，不监控。
+- Actions：无删除、版本、依赖/工具链/工作流修改、原Accessibility/capture/input处理修改。此记录为提交前快照；随后Git/dispatch精确回执以Git与最终交付为准。
+- Recovery：按下面明确路径审阅回退，无record/identity schema迁移；不能回滚已执行shell系统副作用。STATE006 / WORK012。
+
+修改/新增路径：
+
+- `.codex/CHANGELOG_AI.md`
+- `.codex/CHANGE_EVENT_LOG.md`
+- `.codex/CURRENT_WORK.md`
+- `.codex/DECISION_LOG.md`
+- `.codex/PROJECT_MEMORY.md`
+- `.codex/PROJECT_STATE.md`
+- `.codex/TASK_HISTORY.md`
+- `AGENTS.md`
+- `EXTERNAL_ASSET_REGISTRY.md`
+- `PROJECT_START_HERE.md`
+- `TEST_MATRIX.md`
+- `docs/ADR/0018-device-owned-remote-adb.md`
+- `docs/ADR/0019-adb-discovery-and-independent-control.md`
+- `docs/ADR/README.md`
+- `docs/AI_ENGINEERING/08_BUILD_SYSTEM.md`
+- `docs/AI_ENGINEERING/10_SECURITY_MODEL.md`
+- `docs/AI_ENGINEERING/12_LOCAL_ADB.md`
+- `docs/AI_ENGINEERING/13_REMOTE_ADB.md`
+- `docs/BASELINE/13_ADB_USABILITY_BASELINE_2026-10-13.md`
+- `docs/BASELINE/BASELINE_INDEX.md`
+- `docs/tasks/T-2026-10-13-006-adb-usability.md`
+- `flutter/android/app/src/main/java/me/ashell/localadb/AdbPortDiscovery.java`
+- `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbManager.java`
+- `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbPlugin.java`
+- `flutter/lib/desktop/adb/remote_adb_controller.dart`
+- `flutter/lib/desktop/adb/remote_adb_menu.dart`
+- `flutter/lib/desktop/widgets/remote_toolbar.dart`
+- `flutter/lib/mobile/adb/local_adb_bridge.dart`
+- `flutter/lib/mobile/adb/local_adb_page.dart`
+- `src/remote_adb.rs`
+- `src/server/connection.rs`

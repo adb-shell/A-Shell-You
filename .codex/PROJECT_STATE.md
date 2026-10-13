@@ -1,7 +1,7 @@
 # AShell Project State
 
 Schema Version：`1.0`  
-State Revision：`STATE-20261013-005`
+State Revision：`STATE-20261013-006`
 
 Last Updated：2026-10-13（Asia/Tokyo）
 
@@ -11,7 +11,7 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 
 > 本文件是截至 `Observed At` 的当前状态快照，不是生产实时监控，也不替代源码、`docs/AI_ENGINEERING/`、ADR 或 Baseline。新会话必须用只读检查确认其新鲜度；发现漂移时记录 conflict/stale，不得用本文件覆盖源码事实或改写旧 Baseline。
 
-最新变更证据：[T-2026-10-13-005 ADB bind导入修复](../docs/tasks/T-2026-10-13-005-adb-bind-import.md)。main/de8bc76已包含T004；用户Android CI日志显示ADB controller三处bind未定义，Flutter编译FAIL。当前工作树补显式platform_model导入，仅一行代码变更；静态核对完成，修复后未重编。
+最新变更：[T006 ADB可用性](../docs/tasks/T-2026-10-13-006-adb-usability.md)，观察main/504adea（已含T005导入修复），initial clean。ADB从手机keyboard权限解耦；双NSD、一键配对连接、PC QR及独立拖动弹窗、手机UI已实现。V0，本机无正式工具链；已授权提交/推送及both/aarch64 CI单次dispatch，不监控。此为提交前快照，实际SHA/外部动作回执以Git和本会话最终答复为准。
 
 2026-10-12 T003 历史补充：当时按用户要求统一品牌字段/路径与两处公共服务匹配。历史文档已标注名称规范化，原文字与真实源仓地址从a036f31恢复；当时的检索结果不代表本次重新扫描全仓品牌。
 
@@ -21,13 +21,13 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 |---|---|---|
 | Product/runtime | `A Shell You` / `AShell`；crate ashell；Android me.ashell；Flutter内部flutter_hbb | source + ADR-0014 |
 | Rust / Flutter version | `5.2.1` / `5.2.1+59` | manifests + Baseline |
-| Baseline ID | `AS-BL-2026-10-13-917e661-remote-adb-worktree` | `docs/BASELINE/12_REMOTE_ADB_BASELINE_2026-10-13.md`；旧基线冻结 |
+| Baseline ID | `AS-BL-2026-10-13-504adea-adb-usability` | Baseline13；旧基线冻结 |
 | Branch | `main` | read-only Git observation |
-| HEAD | `de8bc768f0a71cab3f60e93f321ae0f65d74c658` | T005只读观察；本轮无Git写入 |
-| Worktree | 初始clean；当前仅ADB controller导入与相关记录修改，未提交 | T005 / CE-20261013-T005-01 |
+| HEAD | `504adea0119d9ff96d33a16cd27e559d1492a723` | T006开始观察；最终SHA由Git回执确认 |
+| Worktree | 初始clean；仅独立ADB模块/最小接入点及记录；准备提交 | T006 / CE-20261013-T006-01 |
 | History mapping | a036f31提交前轮记忆；6fb0aa6初始化的975 blobs与历史源匹配是迁移前证据，准确RustDesk fork未知 | 历史接管报告；不能用该一致性描述当前dirty tree |
 | Highest completed verification | `V0` repository/document/schema checks | `TEST_MATRIX.md` + task records |
-| Formal build/runtime evidence | 用户Android CI日志：修复前Flutter编译FAIL；修复后NOT_RUN，设备V3/V4仍待验 | T005 / ADB-R07；不推定其他job通过 |
+| Formal build/runtime evidence | 旧SHA两端Flutter缺bind已修复；T006仅V0，授权CI dispatch不监控，设备V3/V4待验 | ADB-R01—11；不宣称构建成功 |
 | Release readiness | `BLOCKED` | security、external assets、V2—V4、signing/SBOM/rollback gaps |
 
 ## 2. Governance and Knowledge Readiness
@@ -60,18 +60,18 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 
 - Active task registry：`CURRENT_WORK.md`。
 - Detailed task history：`TASK_HISTORY.md`。
-- Latest completed AI task：`T-2026-10-13-005`（bind缺失导入已修复/V0；新SHA编译待验证）。
+- Latest implementation task：`T-2026-10-13-006`（ADB可用性/V0；提交与CI回执见最终交付）。
 - Current active task：`none`；以 CURRENT_WORK 实时行和新会话只读复核为准。
-- Latest recorded modification event：`CE-20261013-T005-01`。
-- Latest decision：D-022 / ADR-0018；T005 reviewed-no-change，仅补Dart导入，无新架构决定。
+- Latest recorded modification event：`CE-20261013-T006-01`。
+- Latest decision：D-023 / ADR-0019；ADB权限从手机keyboard解耦、双发现/QR/一键连接。
 - Architecture decisions：`docs/ADR/README.md`；ADR-0018扩展0017远程能力，ADR-0015旧退役/0014产品身份保持。
 
 ## 5. Standing Authority State
 
 - There is no standing C2 or C3 authorization.
 - Historical approvals in memory、Task History、Decision Log or ADR never transfer to a new session.
-- T005当前故障反馈授权针对性代码修复和必要记录；不自动Git写入或重新dispatch。
-- 本轮仅ADB controller一行导入及文档/记忆，未build/test/analyze/codegen、设备、Git、签名/发布。
+- T006当前请求明确授权代码/文档、stage/commit/push到既有GitHub main及单次Build AShell clients both/aarch64，不监控；不扩大为发布/生产操作。
+- 无本地build/test/analyze/codegen、设备、删除/版本/发布；提交前记录不预报Git/dispatch成功。
 
 ## 6. Freshness and Update Contract
 

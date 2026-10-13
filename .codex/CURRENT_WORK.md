@@ -1,7 +1,7 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261013-010`
+Registry Revision：`WORK-20261013-012`
 
 Last Updated：2026-10-13
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-无活动任务。T005缺失导入已修复，待提交修复后在新SHA正式编译；见Last Closed Task。
+无活动源码任务。T006实现和记录完成；本文件为提交前快照，随后按用户授权stage/commit/push并单次dispatch，实际回执见会话最终交付，不监控构建。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ Active Task Count：0
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-13-005`
-- Result：用户Android CI的三处bind未定义已定位，ADB controller补一行platform_model直接导入；原链/CI/依赖未改。
+- Task ID：`T-2026-10-13-006`
+- Result：独立ADB权限修复、双NSD、一键配对连接、PC系统QR与分窗拖动、Android UI；原链/CI/依赖不变。
 - Closed At：2026-10-13（Asia/Tokyo）
-- Final T-State：`T8 — source fix complete`（V0；修复前CI FAIL，修复后V2待验证）
-- State / Event：`STATE-20261013-005` / `CE-20261013-T005-01`
-- Decision：D-022 / ADR-0018 reviewed-no-change；引用Baseline12，T004已由de8bc76固化。
-- Verification：V0日志/符号声明与import/export/ADB同类调用/FRB合同/差异与文档检查；未执行项目命令。
-- Next Gate：提交修复后发起新SHA Android构建；重跑旧commit不带修复。无本轮Git写入/build/test/device/dispatch/release。
+- Final T-State：`T8 — source complete / delivery`（V0；正式V2/V3/V4待验证）
+- State / Event：`STATE-20261013-006` / `CE-20261013-T006-01`
+- Decision：D-023 / ADR-0019 / Baseline13；旧决定按历史保存。
+- Verification：V0合同/参数/权限/NSD与取消/窗口/差异空白/保护路径/新文档链接；无本地工具链，未执行本地项目命令。
+- Next Gate：本次已授权提交推送与both/aarch64 CI dispatch，准确结果见最终回执，不监控；后续用户提供新包验证结果。无删除/版本/发布/生产操作。
 - Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md 中同 ID。
-- Detailed record：docs/tasks/T-2026-10-13-005-adb-bind-import.md；观察main/de8bc76，initial clean，一行代码修复与记录未提交。
+- Detailed record：docs/tasks/T-2026-10-13-006-adb-usability.md；观察main/504adea，initial clean；提交前快照。

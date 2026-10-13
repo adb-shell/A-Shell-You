@@ -243,3 +243,12 @@
 ### D-022 review — T-2026-10-13-005
 
 2026-10-13：reviewed-no-change。Android CI日志证明PC ADB controller缺少bind直接导入；仅补platform_model.dart导入，不改ADR-0018协议/权限/生命周期或外部依赖。修复后编译待验证；CE-20261013-T005-01。
+
+## D-023：ADB 独立权限与双端口发现、一键连接
+
+- 2026-10-13 / accepted for implementation / T006。当前用户明确要求修复PC不可用/状态不同步、智能配对和独立UI，授权commit/push/CI dispatch不监控。
+- Decision：从Android keyboard=N/Accessibility状态解耦；已认证普通会话可读state，操作另要求非PC view-only，切只读/断线取消owner；原权限处理不改。NSD双服务只接纳本机，pairConnect自动验证Shell，QR按AOSP临时serviceName/口令，无系统码读取。
+- UI：同款ADB图标菜单、各功能独立可拖动弹窗、Android只填码/手动端口/扫描；3秒共享状态，结果仅origin。
+- Compatibility：字段40/JSON v1/FRB/identity保持，status.apiVersion=2；旧pair/connect保留；无新依赖，研究LADB/aShellYou并独立适配，未移植其settings自动化/adb binary。
+- Verification：V0；本地无工具链，正式V2/V3/V4待证；CI授权仅触发非监控。普通认证会话通用shell仍是高权限面，不修复原认证问题。
+- ADR-0019更新0018权限/发现/时限；Baseline13 / STATE006 / CE-20261013-T006-01。回滚限事件路径，无存储迁移；代码回退不能撤销shell副作用。

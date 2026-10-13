@@ -1,5 +1,7 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
+2026-10-13 T006：main/504adea基线新增ADB独立权限gate、配对/连接双NSD、一键配对并验证Shell、PC系统二维码配对及独立可拖动弹窗。此前T004远程模块已由de8bc76固化，T005导入由504adea修复；下文“无PC ADB”为T003历史时点。当前见13_REMOTE_ADB、ADR-0019、Baseline13；仅V0。用户授权提交后运行Build AShell clients both/aarch64，不监控，执行结果见Git/交付回执。原无障碍/视频/输入链保持。
+
 2026-10-13 T004：main/917e661工作树新增PC顶栏远程ADB，专用Misc.remote_adb(40)与独立JNI接入Android共享manager，支持配对/连接/shell/撤销/刷新与多PC状态。见 `docs/AI_ENGINEERING/13_REMOTE_ADB.md` / ADR-0018；仅V0，编译/真机待验证，未提交。无ADB投屏，原无障碍/视频/输入处理保持。
 
 2026-10-13 T001：GitHub CI 仅保留 build-clients.yml，独立配置 Android/Windows 手动编译、Android aarch64/universal、临时测试签名、Actions-only artifacts。见 docs/BUILD_CLIENTS_ACTIONS.md；本地 build.sh/build.cmd 仍独立。历史源码验证为 V0，runner 成功证据待补。

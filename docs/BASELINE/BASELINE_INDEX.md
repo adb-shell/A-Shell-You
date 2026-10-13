@@ -1,5 +1,7 @@
 # AShell Engineering Baseline Index
 
+T006当前快照：[AS-BL-2026-10-13-504adea-adb-usability](13_ADB_USABILITY_BASELINE_2026-10-13.md)，独立ADB权限/双端口发现/一键连接/扫码；V0。用户授权提交后运行both/aarch64 CI，不监控；下列“最新”保留各历史时点含义。
+
 最新ADB工作树快照：[AS-BL-2026-10-13-917e661-remote-adb-worktree](12_REMOTE_ADB_BASELINE_2026-10-13.md)。T004新增PC请求与Android共享状态，仅V0，V2—V4待验证，未提交。此前 [Baseline11](11_LOCAL_ADB_BASELINE_2026-10-13.md) 与以下旧基线继续冻结。
 
 最新 CI 工作树快照：[AS-BL-2026-10-13-c521601-android-sdk-setup-worktree](10_ANDROID_SDK_SETUP_BASELINE_2026-10-13.md)。T002 修复初版 sdkmanager 缺失；固定两 Android job 的 SDK setup 和 CLI 版本；修复后 V0，runner 构建待验证。原 [独立客户端 Actions 快照](09_CLIENT_ACTIONS_BASELINE_2026-10-13.md) 与以下旧快照保留冻结含义，不代表当前 HEAD。

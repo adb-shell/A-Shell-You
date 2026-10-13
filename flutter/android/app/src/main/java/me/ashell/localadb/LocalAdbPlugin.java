@@ -47,7 +47,7 @@ public final class LocalAdbPlugin implements FlutterPlugin, ActivityAware, Metho
             return;
         }
         Map<String, Object> args = new HashMap<>();
-        for (String key : new String[]{"port", "code", "command"}) {
+        for (String key : new String[]{"port", "connectPort", "serviceName", "code", "command"}) {
             Object value = call.argument(key);
             if (value != null) args.put(key, value);
         }

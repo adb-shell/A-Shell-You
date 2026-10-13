@@ -37,7 +37,7 @@ mod pc {
 
     pub fn controller(session_id: Uuid, key: &str, param: &str) -> Option<String> {
         let mut pending = PENDING.lock().ok()?;
-        pending.retain(|_, p| p.since.elapsed() < Duration::from_secs(190));
+        pending.retain(|_, p| p.since.elapsed() < Duration::from_secs(750));
         if key == "remote_adb_poll" || key == "remote_adb_forget" {
             let p = pending.get(param)?;
             if p.session != session_id { return None; }
@@ -81,16 +81,17 @@ mod pc {
 pub use pc::{controller, receive};
 
 #[cfg(not(target_os = "ios"))]
-pub fn dispatch(owner: i32, allowed: bool, payload: &str, tx: crate::server::Sender) {
+pub fn dispatch(owner: i32, normal_session: bool, control: bool, payload: &str, tx: crate::server::Sender) {
     if payload.len() > MAX_REQUEST { return; }
     let Ok(value) = serde_json::from_str::<Value>(payload) else { return; };
     let Some(id) = value["id"].as_str().filter(|s| s.len() <= 64) else { return; };
     if value["v"] != 1 || value["kind"] != "request" { return; }
-    let reply = if !allowed {
+    let status_request = value["method"] == "status";
+    let reply = if !normal_session || (!status_request && !control) {
         Some(error(id, "permission", "当前会话没有远程控制权限，不能操作 ADB。"))
     } else {
         #[cfg(target_os = "android")]
-        { android::submit(owner, id, payload, tx.clone()) }
+        { android::submit(owner, id, payload, control, tx.clone()) }
         #[cfg(not(target_os = "android"))]
         { let _ = owner; Some(error(id, "unsupported", "远端未提供 Android ADB 模块。")) }
     };
@@ -107,7 +108,7 @@ pub mod android {
     use crate::server::Sender;
 
     struct Bridge { vm: JavaVM, manager: GlobalRef }
-    struct Reply { owner: i32, id: String, tx: Sender, since: Instant }
+    struct Reply { owner: i32, id: String, control: bool, tx: Sender, since: Instant }
     lazy_static::lazy_static! {
         static ref BRIDGE: Mutex<Option<Bridge>> = Mutex::new(None);
         static ref REPLIES: Mutex<HashMap<String, Reply>> = Mutex::new(HashMap::new());
@@ -139,15 +140,15 @@ pub mod android {
         result.is_ok()
     }
 
-    pub fn submit(owner: i32, id: &str, payload: &str, tx: Sender) -> Option<String> {
+    pub fn submit(owner: i32, id: &str, payload: &str, control: bool, tx: Sender) -> Option<String> {
         let token = uuid::Uuid::new_v4().to_string();
         {
             let Ok(mut replies) = REPLIES.lock() else { return Some(error(id, "busy", "ADB 模块忙。")); };
-            replies.retain(|_, r| r.since.elapsed() < Duration::from_secs(190));
+            replies.retain(|_, r| r.since.elapsed() < Duration::from_secs(750));
             if replies.len() >= 64 || replies.values().filter(|r| r.owner == owner).count() >= 10 {
                 return Some(error(id, "busy", "ADB 请求过多，请稍后重试。"));
             }
-            replies.insert(token.clone(), Reply { owner, id: id.into(), tx, since: Instant::now() });
+            replies.insert(token.clone(), Reply { owner, id: id.into(), control, tx, since: Instant::now() });
         }
         if !invoke("dispatchRemote", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
                    &[&owner.to_string(), &token, payload]) {
@@ -169,6 +170,7 @@ pub mod android {
         let payload = if let Some(value) = value.as_mut().filter(|v| v.is_object()) {
             value["v"] = json!(1);
             value["id"] = json!(reply.id);
+            value["controlAllowed"] = json!(reply.control);
             value.to_string()
         } else { error(&reply.id, "invalid", "ADB 返回数据无效。") };
         let _ = reply.tx.send((hbb_common::tokio::time::Instant::now(), Arc::new(message(payload))));

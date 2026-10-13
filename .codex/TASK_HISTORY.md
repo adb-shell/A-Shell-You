@@ -289,3 +289,13 @@
 - Records：CE-20261013-T005-01 / STATE-20261013-005 / WORK-20261013-010；Baseline12引用当前de8bc76固化状态，D-022/ADR-0018 reviewed-no-change。
 - Actions：无Git写入、build/test/analyze/codegen、设备、dispatch/发布；临时签名日志URL未落仓。
 - Detail：[T005](../docs/tasks/T-2026-10-13-005-adb-bind-import.md)，提交修复后需新SHA构建，重跑旧commit不带修复。
+
+## T-2026-10-13-006 — ADB 可用性与智能配对
+
+- 用户请求：PC统一ADB菜单图标、修复灰色控件和状态不同步、配对/命令等独立窗口且可拖动；手机自动发现配对/连接端口、只填码或手动覆盖、一键pair-connect；可研究LADB/aShellYou；实现后提交推送并单次运行Build AShell clients，不监控。
+- Source：main/504adea initial clean；T005导入已提交；远端main只读核对同SHA。Master和各域静态自审，无子agent。
+- 实现：ADB从mobile keyboard gate解耦，保留authorized普通会话及PC只读限制；双NSD/local-only/串行解析/有界取消；pairConnect和QR指定本机服务；共享状态与阶段；同款toolbar和独立拖动弹窗、手机UI。
+- 验证：V0调用/权限/参数/owner/超时/NSD/窗口生命周期与git diff --check；新文档相对链接有效；原Kotlin/Accessibility/libs/scrap/protobuf字段/依赖/构建脚本未变。无本地Flutter/Dart/Java工具链，未运行本地build/test/analyze/codegen或设备测试。
+- 文档：domain12/13、安全/构建、ADR0019/D023、Baseline13、TEST_MATRIX ADB-R08—11、外部来源与memory齐备。No delete/version/release/production；原capture/input链保持。
+- 提交前T8记录：源码与记录完成；stage/commit/push及GitHub both/aarch64 dispatch已明确授权，将紧接执行；准确SHA与接受回执以本会话最终交付为准，不能把计划记成完成或构建PASS。按用户要求不监控。
+- STATE-20261013-006 / WORK-20261013-012 / CE-20261013-T006-01；详见docs/tasks/T-2026-10-13-006-adb-usability.md。

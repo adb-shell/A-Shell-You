@@ -205,3 +205,9 @@ Mode：`append-only task-level index`
 - Verification：V0，修复前CI FAIL、修复后NOT_RUN；无Git/build/test/device/dispatch/release。
 - Decision / Event：D-022 reviewed-no-change；CE-20261013-T005-01 / STATE-20261013-005 / WORK-20261013-010。
 - Detail：docs/tasks/T-2026-10-13-005-adb-bind-import.md。
+
+## T-2026-10-13-006 — ADB pairing and remote usability
+
+- 2026-10-13 / source-complete / V0。main/504adea initial clean；mobile keyboard=N导致ADB被拒已通过独立gate修正；双NSD/一键连接/PC系统QR/独立拖动弹窗/Android UI。
+- Source与文档完成；C3提交推送及both/aarch64 CI dispatch已授权，实际回执见本会话最终交付；不监控，不声称V2/V3通过。
+- STATE006 / WORK012 / CE-20261013-T006-01 / D-023 / ADR-0019 / Baseline13；Task History与docs/tasks/T-2026-10-13-006-adb-usability.md。无原无障碍/画面/输入/身份/版本/依赖或构建脚本变更。

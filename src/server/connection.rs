@@ -645,8 +645,6 @@ impl Connection {
                             log::info!("Change permission {} -> {}", name, enabled);
                             if &name == "keyboard" {
                                 conn.keyboard = enabled;
-                                #[cfg(target_os = "android")]
-                                if !enabled { crate::remote_adb::android::cancel_requests(conn.inner.id); }
                                 conn.send_permission(Permission::Keyboard, enabled).await;
                                 if let Some(s) = conn.server.upgrade() {
                                     s.write().unwrap().subscribe(
@@ -3003,10 +3001,14 @@ impl Connection {
                     Some(misc::Union::RemoteAdb(json)) => {
                         // This branch is inside the authenticated-session dispatcher.
                         // Do not reuse input masks, terminal, capture or service commands.
-                        let allowed = self.peer_keyboard_enabled()
-                            && self.file_transfer.is_none() && !self.terminal && !self.view_camera;
+                        // Mobile keyboard permission reflects Accessibility, not ADB consent.
+                        // ADB belongs to the authenticated normal session; view-only peers
+                        // may read status but must not perform privileged operations.
+                        let normal_session = self.file_transfer.is_none()
+                            && !self.terminal && !self.view_camera;
                         if let Some(tx) = self.inner.tx.as_ref() {
-                            crate::remote_adb::dispatch(self.inner.id, allowed, &json, tx.clone());
+                            crate::remote_adb::dispatch(self.inner.id, normal_session,
+                                !self.disable_keyboard, &json, tx.clone());
                         }
                     }
                     _ => {}

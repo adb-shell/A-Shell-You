@@ -82,11 +82,15 @@ ADB 详细步骤、限制和取证项见 [本机 ADB](docs/AI_ENGINEERING/12_LOC
 |---|---|---|---|---|---|
 | ADB-R01 | P0 | PC菜单打开先取状态；A正确/错误/过期码配对但不connect；B打开同一Android | 输入提交前状态确认；B看到Android记录，可我已配对直接连接，id成功才connected；顶栏自动隐藏不销毁弹窗请求 | V3 / Flutter+Android | NOT_RUN |
 | ADB-R02 | P0 | A/B/C同时shell/刷新；队列达到8项；每端不同可辨识无副作用输出 | 有限串行、超额busy、不交叉回执；状态共享3秒轮询；非零exit/Unicode/64KiB结果真实 | V3+V4 / Network+Android | NOT_RUN |
-| ADB-R03 | P0 | 断线、弹窗关闭/ESC、控制权限关闭；排队与执行中分别取消；重连 | 仅owner未完成任务取消；空闲共享连接保留；执行中取消可关闭共享transport且状态真实；不自动重放命令 | V3+V4 / Flutter+Network | NOT_RUN |
+| ADB-R03 | P0 | 断线、弹窗关闭/ESC、PC切只读；排队/执行中取消；手机keyboard开关切换 | 仅owner未完成任务取消；空闲连接/取消扫描保留共享ADB；手机keyboard不影响独立ADB；不重放命令 | V3+V4 / Flutter+Network | NOT_RUN |
 | ADB-R04 | P0 | 有排队请求时revoke；再刷新/进程重启/重新配对；模拟清理失败 | 旧任务取消、App身份/记录失效；R8后SSLContext不复用旧key；失败不虚报；系统列表手动忘记提示正确；原会话保留 | V3+V4 / Android+Security | NOT_RUN |
-| ADB-R05 | P1 | NSD先收到其他设备广告；发现被限制、端口变化、系统忘记记录 | 仅选本机服务，5秒后回退；可手工当前连接端口；paired记录不冒充有效shell | V3 / Android | NOT_RUN |
+| ADB-R05 | P1 | NSD先收到其他设备广告；发现被限制、端口变化、多本机广告、服务丢失 | 仅选本机唯一端口，普通发现6.5秒；清旧值，可手工回退；paired不冒充有效shell | V3 / Android | NOT_RUN |
 | ADB-R06 | P0 | 新旧PC/Android组合；非Android；未认证/关闭控制/文件/terminal/camera；坏JSON/超大/未知方法 | 旧端status超时清本地等待；非Androidunsupported；受控端拒绝越权，reply仅发起者；原字段行为不变 | V2+V4 / Network+Security | NOT_RUN |
 | ADB-R07 | P0 | Android Release各目标ABI与PC build.cmd；JNI/protobuf；本机回归及原链并行查询 | 两端字段40可用，FRB未变；JNI/R8加载和撤销重配通过；AND-01/02/04/05/07/08、FLT-04/05/06保持 | V2+V3 / Release+domains | NOT_RUN |
+| ADB-R08 | P0 | 手机本地配对连接；A/B两PC打开ADB弹窗；手机keyboard=N/无Accessibility | 正常认证会话3秒内同步记录/真实连接；view-only能看状态但操作被server拒绝；原输入逻辑保持 | V3+V4 / Android+Network | NOT_RUN |
+| ADB-R09 | P0 | 两端只填码、手填配对端口且连接留空；错码/关闭系统窗/配对后关闭调试 | 自动发现两类端口并pair-connect-id一步完成；部分成功保留paired/显示连接失败；无假connected | V3 / Android+Flutter | NOT_RUN |
+| ADB-R10 | P1 | PC生成QR，手机系统扫码；错手机/他人广告/未扫码超时/关闭窗口/队列等待 | 仅本机且匹配随机serviceName；成功自动连接；60秒扫描/90秒watchdog；秘密不落盘或广播 | V3+V4 / Android+Security | NOT_RUN |
+| ADB-R11 | P1 | PC各菜单、标题栏拖动/缩小窗口、toolbar自动隐藏、断线重连、旧Android | 图标样式一致，配对无shell页签；窗口可见、输入可填写、状态失败明确；旧API提示更新，不重放shell | V3 / Flutter | NOT_RUN |
 
 ## 6. Windows Suite
 

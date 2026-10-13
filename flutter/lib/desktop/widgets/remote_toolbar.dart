@@ -486,8 +486,19 @@ class _RemoteToolbarState extends State<RemoteToolbar> {
     }
     toolbarItems.add(_ChatMenu(id: widget.id, ffi: widget.ffi));
     if (!isWeb && widget.ffi.connType == ConnType.defaultConn) {
-      toolbarItems.add(RemoteAdbMenu(key: ValueKey('adb-${widget.ffi.sessionId}'),
-          sessionId: widget.ffi.sessionId));
+      toolbarItems.add(_IconSubmenuButton(
+        key: ValueKey('adb-${widget.ffi.sessionId}'),
+        tooltip: 'ADB',
+        icon: const SizedBox(width: 32, height: 32,
+            child: Icon(Icons.adb, color: Colors.white, size: 23)),
+        ffi: widget.ffi,
+        color: _ToolbarTheme.blueColor,
+        hoverColor: _ToolbarTheme.hoverBlueColor,
+        menuChildrenGetter: () => remoteAdbActions.entries.map((entry) => MenuButton(
+          child: Text(entry.value), ffi: widget.ffi,
+          onPressed: () => showRemoteAdbDialog(context, widget.ffi.sessionId, entry.key),
+        )).toList(),
+      ));
     }
     if (!isWeb) {
       toolbarItems.add(_VoiceCallMenu(id: widget.id, ffi: widget.ffi));

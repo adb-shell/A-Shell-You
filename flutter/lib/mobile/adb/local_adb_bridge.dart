@@ -5,12 +5,16 @@ class LocalAdbStatus {
   final bool connected;
   final bool busy;
   final bool paired;
+  final int connectPort;
+  final String phase;
 
   const LocalAdbStatus({
     this.supported = false,
     this.connected = false,
     this.busy = false,
     this.paired = false,
+    this.connectPort = 0,
+    this.phase = '',
   });
 
   factory LocalAdbStatus.fromMap(Map<dynamic, dynamic> value) => LocalAdbStatus(
@@ -18,6 +22,8 @@ class LocalAdbStatus {
         connected: value['connected'] == true,
         busy: value['busy'] == true,
         paired: value['paired'] == true,
+        connectPort: (value['connectPort'] as num?)?.toInt() ?? 0,
+        phase: value['phase'] as String? ?? '',
       );
 }
 
@@ -42,6 +48,13 @@ class LocalAdbBridge {
 
   Future<void> pair(int port, String code) =>
       _channel.invokeMethod<void>('pair', {'port': port, 'code': code});
+
+  Future<Map<dynamic, dynamic>> discover() async =>
+      await _channel.invokeMapMethod<dynamic, dynamic>('discover') ?? const {};
+
+  Future<String> pairAndConnect(int port, String code, int connectPort) async =>
+      await _channel.invokeMethod<String>('pairConnect',
+          {'port': port, 'code': code, 'connectPort': connectPort}) ?? '';
 
   Future<String> connect(int port) async =>
       await _channel.invokeMethod<String>('connect', {'port': port}) ?? '';

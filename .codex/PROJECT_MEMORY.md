@@ -6,6 +6,8 @@
 
 ## 0. Latest Recovery Snapshot
 
+最新T006：[ADB可用性](../docs/tasks/T-2026-10-13-006-adb-usability.md)。main/504adea已含T005修复；独立ADB gate修复mobile keyboard=N导致status被拒，双NSD/一键pair-connect/PC系统QR/分窗拖动/手机UI；Android仍单一owner。V0，用户授权随后提交推送与both/aarch64 CI dispatch，不监控；实际回执见会话最终交付，不假定编译成功。D-023/ADR-0019/STATE006/CE-20261013-T006-01/Baseline13；以下“最新”均为历史快照。
+
 最新：`T-2026-10-13-005`，[ADB bind导入修复](../docs/tasks/T-2026-10-13-005-adb-bind-import.md)。main/de8bc76已固化T004；用户Android CI报remote_adb_controller.dart三处bind未定义，compileFlutterBuildRelease失败。补直接import platform_model.dart show bind，源码仅一行；修复后未重编/提交/dispatch，需新SHA构建。STATE-20261013-005 / CE-20261013-T005-01；D-022/ADR-0018 reviewed-no-change。以下状态保留历史时点。
 
 最新：`T-2026-10-13-004`，[PC远程ADB](../docs/tasks/T-2026-10-13-004-remote-adb.md)。main/917e661初始clean，独立PC菜单/Misc.remote_adb(40)/JNI与Android共享manager已在未提交工作树实现。各PC查询Android同一配对记录、连接和队列；回执只给origin；revoke清App身份，系统列表仍手动忘记。无ADB投屏，原无障碍/视频/输入处理保持。V0，正式构建/多PC/权限验收待验证；无Git/产品执行。D-022 / ADR-0018 / STATE-20261013-004 / CE-20261013-T004-01；以下全部“最新”仅指各段历史时点。

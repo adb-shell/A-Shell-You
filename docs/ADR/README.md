@@ -76,6 +76,7 @@ retrospective -> 只有 decision owner 重新批准才可 accepted
 | 0016 | Independent Manual Client Actions | accepted | contemporaneous | D-020 | workflow source / V0；runner V2 pending |
 | 0017 | [Isolated Phone-local ADB Client](0017-isolated-local-adb.md) | accepted | backfill | D-021 | 8662f23 / V0；由0018扩展远程能力 |
 | 0018 | [Device-owned Remote ADB](0018-device-owned-remote-adb.md) | accepted | current | D-022 | T004未提交工作树/V0；多PC与构建待验证 |
+| 0019 | [ADB Discovery and Independent Control](0019-adb-discovery-and-independent-control.md) | accepted | current | D-023 | T006/V0；更新0018权限/发现/时限，正式验证待补 |
 
 ## 6. Responsibility Boundaries
 
