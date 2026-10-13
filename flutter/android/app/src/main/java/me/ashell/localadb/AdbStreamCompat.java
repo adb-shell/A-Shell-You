@@ -6,13 +6,13 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.github.muntashirakon.adb.AdbConnection;
-import io.github.muntashirakon.adb.AdbProtocol;
 import io.github.muntashirakon.adb.AdbStream;
 
 /**
@@ -67,7 +67,13 @@ final class AdbStreamCompat {
         boolean opened = false;
         try {
             AtomicBoolean ready = (AtomicBoolean) Access.READY.get(stream);
-            byte[] packet = AdbProtocol.generateMessage(AdbProtocol.A_OPEN, id, 0, Arrays.copyOf(name, name.length + 1));
+            // libadb's AdbProtocol is package-private. Encode only the standard OPEN packet here.
+            int command = 0x4e45504f; // "OPEN" in little-endian
+            int checksum = 0;
+            for (byte value : name) checksum += value & 0xff;
+            byte[] packet = ByteBuffer.allocate(24 + name.length + 1).order(ByteOrder.LITTLE_ENDIAN)
+                    .putInt(command).putInt(id).putInt(0).putInt(name.length + 1)
+                    .putInt(checksum).putInt(~command).put(name).put((byte) 0).array();
             long deadline = SystemClock.elapsedRealtime() + 8000;
             synchronized (stream) {
                 Access.SEND.invoke(connection, (Object) packet);
