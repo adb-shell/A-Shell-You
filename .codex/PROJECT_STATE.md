@@ -1,19 +1,21 @@
 # AShell Project State
 
 Schema Version：`1.0`  
-State Revision：`STATE-20261014-002`
+State Revision：`STATE-20261014-004`
 
-Last Updated：2026-10-14（Asia/Tokyo；独立ADB投屏与触摸优先级）
+Last Updated：2026-10-14（Asia/Tokyo；主界面ADB分栏与连续截图）
 
 Observed At：2026-10-14（Asia/Tokyo）
 
 Evidence Scope：`repository-observed / V0 / external and runtime verification pending`
 
-续接复核：用户已明确授权查漏补缺、stage/commit/push GitHub main及一次Build AShell clients both/aarch64，不监控。修补旧status覆盖推送及停投屏decoder残留；CE-20261014-T001-02。当前文档为提交前状态，实际交付SHA和dispatch接受结果以Git/最终回执为准；不宣称构建成功。
+T002续接：用户明确授权提交/推送当前35路径到GitHub main，并触发一次Build AShell clients both/aarch64，不监控。本地/远端main均a0e46b1，V0 diff通过；CE-20261014-T002-02。此快照先于执行，实际提交SHA/dispatch回执见Git与最终交付，不能推断构建通过；下方未提交/无CI为执行前事实。
+
+前轮交付回执：a0e46b1已提交推送；Build AShell clients both/aarch64获HTTP204且未监控。当前T002为其上的新修改，无新的Git/CI动作；不推断前轮或本轮编译通过。
 
 > 本文件是截至 `Observed At` 的当前状态快照，不是生产实时监控，也不替代源码、`docs/AI_ENGINEERING/`、ADR 或 Baseline。新会话必须用只读检查确认其新鲜度；发现漂移时记录 conflict/stale，不得用本文件覆盖源码事实或改写旧 Baseline。
 
-最新变更：[T-2026-10-14-001](../docs/tasks/T-2026-10-14-001-adb-mirror.md)。main/a1486ee初始clean；已实现独立scrcpy投屏、多PC共享/全局停止、PC Shell栏两按钮和独立窗口，以及用户追加的ADB优先触摸。原画面也按ADB/无障碍能力选触摸路径；仅增加输入分流和旧远程手势释放，原采集不变。状态推送和本机取帧不恢复远程周期status查询。源码与文档未提交；V0，编译/真机待验证，无Git/构建/CI动作。
+最新变更：[T-2026-10-14-002](../docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)。main/a0e46b1初始clean；实现单源居中/双源左普通右ADB、Shell栏蓝/红按钮、独立ADB连续系统截图及多PC格式协商。PC仅适配视口和等待提示，原Android采集/无障碍/输入优先级保持。D-027 / ADR-0022 / Baseline17 / CE-20261014-T002-01；源码文档未提交，V0，构建/真机待验。
 
 2026-10-12 T003 历史补充：当时按用户要求统一品牌字段/路径与两处公共服务匹配。历史文档已标注名称规范化，原文字与真实源仓地址从a036f31恢复；当时的检索结果不代表本次重新扫描全仓品牌。
 
@@ -23,13 +25,13 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 |---|---|---|
 | Product/runtime | `A Shell You` / `AShell`；crate ashell；Android me.ashell；Flutter内部flutter_hbb | source + ADR-0014 |
 | Rust / Flutter version | `5.2.1` / `5.2.1+59` | manifests + Baseline |
-| Baseline ID | `AS-BL-2026-10-14-a1486ee-adb-mirror-worktree` | Baseline16；旧基线冻结 |
+| Baseline ID | `AS-BL-2026-10-14-a0e46b1-adb-inline-worktree` | Baseline17；旧基线冻结 |
 | Branch | `main` | read-only Git observation |
-| HEAD | `a1486ee2ad2bca991b272a8c7780d2daf2f7c526` | 本轮只读观察；历史文档提交已固化 |
-| Worktree | 初始clean；本轮独立ADB媒体/触摸源码、资产和文档未提交 | T-2026-10-14-001 / CE-20261014-T001-01 |
+| HEAD | `a0e46b10c27c7e6a407c5a61d9e7012b785f99c6` | 本轮只读观察；前轮投屏/触摸已提交 |
+| Worktree | 初始clean；本轮ADB布局/截图源码与文档未提交，无新资产 | T-2026-10-14-002 / CE-20261014-T002-01 |
 | History mapping | a036f31提交前轮记忆；6fb0aa6初始化的975 blobs与历史源匹配是迁移前证据，准确RustDesk fork未知 | 历史接管报告；不能用该一致性描述当前dirty tree |
 | Highest completed verification | `V0` repository/document/schema checks | `TEST_MATRIX.md` + task records |
-| Formal build/runtime evidence | 当前工作树未取得新包/正式构建/真机结果；本轮未触发或监控CI | ADB-M01—M08全部NOT_RUN；旧矩阵继续适用，不宣称构建成功 |
+| Formal build/runtime evidence | 当前工作树未取得新包/正式构建/真机结果；本轮未触发或监控CI | ADB-M01—M12全部NOT_RUN；旧矩阵继续适用，不宣称构建成功 |
 | Release readiness | `BLOCKED` | security、external assets、V2—V4、signing/SBOM/rollback gaps |
 
 ## 2. Governance and Knowledge Readiness

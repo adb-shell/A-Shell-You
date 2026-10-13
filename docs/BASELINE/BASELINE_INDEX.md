@@ -1,6 +1,8 @@
 # AShell Engineering Baseline Index
 
-当前工作树快照：[AS-BL-2026-10-14-a1486ee-adb-mirror-worktree](16_ADB_MIRROR_BASELINE_2026-10-14.md)：scrcpy独立投屏/多PC、ADB优先触摸；未提交，仅V0。以下旧快照继续冻结。
+当前工作树快照：[AS-BL-2026-10-14-a0e46b1-adb-inline-worktree](17_ADB_INLINE_SCREENSHOT_BASELINE_2026-10-14.md)：主界面单双画面、Shell栏样式与独立ADB连续截图；本轮未提交，仅V0。
+
+前轮快照：[AS-BL-2026-10-14-a1486ee-adb-mirror-worktree](16_ADB_MIRROR_BASELINE_2026-10-14.md)已由a0e46b1提交推送，编排204接受但未监控；快照保持冻结，不代表构建通过。
 
 当前源码快照：[AS-BL-2026-10-13-aca7446-adb-sidebar](15_ADB_SIDEBAR_BASELINE_2026-10-13.md)。980f254已固化配对UI/显式刷新，aca7446增加独立Shell栏与开关，初始工作区clean。T008仅文档/V0，无当前构建/真机结果；ADB投屏仍待设计，无新依赖。下列“最新”保留各历史时点含义。
 

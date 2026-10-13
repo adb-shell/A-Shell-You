@@ -1,6 +1,6 @@
 # AShell 模块设计 / Module Design
 
-2026-10-14 T001当前补充：新增[独立scrcpy投屏与ADB优先触摸](14_ADB_MIRROR.md)。Android video-only/control-only各自持有私有ADB连接；Misc.remote_adb_video(41)有界多PC分发，PC独立解码/浮动显示。按用户追加授权在Android输入入口互斥选择ADB或原无障碍，只释放旧远程手势，不停用无障碍Service/截图；原MediaProjection/normal/SKL/ignore视频及waiting不变。资产固定官方5.0.1，FRB签名/构建工具链不变。详细源码、权限、大小上限、CPU成本及验收见链接；本轮未提交，仅V0，V2—V4待证。以下旧ADB描述按其历史日期解释。
+2026-10-14 T002当前补充：普通画布只增加可选桌面视口，左上原点保持；ADB区域独立输入/解码，hasFrame只驱动画面有无布局。Shell栏蓝/红按钮切换/停止视频或截图。 详见[ADB展示/截图/触摸合同](14_ADB_MIRROR.md)，D-027 / ADR-0022 / Baseline17。本轮为main/a0e46b1上未提交扩展，仅V0，V2—V4待证。前轮a0e46b1已推送、CI获204且未监控，不表示构建通过；以下旧描述按其日期解释。
 
 基线：2026-07-12，`HEAD 77062b4`
 

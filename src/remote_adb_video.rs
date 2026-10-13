@@ -17,8 +17,8 @@ pub fn dispatch(owner: i32, normal: bool, control: bool, packet: RemoteAdbVideo,
     if packet.token.is_empty() || packet.token.len() > 64
         || (packet.action != "touch" && !packet.data.is_empty()) || packet.data.len() > 20
         || packet.action.len() > 16 || !packet.error.is_empty() || !packet.state.is_empty()
-        || !packet.input_error.is_empty() { return; }
-    if !normal || (!control && matches!(packet.action.as_str(), "start" | "stop" | "touch")) { return; }
+        || !packet.input_error.is_empty() || !packet.format.is_empty() { return; }
+    if !normal || (!control && matches!(packet.action.as_str(), "start" | "screenshot" | "stop" | "touch")) { return; }
     #[cfg(target_os = "android")]
     android::dispatch(owner, packet, tx);
     #[cfg(not(target_os = "android"))]
@@ -39,12 +39,13 @@ pub mod android {
     use std::{collections::{HashMap, VecDeque}, sync::{Arc, Mutex}};
 
     struct Bridge { vm: JavaVM, manager: GlobalRef }
-    struct Viewer { token: String, tx: Sender, pending: VecDeque<u64>, need_key: bool }
+    struct Viewer { token: String, tx: Sender, pending: VecDeque<u64>, need_key: bool, screenshots: bool }
     struct Hub { viewers: HashMap<i32, Viewer>, state: RemoteAdbVideo, config: Vec<u8>, sequence: u64 }
     lazy_static::lazy_static! {
         static ref BRIDGE: Mutex<Option<Bridge>> = Mutex::new(None);
         static ref HUB: Mutex<Hub> = Mutex::new(Hub { viewers: HashMap::new(), config: Vec::new(), sequence: 0,
-            state: RemoteAdbVideo { action: "state".into(), state: "idle".into(), supported: true, ..Default::default() } });
+            state: RemoteAdbVideo { action: "state".into(), state: "idle".into(), supported: true,
+                format: "h264".into(), screenshot_supported: true, ..Default::default() } });
     }
 
     #[no_mangle]
@@ -69,6 +70,13 @@ pub mod android {
     }
 
     fn send(viewer: &Viewer, mut packet: RemoteAdbVideo) -> bool {
+        if packet.format == "jpeg" && !viewer.screenshots {
+            if packet.action == "frame" { return false; }
+            if matches!(packet.state.as_str(), "starting" | "streaming" | "stopping") {
+                packet.state = "error".into();
+                packet.error = "远端正在使用 ADB 截图传输，请更新 PC 客户端。".into();
+            }
+        }
         packet.token = viewer.token.clone();
         viewer.tx.send((hbb_common::tokio::time::Instant::now(), Arc::new(message(packet)))).is_ok()
     }
@@ -80,15 +88,16 @@ pub mod android {
             if hub.viewers.len() >= 32 && !hub.viewers.contains_key(&owner) { return; }
             let snapshot = hub.state.clone();
             let viewer = hub.viewers.entry(owner).or_insert_with(|| Viewer {
-                token: packet.token.clone(), tx: tx.clone(), pending: VecDeque::new(), need_key: true });
+                token: packet.token.clone(), tx: tx.clone(), pending: VecDeque::new(), need_key: true, screenshots: packet.screenshot_supported });
             if viewer.token != packet.token {
-                *viewer = Viewer { token: packet.token, tx, pending: VecDeque::new(), need_key: true };
+                *viewer = Viewer { token: packet.token, tx, pending: VecDeque::new(), need_key: true, screenshots: packet.screenshot_supported };
             }
             send(viewer, snapshot);
             return;
         }
         let Some(viewer) = hub.viewers.get_mut(&owner) else { return; };
         if viewer.token != packet.token { return; }
+        if action == "screenshot" && !viewer.screenshots { return; }
         if action == "touch" {
             if packet.data.len() != 20 { return; }
             let values: Vec<i32> = packet.data.chunks_exact(4)
@@ -112,9 +121,9 @@ pub mod android {
         } else { action == "stop" };
         drop(hub);
         if action == "unwatch" { release_touch(owner); }
-        if action != "start" && !stop { return; }
-        if !invoke(if stop { "stop" } else { "start" }) {
-            publish(0, "error".into(), "Android 投屏模块尚未初始化，请更新两端客户端。".into());
+        if action != "start" && action != "screenshot" && !stop { return; }
+        if !invoke(if stop { "stop" } else { action }) {
+            publish(0, "error".into(), "Android 投屏模块尚未初始化，请更新两端客户端。".into(), false);
         }
     }
 
@@ -124,10 +133,11 @@ pub mod android {
         if stop { invoke("stop"); }
     }
 
-    fn publish(generation: u64, state: String, error: String) {
+    fn publish(generation: u64, state: String, error: String, screenshot: bool) {
         if let Ok(mut hub) = HUB.lock() {
             hub.state = RemoteAdbVideo { action: "state".into(), generation, state, error, supported: true,
                 adb_priority: hub.state.adb_priority, touch_ready: hub.state.touch_ready,
+                format: if screenshot { "jpeg" } else { "h264" }.into(), screenshot_supported: true,
                 input_error: hub.state.input_error.clone(), ..Default::default() };
             if hub.state.state != "streaming" { hub.config.clear(); }
             let snapshot = hub.state.clone();
@@ -175,21 +185,21 @@ pub mod android {
 
     #[no_mangle]
     pub extern "system" fn Java_me_ashell_localadb_LocalAdbMirror_state(mut env: JNIEnv, _class: JClass,
-        generation: jlong, state: JString, error: JString) {
+        generation: jlong, state: JString, error: JString, screenshot: jboolean) {
         let Ok(state) = env.get_string(&state).map(|s| s.to_string_lossy().into_owned()) else { return; };
         let Ok(error) = env.get_string(&error).map(|s| s.to_string_lossy().into_owned()) else { return; };
-        if generation >= 0 && state.len() <= 16 && error.len() <= 2048 { publish(generation as u64, state, error); }
+        if generation >= 0 && state.len() <= 16 && error.len() <= 2048 { publish(generation as u64, state, error, screenshot != 0); }
     }
 
     #[no_mangle]
     pub extern "system" fn Java_me_ashell_localadb_LocalAdbMirror_frame(env: JNIEnv, _class: JClass,
-        generation: jlong, width: jint, height: jint, config: jboolean, key: jboolean, data: JByteArray) {
+        generation: jlong, width: jint, height: jint, config: jboolean, key: jboolean, data: JByteArray, screenshot: jboolean) {
         if width <= 0 || height <= 0 || width > 1280 || height > 1280 { return; }
         let Ok(size) = env.get_array_length(&data) else { return; };
         if size <= 0 || size as usize > MAX_FRAME || (config != 0 && size > 65536) { return; }
         let Ok(data) = env.convert_byte_array(data) else { return; };
         let Ok(mut hub) = HUB.lock() else { return; };
-        if hub.state.generation != generation as u64 { return; }
+        if hub.state.generation != generation as u64 || (hub.state.format == "jpeg") != (screenshot != 0) { return; }
         if config != 0 {
             hub.config = data;
             for viewer in hub.viewers.values_mut() { viewer.need_key = true; }
@@ -203,7 +213,8 @@ pub mod android {
         payload.extend(data);
         if payload.len() > MAX_FRAME { return; }
         let packet = RemoteAdbVideo { action: "frame".into(), generation: generation as u64, sequence,
-            width: width as u32, height: height as u32, keyframe, data: payload.into(), ..Default::default() };
+            width: width as u32, height: height as u32, keyframe, data: payload.into(),
+            format: hub.state.format.clone(), ..Default::default() };
         for viewer in hub.viewers.values_mut() {
             if viewer.pending.len() >= 4 { viewer.need_key = true; continue; }
             if viewer.need_key && !keyframe { continue; }
@@ -222,11 +233,12 @@ pub mod pc {
     use hbb_common::{base64::{engine::general_purpose::STANDARD, Engine}, message_proto::{video_frame, EncodedVideoFrame, EncodedVideoFrames}};
     use scrap::{codec::Decoder, CodecFormat, ImageFormat, ImageRgb, ImageTexture};
     use serde_json::{json, Value};
+    use image::ImageDecoder;
     use std::{collections::HashMap, sync::{Arc, Mutex, mpsc::{sync_channel, SyncSender}, atomic::{AtomicBool, Ordering}}, time::{Duration, Instant}};
     use uuid::Uuid;
 
     struct View { generation: u64, state: String, error: String, image: Option<String>, supported: bool,
-        adb_priority: bool, touch_ready: bool, input_error: String }
+        adb_priority: bool, touch_ready: bool, input_error: String, format: String, screenshot_supported: bool }
     struct Entry { peer: String, token: String, queue: SyncSender<RemoteAdbVideo>, view: Arc<Mutex<View>>,
         resync: Arc<AtomicBool>, live: Arc<AtomicBool>, since: Instant }
     lazy_static::lazy_static! { static ref ENTRIES: Mutex<HashMap<Uuid, Entry>> = Mutex::new(HashMap::new()); }
@@ -255,7 +267,7 @@ pub mod pc {
             let token = owner.to_owned();
             let (tx, rx) = sync_channel::<RemoteAdbVideo>(8);
             let view = Arc::new(Mutex::new(View { generation: 0, state: "waiting".into(), error: String::new(), image: None, supported: false,
-                adb_priority: false, touch_ready: false, input_error: String::new() }));
+                adb_priority: false, touch_ready: false, input_error: String::new(), format: String::new(), screenshot_supported: false }));
             let resync = Arc::new(AtomicBool::new(true));
             let live = Arc::new(AtomicBool::new(true));
             entries.insert(session_id, Entry { peer: session.get_id(), token: token.clone(), queue: tx,
@@ -284,7 +296,21 @@ pub mod pc {
                     if !live.load(Ordering::Acquire) { break; }
                     let result = (|| -> Result<(), String> {
                         if let Ok(view) = view.lock() {
-                            if view.generation != packet.generation || view.state != "streaming" { return Err(String::new()); }
+                            if view.generation != packet.generation || view.state != "streaming" || view.format != packet.format { return Err(String::new()); }
+                        }
+                        if packet.format == "jpeg" {
+                            decoder = None;
+                            rgb = ImageRgb::new(ImageFormat::ABGR, 1);
+                            let jpeg = image::codecs::jpeg::JpegDecoder::new(std::io::Cursor::new(&packet.data[..]))
+                                .map_err(|_| "ADB 截图格式无效。".to_string())?;
+                            if jpeg.dimensions() != (packet.width, packet.height) { return Err("ADB 截图尺寸无效。".into()); }
+                            if let Ok(mut view) = view.lock() {
+                                if view.generation == packet.generation && view.state == "streaming" && live.load(Ordering::Acquire) {
+                                    view.image = Some(STANDARD.encode(&packet.data));
+                                    view.error.clear();
+                                }
+                            }
+                            return Ok(());
                         }
                         if packet.generation != generation || dimensions != (packet.width, packet.height) {
                             generation = packet.generation;
@@ -335,7 +361,7 @@ pub mod pc {
                 entries.remove(&session_id);
                 return None;
             }
-            if !send(session_id, RemoteAdbVideo { token, action: "watch".into(), ..Default::default() }) {
+            if !send(session_id, RemoteAdbVideo { token, action: "watch".into(), screenshot_supported: true, ..Default::default() }) {
                 if let Some(entry) = entries.remove(&session_id) { entry.live.store(false, Ordering::Release); }
                 return None;
             }
@@ -357,7 +383,8 @@ pub mod pc {
                 view.error = "远端未响应 ADB 投屏订阅，请确认两端均已更新并保持连接。".into();
             }
             return Some(json!({"state":view.state,"error":view.error,"generation":view.generation,"image":view.image.take(),"supported":view.supported,
-                "adbPriority":view.adb_priority,"touchReady":view.touch_ready,"inputError":view.input_error}).to_string());
+                "adbPriority":view.adb_priority,"touchReady":view.touch_ready,"inputError":view.input_error,
+                "format":view.format,"screenshotSupported":view.screenshot_supported}).to_string());
         }
         if action == "touch" {
             let view = entry.view.lock().ok()?;
@@ -370,13 +397,15 @@ pub mod pc {
             send(session_id, RemoteAdbVideo { token: entry.token.clone(), action: "touch".into(), data: data.into(), ..Default::default() });
             return Some("{}".into());
         }
-        if action != "start" && action != "stop" { return None; }
+        if action != "start" && action != "screenshot" && action != "stop" { return None; }
+        if action == "screenshot" && !entry.view.lock().ok()?.screenshot_supported { return None; }
         if !send(session_id, RemoteAdbVideo { token: entry.token.clone(), action: action.into(), ..Default::default() }) { return None; }
         Some("{}".into())
     }
 
     pub fn receive(peer: &str, packet: RemoteAdbVideo) {
-        if packet.data.len() > MAX_FRAME || packet.error.len() > 2048 || packet.input_error.len() > 2048 || packet.state.len() > 16 { return; }
+        if packet.data.len() > MAX_FRAME || packet.error.len() > 2048 || packet.input_error.len() > 2048 || packet.state.len() > 16
+            || !matches!(packet.format.as_str(), "" | "h264" | "jpeg") { return; }
         let Ok(mut entries) = ENTRIES.lock() else { return; };
         let Some((session_id, entry)) = entries.iter_mut().find(|(_, entry)| entry.peer == peer && entry.token == packet.token) else { return; };
         if packet.action == "state" {
@@ -392,6 +421,8 @@ pub mod pc {
                 view.adb_priority = packet.adb_priority;
                 view.touch_ready = packet.touch_ready;
                 view.input_error = packet.input_error;
+                view.format = packet.format;
+                view.screenshot_supported = packet.screenshot_supported;
                 view.state = packet.state;
                 view.error = packet.error;
             }

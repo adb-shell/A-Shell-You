@@ -237,3 +237,13 @@ Mode：`append-only task-level index`
 - Detail：[T001](../docs/tasks/T-2026-10-14-001-adb-mirror.md)、[使用与链路](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 
 - 同任务后续复核：修正旧status回执覆盖推送的epoch时序和停止视频后的decoder/RGB缓存释放。用户新增明确stage/commit/push main、单次both/aarch64 dispatch授权，不监控；CE-20261014-T001-02，STATE/WORK-20261014-002。此记录先于执行，实际Git/dispatch回执见最终交付；未本地构建或真机验证。
+
+## T-2026-10-14-002 — 主界面ADB与连续截图
+
+- Source：main/a0e46b1，初始clean；前轮已推送/CI204且未监控。本轮未提交、无新Git/CI。
+- Delta：单源居中/双源分栏，移除ADB浮动外壳；Shell栏同款蓝/红按钮；独立有界系统截图、JPEG格式协商、视频/截图切换和多PC共享停止。原Android采集/无障碍/输入优先级保持，PC视口和弹窗最小适配。
+- Records：D027 / ADR0022 / Baseline17 / STATE003 / WORK004 / CE-20261014-T002-01。
+- Evidence：V0接口/生命周期/权限/坐标/范围/本地链接检查，正式构建/双PC真机未验证；ADB-M01—M12 NOT_RUN。
+- Detail：[T002](../docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)、[当前合同](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
+
+- T002续接：用户授权提交/推送当前main并单次触发Build AShell clients both/aarch64，不监控。本地/远端a0e46b1、35路径均本任务，diff检查通过；CE-20261014-T002-02 / STATE004 / WORK005。实际SHA/接受回执见Git/交付，不将dispatch当成构建成功。

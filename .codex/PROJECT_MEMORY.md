@@ -1,10 +1,16 @@
 # AShell Project Memory
 
-最后更新：2026-10-14（独立ADB投屏与触摸优先级）
+最后更新：2026-10-14（主界面ADB分栏与连续截图）
 
 用途：AI 会话的稳定入口，不替代源码和完整工程文档。
 
 ## 0. Latest Recovery Snapshot
+
+T002续接交付：用户明确授权推送并执行编排；本地/远端main均a0e46b1，35个待交付路径全部属于本任务。将提交/推送main并单次触发Build AShell clients both/aarch64，沿用不监控边界。STATE004 / WORK005 / CE-20261014-T002-02；此记录在执行前，最终SHA和接受回执见Git/会话交付，不提升V0为构建/真机通过。
+
+当前T-2026-10-14-002：[主界面ADB与连续截图](../docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)。main/a0e46b1初始clean，本轮未提交代码/文档；单源居中，双源左普通/右ADB带中心竖线。Shell栏同款蓝/红按钮，视频与独立系统截图互斥切换，多PC共享/全局停止。截图最多2fps、最长边1280，不绕过Android保护内容。原采集/Accessibility/触摸优先级与工具链保持，PC仅增加视口与ADB替代waiting提示的适配。D027/ADR0022/Baseline17/STATE003/WORK004/CE-20261014-T002-01；V0，正式构建/真机ADB-M01—M12待验证，无本轮Git/CI。
+
+前轮执行结果补录：a0e46b10c27c7e6a407c5a61d9e7012b785f99c6已推送，Build AShell clients both/aarch64获HTTP204且未监控，不证明编译通过。下面T001“执行前”段落及更早段落均保留历史时点含义。
 
 T-2026-10-14-001续接：用户明确要求复核后提交、推送GitHub并运行编排、不监控；main和origin/main仍a1486ee，49个路径均本任务。修正Shell栏旧回执覆盖新推送，以及停止视频后decoder/RGB释放。STATE/WORK-20261014-002 / CE-20261014-T001-02；本文为Git/dispatch执行前记录，实际SHA和接受回执见最终交付，V0不提升为编译/真机通过。
 

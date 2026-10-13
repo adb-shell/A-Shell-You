@@ -26,7 +26,7 @@ import '../widgets/tabbar_widget.dart';
 import '../adb/remote_adb_session_state.dart';
 import '../adb/remote_adb_sidebar.dart';
 import '../adb/remote_adb_mirror.dart';
-import '../adb/remote_adb_mirror_view.dart';
+import '../adb/remote_display_layout.dart';
 
 import 'package:flutter_hbb/native/custom_cursor.dart'
     if (dart.library.html) 'package:flutter_hbb/web/custom_cursor.dart';
@@ -130,6 +130,7 @@ class _RemotePageState extends State<RemotePage>
     _ffi = FFI(widget.sessionId);
     _remoteAdbState = RemoteAdbSessionState(_ffi.sessionId);
     _remoteAdbMirror = RemoteAdbMirror(_ffi);
+    _remoteAdbMirror.hasFrame.addListener(_onAdbFrameAvailability);
     _ffi.zegoVoiceCallModel.addListener(_handleZegoVoiceCallPanelState);
     Get.put<FFI>(_ffi, tag: widget.id);
     _ffi.imageModel.addCallbackOnFirstImage((String peerId) {
@@ -280,6 +281,7 @@ class _RemotePageState extends State<RemotePage>
     _zegoVoicePanelEdgeOffset.dispose();
     _rawKeyFocusNode.dispose();
     _remoteAdbState.dispose();
+    _remoteAdbMirror.hasFrame.removeListener(_onAdbFrameAvailability);
     _remoteAdbMirror.dispose();
     await _ffi.close(closeSession: closeSession);
     _timer?.cancel();
@@ -295,13 +297,26 @@ class _RemotePageState extends State<RemotePage>
     removeSharedStates(widget.id);
   }
 
-  Widget emptyOverlay() => BlockableOverlay(
+  void _onAdbFrameAvailability() {
+    if (!_remoteAdbMirror.hasFrame.value) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _remoteAdbMirror.hasFrame.value) {
+        // A real ADB picture replaces only the waiting hint, not normal capture state.
+        _ffi.dialogManager.dismissByTag('$sessionId-waiting-for-image');
+      }
+    });
+  }
+
+  Widget emptyOverlay({bool adbPassThrough = false}) => BlockableOverlay(
         /// the Overlay key will be set with _blockableOverlayState in BlockableOverlay
         /// see override build() in [BlockableOverlay]
         state: _blockableOverlayState,
-        underlying: Container(
-          color: Colors.transparent,
-        ),
+        underlying: adbPassThrough
+            ? ValueListenableBuilder<bool>(
+                valueListenable: _remoteAdbMirror.hasFrame,
+                builder: (context, hasFrame, _) =>
+                    Container(color: hasFrame ? null : Colors.transparent))
+            : Container(color: Colors.transparent),
       );
 
   Widget buildBody(BuildContext context) {
@@ -350,23 +365,14 @@ class _RemotePageState extends State<RemotePage>
                     }
                   },
                   inputModel: _ffi.inputModel,
-                  child: getBodyForDesktop(context))),
+                  child: !isWeb && _ffi.connType == ConnType.defaultConn && _ffi.ffiModel.isPeerAndroid
+                      ? RemoteDisplayLayout(ffi: _ffi, mirror: _remoteAdbMirror, ordinary: getBodyForDesktop(context))
+                      : getBodyForDesktop(context))),
           Stack(
             children: [
               _ffi.ffiModel.pi.isSet.isTrue &&
                       _ffi.ffiModel.waitForFirstImage.isTrue
-                  ? /*Obx(() => Offstage(
-                      offstage:
-                          _ffi.dialogManager.mobileActionsOverlayVisible.isFalse,
-                      child: Overlay(initialEntries: [
-                        makeMobileActionsOverlayEntry(
-                          () => _ffi.dialogManager
-                              .setMobileActionsOverlayVisible(false),
-                          ffi: _ffi,
-                        )
-                      ]),
-                    ))*/
-                  emptyOverlay()
+                  ? emptyOverlay(adbPassThrough: true)
                   : () {
                       if (!_ffi.ffiModel.isPeerAndroid) {
                         return Offstage();
@@ -450,8 +456,6 @@ class _RemotePageState extends State<RemotePage>
               return bodyWidget();
             }
           }),
-          if (!isWeb && _ffi.connType == ConnType.defaultConn)
-            RemoteAdbMirrorView(mirror: _remoteAdbMirror),
           if (!isWeb && _ffi.connType == ConnType.defaultConn)
             RemoteAdbSidebar(ffi: _ffi, state: _remoteAdbState, mirror: _remoteAdbMirror),
           _buildZegoVoiceCallPanel(),
@@ -913,6 +917,8 @@ class _RemotePageState extends State<RemotePage>
         if (!isWeb) bind.hostStopSystemKeyPropagate(stopped: true);
       }, child: LayoutBuilder(builder: (context, constraints) {
         final c = Provider.of<CanvasModel>(context, listen: false);
+        c.setDesktopViewportSize(!isWeb && _ffi.connType == ConnType.defaultConn && _ffi.ffiModel.isPeerAndroid
+            ? constraints.biggest : null);
         Future.delayed(Duration.zero, () => c.updateViewStyle());
         final peerDisplay = CurrentDisplayState.find(widget.id);
         return Obx(

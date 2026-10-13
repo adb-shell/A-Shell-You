@@ -281,3 +281,10 @@
 - ADR-0021 / Baseline16 / STATE-20261014-001 / CE-20261014-T001-01；V0静态核对，ADB-M01—M08 NOT_RUN。未编译、设备验证或Git/CI操作；运行可用性与ROM权限仍待验收。
 
 - 同任务续接reviewed-no-architecture-change：补状态epoch及空闲解码清理。用户明确授权提交、推送main、单次both/aarch64 dispatch且不监控；CE-20261014-T001-02。接受编排不等于构建通过，既有架构边界不变。
+
+## D-027：主界面双源与独立ADB连续截图
+
+- 2026-10-14 / accepted for implementation；用户要求单源居中、双源普通左/ADB右、中线分隔，Shell栏仿无障碍按钮，并增加ADB强制截图传输。
+- 采用独立分栏视口和系统screencap源，不将ADB帧送进原采集/VideoFrame。固定shell-v2命令、有界PNG/JPEG、最多2fps；视频/截图互斥，原触摸优先级、多PC共享/任一控制PC停止继续有效。
+- 追加format15/screenshot_supported16能力，旧PC隔离JPEG；不增依赖/资产/工具链，不修改原Android无障碍/采集/输入链。强制截图不绕过Android保护内容。
+- ADR0022替代0021浮动UI部分；Baseline17 / STATE003 / CE-20261014-T002-01。V0，ADB-M01—M12 NOT_RUN，未Git/CI或产品构建/设备验证。

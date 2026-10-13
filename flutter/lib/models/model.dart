@@ -1979,6 +1979,9 @@ class ViewStyle {
 }
 
 class CanvasModel with ChangeNotifier {
+  // Optional PC image pane, with the same origin as the original full-width canvas.
+  Size? _desktopViewportSize;
+  void setDesktopViewportSize(Size? size) { _desktopViewportSize = size; }
   // image offset of canvas
   double _x = 0;
   // image offset of canvas
@@ -2050,6 +2053,7 @@ class CanvasModel with ChangeNotifier {
       isDesktop ? windowBorderWidth + kDragToResizeAreaPadding.bottom : 0;
 
   Size getSize() {
+    if (isDesktop && _desktopViewportSize != null) return _desktopViewportSize!;
     final mediaData = MediaQueryData.fromView(ui.window);
     final size = mediaData.size;
     // If minimized, w or h may be negative here.
@@ -2282,6 +2286,7 @@ class CanvasModel with ChangeNotifier {
   }
 
   clear() {
+    _desktopViewportSize = null;
     _x = 0;
     _y = 0;
     _scale = 1.0;

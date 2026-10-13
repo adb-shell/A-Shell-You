@@ -2,62 +2,32 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import '../../consts.dart';
 import 'remote_adb_mirror.dart';
 
-/// A separate, draggable viewport. Pointer events stop here, never at the legacy input canvas.
-class RemoteAdbMirrorView extends StatefulWidget {
+/// Inline ADB surface. Its pointer events never enter the ordinary image canvas.
+class RemoteAdbMirrorView extends StatelessWidget {
   const RemoteAdbMirrorView({super.key, required this.mirror});
   final RemoteAdbMirror mirror;
   @override
-  State<RemoteAdbMirrorView> createState() => _RemoteAdbMirrorViewState();
-}
-
-class _RemoteAdbMirrorViewState extends State<RemoteAdbMirrorView> {
-  Offset? _position;
-  bool _large = false;
-  @override
   Widget build(BuildContext context) => AnimatedBuilder(
-    animation: widget.mirror,
+    animation: mirror,
     builder: (context, _) {
-      final mirror = widget.mirror;
-      if (!mirror.active) return const SizedBox.shrink();
-      return LayoutBuilder(builder: (context, constraints) {
-        final width = math.min(constraints.maxWidth, _large ? 1000.0 : 480.0);
-        final height = math.min(constraints.maxHeight, _large ? 800.0 : 650.0);
-        Offset clamp(Offset p) => Offset(
-          p.dx.clamp(0.0, math.max(0.0, constraints.maxWidth - width)).toDouble(),
-          p.dy.clamp(0.0, math.max(0.0, constraints.maxHeight - height)).toDouble());
-        final position = clamp(_position ?? Offset((constraints.maxWidth - width) / 2, 48));
-        return Stack(children: [Positioned(left: position.dx, top: position.dy, width: width, height: height,
-          child: Listener(behavior: HitTestBehavior.opaque,
-            child: GestureDetector(behavior: HitTestBehavior.opaque,
-              onTap: () {}, onPanUpdate: (_) {},
-              child: Material(elevation: 10, color: Colors.black, borderRadius: BorderRadius.circular(10),
-                clipBehavior: Clip.antiAlias,
-                child: Column(children: [
-                  GestureDetector(behavior: HitTestBehavior.opaque,
-                    onPanUpdate: (event) => setState(() => _position = clamp(position + event.delta)),
-                    child: Container(color: Theme.of(context).colorScheme.surface,
-                      child: Row(children: [
-                        const SizedBox(width: 12), const Icon(Icons.adb, size: 18),
-                        const SizedBox(width: 8), const Expanded(child: Text('ADB 投屏')),
-                        IconButton(tooltip: _large ? '缩小画面' : '放大画面',
-                          onPressed: () => setState(() => _large = !_large), icon: Icon(_large ? Icons.fullscreen_exit : Icons.fullscreen)),
-                        IconButton(tooltip: '关闭所有 PC 的 ADB 投屏', onPressed: mirror.canStop ? () => mirror.setEnabled(false) : null,
-                          icon: const Icon(Icons.stop_screen_share_outlined)),
-                      ]))),
-                  Expanded(child: mirror.image == null
-                      ? Center(child: Text(mirror.summary, style: const TextStyle(color: Colors.white70), textAlign: TextAlign.center))
-                      : _AdbFrame(bytes: mirror.image!, mirror: mirror)),
-                  Padding(padding: const EdgeInsets.all(8), child: Text(
-                    mirror.inputError.isNotEmpty ? mirror.inputError : mirror.error.isEmpty
-                        ? (mirror.touchReady ? 'ADB 触摸优先 · 可点击、拖动；关投屏对所有 PC 生效。' : '正在准备 ADB 触摸…') : mirror.error,
-                    textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 11))),
-                ])),
-            ),
-          ),
-        )]);
-      });
+      final error = mirror.error.isNotEmpty ? mirror.error : mirror.inputError;
+      return ColoredBox(color: kColorCanvas, child: Listener(behavior: HitTestBehavior.opaque,
+        child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () {}, onPanUpdate: (_) {},
+          child: Stack(fit: StackFit.expand, children: [
+            if (mirror.image != null) _AdbFrame(bytes: mirror.image!, mirror: mirror)
+            else Center(child: Padding(padding: const EdgeInsets.all(24),
+              child: Text(mirror.summary, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)))),
+            if (mirror.image != null) Positioned(left: 12, right: 12, bottom: 12,
+              child: IgnorePointer(child: Center(child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(6)),
+                child: Text(error.isNotEmpty ? error : mirror.screenshotMode ? 'ADB 连续截图' : 'ADB 投屏',
+                  textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+              )))),
+          ]))));
     });
 }
 

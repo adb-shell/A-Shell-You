@@ -660,3 +660,19 @@ Mode：`append-only logical persisted-change events`
 - 记录同步：14_ADB_MIRROR、任务与.codex状态/记忆/日志；STATE/WORK-20261014-002。V0通过，正式V2—V4未取得结果。
 - 本事件为stage/commit/push及单次dispatch执行前记录；实际SHA/HTTP接受回执见Git与会话交付。遵守不监控，不读取构建进度；不发布release、不修改生产系统。
 - 最终补充：`flutter/lib/desktop/adb/remote_adb_mirror.dart`触摸经FIFO桥接并复验owner/epoch，防止异步native调用乱序；域文档和任务记录同步。
+
+## CE-20261014-T002-01 — 主界面分栏、Shell按钮与ADB连续截图
+
+- Task：T-2026-10-14-002；main/a0e46b1初始clean；用户明确要求本事件代码功能，未新授权Git/CI，未执行产品构建/设备操作。
+- 新增源码：`flutter/lib/desktop/adb/remote_display_layout.dart`、`flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbScreenshot.java`。
+- 修改源码：`flutter/lib/desktop/adb/{remote_adb_mirror,remote_adb_mirror_view,remote_adb_sidebar}.dart`、`flutter/lib/desktop/pages/remote_page.dart`、`flutter/lib/models/model.dart`（CanvasModel可选视口）、`flutter/android/app/src/main/java/me/ashell/localadb/{LocalAdbMirror,LocalAdbManager}.java`、`src/remote_adb_video.rs`、`libs/hbb_common/protos/message.proto`。
+- Delta：单源/双源居中显示、去ADB浮动外壳、同款蓝/红按钮；视频/系统截图互斥、JPEG能力协商、多PC共享及全局停止；只关闭已被ADB画面替代的等待提示，保留原首帧状态/弹窗层。
+- Evidence：V0源码接口/权限/资源/坐标/字段/文档链接/空白；原Android采集/无障碍/输入路由、构建入口/依赖与HEAD一致；正式V2—V4 NOT_RUN。
+- Docs：14_ADB_MIRROR、ADR0022/D027、Baseline17、TEST_MATRIX、任务、相关域摘要与入口/memory；STATE-20261014-003 / WORK-20261014-004。无新binary或外部依赖，EXT-BIN-SCRCPY-001保持。
+- 前轮回执补录：a0e46b1已提交推送、Build AShell clients both/aarch64获HTTP204且未监控。本事件无Git写入/编排，不推断历史CI成功。
+
+## CE-20261014-T002-02 — 用户授权推送并触发客户端编排
+
+- 当前用户明确要求推送并执行编排；范围为本任务35个代码/文档路径，目标adb-shell/A-Shell-You的main，Build AShell clients / platform=both / android_arch=aarch64，单次dispatch、不监控。
+- 核对本地HEAD和远端main均a0e46b1，暂存区为空，V0差异空白检查通过，无额外业务代码修改或本地构建/设备操作。
+- 同步任务与状态/记忆/日志执行边界，STATE004 / WORK005；D027/ADR0022/Baseline17不变。此事件为执行前记录，准确提交SHA与接受结果见Git/最终回执；不宣称构建成功，不创建Release/tag。

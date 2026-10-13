@@ -1,5 +1,7 @@
 # AShell 安全模型 / Security Model
 
+2026-10-14 T002：新screenshot动作沿用字段41认证普通会话/控制权限gate；命令固定`screencap -p`，不接受peer路径或命令，不触碰原采集。PNG/JPEG/尺寸/超时均有上限，无截图落盘；只向声明能力的PC发送JPEG。系统保护内容仍受Android限制，不承诺绕过FLAG_SECURE。详见[当前合同](14_ADB_MIRROR.md)及ADR-0022；V0自审，V2—V4待验。
+
 接管基线：2026-07-12  
 状态：`verified` + `inferred` + `external` + `verification-required`
 

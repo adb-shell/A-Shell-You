@@ -1,5 +1,7 @@
 # AShell External Asset Registry
 
+2026-10-14 T002：主界面分栏/连续截图无新外部依赖或二进制；截图调用设备系统screencap并使用Android Bitmap及既有image crate，原EXT-BIN-SCRCPY-001未变。D-027 / Baseline17，V0，未构建。
+
 2026-10-14 / EXT-BIN-SCRCPY-001：官方 Genymobile scrcpy-server v5.0.1（Apache-2.0），733930字节；SHA256 `764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536`已与官方发布元数据比对。固定资产和LICENSE/NOTICE位于`flutter/android/app/src/main/assets/adb-mirror/`；仅在Android已授权ADB shell执行，宿主不执行。来源/链接见资产NOTICE与[投屏合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。上游owner Genymobile；集成owner AShell维护者；签名/可复现重建/真机证据未取得，不据此宣称release-ready。T-2026-10-14-001 / D-026 / Baseline16。
 
 2026-10-13 T008：main/aca7446的Shell栏复用既有ADB shell接口，仅增加Flutter侧入口/状态，无新增库、服务、binary或工具链。ADB远程投屏传输为下一阶段待设计方向，尚未选定或引入scrcpy/其他媒体组件；后续确定选型时再登记固定来源、许可、hash/NOTICE等，不将计划登记为已安装资产。详见[当前ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)与[路线图](docs/AI_ENGINEERING/11_ROADMAP.md)。

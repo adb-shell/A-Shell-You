@@ -852,19 +852,21 @@ message Misc {
 
 message RemoteAdbVideo {
   string token = 1;
-  string action = 2; // watch/unwatch/start/stop/ack/nack/touch/state/frame
+  string action = 2; // watch/unwatch/start/screenshot/stop/ack/nack/touch/state/frame
   uint64 sequence = 3;
   uint64 generation = 4;
   uint32 width = 5;
   uint32 height = 6;
   bool keyframe = 7;
-  bytes data = 8; // H.264 Annex B with config on keyframes, or five big-endian int32 touch values
+  bytes data = 8; // H.264 Annex B / JPEG screenshot, or five big-endian int32 touch values
   string state = 9; // idle/starting/streaming/stopping/error
   string error = 10;
   bool supported = 11;
   bool adb_priority = 12;
   bool touch_ready = 13;
   string input_error = 14;
+  string format = 15; // h264 (also the legacy empty default), or jpeg screenshot frames
+  bool screenshot_supported = 16; // capability sent in watch and state
 }
 
 message VoiceCallRequest {

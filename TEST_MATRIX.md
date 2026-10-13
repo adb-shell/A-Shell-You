@@ -1,5 +1,14 @@
 # AShell Commercial Test Matrix
 
+2026-10-14 T002新增ADB-M09—M12，主界面双源/独立连续截图；本轮仅V0，以下产品用例均NOT_RUN。
+
+| Case | 验证目标 | Level | Result |
+|---|---|---|---|
+| ADB-M09 | 普通normal/ignore/SKL、ADB视频/截图的单源/双源/关闭组合：单源正中，双源等宽居中分界；旋转/窗口缩放/原比例视图和左右点击拖动坐标；一侧不覆盖另一侧 | V3 | NOT_RUN |
+| ADB-M10 | 无普通首帧仅ADB时：等待提示退出，配对/命令/顶栏弹窗仍可开关，ADB触摸可用；停止与重连不伪造原waitForFirstImage，不自动开任何采集模式 | V3 | NOT_RUN |
+| ADB-M11 | 两PC截图接收、A开截图/B切视频/B关模式；切换中显式停止取消待启动，慢PC独立背压、最后订阅退出清理；Shell/原视频/无障碍/触摸优先级不受影响 | V3/V4 | NOT_RUN |
+| ADB-M12 | 新PC/旧Android与旧PC/新Android：旧端不误解码JPEG；截图停后空闲恢复；shell-v2退出失败/超限PNG/畸形JPEG/超时/OOM/撤销/只读；两端构建自动生成新字段和JNI签名 | V2/V3/V4 | NOT_RUN |
+
 2026-10-14 T001追加ADB投屏/优先触摸用例ADB-M01—M08，见下表；均NOT_RUN，V0不计产品验证通过。
 
 | ID | Target / Pass Oracle | Level | Status |

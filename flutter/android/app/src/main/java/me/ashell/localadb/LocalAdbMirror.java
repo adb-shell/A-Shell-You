@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.github.muntashirakon.adb.AdbStream;
 
-/** One device-owned scrcpy server, isolated from shared shell and product capture services. */
+/** One device-owned video or screenshot source, isolated from shared shell and product capture. */
 final class LocalAdbMirror {
     interface ShellReady { boolean get(); }
     private static final String ASSET = "adb-mirror/scrcpy-server-v5.0.1";
@@ -33,11 +33,14 @@ final class LocalAdbMirror {
     private Run active;
     private long generation;
     private boolean nativeReady;
+    private boolean screenshotMode;
+    private int pendingPort;
+    private boolean pendingScreenshot;
 
     private static native void register(LocalAdbManager manager);
-    private static native void state(long generation, String phase, String error);
+    private static native void state(long generation, String phase, String error, boolean screenshot);
     private static native void frame(long generation, int width, int height,
-                                     boolean config, boolean keyframe, byte[] data);
+                                     boolean config, boolean keyframe, byte[] data, boolean screenshot);
 
     LocalAdbMirror(Context context, ShellReady shellReady) {
         this.context = context.getApplicationContext();
@@ -56,11 +59,19 @@ final class LocalAdbMirror {
         if (active == null) publish("error", "请先完成 ADB 连接并验证 Shell，等待当前 ADB 操作结束。");
     }
 
-    synchronized void start(int port) {
-        if (active != null || !nativeReady) return;
+    synchronized void start(int port, boolean screenshot) {
+        if (!nativeReady) return;
         if (!shellReady.get() || port <= 0 || port > 65535) { unavailable(); return; }
+        if (active != null) {
+            if (!active.cancelled.get() && active.screenshot == screenshot) return;
+            pendingPort = port;
+            pendingScreenshot = screenshot;
+            stopCurrent("");
+            return;
+        }
+        screenshotMode = screenshot;
         generation++;
-        Run run = new Run(generation, port);
+        Run run = new Run(generation, port, screenshot);
         active = run;
         publish("starting", "");
         run.watchdog = guard.scheduleWithFixedDelay(this::checkHealth, 1, 1, TimeUnit.SECONDS);
@@ -69,6 +80,11 @@ final class LocalAdbMirror {
     }
 
     synchronized void stop(String reason) {
+        pendingPort = 0;
+        stopCurrent(reason);
+    }
+
+    private void stopCurrent(String reason) {
         Run run = active;
         if (run == null) { publish("idle", reason); return; }
         if (!run.cancelled.compareAndSet(false, true)) return;
@@ -87,12 +103,13 @@ final class LocalAdbMirror {
     }
 
     private void publish(String phase, String error) {
-        if (nativeReady) state(generation, phase, error);
+        if (nativeReady) state(generation, phase, error, screenshotMode);
     }
 
     private void capture(Run run) {
         try {
             run.client.connect(run.port, run.cancelled);
+            if (run.screenshot) { captureScreenshots(run); return; }
             String scid = String.format(Locale.US, "%08x", new SecureRandom().nextInt() & 0x7fffffff);
             // A fixed module-owned path bounds leftovers even if upload is interrupted.
             String path = "/data/local/tmp/ashell-scrcpy-5.0.1.jar";
@@ -123,7 +140,11 @@ final class LocalAdbMirror {
                 finally { output.interrupt(); }
             }
         } catch (Exception | LinkageError e) {
-            if (!run.cancelled.get()) run.failure = "ADB 投屏失败，请确认无线调试仍开启并重新连接。设备编码器可能不支持当前采集。";
+            if (!run.cancelled.get()) run.failure = run.screenshot
+                    ? "ADB 系统截图失败，请确认无线调试及 Shell 连接。系统保护内容仍受截图限制。"
+                    : "ADB 投屏失败，请确认无线调试仍开启并重新连接。设备编码器可能不支持当前采集。";
+        } catch (OutOfMemoryError e) {
+            run.failure = "ADB 画面内存不足，已停止本次采集。";
         } finally {
             if (run.watchdog != null) run.watchdog.cancel(false);
             // Clear interruption before joining the private ADB reader during close.
@@ -133,8 +154,29 @@ final class LocalAdbMirror {
                 if (active == run) {
                     active = null;
                     publish(run.failure.isEmpty() ? "idle" : "error", run.failure);
+                    if (pendingPort > 0) {
+                        int port = pendingPort;
+                        boolean screenshot = pendingScreenshot;
+                        pendingPort = 0;
+                        start(port, screenshot);
+                    }
                 }
             }
+        }
+    }
+
+    private void captureScreenshots(Run run) throws Exception {
+        boolean streaming = false;
+        while (!run.cancelled.get()) {
+            long started = SystemClock.elapsedRealtime();
+            LocalAdbScreenshot.Frame screenshot = LocalAdbScreenshot.capture(run.client, run.cancelled);
+            synchronized (this) {
+                if (active != run || run.cancelled.get()) return;
+                run.lastPacket = SystemClock.elapsedRealtime();
+                if (!streaming) { publish("streaming", ""); streaming = true; }
+                frame(run.id, screenshot.width, screenshot.height, false, true, screenshot.jpeg, true);
+            }
+            Thread.sleep(Math.max(1, 500 - (SystemClock.elapsedRealtime() - started)));
         }
     }
 
@@ -187,7 +229,7 @@ final class LocalAdbMirror {
             synchronized (this) {
                 if (active != run || run.cancelled.get()) return;
                 if (!streaming && !config) { publish("streaming", ""); streaming = true; }
-                frame(run.id, width, height, config, key, data);
+                frame(run.id, width, height, config, key, data, false);
             }
         }
     }
@@ -248,12 +290,13 @@ final class LocalAdbMirror {
     private final class Run {
         final long id;
         final int port;
+        final boolean screenshot;
         final LocalAdbClient client = new LocalAdbClient(context);
         final AtomicBoolean cancelled = new AtomicBoolean();
         volatile long lastPacket = SystemClock.elapsedRealtime();
         volatile String failure = "";
         Thread thread;
         ScheduledFuture<?> watchdog;
-        Run(long id, int port) { this.id = id; this.port = port; }
+        Run(long id, int port, boolean screenshot) { this.id = id; this.port = port; this.screenshot = screenshot; }
     }
 }

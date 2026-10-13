@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261014-002`
+Registry Revision：`WORK-20261014-005`
 
-Last Updated：2026-10-14（独立ADB投屏与触摸优先级）
+Last Updated：2026-10-14（主界面ADB分栏与连续截图）
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none。T-2026-10-14-001代码复核完成，已获用户明确授权提交/推送及单次编排；本文为执行前记录，Git/dispatch实际回执见最终交付，不监控。
+none。T-2026-10-14-002源码与文档交付完成；V0，不代表正式构建/真机已通过，待用户后续验证。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ none。T-2026-10-14-001代码复核完成，已获用户明确授权提交/推�
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-14-001`
-- Result：独立scrcpy投屏、多PC接收/全局停止、PC独立窗口与Shell栏两按钮；用户追加ADB优先触摸，无ADB才回到原无障碍。
+- Task ID：`T-2026-10-14-002`
+- Result：主界面单/双源居中、Shell栏同款按钮、独立ADB连续截图和格式协商；原Android采集/无障碍/触摸优先级保持，PC最小视口/弹窗适配。
 - Closed At：2026-10-14（Asia/Tokyo）
 - Final T-State：`T8 — source and documentation complete`（V0；正式V2/V3/V4待验证）
-- State / Event：`STATE-20261014-002` / `CE-20261014-T001-02`（01实现事件保持）
-- Decision：D-026 / ADR-0021 / Baseline16；旧记录保留历史。
-- Verification：V0源码/协议/JNI/R8/生命周期、官方server hash、166个文档本地链接和diff空白通过；原采集与构建入口保持。无产品build/test/analyze/codegen或设备验证。
-- Next Step：紧接执行用户已授权的stage/commit/push main与一次Build AShell clients both/aarch64，不监控；最终SHA/接受结果见交付回执。正式构建结果与ADB-M01—M08真机仍待用户验证。
+- State / Event：`STATE-20261014-004` / `CE-20261014-T002-02`（01实现事件保留）
+- Decision：D-027 / ADR-0022 / Baseline17；旧记录保留历史。
+- Verification：V0源码/协议/JNI/R8/生命周期/坐标与差异范围、本地文档链接和空白；原采集、输入路由及构建依赖保持。无产品build/test/analyze/codegen或设备验证。
+- Next Step：用户已明确授权提交/推送本任务main、单次Build AShell clients both/aarch64且不监控；紧接执行，最终SHA/接受结果见Git与会话交付。ADB-M01—M12正式构建/真机结果仍待验证。
 - Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md中同ID。
-- Detailed record：docs/tasks/T-2026-10-14-001-adb-mirror.md；main/a1486ee、initial clean。
+- Detailed record：docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md；main/a0e46b1、initial clean。

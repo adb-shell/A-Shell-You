@@ -1,6 +1,6 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
-2026-10-14 T001：main/a1486ee工作树新增scrcpy 5.0.1独立ADB投屏、Shell栏开/关、多个PC有界同步接收；用户追加ADB触摸最高优先级，普通共享/截图在Android输入入口互斥分流，无ADB时走原无障碍。原采集与无障碍截图保持，仅追加远程手势释放。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、ADR-0021/D-026/Baseline16；未提交、仅V0，构建/真机待验证，未执行Git/CI。以下T008及以前“无ADB投屏”是历史。
+2026-10-14 T002：main/a0e46b1上实现主界面单源居中/双源左普通右ADB、Shell栏同款按钮、ADB独立连续系统截图。原Android采集/无障碍/触摸优先级保持，PC仅适配视口和ADB等待提示。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、ADR-0022/D-027/Baseline17；本轮未提交，仅V0。前轮a0e46b1已推送、Build AShell clients both/aarch64获204且未监控；没有本轮Git/CI或构建/真机结果。以下旧段为各任务历史快照。
 
 2026-10-13 T008：当前观察main/aca7446，初始clean。980f254固化配对模式/无QR/PC显式刷新；aca7446新增PC Shell栏（三键经独立ADB shell）、“移动端操作”左侧开关与无障碍栏标题。RemotePage持有会话显示状态，确认ADB可用时自动显示，持续可用时保留手动关闭；无PC周期status，也无Android状态push。见13_REMOTE_ADB、D-025、Baseline15、T008；仅V0，当前构建/真机待证。本轮仅同步文档，无Git/构建操作。下一阶段ADB投屏传输待设计，未接入视频，不触碰原无障碍/采集/输入链。
 

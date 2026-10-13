@@ -328,3 +328,13 @@
 - STATE-20261014-001 / WORK-20261014-001 / CE-20261014-T001-01；[详细记录](../docs/tasks/T-2026-10-14-001-adb-mirror.md)。代码/文档交付完成，未提交，不代表运行验收通过。
 
 - 2026-10-14续接：用户明确要求复核后推送并运行编排、不监控。核对main及远端仍a1486ee，49个路径均本任务；修正状态epoch与停止解码资源释放，复核V0通过。准备执行stage/commit/push和一次Build AShell clients both/aarch64，实际回执见Git/最终交付；STATE/WORK-20261014-002 / CE-20261014-T001-02。
+
+## T-2026-10-14-002 — 主界面分栏与ADB连续截图
+
+- main/a0e46b10c27c7e6a407c5a61d9e7012b785f99c6，initial clean；前轮已推送、编排204接受且未监控，仍无编译成功证据。
+- 用户C2授权PC单/双源居中分栏、Shell栏按钮样式与ADB强制连续截图；只在独立模块和必要PC视口/弹窗接入处修改，原Android采集/无障碍/输入链及工具链不变。
+- Android私有连接固定screencap、受限PNG解码/JPEG传输；沿用41共享订阅/ACK，追加格式能力避免旧PC误解码，视频/截图互斥切换/全局停止。
+- V0源码/协议/JNI/R8/坐标/生命周期/范围/文档链接核对通过；无build/test/analyze/codegen或设备验证。ADB-M01—M12待正式环境，不能把源代码交付说成运行验收通过。
+- D027 / ADR0022 / Baseline17 / STATE003 / WORK004 / CE-20261014-T002-01；T8源码与文档完成、未提交，无本轮Git/CI。详见[任务](../docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)。
+
+- 续接授权：用户要求推送并执行编排；核对本地与远端main均a0e46b1，35路径均本任务。提交/推送main后仅触发一次Build AShell clients both/aarch64，不监控；CE-20261014-T002-02 / STATE004 / WORK005。本文为执行前记录，Git/最终回执记录真实SHA和接受结果；无本地产品构建/设备验证。

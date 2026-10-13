@@ -1,5 +1,7 @@
 # AShell Architecture Decision Records
 
+2026-10-14当前：[ADR-0022 主界面ADB与连续截图](0022-inline-adb-screenshot.md)，D-027；替代0021浮动展示部分，继续其独立媒体/触摸与多PC规则，V0。
+
 2026-10-14新增：[ADR-0021 独立scrcpy投屏与ADB优先触摸](0021-independent-scrcpy-mirror.md)，accepted for implementation，D-026；仅V0，构建/真机待验证。
 
 最后更新：2026-07-12  

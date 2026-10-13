@@ -29,6 +29,9 @@ class RemoteAdbMirror extends ChangeNotifier {
   String phase = 'idle';
   String error = '';
   bool supported = false;
+  bool screenshotSupported = false;
+  String format = '';
+  final ValueNotifier<bool> hasFrame = ValueNotifier(false);
   bool adbPriority = false;
   bool touchReady = false;
   String inputError = '';
@@ -38,11 +41,13 @@ class RemoteAdbMirror extends ChangeNotifier {
 
   bool get active => phase == 'starting' || phase == 'streaming' || phase == 'stopping';
   bool get busy => _commandAt != null || phase == 'starting' || phase == 'stopping';
-  bool get canStart => _watching && supported && !active && !busy && !ffi.ffiModel.viewOnly;
+  bool get screenshotMode => format == 'jpeg';
+  bool get canStart => _watching && supported && (!active || screenshotMode) && !busy && !ffi.ffiModel.viewOnly;
+  bool get canScreenshot => _watching && supported && screenshotSupported && (!active || !screenshotMode) && !busy && !ffi.ffiModel.viewOnly;
   bool get canStop => _watching && supported && active && phase != 'stopping' && _commandAt == null && !ffi.ffiModel.viewOnly;
-  String get summary => error.isNotEmpty ? error : phase == 'starting' ? '正在启动 ADB 投屏…'
-      : phase == 'stopping' ? '正在关闭所有 PC 的 ADB 投屏…'
-      : phase == 'streaming' ? (image == null ? '等待 ADB 关键帧…' : 'ADB 投屏 · 多 PC 共享')
+  String get summary => error.isNotEmpty ? error : phase == 'starting' ? (screenshotMode ? '正在启动 ADB 连续截图…' : '正在启动 ADB 投屏…')
+      : phase == 'stopping' ? '正在关闭所有 PC 的 ADB 画面…'
+      : phase == 'streaming' ? (image == null ? '等待 ADB 画面…' : screenshotMode ? 'ADB 连续截图 · 多 PC 共享' : 'ADB 投屏 · 多 PC 共享')
       : phase == 'waiting' ? '正在确认投屏能力…' : 'ADB 投屏未开启';
 
   Future<String?> _call(String action, {String? owner}) => bind.sessionGetCommon(
@@ -60,6 +65,8 @@ class RemoteAdbMirror extends ChangeNotifier {
     _timer?.cancel();
     _watching = false;
     supported = false;
+    screenshotSupported = false;
+    format = '';
     adbPriority = false;
     ffi.inputModel.adbTouchPriority = false;
     touchReady = false;
@@ -69,7 +76,10 @@ class RemoteAdbMirror extends ChangeNotifier {
     phase = ready ? 'waiting' : 'idle';
     error = '';
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_disposed && epoch == _epoch) notifyListeners();
+      if (!_disposed && epoch == _epoch) {
+        hasFrame.value = phase == 'streaming' && image != null;
+        notifyListeners();
+      }
     });
     // Serialize old unwatch/new watch, including rapid reconnect and widget disposal.
     _transition = _transition.then((_) async {
@@ -106,11 +116,14 @@ class RemoteAdbMirror extends ChangeNotifier {
       final nextError = value['error'] as String? ?? '';
       final nextGeneration = (value['generation'] as num? ?? 0).toInt();
       final nextSupported = value['supported'] == true;
+      final nextFormat = value['format'] as String? ?? '';
+      final nextScreenshotSupported = value['screenshotSupported'] == true;
       final frame = value['image'] as String?;
       final priority = value['adbPriority'] == true;
       final ready = value['touchReady'] == true;
       final touchError = value['inputError'] as String? ?? '';
-      bool changed = next != phase || nextError != error || nextGeneration != _generation || supported != nextSupported;
+      bool changed = next != phase || nextError != error || nextGeneration != _generation || supported != nextSupported
+          || format != nextFormat || screenshotSupported != nextScreenshotSupported;
       if (changed) _commandAt = null;
       changed = changed || priority != adbPriority || ready != touchReady || touchError != inputError;
       adbPriority = priority;
@@ -128,7 +141,10 @@ class RemoteAdbMirror extends ChangeNotifier {
       phase = next;
       _generation = nextGeneration;
       supported = nextSupported;
+      format = nextFormat;
+      screenshotSupported = nextScreenshotSupported;
       if (frame != null && phase == 'streaming') { image = base64Decode(frame); changed = true; }
+      hasFrame.value = phase == 'streaming' && image != null;
       if (changed) notifyListeners();
     } catch (_) {
       if (!_disposed && epoch == _epoch && error.isEmpty) {
@@ -154,13 +170,13 @@ class RemoteAdbMirror extends ChangeNotifier {
     await _touchTransition;
   }
 
-  Future<void> setEnabled(bool enabled) async {
-    if (enabled ? !canStart : !canStop) return;
+  Future<void> setEnabled(bool enabled, {bool screenshot = false}) async {
+    if (enabled ? (screenshot ? !canScreenshot : !canStart) : !canStop) return;
     _commandAt = DateTime.now();
     error = '';
     notifyListeners();
     try {
-      if (await _call(enabled ? 'start' : 'stop') == null) throw StateError('offline');
+      if (await _call(enabled ? (screenshot ? 'screenshot' : 'start') : 'stop') == null) throw StateError('offline');
     } catch (_) {
       if (!_disposed) {
         _commandAt = null;
@@ -177,6 +193,7 @@ class RemoteAdbMirror extends ChangeNotifier {
     _epoch++;
     _timer?.cancel();
     ffi.ffiModel.removeListener(_peerChanged);
+    hasFrame.dispose();
     final owner = _owner;
     _transition.then((_) => _call('unwatch', owner: owner)).catchError((Object _) => null);
     super.dispose();
