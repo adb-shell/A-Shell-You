@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../../common.dart';
 import 'remote_adb_controller.dart';
+import 'remote_adb_session_state.dart';
 
 const remoteAdbActions = <String, String>{
   'pair': '远程 ADB 连接配对',
@@ -15,14 +17,19 @@ const remoteAdbActions = <String, String>{
 };
 
 /// The route owns its controller because the toolbar unmounts when auto-hidden.
-Future<void> showRemoteAdbDialog(BuildContext context, SessionID sessionId, String action) =>
-    showDialog<void>(context: context, barrierDismissible: false,
-        builder: (_) => _RemoteAdbDialog(sessionId: sessionId, action: action));
+Future<void> showRemoteAdbDialog(BuildContext context, SessionID sessionId, String action) {
+  final sessionState = context.read<RemoteAdbSessionState?>();
+  return showDialog<void>(context: context, barrierDismissible: false,
+      builder: (_) => _RemoteAdbDialog(sessionId: sessionId, action: action,
+          sessionState: sessionState));
+}
 
 class _RemoteAdbDialog extends StatefulWidget {
   final SessionID sessionId;
   final String action;
-  const _RemoteAdbDialog({required this.sessionId, required this.action});
+  final RemoteAdbSessionState? sessionState;
+  const _RemoteAdbDialog({required this.sessionId, required this.action,
+      this.sessionState});
   @override State<_RemoteAdbDialog> createState() => _RemoteAdbDialogState();
 }
 
@@ -31,7 +38,8 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   final pairCode = TextEditingController();
   final connectPort = TextEditingController();
   final command = TextEditingController(text: 'id');
-  late final RemoteAdbController adb = RemoteAdbController(widget.sessionId);
+  late final RemoteAdbController adb = RemoteAdbController(widget.sessionId,
+      sessionState: widget.sessionState);
   String mode = 'auto';
   String validation = '';
   Offset offset = Offset.zero;

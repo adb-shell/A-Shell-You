@@ -25,6 +25,7 @@ import '../../common/shared_state.dart';
 import './popup_menu.dart';
 import './kb_layout_type_chooser.dart';
 import '../adb/remote_adb_menu.dart';
+import '../adb/remote_adb_session_state.dart';
 
 class ToolbarState {
   late RxBool _pin;
@@ -457,6 +458,9 @@ class _RemoteToolbarState extends State<RemoteToolbar> {
     toolbarItems.add(_PinMenu(state: widget.state));
     if (!isWebDesktop) {
       toolbarItems.add(_MobileActionDevMenu(ffi: widget.ffi));
+      if (!isWeb && widget.ffi.connType == ConnType.defaultConn) {
+        toolbarItems.add(const _AdbActionMenu());
+      }
       toolbarItems.add(_MobileActionMenu(ffi: widget.ffi));
     }
 
@@ -586,6 +590,31 @@ class _PinMenu extends StatelessWidget {
             ? _ToolbarTheme.hoverBlueColor
             : _ToolbarTheme.hoverInactiveColor,
       ),
+    );
+  }
+}
+
+class _AdbActionMenu extends StatelessWidget {
+  const _AdbActionMenu();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer2<RemoteAdbSessionState, FfiModel>(
+      builder: (context, state, model, _) {
+        if (!model.isPeerAndroid) return const Offstage();
+        final enabled = state.available && !model.viewOnly;
+        final visible = enabled && state.visible;
+        return _IconMenuButton(
+          icon: SizedBox(width: 32, height: 32,
+              child: Icon(Icons.adb, size: 23,
+                  color: enabled ? Colors.white : Colors.white38)),
+          tooltip: enabled ? 'Shell栏' : 'Shell栏（ADB 不可用或会话只读）',
+          onPressed: enabled ? state.toggle : null,
+          color: visible ? _ToolbarTheme.blueColor : _ToolbarTheme.inactiveColor,
+          hoverColor: visible
+              ? _ToolbarTheme.hoverBlueColor : _ToolbarTheme.hoverInactiveColor,
+        );
+      },
     );
   }
 }

@@ -4,11 +4,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../../common.dart';
 import '../../models/platform_model.dart' show bind;
+import 'remote_adb_session_state.dart';
 
 /// Session-scoped consumer; pairing records and the ADB transport belong to Android.
 class RemoteAdbController extends ChangeNotifier {
   final SessionID sessionId;
-  RemoteAdbController(this.sessionId);
+  final RemoteAdbSessionState? sessionState;
+  RemoteAdbController(this.sessionId, {this.sessionState})
+      : assert(sessionState == null || sessionState?.sessionId == sessionId);
 
   Map<String, dynamic> state = {};
   bool busy = false;
@@ -69,12 +72,13 @@ class RemoteAdbController extends ChangeNotifier {
     }
   }
 
-  void _apply(Map<String, dynamic> response) {
+  void _apply(Map<String, dynamic> response, {int? expectedEpoch}) {
     if (response['state'] is Map) {
       state = Map<String, dynamic>.from(response['state'] as Map);
       stale = false;
       statusError = '';
       controlAllowed = response['controlAllowed'] != false;
+      sessionState?.apply(state, controlAllowed, expectedEpoch: expectedEpoch);
     }
   }
 
@@ -83,6 +87,7 @@ class RemoteAdbController extends ChangeNotifier {
     refreshing = true;
     _notify();
     final epoch = _refreshEpoch;
+    final sessionEpoch = sessionState?.epoch;
     try {
       final response = await _request('status');
       if (_disposed || epoch != _refreshEpoch) return;
@@ -91,13 +96,14 @@ class RemoteAdbController extends ChangeNotifier {
       if (remoteState is! Map) throw Exception('Android 返回的 ADB 状态无效，请更新客户端后重试。');
       final changed = stale || state['paired'] != remoteState['paired']
           || state['connected'] != remoteState['connected'];
-      _apply(response);
+      _apply(response, expectedEpoch: sessionEpoch);
       if (changed && !busy) _hasResult = false;
       if (!busy && !_hasResult) message = supported ? summary : '远端不支持此无线调试模块（需要 Android 11+）。';
     } catch (error) {
       if (!_disposed && epoch == _refreshEpoch) {
         stale = true;
         statusError = _errorText(error);
+        sessionState?.invalidate(expectedEpoch: sessionEpoch);
         if (!busy) _hasResult = false;
       }
     } finally {
@@ -116,6 +122,9 @@ class RemoteAdbController extends ChangeNotifier {
     busy = true;
     _hasResult = true;
     _refreshEpoch++;
+    sessionState?.advanceEpoch();
+    final sessionEpoch = sessionState?.epoch;
+    bool receivedState = false;
     message = '请求已发送，Android 将按顺序处理；其他 PC 共用同一 ADB 状态。';
     if (method == 'shell') output = '';
     _notify();
@@ -123,7 +132,10 @@ class RemoteAdbController extends ChangeNotifier {
       final response = await _request(method, args);
       if (_disposed) return null;
       _refreshEpoch++;
-      _apply(response);
+      receivedState = response['state'] is Map;
+      _apply(response, expectedEpoch: sessionEpoch);
+      if (!receivedState) sessionState?.invalidate(expectedEpoch: sessionEpoch);
+      sessionState?.advanceEpoch(expectedEpoch: sessionEpoch);
       if (response['ok'] != true) throw Exception(response['message'] ?? 'ADB 操作失败。');
       final result = response['result'];
       switch (method) {
@@ -148,7 +160,14 @@ class RemoteAdbController extends ChangeNotifier {
       }
       return result is Map ? Map<String, dynamic>.from(result) : <String, dynamic>{};
     } catch (error) {
-      if (!_disposed) message = _errorText(error);
+      if (!_disposed) {
+        message = _errorText(error);
+        // Query again after an uncertain outcome instead of leaving Shell ready.
+        if (!receivedState) {
+          sessionState?.invalidate(expectedEpoch: sessionEpoch);
+          sessionState?.advanceEpoch(expectedEpoch: sessionEpoch);
+        }
+      }
     } finally {
       busy = false;
       _notify();
@@ -165,6 +184,9 @@ class RemoteAdbController extends ChangeNotifier {
 
   @override void dispose() {
     if (busy) {
+      final epoch = sessionState?.epoch;
+      // Disposal may happen while Flutter is unmounting a route.
+      scheduleMicrotask(() => sessionState?.invalidate(expectedEpoch: epoch));
       // Fire only a cancellation request; never replay commands or disconnect an idle shared ADB.
       unawaited(_request('cancel').then<void>((_) {}).catchError((Object _) {}));
     }

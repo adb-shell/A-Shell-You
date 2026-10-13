@@ -371,7 +371,7 @@ class DraggableMobileActions extends StatelessWidget {
     return Draggable(
       position: position,
       width: 70.0 * scale,
-      height:  scale * height * 11,
+      height:  scale * height * 12,
       builder: (_, onPanUpdate) {
         return GestureDetector(
           onPanUpdate: onPanUpdate,
@@ -386,6 +386,13 @@ class DraggableMobileActions extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4 * scale),
+                    child: FittedBox(fit: BoxFit.scaleDown,
+                      child: Text('无障碍栏', style: TextStyle(
+                        color: Colors.white, fontSize: 12 * scale,
+                      ))),
+                  ),
                   IconButton(
                     color: Colors.white,
                     onPressed: onBackPressed,

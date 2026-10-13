@@ -1148,7 +1148,7 @@ makeMobileActionsOverlayEntry(VoidCallback? onHide, {FFI? ffi}) {
     final session = ffi ?? gFFI;
     const double overlayW = 200;
     const double overlayH = 45;
-    const double actionRows = 11;
+    const double actionRows = 12;
     final screenSize = MediaQuery.of(context).size;
     final tabBarHeight = isDesktop ? kDesktopRemoteTabBarHeight : 0.0;
     final top = screenSize.height * 0.1;
