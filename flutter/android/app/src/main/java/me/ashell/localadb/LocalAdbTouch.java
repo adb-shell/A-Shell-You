@@ -226,7 +226,7 @@ final class LocalAdbTouch {
                         boolean changed = rotationWidth != size.widthPixels || rotationHeight != size.heightPixels;
                         boolean expired = event != null && SystemClock.elapsedRealtime() - event.at > 1500;
                         if (owner != null && (changed || SystemClock.elapsedRealtime() - lastEvent > 10000
-                                || expired || event != null && event.action == 3)) {
+                                || (expired && event.owner == owner) || event != null && event.action == 3)) {
                             writeTouch(stream, 1, lastX, lastY, rotationWidth, rotationHeight);
                             owner = null;
                         }

@@ -44,6 +44,9 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
 
   void _applyTouchState() {
     if (!mounted) return;
+    // New peers publish verified Shell snapshots directly to the controller.
+    // Touch notifications must not mark that newer state stale before an older query returns.
+    if (widget.state.snapshot != null) return;
     if (!widget.mirror.supported) { _pushedPriority = null; return; }
     final priority = widget.mirror.adbPriority;
     // Mirror also notifies for local button progress, not just remote capability changes.

@@ -174,7 +174,9 @@ pub mod android {
                 format, screenshot_supported: true, layout_supported: true,
                 input_error: hub.state.input_error.clone(), privacy_supported: true,
                 privacy_state: hub.state.privacy_state.clone(), privacy_error: hub.state.privacy_error.clone(), ..Default::default() };
-            if hub.state.state != "streaming" { hub.config.clear(); }
+            // Repeated start requests can arrive after SPS/PPS but before the first frame.
+            // Keep that generation's codec config until the source stops or is replaced.
+            if new_generation || !matches!(hub.state.state.as_str(), "starting" | "streaming") { hub.config.clear(); }
             let snapshot = hub.state.clone();
             for viewer in hub.viewers.values_mut() {
                 if new_generation { viewer.pending.clear(); }
