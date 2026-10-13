@@ -1,5 +1,18 @@
 # AShell Commercial Test Matrix
 
+2026-10-14 T001追加ADB投屏/优先触摸用例ADB-M01—M08，见下表；均NOT_RUN，V0不计产品验证通过。
+
+| ID | Target / Pass Oracle | Level | Status |
+|---|---|---|---|
+| ADB-M01 | Android aarch64/universal + Windows正式构建；APK含固定server/hash/LICENSE，新JNI经R8保留；Windows H.264独立解码可用 | V2 | NOT_RUN |
+| ADB-M02 | A/B两PC订阅同一Android；A开投屏B自动接收，任一关投屏两者关闭；只退出A时B继续；最后退出释放视频 | V3/V4 | NOT_RUN |
+| ADB-M03 | 慢PC、解码慢、帧窗口耗尽：在途<=4、等待关键帧后恢复，另一PC继续；新PC在静止画面加入也收到首帧 | V3/V4 | NOT_RUN |
+| ADB-M04 | 旋转/缩放/黑边/横竖屏、关闭重开、页面移窗/断线重连；旧帧不复活，图像释放、旧owner不能取消新订阅 | V3 | NOT_RUN |
+| ADB-M05 | 原共享+无无障碍+ADB：可点击拖动；原共享+无障碍+ADB：只注入ADB；无ADB+无障碍：恢复原触摸；无ADB无无障碍不可触摸 | V3 | NOT_RUN |
+| ADB-M06 | 拖动期间切ADB/撤销/断线/只读/旋转/队列溢出；正确抬指；两PC争用不能互相抬起手势；关投屏仍可在原共享上ADB触摸 | V3/V4 | NOT_RUN |
+| ADB-M07 | 原normal/SKL/ignore截图、无障碍Service、首帧waiting、共享开关、Shell三键/命令和多PC重连回归；新源不篡改旧状态 | V3 | NOT_RUN |
+| ADB-M08 | 未认证/只读/file/terminal/camera请求、未知字段、旧端、超大帧/畸形触摸、错误资产hash/编码器失败；拒绝或可恢复错误，无原链回退副作用 | V2/V4 | NOT_RUN |
+
 2026-10-13 T008：[Baseline15](docs/BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md) 固定main/aca7446的PC Shell栏；新增ADB-R16—19。文档/V0复核不构成编译/真机结果，新增用例全部NOT_RUN；投屏传输尚未实现，不列已通过用例。
 
 2026-10-13 ADB 增量：8662f23 / [Baseline 11](docs/BASELINE/11_LOCAL_ADB_BASELINE_2026-10-13.md) 已接入独立本机模块。AND-06 继续验证旧组件退役；新增 AND-09—13 验证新实现。T003 仅文档/V0，所有新增 V2/V3 用例 `NOT_RUN`，没有从文档同步请求推定编译或真机 PASS。

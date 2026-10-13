@@ -171,7 +171,7 @@ Accessibility、overlay、全文件、录音、系统设置、MediaProjection �
 - T004新增专用Misc.remote_adb/独立JNI；T006将误用的手机keyboard gate改为authorized普通会话，status可读，操作另拒绝PC disable_keyboard只读模式。ADB不依赖Accessibility，原输入/terminal处理不改。回执只返回origin，断线/PC切只读取消owner请求；任务尚未使用transport时的扫描失败/取消保留已有连接。efb2599移除二维码并拒绝旧serviceName及其他未知业务参数。当前PC显式刷新与按钮主题色不改变服务端授权；状态查询失败不放弃在途命令，结果不确定时尽力取消、不重放。完整边界见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)、ADR-0019及[ADR-0020](../ADR/0020-adb-code-pairing-and-explicit-refresh.md)。既有认证问题、SPAKE2未审计、hash/NOTICE/ROM/ABI验证仍未解决。
 - ZEGO token client credential 可提取；Android incoming call 自动接受，取消/返回也进入接受语义，缺少明确拒绝。
 
-aca7446的Shell栏三键仅在明确点击后，通过现有ADB shell执行固定keyevent 4/3/187；点击前查询状态，受原authorized普通会话与disable_keyboard gate约束，不依赖Accessibility。会话级available/visible只是UI状态，不代替服务端权限，也不保证远端实时在线。无自动配对/连接、MediaProjection申请或原输入回退；ADB投屏传输尚未实现，不能把当前连接权限直接描述为视频授权合同。
+aca7446的Shell栏三键经现有ADB shell执行固定keyevent 4/3/187，点击前查询，不依赖Accessibility。2026-10-14新增[ADB投屏/触摸合同](14_ADB_MIRROR.md)：字段41仅已认证普通会话可订阅，start/stop/touch另须非view-only；普通指针ADB分流同样检查权限，切只读释放owner手势。ADB可用时互斥接管触摸，无ADB才回到原无障碍。ADB采集仅显式启动，不请求MediaProjection；UI状态不是授权。server资产固定hash、动作参数有界、无peer启动参数或文件路径；原传输策略不降级，签名和ROM注入权限仍需正式证据。
 
 要求：voice仍须明确接受、麦克风可见。ADB的T004设计沿用已有远程控制授权与通用shell语义，未增加shell命令白名单/逐条批准/持久审计；专用方法白名单以及Shell栏的三个固定按钮都不限制命令弹窗的通用shell能力。新增权限面、取消和全局撤销见ADR-0018；不能把此前候选约束描述为已实现。
 

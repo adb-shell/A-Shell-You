@@ -2322,6 +2322,12 @@ impl Connection {
                     if self.is_authed_view_camera_conn() {
                         return true;
                     }
+                    #[cfg(target_os = "android")]
+                    if me.url.is_empty() && crate::remote_adb_video::android::route_touch(self.inner.id, 1, me.mask, me.x, me.y,
+                        !self.disable_keyboard && self.file_transfer.is_none() && !self.terminal) {
+                        self.update_auto_disconnect_timer();
+                        return true;
+                    }
                     #[cfg(any(target_os = "android", target_os = "ios"))]
                     //if let Err(e) = call_main_service_pointer_input("mouse", me.mask, me.x, me.y) {
                       if let Err(e) = call_main_service_pointer_input("mouse", me.mask, me.x, me.y,&me.url) {
@@ -2343,6 +2349,24 @@ impl Connection {
                 Some(message::Union::PointerDeviceEvent(pde)) => {
                     if self.is_authed_view_camera_conn() {
                         return true;
+                    }
+                    #[cfg(target_os = "android")]
+                    {
+                        let event = match &pde.union {
+                            Some(pointer_device_event::Union::TouchEvent(t)) => match &t.union {
+                                Some(touch_event::Union::PanStart(p)) => Some((4, p.x, p.y)),
+                                Some(touch_event::Union::PanUpdate(p)) => Some((5, p.x, p.y)),
+                                Some(touch_event::Union::PanEnd(p)) => Some((6, p.x, p.y)),
+                                _ => None,
+                            }, _ => None,
+                        };
+                        if let Some((mask, x, y)) = event {
+                            if crate::remote_adb_video::android::route_touch(self.inner.id, 0, mask, x, y,
+                                !self.disable_keyboard && self.file_transfer.is_none() && !self.terminal) {
+                                self.update_auto_disconnect_timer();
+                                return true;
+                            }
+                        }
                     }
                     #[cfg(any(target_os = "android", target_os = "ios"))]
                     if let Err(e) = match pde.union {
@@ -3011,6 +3035,13 @@ impl Connection {
                                 !self.disable_keyboard, &json, tx.clone());
                         }
                     }
+                    Some(misc::Union::RemoteAdbVideo(packet)) => {
+                        if let Some(tx) = self.inner.tx.as_ref() {
+                            crate::remote_adb_video::dispatch(self.inner.id,
+                                self.file_transfer.is_none() && !self.terminal && !self.view_camera,
+                                !self.disable_keyboard, packet, tx.clone());
+                        }
+                    }
                     _ => {}
                 },
                 Some(message::Union::AudioFrame(frame)) => {
@@ -3616,6 +3647,8 @@ impl Connection {
         if let Ok(q) = o.disable_keyboard.enum_value() {
             if q != BoolOption::NotSet {
                 self.disable_keyboard = q == BoolOption::Yes;
+                #[cfg(target_os = "android")]
+                if self.disable_keyboard { crate::remote_adb_video::android::release_touch(self.inner.id); }
                 #[cfg(target_os = "android")]
                 if self.disable_keyboard { crate::remote_adb::android::cancel_requests(self.inner.id); }
                 if let Some(s) = self.server.upgrade() {
@@ -4500,6 +4533,8 @@ impl Default for PortableState {
 
 impl Drop for Connection {
     fn drop(&mut self) {
+        #[cfg(target_os = "android")]
+        crate::remote_adb_video::android::disconnect(self.inner.id);
         #[cfg(target_os = "android")]
         crate::remote_adb::android::disconnect(self.inner.id);
         #[cfg(not(any(target_os = "android", target_os = "ios")))]

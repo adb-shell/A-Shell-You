@@ -317,3 +317,14 @@
 - 新增Baseline15、D025、R16—19（NOT_RUN），ADR0020补充UI证据；路线图记录投屏采集/媒体传输/PC解码、所有权/多PC、隔离和兼容待设计，不预选组件。
 - V0检查：源码对照、Markdown引用/空白、仅文档范围、八份Dart SHA-256保护；正式构建/真机结果未取得，不提升为V2/V3/V4通过。
 - STATE008 / WORK016 / CE-20261013-T008-01；详见[任务记录](../docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。文档待提交，下一任务先重新核对HEAD/status。
+
+## T-2026-10-14-001 — scrcpy 投屏与 ADB 优先触摸
+
+- Source：main/a1486ee2ad2bca991b272a8c7780d2daf2f7c526，初始clean；T008文档已固化。用户当前授权代码集成和追加触摸优先级；无Git/构建/CI授权。
+- 实现：Android独立video/control服务、固定官方server资产、独立JNI/字段41、按PC流控、独立PC解码/画面；Shell栏开/关投屏，多PC全局停止。原共享与截图也通过最小输入分流使用ADB，无ADB才回到Accessibility；关闭视频保留ADB触摸。
+- 生命周期：generation/token隔离陈旧帧/页面，旋转重置解码，停止和断线清理；多PC手势互斥、只读/离开/超时释放，有界视频/输入队列。原MediaProjection、采集JNI、正常VideoFrame、构建入口/依赖版本未改。
+- 文档：14_ADB_MIRROR、ADR0021/D026、Baseline16、外部资产及ADB-M01—M08矩阵；当前工程入口与记忆同步，旧记录保留历史。
+- V0：源码/JNI/R8/协议producer-consumer和字段编号检查、官方asset hash/ZIP结构、diff范围/空白/文档本地链接。未运行build/test/analyze/codegen、设备、Git写入、CI或发布；正式构建与真机验证NOT_RUN。
+- STATE-20261014-001 / WORK-20261014-001 / CE-20261014-T001-01；[详细记录](../docs/tasks/T-2026-10-14-001-adb-mirror.md)。代码/文档交付完成，未提交，不代表运行验收通过。
+
+- 2026-10-14续接：用户明确要求复核后推送并运行编排、不监控。核对main及远端仍a1486ee，49个路径均本任务；修正状态epoch与停止解码资源释放，复核V0通过。准备执行stage/commit/push和一次Build AShell clients both/aarch64，实际回执见Git/最终交付；STATE/WORK-20261014-002 / CE-20261014-T001-02。

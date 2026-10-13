@@ -1926,6 +1926,10 @@ impl<T: InvokeUiSession> Remote<T> {
                         #[cfg(any(target_os = "android", target_os = "ios", feature = "flutter"))]
                         crate::remote_adb::receive(&self.handler.get_id(), &json);
                     }
+                    Some(misc::Union::RemoteAdbVideo(packet)) => {
+                        #[cfg(all(feature = "flutter", not(any(target_os = "android", target_os = "ios"))))]
+                        crate::remote_adb_video::pc::receive(&self.handler.get_id(), packet);
+                    }
                     _ => {}
                 },
                 Some(message::Union::TestDelay(t)) => {

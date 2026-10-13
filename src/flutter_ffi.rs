@@ -2673,6 +2673,10 @@ pub fn session_get_common_sync(
 }
 
 pub fn session_get_common(session_id: SessionID, key: String, param: String) -> Option<String> {
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    if key == "adb_video" {
+        return crate::remote_adb_video::pc::controller(session_id, &param);
+    }
     if key == "remote_adb_request" || key == "remote_adb_poll" || key == "remote_adb_forget" {
         return crate::remote_adb::controller(session_id, &key, &param);
     }

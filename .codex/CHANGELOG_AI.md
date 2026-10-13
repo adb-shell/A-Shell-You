@@ -227,3 +227,13 @@ Mode：`append-only task-level index`
 - Records：D025 / ADR0020补录 / Baseline15 / STATE008 / WORK016 / CE-20261013-T008-01；R16—19全部NOT_RUN。
 - Evidence：V0文档与源码对照/链接/差异/hash，未运行产品build/test/analyze/codegen或设备，不Git/CI操作。
 - Detail：[T008](../docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。
+
+## T-2026-10-14-001 — 独立 ADB 投屏与触摸优先级
+
+- Source：main/a1486ee，初始clean；当前源码/官方asset/文档未提交。
+- Delta：固定scrcpy-server v5.0.1，Android独立投屏与触摸连接，Misc41多PC流控，PC Shell栏开/关和独立画面。ADB触摸最高优先级，作用于原共享/截图；无ADB才用原Accessibility，原采集保持。
+- Records：D026 / ADR0021 / Baseline16 / STATE-20261014-001 / WORK-20261014-001 / CE-20261014-T001-01。
+- Evidence：V0调用/协议/生命周期/权限与资产hash、范围/文档检查；ADB-M01—M08均NOT_RUN。未编译、真机、Git写入或CI，不宣称投屏性能/ROM兼容已通过。
+- Detail：[T001](../docs/tasks/T-2026-10-14-001-adb-mirror.md)、[使用与链路](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
+
+- 同任务后续复核：修正旧status回执覆盖推送的epoch时序和停止视频后的decoder/RGB缓存释放。用户新增明确stage/commit/push main、单次both/aarch64 dispatch授权，不监控；CE-20261014-T001-02，STATE/WORK-20261014-002。此记录先于执行，实际Git/dispatch回执见最终交付；未本地构建或真机验证。

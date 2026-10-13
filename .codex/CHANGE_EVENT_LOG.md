@@ -616,3 +616,47 @@ Mode：`append-only logical persisted-change events`
 - `docs/BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md`
 - `docs/BASELINE/BASELINE_INDEX.md`
 - `docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md`
+
+## CE-20261014-T001-01 — 独立 scrcpy 视频和 ADB 优先触摸
+
+- Task/Owner：T-2026-10-14-001 / Codex，2026-10-14，ashell-master跨域静态自审；无子agent。
+- Authority：用户原请求scrcpy集成、多PC投屏/全局关闭，追加ADB触摸优先于Accessibility。C2代码/协议/资产/文档；未授权Git写入或产品构建/测试/CI。
+- Source：main/a1486ee2ad2bca991b272a8c7780d2daf2f7c526，initial clean；未提交工作树。
+- Delta：Android LocalAdbMirror/LocalAdbTouch及几何适配、独立JNI、Misc41、Rust广播/背压/独立PC解码、Flutter独立画面与Shell栏两按钮。最小原输入分流/能力gate、旧Accessibility手势释放；原视频和截图采集、身份/版本/工具链保持。
+- Asset：EXT-BIN-SCRCPY-001，官方v5.0.1，733930字节，SHA256 `764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536`；官方元数据比对和ZIP结构检查，未签名验证/重建。
+- Records：D026 / ADR0021 / Baseline16 / STATE-20261014-001 / WORK-20261014-001；ADB-M01—M08全部NOT_RUN。
+- Verification：V0源码/JNI/R8/上下游合同、字段40保持/41无重复、空白/范围/本地文档链接；正式编译、设备和双PC均未执行。
+- Rollback：仅撤回下列本事件增量/新增文件，保留历史基线和原ADB身份；不停止原共享，不运行killall或关闭adbd。运行时私有连接停止只释放自身资源；中断上传可残留两个固定临时文件，下次覆盖。
+
+代码与资产路径：
+
+- `flutter/android/app/local-adb.pro`
+- `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbClient.java`
+- `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbManager.java`
+- `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbMirror.java`
+- `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbTouch.java`
+- `flutter/android/app/src/main/kotlin/me/ashell/localadb/AdbTouchCoordinates.kt`
+- `flutter/android/app/src/main/kotlin/me/ashell/nZW99cdXQ0COhB2o.kt`
+- `flutter/android/app/src/main/assets/adb-mirror/`（server / LICENSE.scrcpy / NOTICE.md）
+- `libs/hbb_common/protos/message.proto`
+- `src/remote_adb_video.rs`
+- `src/lib.rs`
+- `src/client/io_loop.rs`
+- `src/flutter_ffi.rs`
+- `src/server/connection.rs`
+- `flutter/lib/models/input_model.dart`
+- `flutter/lib/desktop/pages/remote_page.dart`
+- `flutter/lib/desktop/adb/remote_adb_sidebar.dart`
+- `flutter/lib/desktop/adb/remote_adb_mirror.dart`
+- `flutter/lib/desktop/adb/remote_adb_mirror_view.dart`
+
+文档与记忆路径：`.codex/{CURRENT_WORK,PROJECT_STATE,PROJECT_MEMORY,CHANGELOG_AI,CHANGE_EVENT_LOG,DECISION_LOG,TASK_HISTORY}.md`；`AGENTS.md`、`PROJECT_START_HERE.md`、`EXTERNAL_ASSET_REGISTRY.md`、`TEST_MATRIX.md`；`docs/AI_ENGINEERING/{00_PROJECT_OVERVIEW,01_ARCHITECTURE,02_SOURCE_MAP,03_MODULE_DESIGN,04_ANDROID_PIPELINE,06_NETWORK_PROTOCOL,08_BUILD_SYSTEM,10_SECURITY_MODEL,11_ROADMAP,12_LOCAL_ADB,13_REMOTE_ADB,14_ADB_MIRROR}.md`；`docs/ADR/{README,0021-independent-scrcpy-mirror}.md`；`docs/BASELINE/{BASELINE_INDEX,16_ADB_MIRROR_BASELINE_2026-10-14}.md`；`docs/tasks/T-2026-10-14-001-adb-mirror.md`。
+
+## CE-20261014-T001-02 — 复核补漏与 Git/CI 授权交付
+
+- 用户同会话追加明确授权：查漏补缺后提交/推送GitHub main并运行编排，不监控。目标adb-shell/A-Shell-You；Build AShell clients / platform=both / android_arch=aarch64。
+- 只读复核：本地main/远端main均a1486ee；工作树49个路径均为01事件，无其他任务改动；workflow存在且active。无本地产品build/test/analyze/codegen。
+- 修补：`flutter/lib/desktop/adb/remote_adb_sidebar.dart`推送变更推进epoch，避免旧查询回执覆盖；`src/remote_adb_video.rs`空闲250ms检查停止状态并释放decoder/RGB，不移除订阅。原采集/编译依赖/协议字段不变。
+- 记录同步：14_ADB_MIRROR、任务与.codex状态/记忆/日志；STATE/WORK-20261014-002。V0通过，正式V2—V4未取得结果。
+- 本事件为stage/commit/push及单次dispatch执行前记录；实际SHA/HTTP接受回执见Git与会话交付。遵守不监控，不读取构建进度；不发布release、不修改生产系统。
+- 最终补充：`flutter/lib/desktop/adb/remote_adb_mirror.dart`触摸经FIFO桥接并复验owner/epoch，防止异步native调用乱序；域文档和任务记录同步。

@@ -984,6 +984,19 @@ class nZW99cdXQ0COhB2o : AccessibilityService() {
         lastY = y
     }
 
+    // ADB takes over remote touch only; screenshots, service and permissions remain active.
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun suspendRemoteTouchForAdb() {
+        isWaitingLongPress = false
+        recentActionTask?.cancel()
+        recentActionTask = null
+        wheelActionsQueue.clear()
+        if (stroke != null) endGesture(mouseX, mouseY)
+        leftIsDown = false
+        touchPath.reset()
+        stroke = null
+    }
+
     @RequiresApi(Build.VERSION_CODES.N)
     private fun doDispatchGesture(x: Int, y: Int, willContinue: Boolean) {
         touchPath.lineTo(x.toFloat(), y.toFloat())

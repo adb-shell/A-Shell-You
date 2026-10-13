@@ -1,5 +1,7 @@
 # AShell Project Start Here
 
+2026-10-14 T001：main/a1486ee工作树新增scrcpy 5.0.1独立ADB投屏、Shell栏开/关、多个PC有界同步接收；用户追加ADB触摸最高优先级，普通共享/截图在Android输入入口互斥分流，无ADB时走原无障碍。原采集与无障碍截图保持，仅追加远程手势释放。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、ADR-0021/D-026/Baseline16；未提交、仅V0，构建/真机待验证，未执行Git/CI。以下T008及以前“无ADB投屏”是历史。
+
 2026-10-13 T001历史：[独立客户端 Actions](docs/BUILD_CLIENTS_ACTIONS.md) 替换旧 GitHub 编排，仅手动 Android/Windows、测试签名和 Actions 下载；当时观察main/8662f23，V0。下文旧任务为各自历史快照；新会话先核对HEAD/status。
 
 当前ADB（2026-10-13 T008）：观察main/aca7446，初始clean；980f254固化无QR/两端模式/PC显式刷新，aca7446追加“移动端操作”左侧的ADB开关、可拖动Shell栏及ADB返回/主页/多任务，原侧栏仅加“无障碍栏”标题和布局空间。ADB确认可用时自动显示，持续可用时保留手动关闭；无PC周期status，各PC按事件查询Android共享状态。见[远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[Baseline15](docs/BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md)、[T008](docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。仅V0，构建/真机待证。本轮仅同步文档；下一阶段[ADB投屏传输](docs/AI_ENGINEERING/11_ROADMAP.md)待设计，未选型/集成，不改原视频/输入/Accessibility链。

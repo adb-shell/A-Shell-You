@@ -62,7 +62,7 @@ AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一�
 - 键鼠/触控输入、剪贴板、文件剪贴板、文件传输、端口转发、截图、录制、终端。
 - Flutter 桌面多窗口、移动端 UI、旧 Sciter UI 兼容面。
 - Android `MainService`、`MediaProjection`、Accessibility 输入、normal/SKL/ignore 三帧源、黑屏、防触、Dev 自动点选、状态监测和自动重连。
-- Android独立ADB由8662f23接入，后续扩展PC配对/连接/命令/撤销/状态，Android共享身份与有限串行队列；新NSD发现本机配对和连接端口。980f254固化无QR/PC显式刷新/模式控件分离，aca7446加入可拖动Shell栏的ADB返回/主页/多任务及独立开关，原侧栏增加“无障碍栏”标题。旧LADB/mDNS/自动化保持退役，ADB投屏传输仍待独立设计。见 [本机ADB](12_LOCAL_ADB.md) / [远程ADB](13_REMOTE_ADB.md)，源码/V0，编译与运行待验证。
+- Android独立ADB由8662f23接入，后续扩展PC配对/连接/命令/撤销/状态与Shell栏。2026-10-14 T001新增scrcpy独立投屏、多PC有界接收及ADB优先触摸；原采集/无障碍截图保持，仅在输入入口互斥分流并释放旧手势。见[本机ADB](12_LOCAL_ADB.md) / [远程ADB](13_REMOTE_ADB.md) / [投屏与触摸](14_ADB_MIRROR.md)，源码/V0，编译与运行待验证。旧LADB与二维码仍退役。
 - Windows DXGI/GDI capture、privacy mode、Amyuni virtual display、输入注入与 portable service。
 - Flutter 产品账号、地址簿、设备组、Rust OIDC client、sync/heartbeat/downloader。
 - ZEGO 1v1 语音媒体；Rust 仅承载邀请/状态控制。

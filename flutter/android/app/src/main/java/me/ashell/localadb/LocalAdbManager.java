@@ -32,6 +32,8 @@ public final class LocalAdbManager {
     private final Context context;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final LocalAdbClient client;
+    private final LocalAdbMirror mirror;
+    private final LocalAdbTouch touch;
     private final SharedPreferences records;
     private final ExecutorService worker = Executors.newSingleThreadExecutor(
             task -> new Thread(task, "ashell-local-adb"));
@@ -44,13 +46,40 @@ public final class LocalAdbManager {
         this.context = context;
         client = new LocalAdbClient(context);
         records = context.getSharedPreferences("local_adb_record_v1", Context.MODE_PRIVATE);
+        mirror = new LocalAdbMirror(context, client::isConnected);
+        touch = new LocalAdbTouch(context, client::isConnected);
         RemoteAdbNative.attach(this);
+        mirror.attach(this);
     }
+
+    // Independent JNI entry; no long-running video operation occupies the shell queue.
+    public void controlMirror(String action) {
+        main.post(() -> {
+            if ("start".equals(action)) {
+                if (current != null || !queue.isEmpty() || !client.isConnected()) {
+                    mirror.unavailable();
+                } else {
+                    mirror.start(records.getInt("connectPort", 0));
+                }
+            } else if ("stop".equals(action)) mirror.stop("");
+        });
+    }
+
+    public boolean routeAdbTouch(int owner, int kind, int mask, int x, int y, boolean allowed) {
+        return touch.legacy(owner, kind, mask, x, y, allowed);
+    }
+
+    public void injectMirrorTouch(int owner, int action, int x, int y, int width, int height) {
+        touch.normalized(owner, action, x, y, width, height);
+    }
+
+    public void releaseTouchOwner(int owner) { touch.release(owner); }
 
     Map<String, Object> status() {
         Map<String, Object> value = new HashMap<>();
         value.put("supported", Build.VERSION.SDK_INT >= 30);
         value.put("apiVersion", 2);
+        value.put("mirrorVersion", 1);
         value.put("connected", client.isConnected());
         value.put("paired", Build.VERSION.SDK_INT >= 30
                 && records.getBoolean("paired", false) && AdbIdentity.exists(context));
@@ -143,6 +172,11 @@ public final class LocalAdbManager {
     private void startNext() {
         if (current != null || queue.isEmpty()) return;
         Operation operation = queue.remove();
+        if ("pair".equals(operation.kind) || "pairConnect".equals(operation.kind)
+                || "disconnect".equals(operation.kind) || "revoke".equals(operation.kind)) {
+            mirror.stop("");
+            touch.stop();
+        }
         current = operation;
         operation.timeout = () -> { if (current == operation) cancelCurrent("timeout"); };
         // At most 8 operations, each <=35s. PC routes retain results for 310s.
@@ -221,6 +255,8 @@ public final class LocalAdbManager {
                 if (current != operation) return;
                 current = null;
                 revision++;
+                if (client.isConnected()) touch.enable(records.getInt("connectPort", 0));
+                else touch.stop();
                 if (operation.cancelled.get()) operation.reply.failure(operation.cancelReason,
                         operation.pairCompleted ? "配对已成功，后续连接已取消或超时。可点击“我已配对”重新连接。"
                                 : "timeout".equals(operation.cancelReason) ? "ADB 操作超时，请查看当前配对/连接状态后重试。" : "ADB 操作已取消。");

@@ -270,3 +270,14 @@
 - RemotePage拥有显示状态；各PC开关独立，Android仍拥有身份/连接/队列。事件查询与回执更新快照，无周期status或实时push。
 - ADR assessment：现有0018/0019/0020能力的UI入口，无新协议/长期选型，0020追加实施证据，不另建ADR。STATE008 / Baseline15 / CE-20261013-T008-01；V0，R16—19待验证。
 - 后续ADB投屏传输为用户提出的下一阶段方向，具体组件/媒体协议未选定，未实现；不是本次文档任务中的开发或发布决定。
+
+## D-026：独立 scrcpy 投屏与 ADB 优先触摸
+
+- 2026-10-14 / accepted for implementation；用户明确要求scrcpy投屏、多PC接收、任意控制PC关闭，随后明确追加ADB触摸优先，适用于原共享/截图画面。
+- 采用固定官方scrcpy-server v5.0.1/Apache-2.0，Android单独video-only与control-only连接，复用已有ADB身份；不引入PC adb.exe或第二条远控网络。
+- 新Misc.remote_adb_video(41)承载有界H.264、订阅/ACK及固定格式触摸；PC独立解码和可拖动窗口，Shell栏增开/关投屏。Android拥有全局视频状态，每PC独立流控；最后订阅离开停止视频。
+- ADB可用时拦截普通远程触摸并结束旧Accessibility手势，ADB不可用才使用原无障碍；不停止无障碍Service/截图。ADB控制准备失败保留优先级并提示，不同时注入两种触摸。关视频不关触摸；键盘/文字暂未迁移。
+- 原MediaProjection、normal/SKL/ignore、采集JNI、VideoFrame/texture/waiting、字段40/FRB签名/工具链/身份保持。普通命令URL绕过新指针分流。
+- ADR-0021 / Baseline16 / STATE-20261014-001 / CE-20261014-T001-01；V0静态核对，ADB-M01—M08 NOT_RUN。未编译、设备验证或Git/CI操作；运行可用性与ROM权限仍待验收。
+
+- 同任务续接reviewed-no-architecture-change：补状态epoch及空闲解码清理。用户明确授权提交、推送main、单次both/aarch64 dispatch且不监控；CE-20261014-T001-02。接受编排不等于构建通过，既有架构边界不变。

@@ -12,6 +12,7 @@ mod server;
 pub use self::server::*;
 mod client;
 mod remote_adb;
+mod remote_adb_video;
 mod lan;
 #[cfg(not(any(target_os = "ios")))]
 mod rendezvous_mediator;

@@ -142,9 +142,13 @@
 - record upload。
 - 新 capture/virtual-display backend。
 
-旧本地LADB保持退役；8662f23本机模块已扩展专用PC ADB协议、Android共享manager与状态，aca7446的Shell栏通过独立ADB命令实现返回/主页/多任务。见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)，V2/V3/V4仍待证据。ADB投屏与完整触摸/键盘控制仍未实现；不能把ADB shell可用等同于视频可用。
+旧本地LADB保持退役；8662f23本机模块已扩展专用PC ADB协议、Android共享manager与状态，aca7446的Shell栏通过独立ADB命令实现返回/主页/多任务。T-2026-10-14-001新增独立ADB投屏与ADB优先触摸，见 [14_ADB_MIRROR.md](14_ADB_MIRROR.md)，V2/V3/V4仍待证据。完整键盘/文字输入未迁移；不能把ADB shell可用等同于视频可用。
 
-### 下一阶段交接：ADB远程投屏传输（待设计、未实施）
+### ADB远程投屏传输：T001已实施，正式验证待完成
+
+2026-10-14：用户已明确授权并追加ADB触摸最高优先级，实现见[14_ADB_MIRROR](14_ADB_MIRROR.md)。固定scrcpy5.0.1、新字段41、多PC有界队列、独立PC视图及control-only输入服务已落源码，当前V0、未提交，ADB-M01—M08待正式验证。后续重点为设备/OEM注入权限、并发编码、网络与本机JPEG桥性能；不能把源码完成写成runtime-ready。
+
+以下为T008交接时的历史设计输入，已由ADR-0021具体化，不再代表当前未选型状态：
 
 2026-10-13用户提出下一阶段集成方向；本次只同步当前文档。起点为main/aca7446与[Baseline15](../BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md)，尚未选定scrcpy或其他项目，也未下载/引入新的server binary、codec、协议或依赖。
 

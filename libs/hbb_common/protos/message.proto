@@ -845,7 +845,26 @@ message Misc {
     string ashell_status = 39;
     // Independent device-owned ADB request/reply JSON, versioned and bounded by endpoints.
     string remote_adb = 40;
+    // Independent scrcpy media/control; never enters the original VideoFrame path.
+    RemoteAdbVideo remote_adb_video = 41;
   }
+}
+
+message RemoteAdbVideo {
+  string token = 1;
+  string action = 2; // watch/unwatch/start/stop/ack/nack/touch/state/frame
+  uint64 sequence = 3;
+  uint64 generation = 4;
+  uint32 width = 5;
+  uint32 height = 6;
+  bool keyframe = 7;
+  bytes data = 8; // H.264 Annex B with config on keyframes, or five big-endian int32 touch values
+  string state = 9; // idle/starting/streaming/stopping/error
+  string error = 10;
+  bool supported = 11;
+  bool adb_priority = 12;
+  bool touch_ready = 13;
+  string input_error = 14;
 }
 
 message VoiceCallRequest {

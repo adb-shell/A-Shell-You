@@ -331,6 +331,8 @@ class ToReleaseKeys {
 
 class InputModel {
   final WeakReference<FFI> parent;
+  // Device-pushed ADB touch priority; never enables keyboard/text injection.
+  bool adbTouchPriority = false;
   String keyboardMode = '';
   static String Clipboard_Management = '';
   
@@ -880,7 +882,10 @@ class InputModel {
           'wheeltouch',
           'wheeldevselector',
         }.contains(type);
-    if (!keyboardPerm && !isAndroidControlCommand) return;
+    final adbPointer = adbTouchPriority && !isViewOnly &&
+        parent.target!.ffiModel.isPeerAndroid &&
+        const ['down', 'up', 'wheel', 'trackpad'].contains(type);
+    if (!keyboardPerm && !isAndroidControlCommand && !adbPointer) return;
     if (isViewCamera) return;
     
 
@@ -1012,7 +1017,7 @@ class InputModel {
 
   /// Send mouse movement event with distance in [x] and [y].
   Future<void> moveMouse(double x, double y) async {
-    if (!keyboardPerm) return;
+    if (!keyboardPerm && !(adbTouchPriority && !isViewOnly && parent.target!.ffiModel.isPeerAndroid)) return;
     if (isViewCamera) return;
     var x2 = x.toInt();
     var y2 = y.toInt();

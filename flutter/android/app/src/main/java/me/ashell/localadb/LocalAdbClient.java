@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.github.muntashirakon.adb.AdbConnection;
+import io.github.muntashirakon.adb.AdbStream;
 import io.github.muntashirakon.adb.PairingConnectionCtx;
 
 /** Worker-thread owner of a local ADB connection. No product JNI, services or peer protocol. */
@@ -87,6 +88,13 @@ final class LocalAdbClient {
         Map<String, Object> result = AdbShell.execute(value, command, cancelled);
         check(cancelled);
         return result;
+    }
+
+    // Used only by the mirror's private LocalAdbClient, never by the shared shell client.
+    AdbStream openMirrorStream(String destination) throws Exception {
+        AdbConnection value = connection;
+        if (!isConnected() || value == null) throw new IllegalStateException("ADB disconnected");
+        return value.open(destination);
     }
 
     private AdbLocalSocket newTransport(int port, AtomicBoolean cancelled) throws Exception {

@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261013-016`
+Registry Revision：`WORK-20261014-002`
 
-Last Updated：2026-10-14（T008跨日交付，ID沿用启动日期）
+Last Updated：2026-10-14（独立ADB投屏与触摸优先级）
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-无活动任务。T008已同步main/aca7446的Shell栏、ADB合同、验证矩阵和恢复记忆；26份Markdown待提交，八份Dart源码hash保持。下一阶段ADB投屏传输待设计，尚未选型或实施；本轮没有Git写入、构建或CI操作。
+none。T-2026-10-14-001代码复核完成，已获用户明确授权提交/推送及单次编排；本文为执行前记录，Git/dispatch实际回执见最终交付，不监控。
 
 ## 2. Concurrent Session Rules
 
@@ -27,13 +27,13 @@ Active Task Count：0
 
 ## 4. Last Closed Task
 
-- Task ID：`T-2026-10-13-008`
-- Result：当前Shell栏开关/三键/生命周期、多PC快照与原链边界同步；R16—19及投屏待设计交接齐备。
+- Task ID：`T-2026-10-14-001`
+- Result：独立scrcpy投屏、多PC接收/全局停止、PC独立窗口与Shell栏两按钮；用户追加ADB优先触摸，无ADB才回到原无障碍。
 - Closed At：2026-10-14（Asia/Tokyo）
-- Final T-State：`T8 — documentation complete`（V0；正式V2/V3/V4待验证）
-- State / Event：`STATE-20261013-008` / `CE-20261013-T008-01`
-- Decision：D-025 / ADR-0020 UI补录 / Baseline15；旧记录保留历史。
-- Verification：26份Markdown、145个本地文件链接有效、diff空白通过、八份Dart SHA-256不变；无产品build/test/analyze/codegen或设备验证。
-- Next Step：用户后续启动ADB投屏传输设计；核对新HEAD/status，再明确独立媒体通道和多PC所有权。当前无投屏实现/新依赖，未Git/CI操作。
+- Final T-State：`T8 — source and documentation complete`（V0；正式V2/V3/V4待验证）
+- State / Event：`STATE-20261014-002` / `CE-20261014-T001-02`（01实现事件保持）
+- Decision：D-026 / ADR-0021 / Baseline16；旧记录保留历史。
+- Verification：V0源码/协议/JNI/R8/生命周期、官方server hash、166个文档本地链接和diff空白通过；原采集与构建入口保持。无产品build/test/analyze/codegen或设备验证。
+- Next Step：紧接执行用户已授权的stage/commit/push main与一次Build AShell clients both/aarch64，不监控；最终SHA/接受结果见交付回执。正式构建结果与ADB-M01—M08真机仍待用户验证。
 - Changelog / Task / Event：CHANGELOG_AI.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md中同ID。
-- Detailed record：docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md；main/aca7446、initial clean，文档待提交。
+- Detailed record：docs/tasks/T-2026-10-14-001-adb-mirror.md；main/a1486ee、initial clean。

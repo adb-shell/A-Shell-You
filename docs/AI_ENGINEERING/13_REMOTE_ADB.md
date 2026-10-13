@@ -2,7 +2,7 @@
 
 当前核对：2026-10-13（Asia/Tokyo），main/aca7446，文档同步开始时工作区clean。980f254已固化无二维码、PC显式刷新、两端配对模式与连接按钮调整；aca7446增加PC独立Shell栏及开关。本次仅同步文档，证据仍为V0。见 [T008](../tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)、[Baseline15](../BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md)；[T007](../tasks/T-2026-10-13-007-adb-docs-sync.md)和Baseline14保留原交付前历史。
 
-PC通过已认证普通远控会话，把ADB请求交给Android App。ADB私钥、配对记录、连接和操作队列均属于Android进程。当前支持通用Shell命令和Shell栏三键导航，未集成ADB投屏、scrcpy、视频接收或完整触摸/键盘控制。三键通过独立ADB命令执行；原Accessibility、MediaProjection、normal/SKL/ignore、输入协议、terminal、ZEGO、产品身份和传输策略保持。
+PC通过已认证普通远控会话，把ADB请求交给Android App。ADB私钥、配对记录、连接和操作队列均属于Android进程。2026-10-14 T001在通用Shell命令和三键导航基础上新增[独立scrcpy投屏与ADB优先触摸](14_ADB_MIRROR.md)，Shell栏追加开/关投屏；下文T008三键快照保留历史含义。原画面采集、无障碍截图、terminal、ZEGO、产品身份和传输策略保持；普通指针在Android入口先选择ADB，无ADB才走无障碍。未扩展ADB完整键盘输入。
 
 ## 使用
 

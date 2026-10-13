@@ -1,5 +1,7 @@
 # AShell Architecture Decision Records
 
+2026-10-14新增：[ADR-0021 独立scrcpy投屏与ADB优先触摸](0021-independent-scrcpy-mirror.md)，accepted for implementation，D-026；仅V0，构建/真机待验证。
+
 最后更新：2026-07-12  
 治理状态：`accepted`
 

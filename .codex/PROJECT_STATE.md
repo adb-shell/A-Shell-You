@@ -1,17 +1,19 @@
 # AShell Project State
 
 Schema Version：`1.0`  
-State Revision：`STATE-20261013-008`
+State Revision：`STATE-20261014-002`
 
-Last Updated：2026-10-14（Asia/Tokyo；T008跨日文档交付）
+Last Updated：2026-10-14（Asia/Tokyo；独立ADB投屏与触摸优先级）
 
-Observed At：2026-10-13（Asia/Tokyo）
+Observed At：2026-10-14（Asia/Tokyo）
 
 Evidence Scope：`repository-observed / V0 / external and runtime verification pending`
 
+续接复核：用户已明确授权查漏补缺、stage/commit/push GitHub main及一次Build AShell clients both/aarch64，不监控。修补旧status覆盖推送及停投屏decoder残留；CE-20261014-T001-02。当前文档为提交前状态，实际交付SHA和dispatch接受结果以Git/最终回执为准；不宣称构建成功。
+
 > 本文件是截至 `Observed At` 的当前状态快照，不是生产实时监控，也不替代源码、`docs/AI_ENGINEERING/`、ADR 或 Baseline。新会话必须用只读检查确认其新鲜度；发现漂移时记录 conflict/stale，不得用本文件覆盖源码事实或改写旧 Baseline。
 
-最新变更：[T008文档同步](../docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。观察main/aca7446，初始clean；980f254已固化前轮UI/文档，aca7446增加独立Shell栏、顶栏开关及无障碍栏标题。状态按事件查询，可用时自动显示且普通回执保留手动关闭；无PC周期status、无投屏传输。当前仅Markdown/V0，八份Dart源码hash保护，无Git/构建/CI动作。下一阶段投屏待设计，当前SHA构建/真机证据未取得。
+最新变更：[T-2026-10-14-001](../docs/tasks/T-2026-10-14-001-adb-mirror.md)。main/a1486ee初始clean；已实现独立scrcpy投屏、多PC共享/全局停止、PC Shell栏两按钮和独立窗口，以及用户追加的ADB优先触摸。原画面也按ADB/无障碍能力选触摸路径；仅增加输入分流和旧远程手势释放，原采集不变。状态推送和本机取帧不恢复远程周期status查询。源码与文档未提交；V0，编译/真机待验证，无Git/构建/CI动作。
 
 2026-10-12 T003 历史补充：当时按用户要求统一品牌字段/路径与两处公共服务匹配。历史文档已标注名称规范化，原文字与真实源仓地址从a036f31恢复；当时的检索结果不代表本次重新扫描全仓品牌。
 
@@ -21,13 +23,13 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 |---|---|---|
 | Product/runtime | `A Shell You` / `AShell`；crate ashell；Android me.ashell；Flutter内部flutter_hbb | source + ADR-0014 |
 | Rust / Flutter version | `5.2.1` / `5.2.1+59` | manifests + Baseline |
-| Baseline ID | `AS-BL-2026-10-13-aca7446-adb-sidebar` | Baseline15；旧基线冻结 |
+| Baseline ID | `AS-BL-2026-10-14-a1486ee-adb-mirror-worktree` | Baseline16；旧基线冻结 |
 | Branch | `main` | read-only Git observation |
-| HEAD | `aca74467a3f83392c6a440e6507a63508f9294f6` | T008只读观察；本地origin/main同SHA，未远端查询 |
-| Worktree | 初始clean；本轮仅Markdown文档待提交，未改源码 | T008 / CE-20261013-T008-01；八份Dart hash保护 |
+| HEAD | `a1486ee2ad2bca991b272a8c7780d2daf2f7c526` | 本轮只读观察；历史文档提交已固化 |
+| Worktree | 初始clean；本轮独立ADB媒体/触摸源码、资产和文档未提交 | T-2026-10-14-001 / CE-20261014-T001-01 |
 | History mapping | a036f31提交前轮记忆；6fb0aa6初始化的975 blobs与历史源匹配是迁移前证据，准确RustDesk fork未知 | 历史接管报告；不能用该一致性描述当前dirty tree |
 | Highest completed verification | `V0` repository/document/schema checks | `TEST_MATRIX.md` + task records |
-| Formal build/runtime evidence | 未取得aca7446的新包/正式构建/真机结果；本轮未触发或监控CI | ADB-R01—09、11—19待验，旧R10为N/A；不宣称构建成功 |
+| Formal build/runtime evidence | 当前工作树未取得新包/正式构建/真机结果；本轮未触发或监控CI | ADB-M01—M08全部NOT_RUN；旧矩阵继续适用，不宣称构建成功 |
 | Release readiness | `BLOCKED` | security、external assets、V2—V4、signing/SBOM/rollback gaps |
 
 ## 2. Governance and Knowledge Readiness
@@ -52,6 +54,7 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 | ZEGO service | `EXT-SVC-004`, `EXT-SVC-005` | partial/external；incident and lock drift | API/Security owner |
 | Retired Android ADB assets | `EXT-BIN-ADB-001`；`EXT-REF-ADB-002/003` | RETIRED，不再是当前发布 blocker；历史来源记录保留 | Release 验证 APK 无 libadb.so |
 | New local ADB dependencies | `EXT-LIB-ADB-004`—`007` | 固定版本/许可来源已记录，hash/NOTICE/SBOM/Release JNI/R8/ROM验证未闭环 | Android/Security/Release，OWNER-REQUIRED；AND-09—13 |
+| New scrcpy server asset | `EXT-BIN-SCRCPY-001` | v5.0.1固定来源/大小/hash/Apache-2.0已记录并离线打包；未验证签名或重建上游产物 | Android/Release；ADB-M01—M08 |
 | Windows native assets | `EXT-WIN-001`—`009` applicable items | external/generated/unverified | Windows/Release/Security owner |
 | Build/sign/release | `EXT-SIGN-*`, `EXT-BUILD-*`, `EXT-CI-001`, `EXT-REL-001` | formal environments and custody incomplete | Release owner / G2—G3 |
 | Upstream/compliance | `EXT-HIST-001`, `EXT-COMP-001` | exact fork lineage、SBOM/NOTICE/source-offer incomplete | source/legal/release owner |
@@ -60,17 +63,17 @@ Evidence Scope：`repository-observed / V0 / external and runtime verification p
 
 - Active task registry：`CURRENT_WORK.md`。
 - Detailed task history：`TASK_HISTORY.md`。
-- Latest documented changes：`T-2026-10-13-008`（Shell栏事实与下一阶段投屏待设计交接；仅文档/V0）。
+- Latest documented changes：`T-2026-10-14-001`（独立ADB投屏与触摸优先级；源码/资产/文档，V0）。
 - Current active task：`none`；以 CURRENT_WORK 实时行和新会话只读复核为准。
-- Latest recorded modification event：`CE-20261013-T008-01`。
-- Latest decision：D-025补录Shell栏UI；D-024 / ADR-0020无二维码/显式刷新继续有效，ADR-0019独立权限/NSD保持。
+- Latest recorded modification event：`CE-20261014-T001-02`（对01的复核与授权交付补录）。
+- Latest decision：D-026 / ADR-0021独立scrcpy投屏与ADB优先触摸；D-024 / ADR-0020无二维码/显式刷新继续有效，ADR-0019独立权限/NSD保持。
 - Architecture decisions：`docs/ADR/README.md`；ADR-0018扩展0017远程能力，ADR-0015旧退役/0014产品身份保持。
 
 ## 5. Standing Authority State
 
 - There is no standing C2 or C3 authorization.
 - Historical approvals in memory、Task History、Decision Log or ADR never transfer to a new session.
-- T008用户仅要求更新当前文档，并提出稍后集成ADB投屏方向；本轮不开始代码实现或执行Git/CI操作。
+- 本轮用户授权scrcpy投屏及追加ADB触摸优先级；随后明确追加查漏补缺、提交/推送main和一次both/aarch64编排，不监控。该授权仅限本任务交付。
 - 无本地build/test/analyze/codegen、设备、删除/版本/发布；先前任务的CI接受不是当前源码成功证据。
 
 ## 6. Freshness and Update Contract

@@ -7,13 +7,15 @@ import '../../consts.dart';
 import '../../models/model.dart';
 import 'remote_adb_controller.dart';
 import 'remote_adb_session_state.dart';
+import 'remote_adb_mirror.dart';
 
 /// ADB navigation has its own position, controller and command path.
 class RemoteAdbSidebar extends StatefulWidget {
-  const RemoteAdbSidebar({super.key, required this.ffi, required this.state});
+  const RemoteAdbSidebar({super.key, required this.ffi, required this.state, required this.mirror});
 
   final FFI ffi;
   final RemoteAdbSessionState state;
+  final RemoteAdbMirror mirror;
 
   @override
   State<RemoteAdbSidebar> createState() => _RemoteAdbSidebarState();
@@ -27,6 +29,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
   bool _probePending = false;
   bool _sending = false;
   bool _peerUpdateScheduled = false;
+  bool? _pushedPriority;
   Offset? _position;
 
   @override
@@ -34,7 +37,20 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
     super.initState();
     _adb = RemoteAdbController(widget.ffi.sessionId, sessionState: widget.state);
     widget.ffi.ffiModel.addListener(_schedulePeerUpdate);
+    widget.mirror.addListener(_applyTouchState);
     _schedulePeerUpdate();
+  }
+
+  void _applyTouchState() {
+    if (!mounted) return;
+    if (!widget.mirror.supported) { _pushedPriority = null; return; }
+    if (_pushedPriority != widget.mirror.adbPriority) {
+      _pushedPriority = widget.mirror.adbPriority;
+      // An older in-flight status reply must not overwrite the device push.
+      widget.state.advanceEpoch();
+    }
+    widget.state.apply({'supported': true, 'connected': widget.mirror.adbPriority},
+        !widget.ffi.ffiModel.viewOnly);
   }
 
   void _schedulePeerUpdate() {
@@ -89,6 +105,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
   @override
   void dispose() {
     widget.ffi.ffiModel.removeListener(_schedulePeerUpdate);
+    widget.mirror.removeListener(_applyTouchState);
     _adb.dispose();
     super.dispose();
   }
@@ -96,7 +113,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([widget.state, _adb,
+      animation: Listenable.merge([widget.state, _adb, widget.mirror,
         widget.ffi.ffiModel, widget.ffi.canvasModel]),
       builder: (context, _) {
         _schedulePeerUpdate();
@@ -113,7 +130,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
               math.min(constraints.maxWidth / 70,
                   constraints.maxHeight * 0.9 / (45 * 12)));
           final width = 70.0 * scale;
-          final height = 190.0 * scale;
+          final height = 290.0 * scale;
           Offset clamp(Offset value) => Offset(
               value.dx.clamp(0.0, math.max(0.0, constraints.maxWidth - width)).toDouble(),
               value.dy.clamp(0.0, math.max(0.0, constraints.maxHeight - height)).toDouble());
@@ -134,7 +151,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                 onPanUpdate: (event) => setState(() {
                   _position = clamp(clamp(_position ?? position) + event.delta);
                 }),
-                child: FittedBox(child: SizedBox(width: 70, height: 190,
+                child: FittedBox(child: SizedBox(width: 70, height: 290,
                   child: Card(
                     color: Colors.transparent,
                     shadowColor: Colors.transparent,
@@ -155,6 +172,10 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                           button(Icons.arrow_back, 'ADB 返回', 4),
                           button(Icons.home, 'ADB 主页', 3),
                           button(Icons.more_horiz, 'ADB 多任务', 187),
+                          _mirrorButton(Icons.screen_share_outlined, '开投屏', widget.mirror.canStart,
+                              () => widget.mirror.setEnabled(true)),
+                          _mirrorButton(Icons.stop_screen_share_outlined, '关投屏', widget.mirror.canStop,
+                              () => widget.mirror.setEnabled(false)),
                         ],
                       ),
                     ),
@@ -167,4 +188,15 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
       },
     );
   }
+
+  Widget _mirrorButton(IconData icon, String label, bool enabled, VoidCallback action) => Tooltip(
+    message: widget.mirror.inputError.isNotEmpty ? widget.mirror.inputError
+        : widget.mirror.error.isNotEmpty ? widget.mirror.error
+        : label == '关投屏' ? '关闭所有 PC 的 ADB 投屏' : widget.mirror.summary,
+    child: TextButton(onPressed: enabled ? action : null,
+      style: TextButton.styleFrom(foregroundColor: Colors.white, disabledForegroundColor: Colors.white38,
+          minimumSize: const Size(60, 44), padding: const EdgeInsets.symmetric(vertical: 2)),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 22),
+        Text(label, style: const TextStyle(fontSize: 11))])),
+  );
 }

@@ -1,5 +1,7 @@
 # AShell Android 完整链路 / Android Pipeline
 
+2026-10-14 T001当前补充：新增[独立scrcpy投屏与ADB优先触摸](14_ADB_MIRROR.md)。Android video-only/control-only各自持有私有ADB连接；Misc.remote_adb_video(41)有界多PC分发，PC独立解码/浮动显示。按用户追加授权在Android输入入口互斥选择ADB或原无障碍，只释放旧远程手势，不停用无障碍Service/截图；原MediaProjection/normal/SKL/ignore视频及waiting不变。资产固定官方5.0.1，FRB签名/构建工具链不变。详细源码、权限、大小上限、CPU成本及验收见链接；本轮未提交，仅V0，V2—V4待证。以下旧ADB描述按其历史日期解释。
+
 基线：2026-07-12，`HEAD 77062b4`
 
 > 本文只记录当前仓库可证明的 Android 运行时事实。标签含义：`verified` 为源码直接证实；`inferred` 为跨文件静态推断；`external` 为 Android/第三方平台行为；`verification-required` 为必须在正式构建机或真机确认的事项。源码高于本文。

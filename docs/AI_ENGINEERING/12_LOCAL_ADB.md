@@ -2,7 +2,7 @@
 
 当前核对：2026-10-13，main/aca7446，初始工作区clean。二维码移除、两端自动/手动模式与PC显式刷新已由980f254及其祖先固化；aca7446仅新增PC Shell栏和原侧栏标题，本机ADB能力保持。当前文档同步见 [T008](../tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)，远程共享与三键导航见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)；[T007](../tasks/T-2026-10-13-007-adb-docs-sync.md)保留原历史。
 
-当前实现是 Android App 内的独立无线调试客户端：配对、连接、验证 shell 身份和执行单次命令。主页向左滑到右侧 ADB 页，向右滑返回。采用 `libadb-android:3.1.1`；没有恢复旧 LADB 进程、`libadb.so`、旧通道或无障碍自动配对。T004 增加 PC 远程 ADB 请求，Android 共享身份/连接；scrcpy/ADB 投屏与视频接收仍未接入。
+当前实现是 Android App 内的独立无线调试客户端：配对、连接、验证 shell 身份和执行单次命令。主页向左滑到右侧 ADB 页，向右滑返回。采用 `libadb-android:3.1.1`；没有恢复旧 LADB 进程、`libadb.so`、旧通道或无障碍自动配对。T004增加PC远程ADB；2026-10-14 T001新增[独立scrcpy投屏与ADB优先触摸](14_ADB_MIRROR.md)，共用身份、独立媒体/控制连接。仅V0，构建/运行待验证。
 
 证据为源码/V0。当前会话未取得对应 APK、构建日志或真机测试结果，不能据“允许同步文档”推定 V2/V3 已通过。任务见 [T003](../tasks/T-2026-10-13-003-local-adb-docs.md)，决定见 [ADR-0017](../ADR/0017-isolated-local-adb.md)。
 
@@ -92,7 +92,7 @@ flowchart LR
 
 本地 Shell 是用户主动输入的任意命令，不带命令白名单或逐条二次批准；系统配对授予的是 ADB 能力。断开与超时不是系统撤权。旧 prefs/私钥/授权不导入也不自动清除；新身份与 T009 的旧资产分开。设备数据重置不是常规故障处理步骤，因为可能同时影响原产品配置。
 
-T004 / ADR-0018 已增加专用远程协议、既有远程控制权限gate、共享撤销与owner取消；通用shell没有命令内容白名单/持久审计，完整边界见13_REMOTE_ADB。当前仍未提供scrcpy server推送/启动、socket转发协议、视频解码/接收或输入桥。
+T004 / ADR-0018增加专用远程协议、远程控制权限gate、共享撤销与owner取消；通用shell没有命令内容白名单/持久审计，完整边界见13_REMOTE_ADB。T001的scrcpy资产推送/启动、socket、视频解码和输入分流另见14_ADB_MIRROR及ADR-0021；不占用原Shell队列。
 
 ## 6. 构建与第三方依赖
 

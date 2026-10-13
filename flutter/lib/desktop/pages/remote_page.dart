@@ -25,6 +25,8 @@ import '../widgets/kb_layout_type_chooser.dart';
 import '../widgets/tabbar_widget.dart';
 import '../adb/remote_adb_session_state.dart';
 import '../adb/remote_adb_sidebar.dart';
+import '../adb/remote_adb_mirror.dart';
+import '../adb/remote_adb_mirror_view.dart';
 
 import 'package:flutter_hbb/native/custom_cursor.dart'
     if (dart.library.html) 'package:flutter_hbb/web/custom_cursor.dart';
@@ -107,6 +109,7 @@ class _RemotePageState extends State<RemotePage>
 
   late FFI _ffi;
   late final RemoteAdbSessionState _remoteAdbState;
+  late final RemoteAdbMirror _remoteAdbMirror;
 
   SessionID get sessionId => _ffi.sessionId;
 
@@ -126,6 +129,7 @@ class _RemotePageState extends State<RemotePage>
     super.initState();
     _ffi = FFI(widget.sessionId);
     _remoteAdbState = RemoteAdbSessionState(_ffi.sessionId);
+    _remoteAdbMirror = RemoteAdbMirror(_ffi);
     _ffi.zegoVoiceCallModel.addListener(_handleZegoVoiceCallPanelState);
     Get.put<FFI>(_ffi, tag: widget.id);
     _ffi.imageModel.addCallbackOnFirstImage((String peerId) {
@@ -276,6 +280,7 @@ class _RemotePageState extends State<RemotePage>
     _zegoVoicePanelEdgeOffset.dispose();
     _rawKeyFocusNode.dispose();
     _remoteAdbState.dispose();
+    _remoteAdbMirror.dispose();
     await _ffi.close(closeSession: closeSession);
     _timer?.cancel();
     _ffi.dialogManager.dismissAll();
@@ -446,7 +451,9 @@ class _RemotePageState extends State<RemotePage>
             }
           }),
           if (!isWeb && _ffi.connType == ConnType.defaultConn)
-            RemoteAdbSidebar(ffi: _ffi, state: _remoteAdbState),
+            RemoteAdbMirrorView(mirror: _remoteAdbMirror),
+          if (!isWeb && _ffi.connType == ConnType.defaultConn)
+            RemoteAdbSidebar(ffi: _ffi, state: _remoteAdbState, mirror: _remoteAdbMirror),
           _buildZegoVoiceCallPanel(),
         ],
       ),

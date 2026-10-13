@@ -1,10 +1,14 @@
 # AShell Project Memory
 
-最后更新：2026-10-14（T008跨日文档交付）
+最后更新：2026-10-14（独立ADB投屏与触摸优先级）
 
 用途：AI 会话的稳定入口，不替代源码和完整工程文档。
 
 ## 0. Latest Recovery Snapshot
+
+T-2026-10-14-001续接：用户明确要求复核后提交、推送GitHub并运行编排、不监控；main和origin/main仍a1486ee，49个路径均本任务。修正Shell栏旧回执覆盖新推送，以及停止视频后decoder/RGB释放。STATE/WORK-20261014-002 / CE-20261014-T001-02；本文为Git/dispatch执行前记录，实际SHA和接受回执见最终交付，V0不提升为编译/真机通过。
+
+最新T-2026-10-14-001：[scrcpy投屏与ADB优先触摸](../docs/tasks/T-2026-10-14-001-adb-mirror.md)。main/a1486ee初始clean，本轮未提交实现固定官方scrcpy-server v5.0.1、Android独立video/control连接、Misc字段41、多PC有界视频、PC独立窗口和Shell栏开/关投屏。用户追加授权ADB触摸优先，适用于原共享/截图；ADB不可用才回到无障碍，接管时仅结束旧远程手势，不停Accessibility Service。原采集JNI/MainService/VideoFrame、工具链、身份和字段40保持。关投屏不关ADB触摸；任意控制PC全局关视频，最后订阅退出停止视频；PC本地50ms取帧不是远程status轮询。D-026/ADR-0021/Baseline16/STATE-20261014-001/CE-20261014-T001-01。V0源码/协议/资产哈希和范围检查；未执行编译、测试、analyze、codegen、设备、Git写入或CI。ADB-M01—M08全部NOT_RUN；OEM注入和双PC真机需验证。以下均为历史快照。
 
 最新T008：[Shell栏与ADB交接文档同步](../docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。观察main/aca7446，初始clean；980f254固化前轮UI/文档，aca7446提交八份Dart侧栏代码。Shell栏在ADB确认可用时自动显示，顶栏“移动端操作”左侧开关可关/开且普通回执保留关闭；仅ADB返回/主页/多任务，原侧栏加无障碍栏标题，原链保持。无PC周期status，事件查询才更新Android共享状态，非实时push。D-025/STATE008/CE-20261013-T008-01/Baseline15；本轮仅Markdown，代码hash保护，V0，当前构建/真机未验证，未Git/CI操作。下一阶段[投屏传输](../docs/AI_ENGINEERING/11_ROADMAP.md)待设计，未选型/实现；不要把shell ready等同于视频ready。以下均为历史快照。
 
