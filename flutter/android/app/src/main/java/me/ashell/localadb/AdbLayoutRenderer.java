@@ -5,10 +5,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.text.Layout;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,6 +32,8 @@ final class AdbLayoutRenderer {
         outline.setStyle(Paint.Style.STROKE);
         outline.setStrokeWidth(pixel);
         text.setColor(Color.WHITE);
+        // Only the app renders text. Use the public built-in family and its script fallback.
+        text.setTypeface(Typeface.SANS_SERIF);
         textSize = Math.max(24f, 11f * pixel);
     }
 
@@ -70,7 +76,21 @@ final class AdbLayoutRenderer {
         if (lineHeight > available) text.setTextSize(textSize * available / lineHeight);
         metrics = text.getFontMetrics();
         int lines = Math.max(1, Math.min(8, (int) (available / (metrics.descent - metrics.ascent))));
-        StaticLayout layout = StaticLayout.Builder.obtain(label, 0, label.length(), text, bounds.width() - 2)
+        // Color only actual digits; keep the same shaping, wrapping and bounds for mixed text.
+        SpannableString styled = new SpannableString(label);
+        int start = -1;
+        for (int i = 0; i < label.length();) {
+            int codePoint = label.codePointAt(i);
+            boolean digit = Character.isDigit(codePoint);
+            if (digit && start < 0) start = i;
+            if (!digit && start >= 0) {
+                styled.setSpan(new ForegroundColorSpan(Color.RED), start, i, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                start = -1;
+            }
+            i += Character.charCount(codePoint);
+        }
+        if (start >= 0) styled.setSpan(new ForegroundColorSpan(Color.RED), start, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        StaticLayout layout = StaticLayout.Builder.obtain(styled, 0, styled.length(), text, bounds.width() - 2)
                 .setAlignment(Layout.Alignment.ALIGN_NORMAL).setIncludePad(false)
                 .setMaxLines(lines).setEllipsize(TextUtils.TruncateAt.END).build();
         int saved = canvas.save();

@@ -5,6 +5,7 @@ import android.os.SystemClock;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -99,16 +100,26 @@ final class LocalAdbPrivacy {
 
     private void control(Run run) {
         Thread writer = null;
+        String operation = "App 白字绘制";
         try {
+            byte[] hint = AdbPrivacyHint.render(context);
+            if (run.cancelled.get()) return;
+            operation = "ADB 连接";
             run.client.connect(run.port, run.cancelled);
             // This is the installed, signed base APK, not peer-supplied code or a downloaded binary.
             String apk = "'" + context.getApplicationInfo().sourceDir.replace("'", "'\"'\"'") + "'";
             String command = "shell,v2,raw:CLASSPATH=" + apk
-                    + " app_process / me.ashell.localadb.AdbPrivacyOverlay";
+                    + " exec app_process / me.ashell.localadb.AdbPrivacyOverlay";
+            operation = "遮罩启动";
             try (AdbStream process = run.client.openMirrorStream(command)) {
               try {
                 writer = new Thread(() -> {
                     try {
+                        // One writer owns startup pixels AND lease commands. Heartbeats must
+                        // not interleave with the PNG or be interpreted as image bytes.
+                        byte[] startup = ByteBuffer.allocate(5 + hint.length)
+                                .put((byte) 1).putInt(hint.length).put(hint).array();
+                        writeStartup(process, startup, run.cancelled);
                         do {
                             boolean stop = run.cancelled.get();
                             byte[] packet = {0, 1, 0, 0, 0, (byte) (stop ? 0 : 1)}; // shell-v2 stdin
@@ -130,10 +141,13 @@ final class LocalAdbPrivacy {
                     readFully(process, header, header.length);
                     int size = ByteBuffer.wrap(header, 1, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
                     int channel = header[0] & 255;
-                    if (size < 0 || size > 65536 || channel < 1 || channel > 3) throw new IOException();
+                    if (size < 0 || size > 65536 || channel < 1 || channel > 3
+                            || (channel == 3 && size != 1)) throw new IOException();
+                    int exitCode = -1;
                     while (size > 0) {
                         int count = Math.min(size, buffer.length);
                         readFully(process, buffer, count);
+                        if (channel == 3) exitCode = buffer[0] & 255;
                         if (channel == 1) {
                             for (int i = 0; i < count; i++) {
                                 int ch = buffer[i] & 255;
@@ -148,7 +162,7 @@ final class LocalAdbPrivacy {
                             run.off = true; // shell-v2 confirms the helper process exited
                             if (active == run) {
                                 if (!run.cancelled.get() && run.failure.isEmpty())
-                                    run.failure = "ADB 黑屏遮罩进程已退出。";
+                                    run.failure = "ADB 黑屏遮罩进程已退出（exit " + exitCode + "）。";
                                 stopCurrent();
                             }
                         }
@@ -166,8 +180,9 @@ final class LocalAdbPrivacy {
                 run.client.abort(); // unblock AdbStream.close before leaving the resource scope
               }
             }
-        } catch (Exception | LinkageError ignored) {
-            if (!run.cancelled.get()) run.failure = "ADB 黑屏遮罩不可用：系统未支持排除截图的图层，或 ADB 已断开。";
+        } catch (Exception | LinkageError failure) {
+            if (!run.cancelled.get()) run.failure = "ADB 黑屏" + operation + "失败（"
+                    + failure.getClass().getSimpleName() + "）。";
         } finally {
             if (writer != null) writer.interrupt();
             run.client.abort();
@@ -193,12 +208,32 @@ final class LocalAdbPrivacy {
         if ("ASHELL_OVERLAY_READY".equals(line)) {
             run.ready = true;
             if (!run.cancelled.get()) publish("on", "");
-        } else if ("ASHELL_OVERLAY_ERROR".equals(line)) {
-            run.failure = "系统不支持此黑屏遮罩；未使用会遮挡 PC 画面的普通遮罩替代。";
+        } else if ("ASHELL_OVERLAY_ERROR".equals(line) || line.startsWith("ASHELL_OVERLAY_ERROR:")) {
+            run.failure = "ADB 黑屏遮罩创建失败。";
+            String[] fields = line.split(":", -1);
+            if (fields.length == 4 && fields[1].matches("[1-5]") && fields[2].matches("[0-9]{1,3}")
+                    && fields[3].matches("[A-Za-z0-9_$]{1,80}")) {
+                String operation = "2".equals(fields[1]) ? "提示图片接收" : "3".equals(fields[1]) ? "图层创建"
+                        : "4".equals(fields[1]) ? "提示图片显示" : "5".equals(fields[1]) ? "图层显示" : "启动";
+                run.failure = "ADB 黑屏" + operation + "失败（API " + fields[2] + " / " + fields[3] + "）。";
+            }
             stopCurrent();
         } else if ("ASHELL_OVERLAY_OFF".equals(line)) {
             run.off = true;
             stopCurrent();
+        }
+    }
+
+    private static void writeStartup(AdbStream stream, byte[] bytes, AtomicBoolean cancelled) throws IOException {
+        // Keep each write within the minimum ADB payload; libadb 3.1.1 cannot safely
+        // split arbitrary large writes. The inner length is big-endian, shell-v2 is LE.
+        for (int offset = 0; offset < bytes.length;) {
+            if (cancelled.get()) throw new InterruptedIOException("Stopped");
+            int size = Math.min(4091, bytes.length - offset);
+            byte[] packet = ByteBuffer.allocate(5 + size).order(ByteOrder.LITTLE_ENDIAN)
+                    .put((byte) 0).putInt(size).put(bytes, offset, size).array();
+            stream.write(packet, 0, packet.length); stream.flush();
+            offset += size;
         }
     }
 

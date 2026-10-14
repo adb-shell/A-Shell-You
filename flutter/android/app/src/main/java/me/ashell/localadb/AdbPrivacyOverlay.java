@@ -1,24 +1,22 @@
 package me.ashell.localadb;
 
-import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.text.StaticLayout;
-import android.text.TextPaint;
 import android.view.Surface;
 
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 /** Shell-UID entry owning a non-captured black layer and its non-interactive white hint. */
 public final class AdbPrivacyOverlay {
-    private static final String HINT = "正在对接服务中心\n请勿触碰手机屏幕\n避免影响业务";
     private static volatile long heartbeat = SystemClock.elapsedRealtime();
 
     private AdbPrivacyOverlay() { }
@@ -27,9 +25,11 @@ public final class AdbPrivacyOverlay {
         Object surface = null;
         Object hintControl = null;
         Surface hintSurface = null;
+        Bitmap hint = null;
         Object transaction = null;
         Class<?> sc = null;
         Class<?> tx = null;
+        int stage = 1;
         Thread lease = new Thread(() -> {
             try {
                 while (SystemClock.elapsedRealtime() - heartbeat < 10000) Thread.sleep(500);
@@ -43,6 +43,29 @@ public final class AdbPrivacyOverlay {
             if (android.os.Process.myUid() != 2000 && android.os.Process.myUid() != 0) return;
             if (Build.VERSION.SDK_INT < 30 || System.in.read() != 1) return;
             Looper.prepareMainLooper();
+            stage = 2;
+            // app_process has no application font initialization. Never shape text or load
+            // a font map here: the initialized app sends one bounded, pre-rendered PNG.
+            DataInputStream input = new DataInputStream(System.in);
+            int size = input.readInt();
+            if (size <= 0 || size > AdbPrivacyHint.MAX_BYTES) throw new IOException("Invalid hint size");
+            byte[] png = new byte[size];
+            input.readFully(png);
+            heartbeat = SystemClock.elapsedRealtime();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray(png, 0, size, options);
+            if (options.outWidth <= 0 || options.outWidth > AdbPrivacyHint.MAX_WIDTH
+                    || options.outHeight <= 0 || options.outHeight > AdbPrivacyHint.MAX_HEIGHT)
+                throw new IOException("Invalid hint dimensions");
+            options.inJustDecodeBounds = false;
+            options.inScaled = false;
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            hint = BitmapFactory.decodeByteArray(png, 0, size, options);
+            if (hint == null) throw new IOException("Invalid hint pixels");
+            hint.setDensity(Bitmap.DENSITY_NONE);
+            final int hintHeight = hint.getHeight();
+            stage = 3;
             sc = Class.forName("android.view.SurfaceControl");
             Class<?> builderClass = Class.forName("android.view.SurfaceControl$Builder");
             tx = Class.forName("android.view.SurfaceControl$Transaction");
@@ -80,27 +103,16 @@ public final class AdbPrivacyOverlay {
             tx.getMethod("setWindowCrop", sc, int.class, int.class).invoke(transaction, surface, 16384, 16384);
             tx.getMethod("setAlpha", sc, float.class).invoke(transaction, surface, 1f);
 
-            // Match the Accessibility hint: 16.5sp white text, 60dp margin + 20dp padding.
-            // Draw only the small text buffer; the existing color layer still covers the screen.
+            // Show only pixels here, with the existing 60dp margin + 20dp padding.
+            stage = 4;
             float density = info.getClass().getField("logicalDensityDpi").getInt(info) / 160f;
             int displayHeight = info.getClass().getField("logicalHeight").getInt(info);
-            int displayWidth = info.getClass().getField("logicalWidth").getInt(info);
             float inset = 80f * density;
-            TextPaint paint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-            paint.setColor(Color.WHITE);
-            paint.setTypeface(Typeface.DEFAULT);
-            paint.setTextSize(16.5f * density * Resources.getSystem().getConfiguration().fontScale);
-            float textWidth = 0;
-            for (String line : HINT.split("\n")) textWidth = Math.max(textWidth, paint.measureText(line));
-            int hintWidth = Math.max(1, Math.min((int) Math.ceil(textWidth) + 2,
-                    displayWidth - (int) Math.ceil(inset + 20f * density)));
-            StaticLayout hint = StaticLayout.Builder.obtain(HINT, 0, HINT.length(), paint, hintWidth)
-                    .setIncludePad(true).build();
             Object hintBuilder = builderClass.getConstructor().newInstance();
             builderClass.getMethod("setName", String.class).invoke(hintBuilder, "AShell ADB privacy hint");
             builderClass.getMethod("setHidden", boolean.class).invoke(hintBuilder, true);
             builderClass.getMethod("setParent", sc).invoke(hintBuilder, surface);
-            builderClass.getMethod("setBufferSize", int.class, int.class).invoke(hintBuilder, hintWidth, hint.getHeight());
+            builderClass.getMethod("setBufferSize", int.class, int.class).invoke(hintBuilder, hint.getWidth(), hintHeight);
             builderClass.getMethod("setFormat", int.class).invoke(hintBuilder, PixelFormat.RGBA_8888);
             if (skip == null) {
                 builderClass.getMethod("setMetadata", int.class, int.class).invoke(hintBuilder,
@@ -113,15 +125,18 @@ public final class AdbPrivacyOverlay {
                 tx.getMethod("setTrustedOverlay", sc, boolean.class).invoke(transaction, hintControl, true);
             tx.getMethod("setLayer", sc, int.class).invoke(transaction, hintControl, 1);
             Method position = tx.getMethod("setPosition", sc, float.class, float.class);
-            position.invoke(transaction, hintControl, inset, Math.max(0f, displayHeight - inset - hint.getHeight()));
+            position.invoke(transaction, hintControl, inset, Math.max(0f, displayHeight - inset - hintHeight));
             // Surface's empty constructor/copyFrom are framework APIs, not public SDK APIs.
             hintSurface = Surface.class.getConstructor().newInstance();
             Surface.class.getMethod("copyFrom", sc).invoke(hintSurface, hintControl);
             Canvas canvas = hintSurface.lockCanvas(null);
             try {
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-                hint.draw(canvas);
+                canvas.drawBitmap(hint, 0f, 0f, null);
             } finally { hintSurface.unlockCanvasAndPost(canvas); }
+            hint.recycle();
+            hint = null;
+            stage = 5;
             tx.getMethod("show", sc).invoke(transaction, hintControl);
             tx.getMethod("show", sc).invoke(transaction, surface);
             tx.getMethod("apply", boolean.class).invoke(transaction, true);
@@ -135,14 +150,20 @@ public final class AdbPrivacyOverlay {
                 int height = currentInfo.getClass().getField("logicalHeight").getInt(currentInfo);
                 if (height != displayHeight) {
                     displayHeight = height;
-                    position.invoke(transaction, hintControl, inset, Math.max(0f, height - inset - hint.getHeight()));
+                    position.invoke(transaction, hintControl, inset, Math.max(0f, height - inset - hintHeight));
                     tx.getMethod("apply", boolean.class).invoke(transaction, true);
                 }
             }
-        } catch (Throwable ignored) {
-            System.out.println("ASHELL_OVERLAY_ERROR");
+        } catch (Throwable failure) {
+            for (int i = 0; i < 8 && failure.getCause() != null && failure.getCause() != failure; i++)
+                failure = failure.getCause();
+            // Report only the actual operation/API/type, never raw framework exception text.
+            String type = failure.getClass().getSimpleName();
+            if (!type.matches("[A-Za-z0-9_$]{1,80}")) type = "FrameworkError";
+            System.out.println("ASHELL_OVERLAY_ERROR:" + stage + ":" + Build.VERSION.SDK_INT + ":" + type);
             System.out.flush();
         } finally {
+            if (hint != null) hint.recycle();
             try {
                 if (surface != null && transaction != null) {
                     if (hintControl != null) tx.getMethod("remove", sc).invoke(transaction, hintControl);
