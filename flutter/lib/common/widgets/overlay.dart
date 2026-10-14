@@ -1789,9 +1789,9 @@ class AShellStatusMonitor extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _row("视频状态：", m.data.video,
+                    if (!_desktopStatus) _row("视频状态：", m.data.video,
                         positiveText: '存在', negativeText: '丢失'),
-                    _row("特殊状态：", m.data.screenshot,
+                    if (!_desktopStatus) _row("特殊状态：", m.data.screenshot,
                         positiveText: '存在', negativeText: '丢失'),
                     _row("共享状态：", m.data.share),
                     _row("无视状态：", m.data.ignore),

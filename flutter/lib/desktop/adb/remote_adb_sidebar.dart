@@ -175,11 +175,10 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
               constraints.maxHeight * 0.1));
           final enabled = !_sending && !_adb.busy && !_adb.refreshing;
           Widget button(IconData icon, String label, int keyCode) => IconButton(
-              tooltip: label,
               color: Colors.white,
               disabledColor: Colors.white38,
               splashRadius: kDesktopIconButtonSplashRadius,
-              icon: Icon(icon), iconSize: 24 * scale,
+              icon: Icon(icon, semanticLabel: label), iconSize: 24 * scale,
               onPressed: enabled ? () => _navigate(keyCode) : null);
           return Stack(children: [
             Positioned(left: position.dx, top: position.dy, width: width, height: height,
@@ -212,30 +211,24 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                           button(Icons.more_horiz, 'ADB 多任务', 187),
                           _divider(),
                           _modeButton(scale, '开投屏', Colors.blue, widget.mirror.canStart,
-                              () => widget.mirror.setEnabled(true), '开启 ADB 视频；正在截图时切换为视频模式'),
+                              () => widget.mirror.setEnabled(true)),
                           _modeButton(scale, '关投屏', Colors.red, widget.mirror.canStopVideo,
-                              () => widget.mirror.setEnabled(false), '关闭所有 PC 的 ADB 视频'),
+                              () => widget.mirror.setEnabled(false)),
                           _divider(),
                           _modeButton(scale, '开无视', Colors.blue, widget.mirror.canScreenshot,
-                              () => widget.mirror.setEnabled(true, screenshot: true),
-                              widget.mirror.screenshotSupported
-                                  ? 'ADB 强制连续系统截图，无需无障碍；系统保护内容仍受限制。开启后替换 ADB 视频。'
-                                  : '请更新 Android 客户端以支持 ADB 连续截图'),
+                              () => widget.mirror.setEnabled(true, screenshot: true)),
                           _modeButton(scale, '关无视', Colors.red, widget.mirror.canStopScreenshot,
-                              () => widget.mirror.setEnabled(false, screenshot: true), '关闭所有 PC 的 ADB 连续截图'),
+                              () => widget.mirror.setEnabled(false, screenshot: true)),
                           _divider(),
                           _modeButton(scale, '开黑屏', Colors.blue, widget.mirror.canBlackOn,
-                              () => widget.mirror.setBlack(true), widget.mirror.privacySupported
-                                  ? '${widget.mirror.privacySummary}；独立黑色遮罩，不关闭物理屏幕，不遮挡 PC 采集画面'
-                                  : '请更新 Android 客户端以支持 ADB 黑屏遮罩', privacy: true),
+                              () => widget.mirror.setBlack(true)),
                           _modeButton(scale, '关黑屏', Colors.red, widget.mirror.canBlackOff,
-                              () => widget.mirror.setBlack(false), '${widget.mirror.privacySummary}；任意 PC 均可关闭', privacy: true),
+                              () => widget.mirror.setBlack(false)),
                           _divider(),
                           _modeButton(scale, '开穿透', Colors.blue, widget.mirror.canLayout,
-                              () => widget.mirror.setEnabled(true, layout: true),
-                              '通过 ADB 绘制界面节点的边框和文字；替换当前 ADB 画面，不影响普通画面和无障碍服务'),
+                              () => widget.mirror.setEnabled(true, layout: true)),
                           _modeButton(scale, '关穿透', Colors.red, widget.mirror.canStopLayout,
-                              () => widget.mirror.setEnabled(false, layout: true), '关闭所有 PC 的 ADB 穿透画面'),
+                              () => widget.mirror.setEnabled(false, layout: true)),
                           _divider(),
                           Container(
                             margin: const EdgeInsets.symmetric(vertical: 4),
@@ -268,11 +261,10 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                           ),
                           _divider(),
                           IconButton(
-                            tooltip: '收起 Shell栏',
                             color: Colors.white,
                             onPressed: widget.state.toggle,
                             splashRadius: kDesktopIconButtonSplashRadius,
-                            icon: const Icon(Icons.keyboard_arrow_down),
+                            icon: const Icon(Icons.keyboard_arrow_down, semanticLabel: '收起 Shell栏'),
                             iconSize: 24 * scale,
                           ),
                         ],
@@ -289,11 +281,8 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
 
   Widget _divider() => const Divider(height: 0, thickness: 2, indent: 10, endIndent: 10, color: Colors.white54);
 
-  Widget _modeButton(double scale, String label, Color color, bool enabled, VoidCallback action, String hint, {bool privacy = false}) => Tooltip(
-    message: privacy ? hint : widget.mirror.inputError.isNotEmpty ? widget.mirror.inputError
-        : widget.mirror.error.isNotEmpty ? widget.mirror.error
-        : hint,
-    child: ElevatedButton(onPressed: enabled ? action : null,
+  Widget _modeButton(double scale, String label, Color color, bool enabled, VoidCallback action) =>
+    ElevatedButton(onPressed: enabled ? action : null,
       // Match AntiShakeButton's visual properties exactly; state remains owned by ADB.
       style: ButtonStyle(
           backgroundColor: MaterialStateProperty.resolveWith((states) =>
@@ -304,6 +293,5 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
           textStyle: MaterialStateProperty.all(TextStyle(fontSize: 12 * scale, fontWeight: FontWeight.w500)),
           shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
           elevation: MaterialStateProperty.all(4)),
-      child: Text(label)),
-  );
+      child: Text(label));
 }
