@@ -87,7 +87,7 @@ class RemoteAdbMirror extends ChangeNotifier {
       : privacyPhase == 'on' ? '手机黑色遮罩已开启；PC 继续接收底层画面'
       : privacyPhase == 'starting' ? '正在建立手机黑色遮罩…'
       : privacyPhase == 'stopping' ? '正在移除手机黑色遮罩…' : '手机黑色遮罩未开启';
-  String get summary => error.isNotEmpty ? error : phase == 'starting' ? (layoutMode ? '正在读取界面布局…' : screenshotMode ? '正在启动连续截图…' : '正在启动投屏…')
+  String get summary => error.isNotEmpty ? error : phase == 'starting' ? (layoutMode ? '正在读取界面布局…' : screenshotMode ? '正在启动无视…' : '正在启动投屏…')
       : phase == 'stopping' ? '正在关闭所有 PC 的 ADB 画面…'
       : phase == 'streaming' ? (image == null ? '等待画面…' : '画面传输中')
       : phase == 'waiting' ? '正在确认画面能力…' : 'ADB 画面未开启';
