@@ -372,8 +372,7 @@ class _RemotePageState extends State<RemotePage>
                       ? RemoteDisplayLayout(ffi: _ffi, mirror: _remoteAdbMirror, ordinary: getBodyForDesktop(context))
                       : getBodyForDesktop(context))),
           Positioned(top: 10, right: 10,
-            child: IgnorePointer(child:
-              RemoteStatusMonitors(_ffi.qualityMonitorModel, _ffi.ashellStatusModel))),
+            child: IgnorePointer(child: _buildStatusMonitors())),
           Stack(
             children: [
               _ffi.ffiModel.pi.isSet.isTrue &&
@@ -469,6 +468,35 @@ class _RemotePageState extends State<RemotePage>
       ),
     );
   }
+
+  Widget _buildStatusMonitors() => AnimatedBuilder(
+        animation: Listenable.merge([_remoteAdbState, _remoteAdbMirror, _ffi.ffiModel]),
+        builder: (context, _) {
+          final showAdb = !isWeb && _ffi.connType == ConnType.defaultConn &&
+              _ffi.ffiModel.isPeerAndroid;
+          final peerReady = _ffi.ffiModel.pi.isSet.value;
+          bool? mediaState(String format) {
+            final phase = _remoteAdbMirror.phase;
+            if (!peerReady || phase == 'waiting' || phase == 'error') return null;
+            if (_remoteAdbMirror.format != format) return false;
+            if (phase == 'starting' || phase == 'stopping') return null;
+            return phase == 'streaming';
+          }
+
+          final privacyPhase = _remoteAdbMirror.privacyPhase;
+          final bool? privacyState = !peerReady || _remoteAdbMirror.phase == 'waiting' ||
+                  privacyPhase == 'starting' || privacyPhase == 'stopping'
+              ? null : privacyPhase == 'on';
+          return RemoteStatusMonitors(_ffi.qualityMonitorModel, _ffi.ashellStatusModel,
+              adbStatus: showAdb ? (
+                video: mediaState('h264'),
+                ignore: mediaState('jpeg'),
+                blank: privacyState,
+                penetrate: mediaState('layout'),
+                available: peerReady && _remoteAdbState.available,
+              ) : null);
+        },
+      );
 
   Widget _buildZegoVoiceCallPanel() {
     return AnimatedBuilder(

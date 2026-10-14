@@ -1720,9 +1720,21 @@ class QualityMonitor extends StatelessWidget {
               : const SizedBox.shrink()));
 }
 
+// Presentation snapshot supplied by the desktop session; no ADB controller or polling here.
+typedef AdbMonitorStatus = ({
+  bool? video,
+  bool? ignore,
+  bool? blank,
+  bool? penetrate,
+  bool available,
+});
+
 class AShellStatusMonitor extends StatelessWidget {
   final AShellStatusModel ashellStatusModel;
-  AShellStatusMonitor(this.ashellStatusModel);
+  final AdbMonitorStatus? adbStatus;
+  AShellStatusMonitor(this.ashellStatusModel, {this.adbStatus});
+
+  bool get _desktopStatus => isDesktop || isWebDesktop;
 
   Widget _row(String label, bool? state,
       {String positiveText = '\u5f00', String negativeText = '\u5173'}) {
@@ -1771,8 +1783,8 @@ class AShellStatusMonitor extends StatelessWidget {
       child: Consumer<AShellStatusModel>(
         builder: (context, m, child) => m.show
             ? Container(
-                constraints: const BoxConstraints(maxWidth: 200),
-                padding: const EdgeInsets.all(8),
+                constraints: BoxConstraints(maxWidth: _desktopStatus ? 144 : 200),
+                padding: EdgeInsets.symmetric(horizontal: _desktopStatus ? 6 : 8, vertical: 8),
                 color: MyTheme.canvasColor.withAlpha(150),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1785,8 +1797,19 @@ class AShellStatusMonitor extends StatelessWidget {
                     _row("无视状态：", m.data.ignore),
                     _row("黑屏状态：", m.data.blank),
                     _row("穿透状态：", m.data.penetrate),
-                    _row("防触状态：", m.data.touchblock),
-                    _row("加密状态：", m.data.accessibility),
+                    if (!_desktopStatus) _row("防触状态：", m.data.touchblock),
+                    _row("加密状态：", m.data.accessibility,
+                        positiveText: _desktopStatus ? '可用' : '开',
+                        negativeText: _desktopStatus ? '不可用' : '关'),
+                    if (adbStatus != null) ...[
+                      const Divider(height: 12, thickness: 1, color: Colors.white24),
+                      _row("投屏状态：", adbStatus!.video),
+                      _row("无视状态：", adbStatus!.ignore),
+                      _row("黑屏状态：", adbStatus!.blank),
+                      _row("穿透状态：", adbStatus!.penetrate),
+                      _row("命令状态：", adbStatus!.available,
+                          positiveText: '可用', negativeText: '不可用'),
+                    ],
                   ],
                 ),
               )
@@ -1797,7 +1820,9 @@ class AShellStatusMonitor extends StatelessWidget {
 class RemoteStatusMonitors extends StatelessWidget {
   final QualityMonitorModel qualityMonitorModel;
   final AShellStatusModel ashellStatusModel;
-  RemoteStatusMonitors(this.qualityMonitorModel, this.ashellStatusModel);
+  final AdbMonitorStatus? adbStatus;
+  RemoteStatusMonitors(this.qualityMonitorModel, this.ashellStatusModel,
+      {this.adbStatus});
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -1809,7 +1834,8 @@ class RemoteStatusMonitors extends StatelessWidget {
             if (qualityMonitorModel.show) QualityMonitor(qualityMonitorModel),
             if (qualityMonitorModel.show && ashellStatusModel.show)
               const SizedBox(height: 6),
-            if (ashellStatusModel.show) AShellStatusMonitor(ashellStatusModel),
+            if (ashellStatusModel.show)
+              AShellStatusMonitor(ashellStatusModel, adbStatus: adbStatus),
           ],
         ),
       );
