@@ -1,6 +1,7 @@
 # AShell 完整架构 / Architecture
 
-2026-10-14 T002：ADB展示从独立浮动窗口改为主界面分栏；单源居中，双源左普通/右ADB。新增独立ADB连续系统截图，与scrcpy视频互斥，共用多PC背压/全局停止；原Android采集与触摸优先级不变。PC视口/等待提示适配见[当前合同](14_ADB_MIRROR.md)和ADR-0022，覆盖下方T001窗口描述。本轮未提交/V0。
+ADB当前源码7607349：主界面单源居中、双源左普通右ADB；三种ADB源互斥，普通源独立。Android拥有身份并推送真实状态；命令2并发、媒体/黑屏/触摸各自连接，模式化停止不刷新普通视频。T005/Baseline20/ADR0025，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+
 
 基线：2026-07-12，`HEAD 77062b4`
 
@@ -129,7 +130,7 @@ Flutter 普通产品登录和资源 API多为 Dart 直接 HTTP；Rust `account.r
 - Android disconnect 不得自动停止 screen share。
 - waiting 不得自动切 ignore/screenshot fallback。
 - ZEGO 不得进入旧 `audio_service` 媒体链。
-- T009移除旧ADB/LADB；本机LocalAdbPage与PC专用Misc.remote_adb共用LocalAdbManager，Shell栏三键仍经原ADB命令。2026-10-14 T001追加Misc.remote_adb_video(41)、LocalAdbMirror/LocalAdbTouch、独立PC解码与窗口；普通画面输入在Android授权入口按ADB状态分流，无ADB时走原无障碍。原视频、截图、waiting、terminal保持。见[投屏与触摸架构](14_ADB_MIRROR.md)。
+- T009移除旧ADB/LADB；本机LocalAdbPage与PC专用Misc.remote_adb共用LocalAdbManager，Shell栏三键仍经原ADB命令。2026-10-14 T001追加Misc.remote_adb_video(41)、LocalAdbMirror/LocalAdbTouch、独立PC解码与主界面分栏；普通画面输入在Android授权入口按ADB状态分流，无ADB时走原无障碍。原视频、截图、waiting、terminal保持。见[投屏与触摸架构](14_ADB_MIRROR.md)。
 - controller relay-only 与 endpoint direct surface 必须明确区分。
 - 任何 protobuf 改动必须同步 sender、receiver、FFI/UI 和兼容策略。
 - Windows privacy/virtual-display 修改必须带 driver/OS/permission 恢复方案。

@@ -707,3 +707,15 @@ Mode：`append-only logical persisted-change events`
 - LocalAdbTouch补首次stop期限保持、wait后旧Run检查、metrics纳入超时；同步任务及薄记忆。D029/ADR0024/Baseline19 reviewed-no-change，STATE008/WORK012。
 - V0复核调用链/JNI/R8/协议/资源回收/几何与原链差异；不运行本地产品构建/测试/分析/codegen。真机场景补ADB-M18，正式验证仍NOT_RUN。
 - 紧接stage/commit/push当前31路径，单次Build AShell clients both/aarch64、不监控。此为执行前记录，最终SHA与接受结果见Git/交付，不宣称构建通过；无Release/tag/依赖/生产变更。
+
+## CE-20261014-T005-01 — 同步7607349的ADB当前文档
+
+- Task：T-2026-10-14-005；用户明确文档更新后提交推送，明确不执行编排。初始main/7607349、clean；没有新增代码变更。
+- 当前合同：docs/AI_ENGINEERING/12_LOCAL_ADB.md、13_REMOTE_ADB.md、14_ADB_MIRROR.md。
+- 关联导航：AGENTS.md、PROJECT_START_HERE.md、docs/AI_ENGINEERING/00_PROJECT_OVERVIEW.md、01_ARCHITECTURE.md、02_SOURCE_MAP.md、03_MODULE_DESIGN.md、04_ANDROID_PIPELINE.md、06_NETWORK_PROTOCOL.md、08_BUILD_SYSTEM.md、09_DEBUG_SYSTEM.md、10_SECURITY_MODEL.md、11_ROADMAP.md。
+- 验证/资产：TEST_MATRIX.md、EXTERNAL_ASSET_REGISTRY.md；没有新增或替换外部资产。
+- 决定/基线/任务：docs/ADR/0025-adb-lanes-and-state-sync.md、0020-adb-code-pairing-and-explicit-refresh.md后继说明、README.md；docs/BASELINE/20_ADB_CURRENT_BASELINE_2026-10-14.md、BASELINE_INDEX.md；docs/tasks/T-2026-10-14-005-adb-docs-sync.md。
+- 记忆：.codex/PROJECT_STATE.md、PROJECT_MEMORY.md、CURRENT_WORK.md、CHANGELOG_AI.md、DECISION_LOG.md、TASK_HISTORY.md、CHANGE_EVENT_LOG.md；STATE009 / WORK014 / D030。
+- Delta：真实推送/独立命令/UID及OPEN修复、模式化停止/全局触摸、RGBA和动态截图节奏、节点边界、白字遮罩/无视启动文案；将旧当前描述修正为源码事实，冻结历史记录不冒充现状。
+- Verification：V0源码/提交/本地链接/范围/diff；不把日志修复或历史dispatch204当当前构建通过。文档commit/push按当前授权执行，最终SHA与结果见Git/交付。
+- 未执行：业务代码/依赖/版本/工作流修改、构建编排及监控、本地产品build/test/analyze/codegen、设备/生产/Release/tag/删除操作。

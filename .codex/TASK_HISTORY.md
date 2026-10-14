@@ -356,3 +356,11 @@
 - V0源码/协议/JNI/R8/有界资源/文本括号与diff检查；正式构建/真机/多PC仍NOT_RUN。详情docs/tasks/T-2026-10-14-004-adb-ui-and-input.md；D029/ADR0024/Baseline19/STATE007/CE-20261014-T004-01。
 
 - 当前用户追加C2补漏/C3提交推送编排：触摸重复stop保持首次期限、旧Run不能取走新队列事件、尺寸读取纳入守卫。31路径、本地/远端main404b199、Build AShell clients active。CE-20261014-T004-02 / STATE008 / WORK012；将commit/push后dispatch both/aarch64一次且不监控，实际回执见Git/交付。V0不升级为构建或真机通过。
+
+## T-2026-10-14-005 — 同步当前ADB文档，提交推送但不编排
+
+- 来源main/76073498e6b8a405f175c654f54275d143fdcc02，initial clean；现有“增加黑屏文字”代码已在7607349，本轮无业务代码差异。
+- 用户明确C1文档+C3 commit/push到既有origin/main；明确不执行编排，未运行或监控CI，未执行本地产品build/test/analyze/codegen/设备/生产动作。
+- 补录80887c1—7607349代码事实，更新12/13/14、架构/源码/Android/协议/构建调试/安全/路线入口、TEST_MATRIX、External Registry与会话记忆。新增ADR0025/D030/Baseline20；保留旧历史任务/基线。
+- V0合同、来源、链接和diff核对；已有Java编译错误由1c46e74修正源码，当前仍无构建/真机通过证据。后续正式验收覆盖双PC独立命令、状态推送、UID验证、连续模式开关与原链隔离、白字遮罩/R8等。
+- 当前文档交付记录写于提交前；实际commit/push SHA与clean结果由Git/会话交付提供。STATE009 / WORK014 / CE-20261014-T005-01；详情docs/tasks/T-2026-10-14-005-adb-docs-sync.md。

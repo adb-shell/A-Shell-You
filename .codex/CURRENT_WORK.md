@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261014-012`
+Registry Revision：`WORK-20261014-014`
 
-Last Updated：2026-10-14（ADB样式/几何/触摸/节点穿透）
+Last Updated：2026-10-14（ADB当前合同与修复文档同步）
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none。T-2026-10-14-004复核完成，触摸重复停止/旧Run隔离/尺寸读取超时补齐；STATE008 / CE-20261014-T004-02。用户已授权将当前31路径提交推送main，单次Build AShell clients both/aarch64、不监控；此为执行前关闭记录，实际SHA与接受回执见Git和最终交付。仅V0，未本地产品build/test/analyze/codegen或真机验证。
+none。T-2026-10-14-005文档/V0完成，30个Markdown文件、215个本地链接有效、diff检查通过，无代码/配置差异；紧接执行本次明确授权的commit/push，Git回执见实际提交/交付。用户明确本次不执行编排，未执行本地产品验证或CI监控。STATE009 / CE-20261014-T005-01。
 
 ## 2. Concurrent Session Rules
 
@@ -26,6 +26,9 @@ none。T-2026-10-14-004复核完成，触摸重复停止/旧Run隔离/尺寸读�
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+- 当前T005：同步7607349的ADB当前合同/修复记录、ADR0025/D030/Baseline20、验证矩阵及记忆。源码工作区初始clean；本次仅文档。详细任务：docs/tasks/T-2026-10-14-005-adb-docs-sync.md。
+- 下方为此前关闭快照，不代表本次Git/CI权限或当前HEAD。
 
 - T004续接：本地/远端main均404b199，workflow active；V0检查后补齐触摸回收边界并执行上述Git/CI授权。ADB-M17—M20仍待正式结果，dispatch不等于通过。
 

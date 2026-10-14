@@ -1,5 +1,9 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
+2026-10-14 T005当前：源码main/7607349；文档同步任务开始时clean。ADB已具备独立投屏/无视/节点穿透、白字黑屏、全局优先触摸、2路独立命令及Android状态变化推送；无PC三秒status。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-14-005-adb-docs-sync.md)、ADR0025/D030/Baseline20。V0；当前构建/真机结果待证。本次仅文档提交推送，不执行或监控编排。
+
+以下段落为历史任务快照，不覆盖上述当前合同。
+
 2026-10-14 T002：main/a0e46b1上实现主界面单源居中/双源左普通右ADB、Shell栏同款按钮、ADB独立连续系统截图。原Android采集/无障碍/触摸优先级保持，PC仅适配视口和ADB等待提示。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、ADR-0022/D-027/Baseline17；本轮未提交，仅V0。前轮a0e46b1已推送、Build AShell clients both/aarch64获204且未监控；没有本轮Git/CI或构建/真机结果。以下旧段为各任务历史快照。
 
 2026-10-13 T008：当前观察main/aca7446，初始clean。980f254固化配对模式/无QR/PC显式刷新；aca7446新增PC Shell栏（三键经独立ADB shell）、“移动端操作”左侧开关与无障碍栏标题。RemotePage持有会话显示状态，确认ADB可用时自动显示，持续可用时保留手动关闭；无PC周期status，也无Android状态push。见13_REMOTE_ADB、D-025、Baseline15、T008；仅V0，当前构建/真机待证。本轮仅同步文档，无Git/构建操作。下一阶段ADB投屏传输待设计，未接入视频，不触碰原无障碍/采集/输入链。
@@ -66,7 +70,7 @@
 6. Legacy desktop UI：`src/ui/`
 7. Account / HTTP / sync / upload：`src/hbbs_http/`
 8. Windows privacy mode / virtual display：`src/privacy_mode.rs` + `src/virtual_display_manager.rs`
-9. 旧Android本地ADB/LADB已退役；LocalAdbPage + me.ashell.localadb由T004扩展Android共享manager，PC经专用协议请求配对/连接/shell。aca7446的Shell栏仅通过该shell入口执行三键，RemoteAdbSessionState由RemotePage拥有；与原采集/输入/terminal独立，非ADB投屏。
+9. 旧Android本地ADB/LADB仍退役；新LocalAdbManager归Android进程，字段40承担请求/回执/状态推送，字段41承担独立媒体与触摸。PC Shell栏包含导航、投屏/无视/穿透/黑屏、网址；主界面普通左/ADB右，单源居中。命令、媒体、触摸、遮罩各自连接，详见12_LOCAL_ADB、13_REMOTE_ADB和14_ADB_MIRROR。
 10. ZEGO voice call：Flutter RTC side path + Rust control-channel invitation state
 
 不要把项目误读成：

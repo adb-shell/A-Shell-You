@@ -1,58 +1,18 @@
 # AShell Project Memory
 
-最后更新：2026-10-14（主界面ADB分栏与连续截图）
+最后更新：2026-10-14（当前ADB模块与修复文档同步）
 
 用途：AI 会话的稳定入口，不替代源码和完整工程文档。
 
 ## 0. Latest Recovery Snapshot
 
-T003续接授权：提交/推送当前30路径到GitHub main，并单次执行Build AShell clients both/aarch64，不监控。核对本地/远端941b215，workflow active，V0 diff通过；STATE006/WORK008/CE-20261014-T003-02。此为执行前记录，准确SHA与dispatch回执见Git/最终交付；下方未提交/无授权为旧快照，不推断构建通过。
+2026-10-14 T005：源码main/7607349、初始clean，本次仅ADB文档同步并按用户明确要求提交推送，不执行或监控编排。当前指针STATE009 / WORK014 / CE-20261014-T005-01 / D030 / ADR0025 / Baseline20；[任务](../docs/tasks/T-2026-10-14-005-adb-docs-sync.md)记录验证边界。
 
-T003最新：[ADB控件与遮罩](../docs/tasks/T-2026-10-14-003-adb-controls-and-overlay.md)。main/941b215初始clean；全窗口右上状态浮层、双图向中线靠近、停止/本机桥超时恢复；新增独立shell UID黑色图层（Android11元数据/12+setSkipScreenshot），不熄屏、不改原无障碍/采集/输入实现。多PC共用开关，断链/最后订阅退出自动清理。D028/ADR0023/Baseline18/STATE005/WORK007/CE-20261014-T003-01；V0，源码和记录未提交，ADB-M13—M16未构建/真机验证，无本轮Git/CI。前轮941b215已推送并dispatch204且未监控；下方为旧任务历史。
+ADB当前：双NSD配对和id -u验证，独立2路Shell命令、Android真实状态变化推送及最多3次意外断链恢复。PC无三秒远程status；apiVersion3支持requestId取消，mirrorVersion2按模式停止。主界面单源居中/双源普通左ADB右；投屏、无视、节点穿透三选一，独立白字黑屏、全局ADB优先触摸。PC视频解码后使用RGBA本机桥，截图最多8fps动态节奏、节点约2fps。详见[当前合同](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 
-T002续接交付：用户明确授权推送并执行编排；本地/远端main均a0e46b1，35个待交付路径全部属于本任务。将提交/推送main并单次触发Build AShell clients both/aarch64，沿用不监控边界。STATE004 / WORK005 / CE-20261014-T002-02；此记录在执行前，最终SHA和接受回执见Git/会话交付，不提升V0为构建/真机通过。
+后续源码提交80887c1/f7bcb70/ee4c99b补齐侧栏、独立触摸、执行隔离、同步与竞态；1c46e74修复package-private AdbProtocol造成的Android编译错误；7607349增加黑屏白字和“正在启动无视…”文案。修复后未取得构建/真机通过结果，历史dispatch204不构成验证。
 
-当前T-2026-10-14-002：[主界面ADB与连续截图](../docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)。main/a0e46b1初始clean，本轮未提交代码/文档；单源居中，双源左普通/右ADB带中心竖线。Shell栏同款蓝/红按钮，视频与独立系统截图互斥切换，多PC共享/全局停止。截图最多2fps、最长边1280，不绕过Android保护内容。原采集/Accessibility/触摸优先级与工具链保持，PC仅增加视口与ADB替代waiting提示的适配。D027/ADR0022/Baseline17/STATE003/WORK004/CE-20261014-T002-01；V0，正式构建/真机ADB-M01—M12待验证，无本轮Git/CI。
-
-前轮执行结果补录：a0e46b10c27c7e6a407c5a61d9e7012b785f99c6已推送，Build AShell clients both/aarch64获HTTP204且未监控，不证明编译通过。下面T001“执行前”段落及更早段落均保留历史时点含义。
-
-T-2026-10-14-001续接：用户明确要求复核后提交、推送GitHub并运行编排、不监控；main和origin/main仍a1486ee，49个路径均本任务。修正Shell栏旧回执覆盖新推送，以及停止视频后decoder/RGB释放。STATE/WORK-20261014-002 / CE-20261014-T001-02；本文为Git/dispatch执行前记录，实际SHA和接受回执见最终交付，V0不提升为编译/真机通过。
-
-最新T-2026-10-14-001：[scrcpy投屏与ADB优先触摸](../docs/tasks/T-2026-10-14-001-adb-mirror.md)。main/a1486ee初始clean，本轮未提交实现固定官方scrcpy-server v5.0.1、Android独立video/control连接、Misc字段41、多PC有界视频、PC独立窗口和Shell栏开/关投屏。用户追加授权ADB触摸优先，适用于原共享/截图；ADB不可用才回到无障碍，接管时仅结束旧远程手势，不停Accessibility Service。原采集JNI/MainService/VideoFrame、工具链、身份和字段40保持。关投屏不关ADB触摸；任意控制PC全局关视频，最后订阅退出停止视频；PC本地50ms取帧不是远程status轮询。D-026/ADR-0021/Baseline16/STATE-20261014-001/CE-20261014-T001-01。V0源码/协议/资产哈希和范围检查；未执行编译、测试、analyze、codegen、设备、Git写入或CI。ADB-M01—M08全部NOT_RUN；OEM注入和双PC真机需验证。以下均为历史快照。
-
-最新T008：[Shell栏与ADB交接文档同步](../docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。观察main/aca7446，初始clean；980f254固化前轮UI/文档，aca7446提交八份Dart侧栏代码。Shell栏在ADB确认可用时自动显示，顶栏“移动端操作”左侧开关可关/开且普通回执保留关闭；仅ADB返回/主页/多任务，原侧栏加无障碍栏标题，原链保持。无PC周期status，事件查询才更新Android共享状态，非实时push。D-025/STATE008/CE-20261013-T008-01/Baseline15；本轮仅Markdown，代码hash保护，V0，当前构建/真机未验证，未Git/CI操作。下一阶段[投屏传输](../docs/AI_ENGINEERING/11_ROADMAP.md)待设计，未选型/实现；不要把shell ready等同于视频ready。以下均为历史快照。
-
-最新T007：[ADB文档同步](../docs/tasks/T-2026-10-13-007-adb-docs-sync.md)。观察main/efb2599，初始三份Dart dirty；二维码与旧serviceName已在efb2599移除，后续工作树取消PC三秒刷新、两端自动模式只显示配对码/手动模式显示端口与扫描、PC连接按钮主题色。Android本机3秒查询保持；多PC共享状态需各自开窗/手动查询，操作回执更新当前窗口。V0；efb2599已推送且both/aarch64 dispatch获HTTP204，未监控，无构建成功证据。本轮仅同步文档并保护源码hash；用户追加授权提交全部待交付改动、推送并再触发单次编排，不监控，实际结果见最终回执。D-024/ADR-0020/STATE007/CE-20261013-T007-01/Baseline14。
-
-历史T006：[ADB可用性](../docs/tasks/T-2026-10-13-006-adb-usability.md)。main/504adea上实现独立ADB gate、双NSD/一键连接/PC系统QR/分窗拖动/手机UI，随后由feac956固化。二维码与PC轮询已由T007记录的新决定取代；D-023/ADR-0019/STATE006/CE-20261013-T006-01/Baseline13保持历史。以下“最新”均为各任务当时快照。
-
-最新：`T-2026-10-13-005`，[ADB bind导入修复](../docs/tasks/T-2026-10-13-005-adb-bind-import.md)。main/de8bc76已固化T004；用户Android CI报remote_adb_controller.dart三处bind未定义，compileFlutterBuildRelease失败。补直接import platform_model.dart show bind，源码仅一行；修复后未重编/提交/dispatch，需新SHA构建。STATE-20261013-005 / CE-20261013-T005-01；D-022/ADR-0018 reviewed-no-change。以下状态保留历史时点。
-
-最新：`T-2026-10-13-004`，[PC远程ADB](../docs/tasks/T-2026-10-13-004-remote-adb.md)。main/917e661初始clean，独立PC菜单/Misc.remote_adb(40)/JNI与Android共享manager已在未提交工作树实现。各PC查询Android同一配对记录、连接和队列；回执只给origin；revoke清App身份，系统列表仍手动忘记。无ADB投屏，原无障碍/视频/输入处理保持。V0，正式构建/多PC/权限验收待验证；无Git/产品执行。D-022 / ADR-0018 / STATE-20261013-004 / CE-20261013-T004-01；以下全部“最新”仅指各段历史时点。
-
-最新：`T-2026-10-13-003`，[本机 ADB 文档同步](../docs/tasks/T-2026-10-13-003-local-adb-docs.md)。观察 main/f84a78f，initial clean；8662f23 的独立模块保持，当前主页 ServerPage → LocalAdbPage，API 30+ 手动配对/连接/id验证/shell。无 PC ADB/ADB 投屏；旧 LADB 仍退役。当前事实见 [12_LOCAL_ADB.md](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)。本轮仅 Markdown/V0；V2/V3 结果未提供，未执行 Git 写入、构建、设备或发布。D-021 / ADR-0017 / STATE-20261013-003 / CE-20261013-T003-01；以下为各任务当时快照，不覆盖当前 HEAD。
-
-最新：`T-2026-10-13-002`，见 [SDK 初始化修复](../docs/tasks/T-2026-10-13-002-android-sdk-setup.md)。main/c521601、initial clean；T001 已按同一会话“提交github”要求推送。用户报告 sdkmanager 缺失，native/APK 两 job 补固定 SDK setup / CLI 16.0；修复后 V0，运行待验证。STATE-20261013-002 / CE-20261013-T002-01，D-020 reviewed-no-change。本快照在修复提交前写入，后续提交/推送状态以 Git 回执为准；以下 T001 为当时历史快照。
-
-当前最新：`T-2026-10-13-001`，见 [独立客户端 Actions](../docs/BUILD_CLIENTS_ACTIONS.md) 与 [任务](../docs/tasks/T-2026-10-13-001-client-actions.md)。main/8662f23、initial clean；HEAD 已含新的隔离 local ADB。唯一 build-clients.yml 手动选择 Android/Windows/both 与 aarch64/universal，默认 both+aarch64；Android 临时测试签名、Windows unsigned EXE/ZIP；仅 Actions artifacts 14天。旧12个workflow及失效Dependabot移除，本地脚本元数据解耦。只完成V0，未实际编译/Git/签名/上传；本轮修改未提交。D-020 / ADR-0016 / CE-20261013-T001-01 / STATE-20261013-001。
-
-以下 T009 及更早段落是当时快照；“未接入新组件”不能覆盖8662f23当前源码。T009删除的旧libadb.so仍排除，新的local ADB不是该旧组件。
-
-当前最新：`T-2026-10-12-009`，见 [旧 ADB 退役](../docs/tasks/T-2026-10-12-009-remove-legacy-adb.md)。main/13f792d，初始 clean；T008 已提交。删除主页右侧 ADB 页、Dart/native 通道、4 个 Kotlin 模块、无线调试自动化及两项专用权限，排除旧 libadb.so，移除 host adb 检查；新组件未接入。Windows/远控核心/JNI/MainService/DevAutoSelectorController 未改。V0 核对完成，未 build/test/analyze/codegen/操作设备/Git 写入；本轮修改未提交。D-019 / ADR-0015 / CE-20261012-T009-01 / STATE-20261012-010。
-
-以下 T008/T007 为当时快照，不代表当前工作区状态。
-
-当前最新：`T-2026-10-12-008`，见 [Android构建诊断](../docs/tasks/T-2026-10-12-008-android-resource-build.md)。main/fb5c393（修改图标），开始clean；T006/T007此前已按明确请求推送test并快进合并/推送main。用户原目录更新源码后增量编译遇到mergeReleaseResources/source-sets，疑似旧AGP增量问题，未取得完整stacktrace，不能确认根因。已静态修正build.sh两打包函数的stdout路径协议与错误码传播；不会在Flutter失败后继续选旧APK/签名。未改图标和工具链，未清缓存/编译/Git写入；源码修改未提交，只有bash -n及静态检查。CE-20261012-T008-01 / STATE-20261012-009；后续构建机clean/retry需要实际结果。
-
-以下T007为图标修改完成、Git提交之前的历史快照，不代表当前分支或dirty状态。
-
-最新任务：`T-2026-10-12-007`，见 [图标覆盖复核](../docs/tasks/T-2026-10-12-007-icon-coverage.md)。源test/c9b7cd135be838989953e7ab7037f8c6d8d6aa31，initial dirty为T006的32文件；新增补齐后合并51文件未提交。Android通知/主题使用同源机器人白色alpha，默认悬浮球保留完整原图；Windows旧Sciter改为读取同源128 PNG、自解压窗口持有small/big图标、卸载快捷方式引用主EXE。主EXE/服务/托盘/MSI消费链已静态核对；OS RuntimeBroker、系统服务管理器通用图标及用户customSvg不覆盖。12PNG/16XML、引用/ignore、源图及T006图片hash保护检查通过，只有V0。NWG API对照官方源码，本地解析依赖不可核对；实际Windows/Android显示未验证。事件CE-20261012-T007-01；STATE-20261012-008；无架构决定delta，禁止继承编译或Git权限。
-
-T006历史：[产品图标记录](../docs/tasks/T-2026-10-12-006-product-icons.md)。从同一原PNG转换21个图片资源，统一Windows主程序/自解压EXE/托盘、Flutter角标及Android桌面；原图实际1254方形RGBA，源图/UI主图规范为1024。loadIcon使用同源PNG主图与备用，不再回退旧SVG。此轮图片和Flutter代码在T007保持hash不变；T006没有覆盖的通知/悬浮图及主题配置由T007补齐。两轮均未编译/测试/实际打包/安装/Git写入。
-
-T005历史：统一PC入口为build.cmd，直接打包本次清理后编译的Release，不下载/装配外部DLL和驱动；Brotli需预装，共用generator传播Cargo错误并检查输入边界，保留manifest恢复与最终产物检查。当前由c9b7cd1固化；历史基线AS-BL-2026-10-12-c0951b5-pc-build-worktree保持冻结。修改后正式构建和未附带外部组件时的功能仍待验证。
-
-产品 A Shell You，内部 AShell/ashell，Android me.ashell，后台 A Shell You、launcher 一个壳子。**Flutter内部package必须保留flutter_hbb及其导入。** 两处公共服务匹配使用ashell.；构建变量ASHELL_*，ZEGO字段ashellSessionId。基线 `AS-BL-2026-10-12-a036f31-worktree` 加T003增量已由f423335固化。历史文档品牌名称按用户要求规范化，原文字/源仓地址从Git a036f31恢复。详见 [迁移报告](../docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。未编译/测试/codegen；实际构建机和服务未操作。下段接管记录保留历史日期与验证结论，不表示当前HEAD或运行验证。
+本次文档不修改原无障碍/画面/输入、产品身份或构建链。此前无障碍栏仅移除防触按钮，原实现保留。旧T001—T004及T007/T008快照在TASK_HISTORY、CHANGELOG_AI和docs/tasks中保留；不要继续从这些历史记录推断当前无push/未集成投屏/全部串行。本文写于文档提交前，最终Git结果见提交与会话交付。
 
 ### 迁移前接管证据（历史）
 

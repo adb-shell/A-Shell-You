@@ -1,11 +1,12 @@
 # AShell 网络与协议 / Network Protocol
 
-2026-10-14 T002当前补充：RemoteAdbVideo追加format(15)、screenshot_supported(16)、screenshot动作；JPEG按能力分发，旧PC不误解码。原认证/控制权限、每PC4帧ACK窗口与全局停止保持，原40/41和VideoFrame编号不变。 详见[ADB展示/截图/触摸合同](14_ADB_MIRROR.md)，D-027 / ADR-0022 / Baseline17。本轮为main/a0e46b1上未提交扩展，仅V0，V2—V4待证。前轮a0e46b1已推送、CI获204且未监控，不表示构建通过；以下旧描述按其日期解释。
+ADB当前源码7607349：字段40除请求/回执外推送kind=state（订阅token、instance/revision）；状态apiVersion3、mirrorVersion2，支持requestId取消与按模式stop。字段41保持15—22能力/几何字段，每PC8帧且8MiB在途；原认证/传输策略与VideoFrame不变。T005/ADR0025，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+
 
 接管基线：2026-07-12  
 状态：`verified` + `verification-required`
 
-2026-10-13 T004：追加 `Misc.remote_adb = 40`，JSON v1通过既有认证peer stream传输，不增加二次加密、不关闭原加密/relay-only。受控端校验authorized与远控keyboard permission，独立JNI访问Android ADB manager；旧输入/terminal字段和处理保持。新旧端兼容、限额、owner取消和威胁模型见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。仅V0，V2—V4待验证。
+2026-10-13 T004：追加 `Misc.remote_adb = 40`，JSON v1通过既有认证peer stream传输，不增加二次加密、不关闭原加密/relay-only。当前受控端校验authorized、普通会话及PC只读状态，ADB不依赖手机Accessibility键盘权限，独立JNI访问Android ADB manager；旧输入/terminal字段和处理保持。新旧端兼容、限额、owner取消和威胁模型见 [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。仅V0，V2—V4待验证。
 
 > 本文描述仓库内的端点协议实现。`hbbs`、`hbbr` 服务端源码不在本仓库，因此服务端部署、数据库和运营策略只能作为外部依赖记录，不能由本文推断。
 

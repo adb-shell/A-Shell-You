@@ -1,6 +1,7 @@
 # AShell 源码地图 / Source Map
 
-2026-10-14 T002当前补充：新入口remote_display_layout.dart将ADB并入主界面，单源居中/双源左右；LocalAdbScreenshot.java提供连续系统截图，RemoteAdbMirror管理互斥模式。 详见[ADB展示/截图/触摸合同](14_ADB_MIRROR.md)，D-027 / ADR-0022 / Baseline17。本轮为main/a0e46b1上未提交扩展，仅V0，V2—V4待证。前轮a0e46b1已推送、CI获204且未监控，不表示构建通过；以下旧描述按其日期解释。
+ADB当前源码7607349：新增LocalAdbCommands、AdbStreamCompat；LocalAdbManager负责状态推送和有限连接恢复，LocalAdbMirror管理三种源，LocalAdbPrivacy/AdbPrivacyOverlay负责排除采集的白字黑屏。PC独立RGBA/JPEG桥、主界面分栏与共享snapshot。T005/Baseline20，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+
 
 基线：2026-07-12，`HEAD 77062b4`
 

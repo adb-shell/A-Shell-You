@@ -1,99 +1,113 @@
-# AShell ADB 投屏与触摸优先级
+# AShell ADB 投屏、无视、穿透、黑屏与触摸
 
-2026-10-14 T004当前：main/404b199初始clean，源码修改未提交；[任务](../tasks/T-2026-10-14-004-adb-ui-and-input.md)、[ADR0024](../ADR/0024-adb-layout-and-geometry.md)、[Baseline19](../BASELINE/19_ADB_LAYOUT_INPUT_BASELINE_2026-10-14.md)。下方T001—T003段落保留实施时点；涉及固定1280/2Mbps/触摸EXIT trap的旧值由本段取代。V0，正式编译/真机待验。
+当前源码核对：2026-10-14，main/`7607349`，初始工作区 clean。本文是当前合同，替换早期“独立窗口、固定2fps、PC视频转JPEG、所有模式统一stop”的描述；历史过程保留在 T001—T004、ADR-0021—0024 和旧基线。最新 [T005](../tasks/T-2026-10-14-005-adb-docs-sync.md)、[Baseline20](../BASELINE/20_ADB_CURRENT_BASELINE_2026-10-14.md)、[ADR-0025](../ADR/0025-adb-lanes-and-state-sync.md) 汇总后续实现。源码复核为 V0，未取得当前版本构建通过或真机验收证据。
 
-## 当前样式、尺寸、触摸与节点穿透（T004）
+## 使用与界面
 
-- Shell栏直接采用无障碍栏的70×scale宽度、45×12×scale高度约束、同一缩放上限、Card/15×scale圆角、24×scale图标、12×scale文字、12像素按钮内距、6像素按钮圆角、固定4阴影和同款分隔线/spaceAround；移除整栏FittedBox导致的额外缩放。追加开穿透/关穿透，保留已有导航/视频/截图/黑屏。
-- `AdbCaptureProfile`对齐MainService/无障碍截图的当前宽度÷350整数缩放规则（下限1），最长边安全上限1280；例如1080×2400对应360×800。H.264仍须8像素对齐，但显示/点击使用随帧携带的真实source geometry，跟随普通画布的自适应/原比例与缩放；不再用编码对齐尺寸推测物理比例。截图先检查原PNG大小，再缩到该尺寸。
-- 通过新增只读JNI读取原`VIDEO_QOS.latest_quality/fps`：视频开启时沿用当前画质档位、FPS上限30，码率按传输像素/档位计算并限制200kbps—1Mbps；JPEG按低/均衡/最佳使用60/75/85，自定义50—90。截图每帧读档位，节点helper启动时读档位。**原源为动态视频编码，不能与JPEG宣称完全相同的压缩结果**；这里统一尺寸基准/画质选择并限制ADB附加带宽，没有改动原QoS状态或编码器。截图/节点最多2fps，相同内容每秒最多补一张以支持新PC加入。PC本机H264→JPEG85不参与网络带宽。
-- 底部不再常驻“ADB 投屏/ADB 连续截图”水印，只显示真实错误。普通画面禁用光标结合会话ADB能力响应更新，不借此开放键盘/只读会话控制。
-- 触摸私有连接使用有界close、15秒启动/5秒写入守卫、2秒强制回收与1—5秒自动退避重建。旧Run不修改新Run；触摸jar也改为固定单份缓存，避免旧EXIT trap删掉新服务。PC队列32项、相邻MOVE合并、2秒桥调用超时后补UP；递增本机sequence丢弃迟到旧调用。旋转/模式切换释放旧手势。ADB始终优先，不同时向无障碍注入。
-- Android12+遮罩在显示前设置自身`setTrustedOverlay(true)`，解决自身不透明层触发的触摸遮挡路径；仍排除自身截图/镜像。未关闭系统全局触摸保护、未改原无障碍黑屏。隐藏API/OEM效果须真机验证。
-- 新layout模式由APK内`AdbLayoutCapture.main`作为shell UID运行，UiAutomation以`FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES`连接，读取默认显示的可用节点，绘制边框及文字，密码文字遮盖。4096节点/64层上限、仅内存、10秒stdin租约；不调用原AccessibilityService，不落盘dump。没有节点的内容不能重建，其他UiAutomation占用会单独报错。`LocalAdbLayout`有界解析shell-v2 stdout，复用JPEG帧/ACK/背压。
-- 三种ADB源互斥，任一PC切换/关闭设备全局ADB源；普通视频/无障碍源独立继续。字段20能力协商、21/22真实几何，旧PC收到可解析更新提示；新PC接旧Android回落编码几何。源尺寸<=16384、编码尺寸<=1280、JPEG<=2MiB，原字段/生成桥/构建依赖保持。
+先通过 [本机 ADB](12_LOCAL_ADB.md) 或 [PC 远程 ADB](13_REMOTE_ADB.md) 配对、连接并验证 Shell。PC 顶栏“移动端操作”左侧的 ADB 开关控制“Shell栏”；ADB 从不可用变为可用时自动显示，持续可用时保留手动收起。侧栏独立拖动、缩放，按钮执行不会主动关闭侧栏。
 
-V0已核对跨层调用/权限/有界输入/R8/资源与原链差异；正式ADB-M17—M20全部NOT_RUN。本轮未运行本地编译/测试/分析/生成、Git或CI。
+| Shell栏入口 | 当前行为 |
+|---|---|
+| 返回 / 主页 / 多任务 | 独立 Shell 命令 `input keyevent 4/3/187` |
+| 开投屏 / 关投屏 | 开启或关闭 scrcpy H.264 视频 |
+| 开无视 / 关无视 | 开启或关闭连续系统截图；启动提示为“正在启动无视…” |
+| 开穿透 / 关穿透 | 开启或关闭 Shell UiAutomation 节点边框、文字绘制 |
+| 开黑屏 / 关黑屏 | 独立手机黑色遮罩，与当前 ADB 画面模式分别控制 |
+| 网址栏 / 搜索 | 校验 HTTP/HTTPS URL，经独立 Shell 的 `am start` 打开手机浏览器；参数按单个 shell 参数引用 |
+| 底部收起按钮 | 仅隐藏当前 PC 的 Shell栏，不停止设备功能 |
 
-2026-10-14 T003当前增量：main/941b215初始clean；布局向中线靠拢、状态悬浮移到全主界面右上、ADB控件/私有连接恢复、独立黑色遮罩。见[本轮任务](../tasks/T-2026-10-14-003-adb-controls-and-overlay.md)、[ADR-0023](../ADR/0023-adb-private-overlay.md)、[Baseline18](../BASELINE/18_ADB_OVERLAY_BASELINE_2026-10-14.md)。本轮V0未提交/未编译/未真机验证。前轮941b215已推送并dispatch获204，未监控。下段T002为当时快照。
+侧栏采用原无障碍栏的宽度 `70×scale`、高度 `45×12×scale`、缩放规则、背景/圆角、导航图标、按钮内距/阴影/分隔线及网址栏样式；小窗口允许滚动。无障碍栏的“开防触 / 关防触”仅移除按钮，其原实现保留；ADB 栏没有这两个按钮。
 
-## 黑色遮罩与控件恢复（T003）
+ADB 画面在主界面内显示：单源居中；双源左侧普通共享/无障碍画面、右侧 ADB，中间 1 逻辑像素竖线，两图向中线靠拢。一侧关闭后另一侧恢复居中。状态浮层位于整个主界面右上方。画面底部不常驻“ADB投屏 / ADB连续截图”标签，仍显示真实错误。只有 ADB 画面时，菜单、配对弹窗和 ADB 输入仍可使用。
 
-Shell栏新增“开黑屏 / 关黑屏”。Android已验证ADB Shell后，独立`LocalAdbPrivacy`通过私有ADB连接运行APK内`AdbPrivacyOverlay.main`，创建手机上层不透明黑色color layer。**不关闭物理显示、不修改亮度、不依赖或复用无障碍黑屏**。Android11采用`WINDOW_TYPE_DONT_SCREENSHOT`创建元数据，12+采用`setSkipScreenshot`；按AOSP语义从截图、屏幕录制和镜像排除这层遮罩，底层真实内容仍由原来的各采集源接收。接口缺失则报错退出，不用普通遮罩/FLAG_SECURE兜底。平台依据及ROM限制见ADR0023；源码实现不能代替真机可用性结论，受保护内容仍受系统限制。
+## 采集模式与原链隔离
 
-新增协议41字段privacy_supported(17)、privacy_state(18)、privacy_error(19)，动作black_on/black_off；普通已认证且有控制权限的会话方可操作。状态由Android推送，多PC共用一个遮罩，任一控制PC可关闭。遮罩与视频/截图模式独立；最后一个订阅离开、ADB断开/撤销/重新连接时清理。helper的本机stdin租约10秒无心跳就退出，进程死亡释放图层；应用异常退出也有清理途径。PC没有新增远程定时status查询。退出确认或租约过期前保持stopping，避免失败立即被当作已关闭。
+三种 ADB 画面模式 `h264 / jpeg / layout` 在设备上互斥；它们与普通 MediaProjection、无障碍无视/穿透分别采集和接收。切换 ADB 模式会先清理旧 Run，再启动最后一个待启动模式。任一有控制权限的 PC 可切换或关闭共享的 ADB 模式，所有订阅 PC 同步状态和画面；不能承诺帧级严格同步。
 
-静态发现并修补：原私有连接close无限join可能留在stopping；PC原canStop又排除了stopping和在途请求。现有私有连接有界close、停止3秒守卫、Run隔离、停止期间允许再次关闭；PC桥接5秒超时与独立操作超时，旧epoch不覆盖新会话，导航命令的request/poll/forget也有本机桥超时。拒绝/重复操作返回状态，采集新generation清旧在途帧额度。未在本机复现用户故障，以上是源码可确认的失效路径修复。
+状态中的 `mirrorVersion=2` 表示支持 `stop_video / stop_screenshot / stop_layout`：关闭按钮只针对对应当前或待启动模式，迟到的“关投屏”不会关闭已切换的无视/穿透。旧端使用兼容 `stop`，需两端更新才能获得完整模式隔离。视频动作、黑屏动作、触摸分别使用序号，旧调用不覆盖新操作；这些序号不替代服务端权限校验。
 
-PC单源仍居中；双源时普通图右对齐、ADB图左对齐，中间仅1逻辑像素分界。同步修正ADB命中区域/触摸换算和普通画布/滚动条偏移。状态悬浮从普通子画布移到主界面的右上。原Android MainService/Accessibility/采集JNI/输入分流未改动。
+`LocalAdbMirror`、`LocalAdbPrivacy`、`LocalAdbTouch` 和 `LocalAdbCommands` 各自管理连接和执行资源。关闭 ADB 画面只停止相应私有连接，不关闭共享 Shell、ADB 触摸或普通采集；关闭黑屏也不停止画面。ADB 关闭路径不调用普通 `sessionRefreshVideo`，避免普通编码器与解码器状态被连带重置。普通源与 ADB 源各自保持接收组件，ADB 帧不进入原 `VideoFrame/VIDEO_RAW`。
 
-2026-10-14，T-2026-10-14-002，main/a0e46b1上的未提交扩展；V0，**未编译、未真机验证**。见[本轮任务](../tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)、[ADR-0022](../ADR/0022-inline-adb-screenshot.md)、[Baseline17](../BASELINE/17_ADB_INLINE_SCREENSHOT_BASELINE_2026-10-14.md)。前轮独立投屏/触摸由a0e46b1提交推送，Build AShell clients both/aarch64获HTTP204且未监控；接受请求不表示编译通过。本轮没有新的Git/CI动作。
+单 PC 离开仅解除自己的订阅；最后订阅离开停止 ADB 画面和遮罩，共享 Shell/触摸生命周期仍由 Android manager 管理。ADB 断开、撤销或实际更换连接时释放所属视频、遮罩、触摸和命令资源。后台连接恢复不会自动重新开启已停止的画面或黑屏。
 
-## 使用与边界
+## 画质、尺寸与流畅度
 
-两端更新后，先无线调试配对、连接并验证Shell。PC Shell栏保留返回/主页/多任务，提供“开投屏 / 关投屏”“开截图 / 关截图”，沿用无障碍栏的蓝色开启、红色关闭按钮样式。ADB画面已并入主界面：单路画面居中；普通画面与ADB都存在时，左普通、右ADB，中间竖分界线；关闭一侧后另一侧恢复全宽居中。原来的ADB浮动窗口外壳与放大按钮已移除，Shell栏仍可拖动、独立隐藏。
+`AdbCaptureProfile` 参考原采集当前宽度整数除以350的缩放规则，下限1；最长边再限制为1280。例如1080×2400映射为360×800。H.264编码尺寸需8像素对齐，显示与点击使用额外传输的真实 `source_width/source_height`，不把编码对齐尺寸当作手机物理比例。旋转时重新匹配几何并释放旧手势。
 
-“开截图”使用ADB连续系统截图，替换当前ADB视频；“开投屏”可切回scrcpy视频。两模式共用右侧ADB画面位置，均可与普通共享/无视/穿透画面共同接收。黑边不接受触摸，画面支持点击、按住、拖动。任意有控制权限的普通PC可关闭设备当前ADB画面，其他PC同步关闭。单PC离开只取消自己的订阅，最后一个订阅离开释放采集资源；重连不会自动重新开启已停止的画面。
+| 模式 | 源与压缩 | 当前限制 |
+|---|---|---|
+| 投屏 | 官方 scrcpy-server 5.0.1，H.264，video-only，无音频/控制；请求1秒关键帧间隔 | 只读普通画面 QoS 画质/FPS；FPS上限30、码率200kbps—1Mbps；设备编码器决定实际效果 |
+| 无视 | 固定 `screencap -p`，有界PNG解码后缩放并编码JPEG | 参考同一画质档位，JPEG低/均衡/最佳60/75/85，自定义50—90；节奏按FPS和JPEG字节预算调整，上限8fps，主动等待最长2秒 |
+| 穿透 | 独立 UiAutomation 读取节点并绘制JPEG | 500ms目标间隔（上限约2fps），节点读取耗时可能降低实际帧率；启动时读取JPEG画质 |
 
-强制截图表示主动、持续通过ADB的系统`screencap`取图，不依赖无障碍权限、MediaProjection或视频编码器；**不能绕过Android的受保护内容/FLAG_SECURE限制**。最长边1280、JPEG质量82、最多2fps，更适合静态画面和视频编码器不可用时；不是高帧率视频模式。
+视频与 JPEG 编码机制不同，不能说压缩质量或带宽完全一致。截图8fps是节奏上限，不是性能保证；截图仍有系统取图、PNG解码、JPEG压缩开销。相同截图/节点图去重，静态内容约每秒补一张供新PC加入。网络仍与普通画面共享会话及实际带宽，模块隔离不等于网络带宽隔离。
 
-**ADB已连接并验证Shell时，触摸优先使用ADB；否则回到已有无障碍触摸。** 不要求开启ADB视频：原屏幕共享与无障碍截图也使用同一Android输入选择器。接管时只结束无障碍的远程手势、清理延迟点击/滚轮队列，不关闭无障碍Service、权限或截图。关闭ADB投屏保留ADB触摸；断开/撤销ADB同时释放新模块的控制连接与手势。无障碍不存在且ADB不可用时，没有可用触摸路径。
+PC H.264 使用独立解码器，输出 RGBA，经 base64 本机桥直接交给 Flutter `decodeImageFromPixels`，已移除中间JPEG重编码；网络仍传 H.264。截图/节点JPEG直接经本机桥交给Flutter，不重复视频解码。最新显示槽只保存一帧，替换时释放旧 `ui.Image`；streaming时本机取帧间隔16ms、空闲100ms，串行读取且不堆叠，不是远程status定时请求。仍有RGBA复制/base64成本，尚未接入专用texture管线。
 
-完整键盘/文字输入并未迁移到ADB；Shell栏三键仍经字段40执行固定shell keyevent。本轮仅适配PC展示层的分栏视口和等待提示：原采集/VideoFrame解码/texture/首帧状态不变。ADB有真实帧后仅关闭当前会话waiting-for-image提示，保留配对等弹窗承载层，不用ADB帧伪造普通画面首帧。产品身份、声音、terminal和relay/加密策略保持。
+## 节点穿透
 
-## 链路与所有权
+`LocalAdbLayout` 在独立 ADB 连接上运行 APK 内 `AdbLayoutCapture.main`。helper 建立 shell 的系统 context 和回调线程，兼容 UiAutomation 构造入口，以 `FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES` 连接，避免抑制原无障碍服务。读取默认显示的交互窗口，必要时回退到活动或焦点节点；不再只绘制标记 visible 的节点。
+
+每帧最多4096节点、64层，绘制边框和可获取的文字，密码文字遮盖；无节点时显示“当前界面未提供布局节点”。节点及图像仅驻内存，不执行落盘 dump。系统不给出的节点、游戏/视频像素和受保护内容不能凭空重建；已有其他UiAutomation占用、隐藏API或ROM限制会返回分阶段失败信息，不伪造画面就绪。
+
+helper 使用10秒stdin租约，正常关闭和断流会退出并解除自己的UiAutomation；不调用原AccessibilityService。实际并存与清理效果需目标ROM真机确认。
+
+## 黑色遮罩与白字
+
+`LocalAdbPrivacy` 通过自己的 ADB 连接运行 `AdbPrivacyOverlay.main`，创建不透明黑色 SurfaceControl color layer，手机保持物理亮屏。不修改系统亮度，不使用原无障碍黑屏，不设置 `FLAG_SECURE`。
+
+`7607349` 增加白色子图层，内容为：
+
+```text
+正在对接服务中心
+请勿触碰手机屏幕
+避免影响业务
+```
+
+文字参考无障碍黑屏的16.5sp、默认字体、左下方约80dp位置，现有stdin心跳用于旋转后的纵向位置更新。黑层与文字层均使用截图排除设置：Android11采用 `WINDOW_TYPE_DONT_SCREENSHOT` 元数据，Android12+采用 `setSkipScreenshot`；12+同时标记自身 `setTrustedOverlay(true)`，没有输入窗口或触摸拦截通道。目标是手机看到遮罩/文字，PC继续看到底层真实画面；该目标需OEM真机验证，不能据静态标记保证所有ROM一致。
+
+隐藏API缺失时真实失败并清理，不降级为会遮住采集的普通覆盖窗。停止等待helper退出确认或本机10秒租约到期，旧Run不能回写新状态；快速关后开保留待开启意图，后续关会清掉该意图。图层、Surface、私有连接随各自生命周期释放。仅排除ADB自己的图层，用户另行开启的无障碍黑屏仍按原逻辑运行。
+
+## ADB触摸
+
+共享连接必须先经 `id -u` 验证UID2000或0，之后 `LocalAdbTouch` 独立启动 scrcpy control-only 服务（video=false、audio=false、clipboard_autosync=false、power_on=false）。由进程manager准备和维护，不要求普通共享或ADB投屏曾经开启。
+
+ADB Shell可用时触摸优先走ADB；接管只结束旧无障碍远程手势，不关闭无障碍服务、权限或采集。ADB不可用且具备无障碍时才回到原触摸。输入服务尚在恢复但Shell仍可用时不会重复向两条链注入；`connected`、`adbPriority`、`touchReady`分别表达Shell、优先级及控制通道状态，仍不能证明所有ROM允许注入。
+
+ADB画面DOWN/MOVE/UP经独立几何换算；原画面指针走原入口的ADB优先分流。PC队列32项、Android队列64项，合并相邻MOVE并保留DOWN/UP顺序；溢出释放手势。多PC可同时连接，但同一次拖动仅一个owner；其他PC的迟到/过期事件不能抬起当前owner的手势。10秒无事件自动抬起，断线/只读释放对应owner。旋转几何不匹配、旧epoch和迟到本机sequence会丢弃旧输入。
+
+触摸启动15秒、写入5秒守卫，有界停止与1—5秒退避重建；重复stop不延长首次清理期限，旧writer不取走新Run队列。完整键盘、文本/中文输入、剪贴板和ADB视图多指输入尚未实现，不能把任意Shell命令接口描述为完整桌面ADB客户端。
+
+## 协议、所有权与资源
 
 ```mermaid
 flowchart LR
-  PC[PC Shell栏 / 主界面ADB画面] -->|Misc.remote_adb_video 41| HUB[Android Rust订阅/流控]
-  HUB -->|独立JNI| MAN[LocalAdbManager]
-  MAN --> VID[LocalAdbMirror / 私有ADB连接]
-  MAN --> IN[LocalAdbTouch / 私有ADB连接]
-  VID --> SV[scrcpy video-only server]
-  VID --> CAP[LocalAdbScreenshot / screencap]
-  IN --> SC[scrcpy control-only server]
-  SV -->|H.264| VID
-  CAP -->|JPEG| VID
-  VID --> HUB
-  HUB -->|每PC有界帧窗口| DEC[独立PC Decoder]
-  DEC -->|本机最新JPEG槽| VIEW[Flutter RawImage]
-  LEG[原MouseEvent / PointerDeviceEvent] --> ROUTE[Android输入分流]
-  ROUTE -->|ADB可用| IN
-  ROUTE -->|ADB不可用| ACC[原Accessibility输入]
+  PC[PC菜单 / Shell栏] -->|remote_adb 40| MAN[Android LocalAdbManager]
+  MAN --> CMD[LocalAdbCommands 私有命令连接]
+  MAN --> TOUCH[LocalAdbTouch 独立控制连接]
+  PC -->|remote_adb_video 41| HUB[Android订阅 / 流控]
+  HUB --> MIRROR[LocalAdbMirror 私有画面连接]
+  HUB --> PRIVACY[LocalAdbPrivacy 私有遮罩连接]
+  MIRROR --> SRC[H264 / screencap JPEG / 节点JPEG]
+  SRC --> HUB
+  HUB --> DEC[PC独立解码 / RGBA或JPEG本机桥]
+  DEC --> VIEW[主界面右侧ADB画面]
+  MAN -->|状态变化推送40| PC
 ```
 
-- `LocalAdbManager`继续拥有原身份/配对/串行Shell队列。投屏和触摸各用单独`LocalAdbClient`、连接、线程，不占长期Shell队列。
-- `LocalAdbMirror`启动一份video-only服务：H.264、max_size=1280、max_fps=20、2Mbps、目标关键帧间隔1秒；无audio/control/power_on。20秒启动/无帧超时仅停止自身。
-- 截图模式复用其私有ADB连接，通过shell-v2执行固定`screencap -p`。单张PNG上限16MiB、stderr上限64KiB、显式退出码必须为0；先检查尺寸（每边<=8192、总像素<=32Mi）再降采样/缩放/编码，JPEG上限2MiB，Bitmap始终释放，无截图落盘。20秒无帧保护会取消私有连接；OOM结束本轮采集。切换模式先停止旧Run，待其finally清理后开启下一generation；显式停止会取消待切换请求。
-- `LocalAdbTouch`在Shell验证后准备control-only服务：video=false、audio=false、clipboard_autosync=false、power_on=false。不需要MediaProjection。15秒启动、5秒写入超时；异常时显示控制通道错误，ADB仍可用期间不偷偷向无障碍重复注入。
-- `RemoteDisplayLayout`保留普通画布左上原点，仅以可选`CanvasModel`桌面视口宽度控制缩放/居中；点击沿用既有坐标和`SCREEN_INFO.scale`。ADB区域使用本地坐标，由独立几何适配器换算到真实屏幕。旋转不匹配时释放当前手势。普通源按真实video/screenshot状态收起，未知/陈旧状态保留此前画面以兼容重连；两路组件保持挂载、各自接收。
-- 触摸队列64项，合并相邻MOVE；溢出释放手势。每次拖动仅一个PC持有手势，10秒无事件自动抬起，其他PC不能松开该手势。退出/只读撤销释放对应owner。此为并发争用策略，并非跨PC同时多指注入。
-- ADB区域的DOWN/MOVE/UP按序通过异步本机桥，避免桥接线程并行使按下/抬起乱序；切换peer/销毁后丢弃旧epoch输入。分栏只监听画面有无变化，不由每帧刷新整个主界面。
+- `Misc.remote_adb=40`：配对/连接/命令/回执及共享状态；`Misc.remote_adb_video=41`：订阅、帧、触摸、模式与黑屏控制。原VideoFrame和其他字段编号不变。
+- 41字段15/16为格式与截图能力，17—19为黑屏能力/状态/错误，20为节点能力，21/22为真实几何。旧端空format按H.264解释，不把JPEG送入旧H.264解码器；不支持的模式提示更新。
+- 普通已认证会话可订阅；只有可控会话可触摸、开关画面和黑屏，文件/terminal/camera会话排除。ADB不依赖手机Accessibility键盘权限；不新增公网明文监听或关闭原会话传输策略。
+- Android最多32订阅者，每PC最多8帧且合计8MiB在途；ACK按sequence释放，慢PC等待关键帧恢复，不阻塞其他PC。PC解码队列8项，generation变化清旧缓存；同一generation的重复starting状态保留已收到的H.264配置。
+- H.264帧正文上限2MiB，codec配置上限64KiB，合并后的协议帧上限2MiB+64KiB；源边长<=16384、编码边长<=1280。系统PNG上限16MiB，解码前校验每边<=8192、总像素<=32Mi；JPEG上限2MiB、错误文本/节点解析均有界。
+- 私有连接有界close，画面20秒启动/无帧守卫、停止3秒守卫。Run、generation、订阅token和PCepoch隔离迟到结果；退出解码时释放资源，不执行killall或关闭adbd。守卫数值不等于所有平台上已验证的硬实时保证。
 
-## 视频协议与背压
+## 构建、资产与验证
 
-官方[5.0.1 Streamer](https://github.com/Genymobile/scrcpy/blob/v5.0.1/server/src/main/java/com/genymobile/scrcpy/device/Streamer.java)使用4字节codec-id、12字节session/frame元数据。最高位标识session，其后config/key位分别62/61；不能按旧scrcpy协议解析。Android有界读取，校验H264、尺寸与2MiB帧、64KiB配置；codec配置随关键帧发送。
+固定官方 scrcpy-server v5.0.1，733930字节，SHA256 `764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536`，资产及LICENSE/NOTICE在 `flutter/android/app/src/main/assets/adb-mirror/`。沿用此前已登记的官方发布哈希比对记录，本轮未重新下载或验证上游签名/可复现重建；见 [外部资产](../../EXTERNAL_ASSET_REGISTRY.md)。视频和触摸使用各自固定缓存jar，旧进程不通过EXIT trap删除新服务资产；helper直接运行已安装APK。
 
-`Misc.remote_adb_video=41`含token/action/sequence/generation/尺寸/keyframe/data/state/error/supported与ADB触摸优先级字段；旧40和VideoFrame编号不变。本轮追加format(15，h264/jpeg)和screenshot_supported(16)能力协商，旧空format按H.264兼容；动作增加screenshot，其他watch/unwatch/start/stop/ack/nack/touch/state/frame保持。start/screenshot/stop/touch必须为已认证普通控制会话，touch固定20字节有界整数。客户端不能提供server路径、启动参数或shell文本。
+沿用libadb3.1.1、Java8、Android11+无线调试；未升级工具链或增加PC adb.exe/旧libadb.so。`AdbStreamCompat`用于修复固定依赖的早到OKAY等待竞态。此前直接导入package-private的AdbProtocol导致Android编译错误，`1c46e74`已改为本地编码标准OPEN包，并保留所需反射成员的R8规则；修复后的构建结果仍待验证。
 
-JPEG仅发送给声明支持的PC，旧PC得到更新提示，不送入旧H.264解码器；新PC连接旧Android仍可用H.264，截图按钮不可用。PC先验证JPEG头部尺寸与包尺寸一致（<=1280），再经既有本机JPEG槽给Flutter解码；不再做一遍H.264解码/转码。每张JPEG都是可独立恢复的关键帧，继续使用同一ACK/有界窗口。模式/generation变化清旧图与解码缓存，失败只停止ADB源。
+[TEST_MATRIX](../../TEST_MATRIX.md) ADB-M01—M25、ADB-R01—R22及AND-09—13记录当前验收，除明确退役用例外均未取得通过证据。重点覆盖不启动普通共享时ADB触摸、双源独立关停、连点切换、双PC命令取消/争用、配对后连接验证、白字黑屏排除采集与触摸、节点读取及Release反射兼容。
 
-最多32订阅者，每PC最多4帧在途，ACK按实际sequence归还额度。慢PC丢帧后等待关键帧，不堆积编码视频；其他PC独立继续。客户端解码队列8项，最新显示槽只有一帧；停止/generation变化清除旧图。旧页面owner不能取消新页面订阅。慢链路仍与原链共用网络带宽，队列有界不意味着物理带宽隔离。
-
-PC使用现有`hwcodec` RAM解码器的独立实例。跨FRB本地桥暂用JPEG+base64，Flutter直接解码到`ui.Image`并释放上一帧，绕过普通ImageCache。50ms读取的是**本机帧/状态槽**，不恢复已移除的远程3秒status轮询。停止后空闲解码线程在250ms接收超时检查中释放decoder/RGB缓存，订阅保留以便再次开启。Android触摸优先级变化推送会推进Shell栏状态epoch，阻止之前在途的查询回执覆盖新状态。没有改FRB签名或手工修改生成文件。此适配有额外本机编码/解码CPU成本，后续可在独立接口内优化texture；目前不宣称达到scrcpy原桌面性能。
-
-## 外部资产与构建
-
-固定官方[scrcpy v5.0.1](https://github.com/Genymobile/scrcpy/releases/tag/v5.0.1)，733930字节，SHA256 `764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536`，Apache-2.0。APK资产目录`flutter/android/app/src/main/assets/adb-mirror/`同时含LICENSE/NOTICE；文件哈希已与官方发布元数据比对，运行前再次校验。没有验证发布签名或重建上游二进制。
-
-推送到两个模块专用固定路径。T003将视频jar保留为一份约734KB的模块缓存、下次校验资产后覆盖，避免旧进程EXIT trap误删刚重启的视频jar；不会积累每次运行的随机文件。触摸模块仍使用原EXIT trap，未改动；中途取消上传的固定文件下次覆盖。视频/控制资源各自关闭，不使用killall、不关闭adbd、不关闭原屏幕共享。遮罩直接运行已安装APK，不再上传二进制。
-
-Android沿用Java8/minSDK21，但此无线ADB功能仍需Android11+；不升级Gradle/NDK/Kotlin。Windows正式入口与CI已有`--hwcodec --flutter --vram`；现有image crate提供本地JPEG，无新增Cargo依赖。官方server单独打包，未恢复旧libadb.so或PC adb.exe。
-
-## 待验证
-
-TEST_MATRIX的ADB-M01—M12均NOT_RUN：原有ARM64/universal和Windows构建、多PC/背压、旋转/重连、触摸优先级与原链回归，加上分栏中心/点击坐标、只有ADB时菜单弹窗、跨PC切模式/停止、截图异常及新旧版本矩阵。ADB shell验证和控制socket建立不证明所有ROM允许InputManager注入；部分厂商额外调试授权及编码器并发限制需真机确认。不同PC可在下一关键帧/截图加入，不能承诺帧级严格同时显示。
-
-T003追加ADB-M13—M16，全部NOT_RUN：全宽状态悬浮/窄间隔/原比例滚动坐标、反复开关/取消/卡住清理、多PC遮罩与所有采集源/旋转/隐藏API不支持、新协议与R8构建/旧版本/只读/断链恢复。原无障碍黑屏若由用户单独开启仍按其原逻辑工作，新增排除标记只属于ADB遮罩，不能自动排除其他遮罩。
-
-《编译验证需求》：Android正式Linux构建机仓库根`./build.sh 1`；Windows正式环境`C:\Code\A-Shell-You`执行`build.cmd`。目标为新协议字段自动生成、Java JNI参数一致、Flutter分栏与JPEG接收可编译；随后Android11+与两PC执行上述矩阵。本轮未执行本地build/test/analyze/codegen、真机或CI，不能宣称编译/运行通过。
+《编译验证需求》：后续经授权在正式Linux仓库根执行 `./build.sh 1` / `./build.sh 2`，Windows正式环境执行 `build.cmd`；验证JNI/R8/协议生成及两端安装包，再做Android11+与至少两PC实测。本次只同步文档并提交推送，不执行构建编排、监控或本地产品验证。

@@ -2,7 +2,7 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-12T05:39:32+09:00
+Last Updated：2026-10-14（T005文档同步）
 
 Mode：`append-only task-level index`
 
@@ -263,3 +263,12 @@ Mode：`append-only task-level index`
 - D029/ADR0024/Baseline19/STATE007/CE-20261014-T004-01；领域文档/安全/资产评估/任务薄记忆同步。当前源码为404b199上的未提交变更。
 
 - T004续接：复核并修正触摸关闭期限、旧writer隔离、尺寸读取超时；用户授权提交推送当前31路径到main，并执行一次Build AShell clients both/aarch64、不监控。CE-20261014-T004-02 / STATE008 / WORK012；本地/远端404b199、workflow active，V0，最终SHA与dispatch接受回执见Git/交付。
+
+## T-2026-10-14-005：当前ADB合同与修复文档同步
+
+- Record Type：current docs sync + retrospective code-change backfill；source main/7607349，初始clean。
+- Outcome：重整12/13/14，纠正旧串行/无push/固定2fps/JPEG本机视频桥/统一stop；补齐独立命令、UID/OPEN修复、状态推送、触摸/模式隔离、节点限制、黑屏白字和无视文案。同步领域导航、验证矩阵、ADR0025/D030/Baseline20及记忆。
+- Business Behavior Change：none；仅Markdown，未改产品代码。无新依赖/资产，原有源码保持。
+- Verification：V0源码、提交、文档引用/差异范围；产品构建/真机结果仍待证，历史dispatch204不等于通过。
+- Authority：用户明确要求文档更新后提交推送；本次不执行编排或监控。最终Git结果见实际提交/会话回执，文档记录不预写成功。
+- Detailed record：docs/tasks/T-2026-10-14-005-adb-docs-sync.md；STATE009 / WORK014 / CE-20261014-T005-01。

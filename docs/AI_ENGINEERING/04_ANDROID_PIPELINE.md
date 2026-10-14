@@ -1,6 +1,7 @@
 # AShell Android 完整链路 / Android Pipeline
 
-2026-10-14 T002当前补充：私有ADB连接以shell-v2运行固定screencap -p，有界PNG降采样为1280/JPEG82、最多2fps；旧Run清理后切模式。原MediaProjection/SKL/ignore、Accessibility与触摸优先级不变。 详见[ADB展示/截图/触摸合同](14_ADB_MIRROR.md)，D-027 / ADR-0022 / Baseline17。本轮为main/a0e46b1上未提交扩展，仅V0，V2—V4待证。前轮a0e46b1已推送、CI获204且未监控，不表示构建通过；以下旧描述按其日期解释。
+ADB当前源码7607349：id -u验证后才connected，独立OPEN兼容层；进程维护触摸及有限恢复，命令各自连接。截图采用普通画质/尺寸基准、最多8fps动态节奏，节点约2fps；黑屏白字与底层画面排除设置共存，OEM待验。T005/Baseline20，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+
 
 基线：2026-07-12，`HEAD 77062b4`
 
@@ -385,7 +386,7 @@ JNI 修改规则：
 
 ## 12. 独立本机 ADB 与旧组件退役
 
-当前新模块见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)：API30+配对/连接、id验证、单次shell-v2、20秒取消watchdog、64KiB输出。T004本机Plugin与PC独立JNI共用LocalAdbManager，原采集JNI/服务不参与。配对不等于连接，连接不等于screen share或PC首帧；无自动重连/调试设置自动化，新NSD只发现本机连接端口。
+当前新模块见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)：API30+配对/连接、id验证、单次shell-v2、20秒取消watchdog、64KiB输出。T004本机Plugin与PC独立JNI共用LocalAdbManager，原采集JNI/服务不参与。配对不等于连接，连接不等于screen share或PC首帧；仅已连接后的意外断链允许有限恢复；不自动开启调试或重放命令，新NSD只发现本机配对/连接端口。
 
 T009 删除的 AdbPage、AndroidAdbManager、11 个 ashell_adb_* 分支、四个 Kotlin 文件及 Accessibility 自动化仍不恢复。WRITE_SECURE_SETTINGS、CHANGE_WIFI_MULTICAST_STATE 仍不声明；旧 libadb.so 仍排除。远控输入、DevAutoSelectorController、正常/SKL/ignore、MediaProjection、ZEGO 和 terminal 未由本次 ADB 集成改动。旧配对/prefs/系统设置不自动清理，新身份不迁移旧 key；历史档案见 [旧集成记录](../ADB_LADB_INTEGRATION_MEMORY.md)。
 

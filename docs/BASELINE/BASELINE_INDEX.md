@@ -1,5 +1,9 @@
 # AShell Engineering Baseline Index
 
+当前：[AS-BL-2026-10-14-7607349-adb-current](20_ADB_CURRENT_BASELINE_2026-10-14.md)。T005补齐ADB当前实现与修复文档，初始clean，V0。本次仅文档提交推送，不执行编排；当前代码构建/真机证据待补。
+
+以下为此前快照索引，按各自日期解释；Baseline19由282b748固化，旧Baseline文件冻结不改。
+
 当前：[AS-BL-2026-10-14-404b199-adb-layout-worktree](19_ADB_LAYOUT_INPUT_BASELINE_2026-10-14.md)，T004 Shell栏/画面压缩/输入恢复/独立节点穿透；未提交，V0。Baseline18由404b199固化并推送，前轮编排204且未监控。
 
 当前：[AS-BL-2026-10-14-941b215-adb-overlay-worktree](18_ADB_OVERLAY_BASELINE_2026-10-14.md)，T003布局/ADB恢复/独立遮罩，V0未提交。Baseline17已由941b215提交推送并触发编排（204，不监控）；下方旧状态保持历史含义。

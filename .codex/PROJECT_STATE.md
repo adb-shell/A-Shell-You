@@ -1,48 +1,26 @@
 # AShell Project State
 
-Schema Version：`1.0`  
-State Revision：`STATE-20261014-008`
+Schema Version：`1.0`
+State Revision：`STATE-20261014-009`
+Last Updated / Observed At：2026-10-14（Asia/Tokyo）
+Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
 
-Last Updated：2026-10-14（Asia/Tokyo；ADB样式/几何/触摸/节点穿透）
-
-Observed At：2026-10-14（Asia/Tokyo）
-
-Evidence Scope：`repository-observed / V0 / external and runtime verification pending`
-
-T004续接复核/C3：补齐LocalAdbTouch重复停止期限、旧writer隔离、尺寸读取超时；31路径均本任务。本地/远端main同为404b199，Build AShell clients active；用户授权提交推送main并dispatch一次both/aarch64，不监控。CE-20261014-T004-02 / WORK012；此为执行前快照，实际提交及接受结果见Git/交付。V0；未本地产品验证，下方“无本轮Git/CI”为此前时点。
-
-当前T004：[ADB样式/画面/输入完善](../docs/tasks/T-2026-10-14-004-adb-ui-and-input.md)，main/404b199初始clean；本轮源码与记录未提交，D029/ADR0024/Baseline19/CE-20261014-T004-01。无本轮Git/CI/产品执行，仅V0；ADB-M17—M20待正式验证。前轮404b199已推送，dispatch204且未监控；下方T003/T002执行前段落均为历史记录。
-
-T003续接C3：用户明确要求提交、推送并执行编排；范围为当前30路径，GitHub adb-shell/A-Shell-You/main，Build AShell clients both/aarch64一次、不监控。只读核对本地/远端main同为941b215、workflow active、diff检查通过。CE-20261014-T003-02 / WORK008；本条为执行前快照，提交SHA与dispatch回执见Git/最终交付；不宣称构建通过，下方“无授权/未提交”为此前时点。
-
-当前T003：[布局/控件/独立黑屏遮罩](../docs/tasks/T-2026-10-14-003-adb-controls-and-overlay.md)，main/941b215初始clean，源码与相关记录未提交；D028/ADR0023/Baseline18/CE-20261014-T003-01。V0，未编译/真机；原Android采集/Accessibility/输入实现、品牌/依赖不变。无本轮Git/CI授权或动作。
-
-前轮执行回执：941b215已提交推送，Build AShell clients both/aarch64获204，遵照用户要求未监控。以下T002执行前段落为历史快照，不代表当前HEAD，也不代表编译通过。
-
-T002续接：用户明确授权提交/推送当前35路径到GitHub main，并触发一次Build AShell clients both/aarch64，不监控。本地/远端main均a0e46b1，V0 diff通过；CE-20261014-T002-02。此快照先于执行，实际提交SHA/dispatch回执见Git与最终交付，不能推断构建通过；下方未提交/无CI为执行前事实。
-
-前轮交付回执：a0e46b1已提交推送；Build AShell clients both/aarch64获HTTP204且未监控。当前T002为其上的新修改，无新的Git/CI动作；不推断前轮或本轮编译通过。
-
-> 本文件是截至 `Observed At` 的当前状态快照，不是生产实时监控，也不替代源码、`docs/AI_ENGINEERING/`、ADR 或 Baseline。新会话必须用只读检查确认其新鲜度；发现漂移时记录 conflict/stale，不得用本文件覆盖源码事实或改写旧 Baseline。
-
-最新变更：[T-2026-10-14-002](../docs/tasks/T-2026-10-14-002-adb-inline-and-screenshot.md)。main/a0e46b1初始clean；实现单源居中/双源左普通右ADB、Shell栏蓝/红按钮、独立ADB连续系统截图及多PC格式协商。PC仅适配视口和等待提示，原Android采集/无障碍/输入优先级保持。D-027 / ADR-0022 / Baseline17 / CE-20261014-T002-01；源码文档未提交，V0，构建/真机待验。
-
-2026-10-12 T003 历史补充：当时按用户要求统一品牌字段/路径与两处公共服务匹配。历史文档已标注名称规范化，原文字与真实源仓地址从a036f31恢复；当时的检索结果不代表本次重新扫描全仓品牌。
+当前[T005](../docs/tasks/T-2026-10-14-005-adb-docs-sync.md)同步截至7607349的ADB文档，初始工作区clean。实际源码已超过旧404b199记忆；历史实现与交付记录见Git、TASK_HISTORY和冻结Baseline，不用旧“未提交/无push”段落覆盖当前事实。本快照写于文档提交前；最终文档提交SHA与推送结果见Git/会话交付。
 
 ## 1. Source and Product Snapshot
 
 | Field | Last Observed State | Evidence |
 |---|---|---|
-| Product/runtime | `A Shell You` / `AShell`；crate ashell；Android me.ashell；Flutter内部flutter_hbb | source + ADR-0014 |
-| Rust / Flutter version | `5.2.1` / `5.2.1+59` | manifests + Baseline |
-| Baseline ID | `AS-BL-2026-10-14-404b199-adb-layout-worktree` | Baseline19；旧基线冻结 |
-| Branch | `main` | read-only Git observation |
-| HEAD | `404b1991157308ebf700108dac3196f9d2889f91` | 本轮只读观察；前轮已提交推送 |
-| Worktree | 初始clean；本轮ADB栏/压缩/触摸/节点穿透源码与记录未提交，无新外部资产 | T-2026-10-14-004 / CE-20261014-T004-01 |
-| History mapping | a036f31提交前轮记忆；6fb0aa6初始化的975 blobs与历史源匹配是迁移前证据，准确RustDesk fork未知 | 历史接管报告；不能用该一致性描述当前dirty tree |
-| Highest completed verification | `V0` repository/document/schema checks | `TEST_MATRIX.md` + task records |
-| Formal build/runtime evidence | 当前工作树未取得新包/正式构建/真机结果；本轮未触发或监控CI | ADB-M01—M12全部NOT_RUN；旧矩阵继续适用，不宣称构建成功 |
-| Release readiness | `BLOCKED` | security、external assets、V2—V4、signing/SBOM/rollback gaps |
+| Product/runtime | A Shell You / AShell；me.ashell；Flutter内部flutter_hbb | 当前manifest，产品身份未改 |
+| Rust / Flutter version | 5.2.1 / 5.2.1+59 | manifests |
+| Branch / implementation HEAD | main / 76073498e6b8a405f175c654f54275d143fdcc02 | 本任务文档提交前只读观察 |
+| Baseline | AS-BL-2026-10-14-7607349-adb-current | Baseline20；旧基线冻结 |
+| Worktree | 初始clean；本轮仅ADB相关Markdown同步 | T005 / CE-20261014-T005-01 |
+| ADB current | 身份/UID验证、2路命令、推送/有限恢复；三种画面与模式化停止；独立全局触摸、白字黑屏 | 12_LOCAL_ADB / 13_REMOTE_ADB / 14_ADB_MIRROR |
+| Verification | V0源码、合同、引用与diff检查；无当前V2—V4通过结论 | TEST_MATRIX |
+| Build evidence | 1c46e74修正日志已确认的AdbProtocol编译错误；此前Android/aarch64 dispatch204后未监控，修复后结果未知 | 08_BUILD_SYSTEM / T005 |
+| Current actions | 用户授权本次文档commit/push；明确不执行编排，未本地build/test/analyze/codegen或真机操作 | 当前用户指令 |
+| Release readiness | BLOCKED，既有安全/资产/正式验证缺口保持 | 下表；文档推送不是发布 |
 
 ## 2. Governance and Knowledge Readiness
 
@@ -73,20 +51,15 @@ T002续接：用户明确授权提交/推送当前35路径到GitHub main，并�
 
 ## 4. Current Memory Pointers
 
-- Active task registry：`CURRENT_WORK.md`。
-- Detailed task history：`TASK_HISTORY.md`。
-- Latest documented changes：`T-2026-10-14-001`（独立ADB投屏与触摸优先级；源码/资产/文档，V0）。
-- Current active task：`none`；以 CURRENT_WORK 实时行和新会话只读复核为准。
-- Latest recorded modification event：`CE-20261014-T001-02`（对01的复核与授权交付补录）。
-- Latest decision：D-026 / ADR-0021独立scrcpy投屏与ADB优先触摸；D-024 / ADR-0020无二维码/显式刷新继续有效，ADR-0019独立权限/NSD保持。
-- Architecture decisions：`docs/ADR/README.md`；ADR-0018扩展0017远程能力，ADR-0015旧退役/0014产品身份保持。
+- Task：T-2026-10-14-005；活动状态以CURRENT_WORK为准。
+- Event：CE-20261014-T005-01；State009 / Work014。
+- Decision：D-030 / ADR-0025（既有执行通道与状态同步决定补录）；D-026—029的媒体/输入/遮罩边界继续有效。
+- Current contract：docs/AI_ENGINEERING/12_LOCAL_ADB.md、13_REMOTE_ADB.md、14_ADB_MIRROR.md。
+- History：TASK_HISTORY、CHANGELOG_AI、CHANGE_EVENT_LOG、旧Task/ADR/Baseline；不把历史dispatch接受当构建成功。
 
 ## 5. Standing Authority State
 
-- There is no standing C2 or C3 authorization.
-- Historical approvals in memory、Task History、Decision Log or ADR never transfer to a new session.
-- 本轮用户授权scrcpy投屏及追加ADB触摸优先级；随后明确追加查漏补缺、提交/推送main和一次both/aarch64编排，不监控。该授权仅限本任务交付。
-- 无本地build/test/analyze/codegen、设备、删除/版本/发布；先前任务的CI接受不是当前源码成功证据。
+本次明确授权文档更新、提交和推送；明确不执行构建编排。没有产品代码、依赖/版本/签名、设备/生产或Release变更；任务关闭后本记录不授予下一任务权限。
 
 ## 6. Freshness and Update Contract
 

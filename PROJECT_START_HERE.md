@@ -1,5 +1,9 @@
 # AShell Project Start Here
 
+2026-10-14 T005当前：源码main/7607349，初始clean；ADB独立投屏/无视/节点穿透、白字黑屏、全局优先触摸、2路独立命令和Android状态推送均已落源码。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-14-005-adb-docs-sync.md)、ADR0025/D030/Baseline20。V0，当前构建/真机待证；本次仅文档提交推送，不执行编排。
+
+以下开头各段为历史任务快照；未提交、无push、投屏待设计等旧状态不代表7607349。
+
 2026-10-14 T003当前：main/941b215上调整全窗口状态浮层/双图间隔、修复ADB停止和请求超时路径、增加不进入采集的独立黑色遮罩（用户明确不采用熄屏）。原Android采集/Accessibility/输入实现保持；见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、ADR0023/Baseline18。V0未提交、未编译/真机。前轮941b215已推送且Build AShell clients获204、未监控；下方旧状态为历史快照。
 
 2026-10-14 T002：main/a0e46b1上实现主界面单源居中/双源左普通右ADB、Shell栏同款按钮、ADB独立连续系统截图。原Android采集/无障碍/触摸优先级保持，PC仅适配视口和ADB等待提示。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、ADR-0022/D-027/Baseline17；本轮未提交，仅V0。前轮a0e46b1已推送、Build AShell clients both/aarch64获204且未监控；没有本轮Git/CI或构建/真机结果。以下旧段为各任务历史快照。

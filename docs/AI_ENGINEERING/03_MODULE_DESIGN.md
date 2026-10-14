@@ -1,6 +1,7 @@
 # AShell 模块设计 / Module Design
 
-2026-10-14 T002当前补充：普通画布只增加可选桌面视口，左上原点保持；ADB区域独立输入/解码，hasFrame只驱动画面有无布局。Shell栏蓝/红按钮切换/停止视频或截图。 详见[ADB展示/截图/触摸合同](14_ADB_MIRROR.md)，D-027 / ADR-0022 / Baseline17。本轮为main/a0e46b1上未提交扩展，仅V0，V2—V4待证。前轮a0e46b1已推送、CI获204且未监控，不表示构建通过；以下旧描述按其日期解释。
+ADB当前源码7607349：连接管理、独立2路Shell、媒体、黑屏和触摸分别管理资源；会话共享Android推送的instance/revision快照，普通忙状态不令Shell栏失效。T005/Baseline20/ADR0025，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+
 
 基线：2026-07-12，`HEAD 77062b4`
 
@@ -82,9 +83,9 @@ AShell 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、bro
 
 当前LocalAdbPage→LocalAdbBridge→me.ashell/local_adb/v1→LocalAdbPlugin→LocalAdbManager。T004的PC专用协议/独立JNI也进入该manager；它拥有进程共享状态和有限串行worker，由LocalAdbClient执行本机配对/连接。AdbIdentity管身份，AdbLocalSocket管loopback transport，AdbShell管shell-v2。见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
 
-T009 / ADR-0015旧runner/bridge/mDNS/Accessibility自动化及libadb.so保持退役。T006新NSD发现本机配对和连接两类端口，无视频流；remote terminal等原链保持。ADR-0017记录本机集成，ADR-0018扩展多PC请求和共享状态，ADR-0019/0020记录独立权限、发现和显式刷新边界。
+T009 / ADR-0015旧runner/bridge/mDNS/Accessibility自动化及libadb.so保持退役。新NSD发现本机配对和连接两类端口，媒体另走字段41；remote terminal等原链保持。ADR-0017记录本机集成，ADR-0018扩展多PC请求和共享状态，ADR-0019/0020记录独立权限、发现和显式刷新边界。
 
-aca7446追加PC `RemoteAdbSidebar`，三个固定导航命令仍走`RemoteAdbController.run('shell')`。`RemoteAdbSessionState`归RemotePage所有，不归自动隐藏的toolbar或短期dialog所有；保存该会话可用性/可见性及epoch，不存码、身份、输出或全局设备状态。不可用→可用自动显示，手动关闭在持续可用期间保持；无周期status。每次导航先查询，不自动连接或回退原Accessibility输入链。具体生命周期与条件见13_REMOTE_ADB。
+aca7446追加PC `RemoteAdbSidebar`，三个固定导航命令仍走`RemoteAdbController.run('shell')`。`RemoteAdbSessionState`归RemotePage所有，不归自动隐藏的toolbar或短期dialog所有；保存会话可用性/可见性、epoch及Android状态快照，不存配对码、私钥或命令输出。不可用→可用自动显示，手动关闭在持续可用期间保持；无周期status。导航使用已确认状态，陈旧时才查询，不回退原Accessibility输入链。命令走LocalAdbCommands，与连接管理worker分离。具体生命周期与条件见13_REMOTE_ADB。
 
 ## 10. Windows privacy/virtual display
 

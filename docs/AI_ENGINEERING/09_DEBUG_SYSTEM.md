@@ -1,5 +1,7 @@
 # AShell 调试与验证体系 / Debug System
 
+2026-10-14 T005补录：ADB必须区分paired记录、握手、id -u验证、touchReady、媒体phase和首帧。1c46e74修正AdbProtocol访问级别编译错误；运行排查先看本机/PC共享instance/revision、connectionBusy与具体模式状态，不把命令忙判为失联或重连整条普通远控。只有源码证据，修复后V2/V3仍待验证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+
 接管基线：2026-07-12  
 状态：`verified` + `verification-required`
 

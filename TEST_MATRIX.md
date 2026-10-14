@@ -1,5 +1,18 @@
 # AShell Commercial Test Matrix
 
+2026-10-14 T005：按7607349同步当前ADB合同。下列为待执行验收，不是已运行测试；已有用例的串行/无push/4帧/三键限定等旧预期已纠正。当前没有V2/V3/V4通过证据，本次不执行编排。
+
+| Case | 验证目标 | Level | Result |
+|---|---|---|---|
+| ADB-R20 | 本机和PC：立即返回OKAY、延迟/关闭OPEN、TLS成功但UID失败、错误端口、配对后连接失败；OPEN兼容层与R8、两次有界连接尝试、paired保留且无假connected | V2/V3/V4 | NOT_RUN |
+| ADB-R21 | A本地/PC配对，B/C已开窗口实时收到instance/revision；乱序查询不覆盖新快照；进程重启、意外断链最多3次恢复、显式断开不重连，无PC三秒status | V3/V4 | NOT_RUN |
+| ADB-R22 | 两PC同时Shell、总计8项满队列、超时/取消requestId/关弹窗；只取消对应请求，其他命令/媒体/触摸保持；输出不串PC，断开/撤销全局清理，不自动重放 | V3/V4 | NOT_RUN |
+| ADB-M21 | 连续开关投屏/无视/穿透/黑屏；模式化stop只影响目标，迟到序号与旧Run不覆盖新意图，关后再开/最后订阅退出释放；普通normal/ignore/SKL不被刷新、卡住或改状态 | V3/V4 | NOT_RUN |
+| ADB-M22 | 从未开启普通共享，仅配对连接后开ADB画面即可触摸；之后双源/关任一源、撤销/重连、只读切换；Shell可用与touchReady区分，两PC过期事件不松开另一PC手势 | V3/V4 | NOT_RUN |
+| ADB-M23 | 同generation重复starting与早到codec配置、反复切换/断线/页面移窗；保留有效配置、丢弃旧帧；每PC在途不超8帧或8MiB，慢端不拖停其他PC | V3/V4 | NOT_RUN |
+| ADB-M24 | H.264本机RGBA颜色/透明度/尺寸正确；16/100ms轮询不堆叠；截图1—8fps自适应、节点约2fps、静态去重；记录CPU/内存/带宽/实际帧率，不把上限当实测性能 | V3 | NOT_RUN |
+| ADB-M25 | Android11/12+/目标OEM：黑屏三行白字16.5sp与左下位置、旋转、手机触摸穿过；PC普通/ADB源不出现遮罩或文字，关后资源释放；“正在启动无视…”正确；Release/R8及Java OPEN编译修复 | V2/V3/V4 | NOT_RUN |
+
 2026-10-14 T004新增（仅V0，均待正式环境）：
 
 | Case | 验证目标 | Level | Result |
@@ -33,14 +46,14 @@
 |---|---|---|---|
 | ADB-M01 | Android aarch64/universal + Windows正式构建；APK含固定server/hash/LICENSE，新JNI经R8保留；Windows H.264独立解码可用 | V2 | NOT_RUN |
 | ADB-M02 | A/B两PC订阅同一Android；A开投屏B自动接收，任一关投屏两者关闭；只退出A时B继续；最后退出释放视频 | V3/V4 | NOT_RUN |
-| ADB-M03 | 慢PC、解码慢、帧窗口耗尽：在途<=4、等待关键帧后恢复，另一PC继续；新PC在静止画面加入也收到首帧 | V3/V4 | NOT_RUN |
+| ADB-M03 | 慢PC、解码慢、帧窗口耗尽：在途<=8且总字节<=8MiB、等待关键帧后恢复，另一PC继续；新PC在静止画面加入也收到首帧 | V3/V4 | NOT_RUN |
 | ADB-M04 | 旋转/缩放/黑边/横竖屏、关闭重开、页面移窗/断线重连；旧帧不复活，图像释放、旧owner不能取消新订阅 | V3 | NOT_RUN |
 | ADB-M05 | 原共享+无无障碍+ADB：可点击拖动；原共享+无障碍+ADB：只注入ADB；无ADB+无障碍：恢复原触摸；无ADB无无障碍不可触摸 | V3 | NOT_RUN |
 | ADB-M06 | 拖动期间切ADB/撤销/断线/只读/旋转/队列溢出；正确抬指；两PC争用不能互相抬起手势；关投屏仍可在原共享上ADB触摸 | V3/V4 | NOT_RUN |
 | ADB-M07 | 原normal/SKL/ignore截图、无障碍Service、首帧waiting、共享开关、Shell三键/命令和多PC重连回归；新源不篡改旧状态 | V3 | NOT_RUN |
 | ADB-M08 | 未认证/只读/file/terminal/camera请求、未知字段、旧端、超大帧/畸形触摸、错误资产hash/编码器失败；拒绝或可恢复错误，无原链回退副作用 | V2/V4 | NOT_RUN |
 
-2026-10-13 T008：[Baseline15](docs/BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md) 固定main/aca7446的PC Shell栏；新增ADB-R16—19。文档/V0复核不构成编译/真机结果，新增用例全部NOT_RUN；投屏传输尚未实现，不列已通过用例。
+2026-10-13 T008：[Baseline15](docs/BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md) 固定main/aca7446的PC Shell栏；新增ADB-R16—19。文档/V0复核不构成编译/真机结果，新增用例全部NOT_RUN；该历史时点投屏尚未实现；当前合同见14_ADB_MIRROR，仍不列已通过用例。
 
 2026-10-13 ADB 增量：8662f23 / [Baseline 11](docs/BASELINE/11_LOCAL_ADB_BASELINE_2026-10-13.md) 已接入独立本机模块。AND-06 继续验证旧组件退役；新增 AND-09—13 验证新实现。T003 仅文档/V0，所有新增 V2/V3 用例 `NOT_RUN`，没有从文档同步请求推定编译或真机 PASS。
 
@@ -108,7 +121,7 @@ These are coverage facts, not pass results.
 | AND-06 | P0 | Legacy ADB retirement (T009) | fresh install/upgrade；home swipe/back；three ABI APK inventory | no old page/channel/automation/libadb.so；ServerPage and other native libraries remain | V2+V3 / E-A | Android+Security+Release / QA |
 | AND-07 | P0 | ZEGO voice consent | incoming/accept/reject/cancel/background/busy/reconnect/mic denial | no auto mic；reject is distinct；busy state clears；token/room scoped | V3+V4 / E-A+E-P | Android+Flutter+API+Security / QA+backend |
 | AND-08 | P0 | Packaging/permissions | clean approved native assets；ABI/JNI；manifest/boot/exported components；permission revoke | hashes/license/provenance match；all ABIs link；no hidden privilege grant | V2+V3 / E-A | Android+Release+Security / Release evidence owner |
-| AND-09 | P0 | Local ADB pairing/connect | API 30+ 正确/错误/过期六位码与配对端口；改用连接端口；API < 30；撤销系统配对 | 只有配对成功后再连接并通过 id/exit=0 才 ready；失败不假报；旧系统提示不支持；无自动调试/重连 | V3 / E-A | Android+Security / QA |
+| AND-09 | P0 | Local ADB pairing/connect | API 30+ 正确/错误/过期六位码与配对端口；改用连接端口；API < 30；撤销系统配对 | 连接并通过id -u/exit=0且UID为2000或0才ready；失败不假报；旧系统提示不支持；无自动调试；仅成功连接后的意外断链有限恢复 | V3 / E-A | Android+Security / QA |
 | AND-10 | P0 | Shell-v2 result | id、Unicode stdout/stderr、非零退出码、空/NUL/超长输入；连续单次命令 | 输出/exitCode 真实；坏输入拒绝；无 PTY/会话持久化假象；原产品状态不受查询影响 | V3 / E-A | Android+Flutter / QA |
 | AND-11 | P0 | Timeout/cancel/output bound | 错误端口、阻塞命令、重复点击、取消、20 秒 watchdog；输出超过 64 KiB | UI 不阻塞/不重复回调；取消后实际清理完成才可重试；超限 truncated、exitCode 可空；不自动重试有副作用命令 | V3 / E-A | Android+Flutter / QA |
 | AND-12 | P0 | Identity/lifecycle | 同进程重复断开连接、进程重启、前后台/切页/engine 销毁；测试环境损坏身份/忘记配对 | 身份不静默替换；无配对码/命令内容日志；断开不伪称撤权；无 timer/worker 泄漏；恢复需明确操作 | V3 / E-A | Android+Security / QA |
@@ -123,24 +136,24 @@ ADB 详细步骤、限制和取证项见 [本机 ADB](docs/AI_ENGINEERING/12_LOC
 | ID | P | 场景 | Pass oracle | Level / Owner | Result |
 |---|---|---|---|---|---|
 | ADB-R01 | P0 | PC菜单打开先取状态；A正确/错误/过期码配对但不connect；B打开同一Android | 输入提交前状态确认；B看到Android记录，可我已配对直接连接，id成功才connected；顶栏自动隐藏不销毁弹窗请求 | V3 / Flutter+Android | NOT_RUN |
-| ADB-R02 | P0 | A/B/C同时shell/手动刷新；队列达到8项；每端不同可辨识无副作用输出 | 有限串行、超额busy、不交叉回执；查询同一Android状态、无PC周期status；非零exit/Unicode/64KiB结果真实 | V3+V4 / Network+Android | NOT_RUN |
+| ADB-R02 | P0 | A/B/C同时shell/手动刷新；队列达到8项；每端不同可辨识无副作用输出 | 最多2命令并发/总计8项、超额busy、不交叉回执；查询同一Android状态、无PC周期status；非零exit/Unicode/64KiB结果真实 | V3+V4 / Network+Android | NOT_RUN |
 | ADB-R03 | P0 | 断线、弹窗关闭/ESC、PC切只读；排队/执行中取消；手机keyboard开关切换 | 仅owner未完成任务取消；空闲连接/取消扫描保留共享ADB；手机keyboard不影响独立ADB；不重放命令 | V3+V4 / Flutter+Network | NOT_RUN |
 | ADB-R04 | P0 | 有排队请求时revoke；再刷新/进程重启/重新配对；模拟清理失败 | 旧任务取消、App身份/记录失效；R8后SSLContext不复用旧key；失败不虚报；系统列表手动忘记提示正确；原会话保留 | V3+V4 / Android+Security | NOT_RUN |
 | ADB-R05 | P1 | NSD先收到其他设备广告；发现被限制、端口变化、多本机广告、服务丢失 | 仅选本机唯一端口，普通发现6.5秒；清旧值，可手工回退；paired不冒充有效shell | V3 / Android | NOT_RUN |
 | ADB-R06 | P0 | 新旧PC/Android组合；非Android；未认证/关闭控制/文件/terminal/camera；坏JSON/超大/未知方法 | 旧端status超时清本地等待；非Androidunsupported；受控端拒绝越权，reply仅发起者；原字段行为不变 | V2+V4 / Network+Security | NOT_RUN |
 | ADB-R07 | P0 | Android Release各目标ABI与PC build.cmd；JNI/protobuf；本机回归及原链并行查询 | 两端字段40可用，FRB未变；JNI/R8加载和撤销重配通过；AND-01/02/04/05/07/08、FLT-04/05/06保持 | V2+V3 / Release+domains | NOT_RUN |
-| ADB-R08 | P0 | 手机本地配对连接；A/B两PC打开ADB弹窗或手动刷新；手机keyboard=N/无Accessibility | 本次查询返回手机记录/真实连接；不承诺自动推送；view-only能看状态但操作被server拒绝；原输入逻辑保持 | V3+V4 / Android+Network | NOT_RUN |
+| ADB-R08 | P0 | 手机本地配对连接；A/B两PC打开ADB弹窗或手动刷新；手机keyboard=N/无Accessibility | 新端变化推送手机记录/真实连接，旧端查询回退；view-only能看状态但操作被server拒绝；原输入逻辑保持 | V3+V4 / Android+Network | NOT_RUN |
 | ADB-R09 | P0 | 两端只填码、手填配对端口且连接留空；错码/关闭系统窗/配对后关闭调试 | 自动发现两类端口并pair-connect-id一步完成；部分成功保留paired/显示连接失败；无假connected | V3 / Android+Flutter | NOT_RUN |
 | ADB-R10 | P1 | 历史PC二维码正例（T006） | efb2599已移除该功能，本用例退役；不以移除视为测试通过，拒绝旧参数转ADB-R14 | V3+V4 / Android+Security | N/A |
 | ADB-R11 | P1 | PC各菜单、标题栏拖动/缩小窗口、toolbar自动隐藏、断线重连、旧Android | 图标样式一致，配对无shell页签；窗口可见、输入可填写、状态失败明确；旧API提示更新，不重放shell | V3 / Flutter | NOT_RUN |
 | ADB-R12 | P1 | 两端默认自动模式；输入手动端口后切回自动再切回手动；扫描期间尝试切换 | 自动仅配对码框，无端口框/扫描按钮，提交端口0；手动显示全部并使用填写值、留空自动；焦点不串框、配对码不被端口覆盖，执行中不可切换 | V3 / Flutter+Android | NOT_RUN |
-| ADB-R13 | P1 | PC开窗后闲置30秒、手动刷新、执行命令；其他PC改状态；本机前后台；Shell栏会话就绪与导航点击 | PC无周期status/进度条闪动；开窗/手动/回执及侧栏事件查询更新；其他PC变化需再次查询，不假报实时推送；保留本地回执等待，本机前台3秒查询不变 | V3+V4 / Flutter+Network | NOT_RUN |
+| ADB-R13 | P1 | PC开窗后闲置30秒、手动刷新、执行命令；其他PC改状态；本机前后台；Shell栏会话就绪与导航点击 | PC无周期status/进度条闪动；开窗/手动/回执及侧栏事件查询更新；新端接收Android变化推送，旧端需查询；保留本地回执等待，本机前台3秒查询不变 | V3+V4 / Flutter+Network | NOT_RUN |
 | ADB-R14 | P0 | 两端UI检查；旧PC发送serviceName（含null）、其他未知参数及正常六位码；本机MethodChannel同类请求 | 无二维码入口/生成/专用等待；退役或未知参数返回invalid、无配对副作用；正常手动/自动配对仍可用 | V3+V4 / Android+Security | NOT_RUN |
 | ADB-R15 | P0 | 已配对可控会话/只读/状态失败/忙；有在途shell时手动状态查询失败；已有ADB下取消配对扫描；配对成功后连接失败 | PC连接按钮可操作时主题色、不依赖配对码；真实禁用条件保持；状态失败不丢命令结果，不重放；未使用transport的扫描取消保留连接，部分成功保留记录并说明 | V3+V4 / Flutter+Android+Network | NOT_RUN |
 | ADB-R16 | P1 | Android会话启动时ADB已连接/仅paired/未确认/unsupported；配对连接成功；手动关闭后刷新、重开弹窗和顶栏自动隐藏；断开后重新连接 | 开关位于“移动端操作”左侧；支持且connected/controlAllowed/非只读才自动显示Shell栏；普通回执保留手动关闭，可再次打开；无障碍栏标题/原默认设置和功能保持 | V3 / Flutter+Android | NOT_RUN |
-| ADB-R17 | P0 | Shell栏依次返回/主页/多任务；关闭Accessibility；视频尚无首帧；PC只读；状态失败与连续点击 | 仅经ADB发送一次input keyevent 4/3/187，点击前查询；只读/失效/处理中不发送，不自动配对或连接；无原输入回调/MediaProjection授权/命令重放 | V3+V4 / Flutter+Android+Security | NOT_RUN |
+| ADB-R17 | P0 | Shell栏依次返回/主页/多任务；关闭Accessibility；视频尚无首帧；PC只读；状态失败与连续点击 | 仅经ADB发送一次input keyevent 4/3/187，状态陈旧时查询；只读/失效/处理中不发送，不自动配对或连接；无原输入回调/MediaProjection授权/命令重放 | V3+V4 / Flutter+Android+Security | NOT_RUN |
 | ADB-R18 | P1 | 查询与配对/连接/撤销回执乱序；断网/超时/非零退出码；命令进行中关闭弹窗或远控页；解除只读 | 旧查询不覆盖后续操作状态；未知结果使侧栏不可用，真实失败回执保持其state语义；mounted/epoch/dispose无异常和泄漏，不假报执行未发生；解除只读可重新查询 | V3+V4 / Flutter+Network | NOT_RUN |
-| ADB-R19 | P1 | 拖动到四边、窗口缩小/放大、DPI/字体缩放、顶栏显示隐藏；两个远控页及两PC连接同一Android | 栏不越可见区域，仅三键与标题；显示开关/位置归各页，不互相串改；共享Android状态按查询更新，关闭一侧空闲窗口不撤销手机身份；原侧栏/视频/输入可用 | V3+V4 / Flutter+Android | NOT_RUN |
+| ADB-R19 | P1 | 拖动到四边、窗口缩小/放大、DPI/字体缩放、顶栏显示隐藏；两个远控页及两PC连接同一Android | 栏不越可见区域，完整按钮/标题/网址栏与小窗口滚动；显示开关/位置归各页，不互相串改；新端共享Android状态按推送/查询更新，关闭一侧空闲窗口不撤销手机身份；原侧栏/视频/输入可用 | V3+V4 / Flutter+Android | NOT_RUN |
 
 ## 6. Windows Suite
 

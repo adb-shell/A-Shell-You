@@ -1,6 +1,7 @@
 # AShell 构建系统 / Build System
 
-2026-10-14 T002当前补充：复用Android Bitmap和既有image 0.24，不增依赖/资产，不改工具链/CI/FRB签名。正式构建需自动生成新增protobuf字段并核验Java/Rust新增boolean JNI参数；未执行本轮构建。 详见[ADB展示/截图/触摸合同](14_ADB_MIRROR.md)，D-027 / ADR-0022 / Baseline17。本轮为main/a0e46b1上未提交扩展，仅V0，V2—V4待证。前轮a0e46b1已推送、CI获204且未监控，不表示构建通过；以下旧描述按其日期解释。
+2026-10-14：用户Android日志确认AdbStreamCompat导入package-private AdbProtocol导致Java编译失败。1c46e74改为本地编码标准OPEN包，保留固定libadb3.1.1反射及R8规则；不是pub过期提示或字体优化警告导致。其后Android/aarch64 dispatch仅有204接受、未监控；当前7607349的构建/真机结果仍未知。T005只同步文档并推送，不执行编排或本地构建。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+
 
 接管基线：2026-07-12  
 状态：`verified` + `verification-required`
