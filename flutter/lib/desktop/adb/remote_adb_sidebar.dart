@@ -147,7 +147,7 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([widget.state, _adb, widget.mirror,
+      animation: Listenable.merge([widget.state, _adb, widget.mirror, widget.mirror.hasFrame,
         widget.ffi.ffiModel, widget.ffi.canvasModel]),
       builder: (context, _) {
         _schedulePeerUpdate();
@@ -182,6 +182,18 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
               icon: Icon(icon), iconSize: 24 * scale,
               onPressed: enabled ? () => _navigate(keyCode) : null);
           return Stack(children: [
+            // The ordinary first-frame dialog may cover the inline ADB view.
+            // Keep actual layout progress/errors visible without changing that dialog's state.
+            if (widget.mirror.layoutMode && !widget.mirror.hasFrame.value &&
+                (widget.mirror.active || widget.mirror.error.isNotEmpty))
+              Positioned(left: 12, right: 12, bottom: 12,
+                child: IgnorePointer(child: Center(child: Container(
+                  constraints: const BoxConstraints(maxWidth: 640),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(6)),
+                  child: Text(widget.mirror.summary, textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                )))),
             Positioned(left: position.dx, top: position.dy, width: width, height: height,
               child: GestureDetector(
                 onPanUpdate: (event) => setState(() {
