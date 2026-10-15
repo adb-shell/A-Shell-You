@@ -53,4 +53,4 @@ Present your final output in the following structure:
 [Present the complete, updated set of instructions for Claude, incorporating all approved changes]
 </final_instructions>
 
-Remember, your goal is to enhance Claude's performance and consistency while maintaining the core functionality and purpose of the AI assistant. Be thorough in your analysis, clear in your explanations, and precise in your implementations.
+Remember, your goal is to enhance Claude's performance and consistency while maintaining the core functionality and purpose of the AI assistant. Be thorough in your analysis, clear in your explanations, and precise in your implementations. 
