@@ -1,5 +1,7 @@
 # ADR-0023 — 独立 ADB 黑屏遮罩与采集隔离
 
+后继说明（2026-10-16）：[ADR-0026](0026-adb-app-side-rendering.md) 补充已有白字层的App侧PNG预渲染及真实layerStack绑定；下方保留最初黑层方案时点，当前实现以14_ADB_MIRROR为准。
+
 - 状态：accepted for implementation / V0；2026-10-14，T-2026-10-14-003，D-028。
 - 请求：手机上层黑色遮罩，PC仍可看见底层真实画面；用户明确排除关闭物理屏幕的替代方案。
 - 决定：新增APK内`AdbPrivacyOverlay.main`，经已验证的本机ADB以shell UID运行；只创建独立SurfaceControl黑色color layer。Android11使用平台`WINDOW_TYPE_DONT_SCREENSHOT`创建元数据；12+使用`setSkipScreenshot(true)`，先设排除属性再show/apply。不设FLAG_SECURE，不更改电源/亮度，不复用或修改无障碍黑屏。

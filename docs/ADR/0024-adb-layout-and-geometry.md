@@ -1,5 +1,7 @@
 # ADR-0024: Independent ADB layout capture and physical geometry
 
+后继说明（2026-10-16）：[ADR-0026](0026-adb-app-side-rendering.md) 将下方“helper绘制JPEG”更新为“helper只读节点、App绘制JPEG”，其余隔离/几何原则保持。下方为原决定的历史实现说明。
+
 - Status：accepted for implementation，2026-10-14；D-029，T-2026-10-14-004。V0，不代表构建或真机通过。
 - Context：用户要求Shell栏严格参考无障碍栏、降低ADB画面负载、修复黑屏/间歇触摸，并新增节点线条/文字穿透。
 - Decision：ADB画面三种互斥源h264/jpeg/layout，继续单设备拥有、多PC订阅及既有控制权限；layout由APK内独立shell UiAutomation helper绘制JPEG，不调用产品AccessibilityService。连接使用`FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES`，禁止默认connect抑制服务，禁止`uiautomator dump`落盘/反复注册。

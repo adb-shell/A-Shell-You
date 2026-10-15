@@ -1,6 +1,6 @@
 # AShell 源码地图 / Source Map
 
-ADB当前源码7607349：新增LocalAdbCommands、AdbStreamCompat；LocalAdbManager负责状态推送和有限连接恢复，LocalAdbMirror管理三种源，LocalAdbPrivacy/AdbPrivacyOverlay负责排除采集的白字黑屏。PC独立RGBA/JPEG桥、主界面分栏与共享snapshot。T005/Baseline20，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+ADB当前源码4d3c446：localadb/AdbLayoutCapture与AdbLayoutNodes读取节点；AdbLayoutSnapshot为有界私有格式；LocalAdbLayout协调请求/几何，AdbLayoutRenderer在App绘JPEG。AdbPrivacyHint在App生成PNG，LocalAdbPrivacy传输，AdbPrivacyOverlay显示并绑定layerStack。PC状态展示在overlay.dart/remote_page.dart，Shell栏在remote_adb_sidebar.dart。2026-10-16 T001/Baseline21，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 
 基线：2026-07-12，`HEAD 77062b4`

@@ -364,3 +364,12 @@
 - 补录80887c1—7607349代码事实，更新12/13/14、架构/源码/Android/协议/构建调试/安全/路线入口、TEST_MATRIX、External Registry与会话记忆。新增ADR0025/D030/Baseline20；保留旧历史任务/基线。
 - V0合同、来源、链接和diff核对；已有Java编译错误由1c46e74修正源码，当前仍无构建/真机通过证据。后续正式验收覆盖双PC独立命令、状态推送、UID验证、连续模式开关与原链隔离、白字遮罩/R8等。
 - 当前文档交付记录写于提交前；实际commit/push SHA与clean结果由Git/会话交付提供。STATE009 / WORK014 / CE-20261014-T005-01；详情docs/tasks/T-2026-10-14-005-adb-docs-sync.md。
+
+## T-2026-10-16-001 — ADB绘图与PC展示文档同步
+
+- 用户明确文档同步后推送并执行编排；沿用不监控要求。初始main/4d3c44640c4b001b9af2c3106e809564f8b615cf、clean，本地/远端一致。
+- 补齐0ec8b5b文档之后227bbe0/a2fc3c3/e5c80ad/393acaa/4d3c446代码事实；当前合同说明App绘图/字体、遮罩绑定、数字红色、去重提示、PC分组状态及悬浮文字精简。
+- 历史回退：曾尝试无障碍权限管理及开发者入口，用户两次明确恢复393acaa并强推同步；最后4d3c446只修改overlay.dart和remote_adb_sidebar.dart两处文字显示，不包含被撤回的菜单/权限功能。已有4d3c446 both/aarch64 dispatch204回执，未监控、无构建结论。
+- 本轮仅Markdown，ADR0026/D031/Baseline21、新M26—M30及记忆同步；未改原产品/无障碍/采集/输入/协议/依赖/构建实现。
+- V0来源、diff、文档引用和范围复核；产品测试NOT_RUN。文档完成后commit/push到origin/main，单次Build AShell clients（both/aarch64），不监控；准确SHA及接受结果见Git/会话交付，不预写成功。
+- STATE-20261016-001 / WORK-20261016-001 / CE-20261016-T001-01；[详细任务](../docs/tasks/T-2026-10-16-001-adb-docs-sync.md)。

@@ -1,6 +1,6 @@
 # AShell 本机 ADB / Local ADB
 
-当前核对：2026-10-14，main/7607349，文档同步开始时工作区clean。当前配对/连接/独立命令、进程状态推送与有限断链恢复见 [T005](../tasks/T-2026-10-14-005-adb-docs-sync.md) / [Baseline20](../BASELINE/20_ADB_CURRENT_BASELINE_2026-10-14.md)。[13_REMOTE_ADB](13_REMOTE_ADB.md)与[14_ADB_MIRROR](14_ADB_MIRROR.md)分别记录PC控制及媒体/触摸；旧T003/T007/T008为历史快照。
+当前核对：2026-10-16，main/4d3c446，文档同步开始时工作区clean。当前配对/连接/独立命令、进程状态推送与有限断链恢复保持既有合同；最新 [T001](../tasks/T-2026-10-16-001-adb-docs-sync.md) / [Baseline21](../BASELINE/21_ADB_RENDER_UI_BASELINE_2026-10-16.md) 补齐App侧绘图与PC展示变化。[13_REMOTE_ADB](13_REMOTE_ADB.md)与[14_ADB_MIRROR](14_ADB_MIRROR.md)分别记录PC控制及媒体/触摸；旧任务为历史快照。
 
 当前实现是 Android App 内的独立无线调试客户端：配对、连接、验证 shell 身份和执行单次命令。主页向左滑到右侧 ADB 页，向右滑返回。采用 `libadb-android:3.1.1`；没有恢复旧 LADB 进程、`libadb.so`、旧通道或无障碍自动配对。T004增加PC远程ADB；2026-10-14 T001新增[独立scrcpy投屏与ADB优先触摸](14_ADB_MIRROR.md)，共用身份、独立媒体/控制连接。仅V0，构建/运行待验证。
 

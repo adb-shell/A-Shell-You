@@ -1,18 +1,20 @@
 # AShell Project Memory
 
-最后更新：2026-10-14（当前ADB模块与修复文档同步）
+最后更新：2026-10-16（ADB绘图、PC展示与回退边界同步）
 
 用途：AI 会话的稳定入口，不替代源码和完整工程文档。
 
 ## 0. Latest Recovery Snapshot
 
-2026-10-14 T005：源码main/7607349、初始clean，本次仅ADB文档同步并按用户明确要求提交推送，不执行或监控编排。当前指针STATE009 / WORK014 / CE-20261014-T005-01 / D030 / ADR0025 / Baseline20；[任务](../docs/tasks/T-2026-10-14-005-adb-docs-sync.md)记录验证边界。
+2026-10-16 T001：源码main/4d3c446、初始clean，本地/远端一致；本次仅文档，按用户要求提交推送后单次Build AShell clients both/aarch64，不监控。当前指针STATE-20261016-001 / WORK-20261016-001 / CE-20261016-T001-01 / D031 / ADR0026 / Baseline21；[任务](../docs/tasks/T-2026-10-16-001-adb-docs-sync.md)记录验证与授权边界。
 
 ADB当前：双NSD配对和id -u验证，独立2路Shell命令、Android真实状态变化推送及最多3次意外断链恢复。PC无三秒远程status；apiVersion3支持requestId取消，mirrorVersion2按模式停止。主界面单源居中/双源普通左ADB右；投屏、无视、节点穿透三选一，独立白字黑屏、全局ADB优先触摸。PC视频解码后使用RGBA本机桥，截图最多8fps动态节奏、节点约2fps。详见[当前合同](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 
-后续源码提交80887c1/f7bcb70/ee4c99b补齐侧栏、独立触摸、执行隔离、同步与竞态；1c46e74修复package-private AdbProtocol造成的Android编译错误；7607349增加黑屏白字和“正在启动无视…”文案。修复后未取得构建/真机通过结果，历史dispatch204不构成验证。
+227bbe0/a2fc3c3/e5c80ad补齐节点读取和App绘图分工、字体回退、有界快照、红色数字、黑屏App预渲染PNG与layerStack；helper不再初始化系统context或文字字体。393acaa新增PC分组状态；4d3c446仅移除桌面视频/特殊状态文字和Shell栏悬浮小字。当前没有无障碍暂停/恢复/授予/关闭或开发者选项菜单，这些先前尝试已随两次回退至393acaa撤回。不能从历史会话恢复这些功能。
 
-本次文档不修改原无障碍/画面/输入、产品身份或构建链。此前无障碍栏仅移除防触按钮，原实现保留。旧T001—T004及T007/T008快照在TASK_HISTORY、CHANGELOG_AI和docs/tasks中保留；不要继续从这些历史记录推断当前无push/未集成投屏/全部串行。本文写于文档提交前，最终Git结果见提交与会话交付。
+此前1c46e74修正AdbProtocol访问级别编译错误；当前构建/真机仍无通过结果。4d3c446推送后的both/aarch64 dispatch204未监控，仅证明请求接受，不构成运行验证。
+
+本次文档不修改原无障碍/画面/输入、产品身份或构建链。此前无障碍栏仅移除防触按钮，原实现保留；桌面隐藏的状态行没有删除底层字段或移动端展示。旧任务/基线保留时点含义。本文写于文档提交前，最终Git结果与本次dispatch回执见提交/会话交付。
 
 ### 迁移前接管证据（历史）
 

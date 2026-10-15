@@ -1,6 +1,6 @@
 # AShell 项目总览 / Project Overview
 
-ADB当前源码7607349：本机/PC配对、UID验证、状态推送、独立命令与媒体/触摸；独立白字黑屏和节点绘制。文档同步见T005/Baseline20，V0，当前构建/真机未证；本次不执行编排。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+ADB当前源码4d3c446：配对/UID验证、状态推送、独立命令与媒体/触摸保持；穿透节点由Shell读取、App绘图，黑屏白字由App预渲染。PC状态分组、Shell栏无悬浮小字；已回退菜单不在当前功能内。2026-10-16 T001/Baseline21，V0，构建/真机待证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 接管基线：2026-07-12  
 源码基线：`HEAD 77062b4`  

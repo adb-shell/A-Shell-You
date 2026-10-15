@@ -1,6 +1,6 @@
 # AShell ADB 投屏、无视、穿透、黑屏与触摸
 
-当前源码核对：2026-10-14，main/`7607349`，初始工作区 clean。本文是当前合同，替换早期“独立窗口、固定2fps、PC视频转JPEG、所有模式统一stop”的描述；历史过程保留在 T001—T004、ADR-0021—0024 和旧基线。最新 [T005](../tasks/T-2026-10-14-005-adb-docs-sync.md)、[Baseline20](../BASELINE/20_ADB_CURRENT_BASELINE_2026-10-14.md)、[ADR-0025](../ADR/0025-adb-lanes-and-state-sync.md) 汇总后续实现。源码复核为 V0，未取得当前版本构建通过或真机验收证据。
+当前源码核对：2026-10-16，main/`4d3c446`，初始工作区 clean。本文为当前合同；历史任务和基线按各自提交解释。最新 [T001](../tasks/T-2026-10-16-001-adb-docs-sync.md)、[Baseline21](../BASELINE/21_ADB_RENDER_UI_BASELINE_2026-10-16.md)、[ADR-0026](../ADR/0026-adb-app-side-rendering.md) 补录节点采集与App绘制分离、遮罩文字及PC状态UI；[ADR-0025](../ADR/0025-adb-lanes-and-state-sync.md) 的通道隔离与同步继续有效。仅 V0，当前构建和真机兼容性尚未取得通过证据。
 
 ## 使用与界面
 
@@ -16,9 +16,21 @@
 | 网址栏 / 搜索 | 校验 HTTP/HTTPS URL，经独立 Shell 的 `am start` 打开手机浏览器；参数按单个 shell 参数引用 |
 | 底部收起按钮 | 仅隐藏当前 PC 的 Shell栏，不停止设备功能 |
 
-侧栏采用原无障碍栏的宽度 `70×scale`、高度 `45×12×scale`、缩放规则、背景/圆角、导航图标、按钮内距/阴影/分隔线及网址栏样式；小窗口允许滚动。无障碍栏的“开防触 / 关防触”仅移除按钮，其原实现保留；ADB 栏没有这两个按钮。
+侧栏采用原无障碍栏的宽度 `70×scale`、高度 `45×12×scale`、缩放规则、背景/圆角、导航图标、按钮内距/阴影/分隔线及网址栏样式；小窗口允许滚动。Shell栏按钮不再显示鼠标悬浮小字提示，图标语义名称保留，回调和启用条件不变。无障碍栏的“开防触 / 关防触”仅移除按钮，其原实现保留；ADB 栏没有这两个按钮。
 
 ADB 画面在主界面内显示：单源居中；双源左侧普通共享/无障碍画面、右侧 ADB，中间 1 逻辑像素竖线，两图向中线靠拢。一侧关闭后另一侧恢复居中。状态浮层位于整个主界面右上方。画面底部不常驻“ADB投屏 / ADB连续截图”标签，仍显示真实错误。只有 ADB 画面时，菜单、配对弹窗和 ADB 输入仍可使用。
+
+穿透启动进度保留画面中心提示，Shell栏底部不再重复显示“正在读取界面布局”等进度。PC右上状态浮层宽度上限144、左右内距6逻辑像素；无障碍部分依次显示共享、无视、黑屏、穿透、加密状态。桌面端移除“视频状态”“特殊状态”“防触状态”显示，底层状态字段和移动端显示保留。“加密状态”仍沿用原字段 `data.accessibility`，桌面文案为可用/不可用，不是新引入的传输加密检测。
+
+已识别为Android的普通PC远控会话，在分界线下按顺序显示ADB状态：
+
+| 标签 | 状态来源与显示 |
+|---|---|
+| 投屏状态 / 无视状态 / 穿透状态 | 分别对应 `h264 / jpeg / layout`；目标模式 streaming 为开，其他模式或已停止为关；未就绪、waiting/error、目标模式启动/停止中显示“—” |
+| 黑屏状态 | `privacyPhase=on` 为开；未就绪、媒体waiting或黑屏启动/停止中显示“—”，其他状态为关 |
+| 命令状态 | 会话已就绪且 `RemoteAdbSessionState.available` 为可用，否则不可用 |
+
+实际排列为“投屏状态、无视状态、黑屏状态、穿透状态、命令状态”。这些显示使用现有状态通知，不增加PC三秒status轮询，也不以按钮点击直接宣告功能成功。
 
 ## 采集模式与原链隔离
 
@@ -38,7 +50,7 @@ ADB 画面在主界面内显示：单源居中；双源左侧普通共享/无障
 |---|---|---|
 | 投屏 | 官方 scrcpy-server 5.0.1，H.264，video-only，无音频/控制；请求1秒关键帧间隔 | 只读普通画面 QoS 画质/FPS；FPS上限30、码率200kbps—1Mbps；设备编码器决定实际效果 |
 | 无视 | 固定 `screencap -p`，有界PNG解码后缩放并编码JPEG | 参考同一画质档位，JPEG低/均衡/最佳60/75/85，自定义50—90；节奏按FPS和JPEG字节预算调整，上限8fps，主动等待最长2秒 |
-| 穿透 | 独立 UiAutomation 读取节点并绘制JPEG | 500ms目标间隔（上限约2fps），节点读取耗时可能降低实际帧率；启动时读取JPEG画质 |
+| 穿透 | Shell UiAutomation 读取节点，App软件Canvas绘制JPEG | 500ms目标间隔（上限约2fps），读取/绘制耗时会降低实际帧率；每帧从App读取当前几何与画质档位 |
 
 视频与 JPEG 编码机制不同，不能说压缩质量或带宽完全一致。截图8fps是节奏上限，不是性能保证；截图仍有系统取图、PNG解码、JPEG压缩开销。相同截图/节点图去重，静态内容约每秒补一张供新PC加入。网络仍与普通画面共享会话及实际带宽，模块隔离不等于网络带宽隔离。
 
@@ -46,17 +58,23 @@ PC H.264 使用独立解码器，输出 RGBA，经 base64 本机桥直接交给 
 
 ## 节点穿透
 
-`LocalAdbLayout` 在独立 ADB 连接上运行 APK 内 `AdbLayoutCapture.main`。helper 建立 shell 的系统 context 和回调线程，兼容 UiAutomation 构造入口，以 `FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES` 连接，避免抑制原无障碍服务。读取默认显示的交互窗口，必要时回退到活动或焦点节点；不再只绘制标记 visible 的节点。
+`LocalAdbLayout` 在独立 ADB 连接上运行 APK 内 `AdbLayoutCapture.main`。当前helper只连接UiAutomation和读取节点，不再调用 `ActivityThread.systemMain`、获取系统context、初始化字体或绘制JPEG。以 `FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES` 连接，并请求交互窗口、view id和非重要节点；原无障碍服务保持独立。
 
-每帧最多4096节点、64层，绘制边框和可获取的文字，密码文字遮盖；无节点时显示“当前界面未提供布局节点”。节点及图像仅驻内存，不执行落盘 dump。系统不给出的节点、游戏/视频像素和受保护内容不能凭空重建；已有其他UiAutomation占用、隐藏API或ROM限制会返回分阶段失败信息，不伪造画面就绪。
+`AdbLayoutNodes` 枚举默认显示的窗口，并始终补读活动窗口根节点，按window id去重；活动根不可用再尝试输入/无障碍焦点。每轮清理helper自己的节点缓存，兼容无参和connectionId入口。Android13+尝试预取根节点；不按visible标记直接排除有有效bounds的节点。单个过期节点允许跳过，查询全部失败不能冒充“无节点”。
 
-helper 使用10秒stdin租约，正常关闭和断流会退出并解除自己的UiAutomation；不调用原AccessibilityService。实际并存与清理效果需目标ROM真机确认。
+`AdbLayoutSnapshot` 每帧最多4096节点、64层；每节点文本最多1024个UTF-16单元、合计256Ki单元，序列化最多2MiB。读取bounds、clickable和文字，密码字段遮盖，文字缺失依次尝试contentDescription/hint。`LAYN / LAYP / LAYE` 是App与helper的私有节点/进度/错误帧，不新增网络协议字段。App按请求读取一帧，再请求下一帧；初始租约先发送，心跳与采集请求共用串行写锁。
+
+`AdbLayoutRenderer` 在正常App进程内使用软件Bitmap/Canvas、`TextPaint`、`StaticLayout`绘图：黑底、可点击节点绿框、其余浅灰框，文字换行/裁剪并最多8行；Unicode数字通过 `Character.isDigit` 标红，其余文字白色。使用公开逻辑字体 `Typeface.SANS_SERIF` 和Android字体回退，不读取厂商字体路径、不打包外部字体。节点读取前后与编码后校验源几何/旋转，变化帧丢弃，避免错位点击。JPEG沿用画质/尺寸档位且不超过2MiB。
+
+没有可绘制节点时，画面明确提示“当前界面未提供可绘制的布局节点 / 请切换到系统设置等标准界面确认”；系统未提供的节点、游戏/视频像素和受保护内容不能凭空重建。失败分别报告节点读取、私有流、App编码或helper退出阶段。exit 134通常对应原生SIGABRT，但单凭退出码不能证明根因；错误保留阶段/API信息，不把失败变为成功画面。
+
+节点和图像只驻内存，不执行落盘dump。helper使用10秒stdin租约，正常关闭、断流或租约到期释放自己的UiAutomation；不调用原AccessibilityService。Android11—17是待验证目标范围，不代表已逐版本或逐ROM验证通过。
 
 ## 黑色遮罩与白字
 
 `LocalAdbPrivacy` 通过自己的 ADB 连接运行 `AdbPrivacyOverlay.main`，创建不透明黑色 SurfaceControl color layer，手机保持物理亮屏。不修改系统亮度，不使用原无障碍黑屏，不设置 `FLAG_SECURE`。
 
-`7607349` 增加白色子图层，内容为：
+白色子图层显示：
 
 ```text
 正在对接服务中心
@@ -64,7 +82,9 @@ helper 使用10秒stdin租约，正常关闭和断流会退出并解除自己的
 避免影响业务
 ```
 
-文字参考无障碍黑屏的16.5sp、默认字体、左下方约80dp位置，现有stdin心跳用于旋转后的纵向位置更新。黑层与文字层均使用截图排除设置：Android11采用 `WINDOW_TYPE_DONT_SCREENSHOT` 元数据，Android12+采用 `setSkipScreenshot`；12+同时标记自身 `setTrustedOverlay(true)`，没有输入窗口或触摸拦截通道。目标是手机看到遮罩/文字，PC继续看到底层真实画面；该目标需OEM真机验证，不能据静态标记保证所有ROM一致。
+`AdbPrivacyHint` 在App进程以16.5sp、`Typeface.SANS_SERIF`及Android字体回退排版，生成最多1024×512、256KiB的PNG。`LocalAdbPrivacy` 先将启动字节、长度及PNG写入helper的私有stdin，再维持心跳。helper校验尺寸后只解码并显示像素，不初始化文字排版或厂商字体文件。位置为左下方约80dp，心跳更新旋转后的纵向位置。
+
+黑层显式绑定默认显示的真实 `layerStack`，白字层作为其子层；事务应用后输出 `ASHELL_OVERLAY_READY` 才确认开启。黑层与文字层均使用截图排除设置：Android11采用 `WINDOW_TYPE_DONT_SCREENSHOT` 元数据，Android12+采用 `setSkipScreenshot`；12+同时标记自身 `setTrustedOverlay(true)`，没有输入窗口或触摸拦截通道。目标是手机看到遮罩/文字，PC继续看到底层真实画面；该目标需OEM真机验证，不能据静态标记保证所有ROM一致。
 
 隐藏API缺失时真实失败并清理，不降级为会遮住采集的普通覆盖窗。停止等待helper退出确认或本机10秒租约到期，旧Run不能回写新状态；快速关后开保留待开启意图，后续关会清掉该意图。图层、Surface、私有连接随各自生命周期释放。仅排除ADB自己的图层，用户另行开启的无障碍黑屏仍按原逻辑运行。
 
@@ -108,6 +128,6 @@ flowchart LR
 
 沿用libadb3.1.1、Java8、Android11+无线调试；未升级工具链或增加PC adb.exe/旧libadb.so。`AdbStreamCompat`用于修复固定依赖的早到OKAY等待竞态。此前直接导入package-private的AdbProtocol导致Android编译错误，`1c46e74`已改为本地编码标准OPEN包，并保留所需反射成员的R8规则；修复后的构建结果仍待验证。
 
-[TEST_MATRIX](../../TEST_MATRIX.md) ADB-M01—M25、ADB-R01—R22及AND-09—13记录当前验收，除明确退役用例外均未取得通过证据。重点覆盖不启动普通共享时ADB触摸、双源独立关停、连点切换、双PC命令取消/争用、配对后连接验证、白字黑屏排除采集与触摸、节点读取及Release反射兼容。
+[TEST_MATRIX](../../TEST_MATRIX.md) ADB-M01—M30、ADB-R01—R22及AND-09—13记录当前验收，除明确退役用例外均未取得通过证据。重点覆盖不启动普通共享时ADB触摸、双源独立关停、连点切换、双PC命令取消/争用、配对后连接验证、App绘图/字体回退、遮罩图层绑定/排除采集、节点读取及Release反射兼容。
 
-《编译验证需求》：后续经授权在正式Linux仓库根执行 `./build.sh 1` / `./build.sh 2`，Windows正式环境执行 `build.cmd`；验证JNI/R8/协议生成及两端安装包，再做Android11+与至少两PC实测。本次只同步文档并提交推送，不执行构建编排、监控或本地产品验证。
+《编译验证需求》：正式Linux仓库根 `./build.sh 1` / `./build.sh 2`、Windows `build.cmd` 用于验证JNI/R8/协议生成及安装包，再做目标Android版本与至少两PC实测。本次用户授权文档提交推送后单次执行 `Build AShell clients`（both/aarch64）；不监控编排，不执行本地产品验证。dispatch接受与构建通过分开记录，最终回执见本轮会话交付。

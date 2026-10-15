@@ -4,7 +4,7 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-12T05:39:32+09:00
+Last Updated：2026-10-16（T001文档同步）
 
 Mode：`append-only logical persisted-change events`
 
@@ -719,3 +719,12 @@ Mode：`append-only logical persisted-change events`
 - Delta：真实推送/独立命令/UID及OPEN修复、模式化停止/全局触摸、RGBA和动态截图节奏、节点边界、白字遮罩/无视启动文案；将旧当前描述修正为源码事实，冻结历史记录不冒充现状。
 - Verification：V0源码/提交/本地链接/范围/diff；不把日志修复或历史dispatch204当当前构建通过。文档commit/push按当前授权执行，最终SHA与结果见Git/交付。
 - 未执行：业务代码/依赖/版本/工作流修改、构建编排及监控、本地产品build/test/analyze/codegen、设备/生产/Release/tag/删除操作。
+
+## CE-20261016-T001-01 — 同步4d3c446的ADB绘图与PC展示合同
+
+- Task：T-2026-10-16-001；用户授权文档更新/提交推送/单次编排，延续不监控要求。初始main/4d3c446、clean，本地与远端一致。
+- 当前合同12/13/14及相关架构/模块/源码/Android/协议/构建/调试/安全/路线入口更新；TEST_MATRIX新增M26—M30全部NOT_RUN；External Registry无新资产。
+- ADR0026/D031补录helper只采集节点、App绘图及黑屏PNG职责；Baseline21冻结当前源码与回退边界，旧Task/Baseline正文保留历史。
+- PC当前状态顺序、未知值、桌面两行删除及Shell栏无悬浮说明写实；无被回退的无障碍权限控制或开发者菜单。AGENTS/PROJECT_START及.codex薄记忆同步STATE-20261016-001 / WORK-20261016-001。
+- 本轮仅Markdown；V0源码/差异/本地链接核对。无本地产品build/test/analyze/codegen、设备、依赖/版本/生产/Release/tag或删除操作。
+- 按授权提交推送后单次Build AShell clients both/aarch64，不监控；实际提交SHA和dispatch接受结果见Git/会话交付，本条不预写成功、不证明构建通过。

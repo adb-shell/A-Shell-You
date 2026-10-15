@@ -1,5 +1,7 @@
 # AShell Architecture Decision Records
 
+当前：[ADR-0026 ADB节点读取与App绘图分离](0026-adb-app-side-rendering.md)，D-031 / T-2026-10-16-001，补录227bbe0/a2fc3c3/e5c80ad。更新0023/0024的绘图进程职责，保持0025隔离与同步边界；V0、设备验证待证。以下为历史索引说明。
+
 当前：[ADR-0025 ADB执行通道隔离与设备状态推送](0025-adb-lanes-and-state-sync.md)，D-030 / T005，补录80887c1—ee4c99b既有决定。替代0020中无push的描述，保留无PC周期status/无QR；补充0018及0021—0024，V0。以下为历史索引说明。
 
 2026-10-14当前：[ADR-0024 独立ADB节点穿透与真实屏幕几何](0024-adb-layout-and-geometry.md)，D-029；补充0021—0023，不改原采集/无障碍，V0。

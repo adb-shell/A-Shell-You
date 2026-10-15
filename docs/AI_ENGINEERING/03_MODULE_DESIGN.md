@@ -1,6 +1,6 @@
 # AShell 模块设计 / Module Design
 
-ADB当前源码7607349：连接管理、独立2路Shell、媒体、黑屏和触摸分别管理资源；会话共享Android推送的instance/revision快照，普通忙状态不令Shell栏失效。T005/Baseline20/ADR0025，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+ADB当前源码4d3c446：连接、2路Shell、媒体、遮罩及触摸资源分别管理，instance/revision同步保持。节点helper只采集，App负责字体/布局/编码；黑屏helper只消费App有界PNG。PC展示沿用现有状态通知，不新增远程轮询。2026-10-16 T001/Baseline21/ADR0026，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 
 基线：2026-07-12，`HEAD 77062b4`

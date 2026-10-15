@@ -1,6 +1,6 @@
 # AShell 调试与验证体系 / Debug System
 
-2026-10-14 T005补录：ADB必须区分paired记录、握手、id -u验证、touchReady、媒体phase和首帧。1c46e74修正AdbProtocol访问级别编译错误；运行排查先看本机/PC共享instance/revision、connectionBusy与具体模式状态，不把命令忙判为失联或重连整条普通远控。只有源码证据，修复后V2/V3仍待验证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+2026-10-16 T001：当前4d3c446；区分paired、握手、UID验证、touchReady、媒体phase与首帧，命令忙不等于ADB失联。穿透排查按节点连接/读取、私有流、App绘图、helper退出阶段；exit134通常为SIGABRT但不单凭退出码定根因。黑屏先查App PNG生成、默认显示layerStack、READY及ROM截图排除；无节点与不支持/失败分开，不伪造就绪。V0，构建/真机待证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 接管基线：2026-07-12  
 状态：`verified` + `verification-required`

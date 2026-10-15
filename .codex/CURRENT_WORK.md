@@ -1,9 +1,9 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261014-014`
+Registry Revision：`WORK-20261016-001`
 
-Last Updated：2026-10-14（ADB当前合同与修复文档同步）
+Last Updated：2026-10-16（ADB绘图/PC展示文档同步）
 
 Active Task Count：0
 
@@ -11,7 +11,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none。T-2026-10-14-005文档/V0完成，30个Markdown文件、215个本地链接有效、diff检查通过，无代码/配置差异；紧接执行本次明确授权的commit/push，Git回执见实际提交/交付。用户明确本次不执行编排，未执行本地产品验证或CI监控。STATE009 / CE-20261014-T005-01。
+none。T-2026-10-16-001文档同步/V0完成；31个Markdown文件、220个本地链接有效、diff检查通过，无业务代码/配置差异。实际commit/push及单次Build AShell clients（both/aarch64）接受结果见Git和会话交付。不监控、不运行本地产品验证。STATE-20261016-001 / CE-20261016-T001-01。
 
 ## 2. Concurrent Session Rules
 
@@ -27,7 +27,8 @@ none。T-2026-10-14-005文档/V0完成，30个Markdown文件、215个本地链�
 
 ## 4. Last Closed Task
 
-- 当前T005：同步7607349的ADB当前合同/修复记录、ADR0025/D030/Baseline20、验证矩阵及记忆。源码工作区初始clean；本次仅文档。详细任务：docs/tasks/T-2026-10-14-005-adb-docs-sync.md。
+- 当前T-2026-10-16-001：同步4d3c446的App绘图/黑屏字体/PC状态/提示及两次回退边界；ADR0026/D031/Baseline21，初始clean，仅文档。任务：docs/tasks/T-2026-10-16-001-adb-docs-sync.md；产品验证NOT_RUN，Git/dispatch准确回执见交付。
+- 历史T005：同步7607349的ADB当前合同/修复记录、ADR0025/D030/Baseline20、验证矩阵及记忆。源码工作区初始clean；仅文档。详细任务：docs/tasks/T-2026-10-14-005-adb-docs-sync.md。
 - 下方为此前关闭快照，不代表本次Git/CI权限或当前HEAD。
 
 - T004续接：本地/远端main均404b199，workflow active；V0检查后补齐触摸回收边界并执行上述Git/CI授权。ADB-M17—M20仍待正式结果，dispatch不等于通过。

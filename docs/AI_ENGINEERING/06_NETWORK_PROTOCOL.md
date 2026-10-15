@@ -1,6 +1,6 @@
 # AShell 网络与协议 / Network Protocol
 
-ADB当前源码7607349：字段40除请求/回执外推送kind=state（订阅token、instance/revision）；状态apiVersion3、mirrorVersion2，支持requestId取消与按模式stop。字段41保持15—22能力/几何字段，每PC8帧且8MiB在途；原认证/传输策略与VideoFrame不变。T005/ADR0025，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+ADB当前源码4d3c446：字段40请求/回执/instance与revision状态推送，apiVersion3；字段41独立媒体/触摸、mirrorVersion2模式化停止，每PC8帧/8MiB在途。App-helper的LAYN/LAYP/LAYE节点帧及黑屏PNG属于本机私有流，不增加peer协议字段。原认证/传输策略及VideoFrame不变。2026-10-16 T001/Baseline21，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 
 接管基线：2026-07-12  

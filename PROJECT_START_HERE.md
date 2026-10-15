@@ -1,5 +1,9 @@
 # AShell Project Start Here
 
+2026-10-16 T001当前：源码main/4d3c446，初始clean；ADB节点采集与App绘图分离、黑屏白字App预渲染、PC状态分组与两处文字精简见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-16-001-adb-docs-sync.md)、ADR0026/D031/Baseline21。当前无已回退的无障碍权限控制或开发者菜单。仅V0，构建/真机待证；本轮文档提交推送后单次Build AShell clients both/aarch64，不监控。
+
+下方各时点快照保留历史含义，不覆盖4d3c446及本次授权。
+
 2026-10-14 T005当前：源码main/7607349，初始clean；ADB独立投屏/无视/节点穿透、白字黑屏、全局优先触摸、2路独立命令和Android状态推送均已落源码。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-14-005-adb-docs-sync.md)、ADR0025/D030/Baseline20。V0，当前构建/真机待证；本次仅文档提交推送，不执行编排。
 
 以下开头各段为历史任务快照；未提交、无push、投屏待设计等旧状态不代表7607349。

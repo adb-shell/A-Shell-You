@@ -1,6 +1,6 @@
 # AShell 完整架构 / Architecture
 
-ADB当前源码7607349：主界面单源居中、双源左普通右ADB；三种ADB源互斥，普通源独立。Android拥有身份并推送真实状态；命令2并发、媒体/黑屏/触摸各自连接，模式化停止不刷新普通视频。T005/Baseline20/ADR0025，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+ADB当前源码4d3c446：主界面单源居中、双源普通左/ADB右；三种ADB源互斥，普通源独立。Android拥有身份/状态；命令、媒体、黑屏、触摸各自连接。新增App绘图边界：shell helper只读取节点或显示已生成的黑屏文字PNG，不初始化系统context/字体。2026-10-16 T001/Baseline21/ADR0026，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 
 基线：2026-07-12，`HEAD 77062b4`

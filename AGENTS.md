@@ -1,5 +1,9 @@
 # AGENTS.md — A Shell You / AShell v5.2.1
 
+2026-10-16 T001当前：源码main/4d3c446，初始clean；Shell只采集布局节点，App绘制穿透文字与黑屏提示PNG。PC分组展示ADB状态，已移除桌面视频/特殊状态文字和Shell栏悬浮提示；已回退的无障碍权限控制/开发者菜单不在当前主线。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-16-001-adb-docs-sync.md)、ADR0026/D031/Baseline21。V0，构建与真机待证。本轮仅文档，按用户授权提交推送后单次Build AShell clients both/aarch64，不监控。后续会话先核对HEAD/status。
+
+以下为历史快照，旧“本次不执行编排”等授权只适用于各自任务。
+
 2026-10-14 T005当前：源码main/7607349；文档同步任务开始时clean。ADB已具备独立投屏/无视/节点穿透、白字黑屏、全局优先触摸、2路独立命令及Android状态变化推送；无PC三秒status。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-14-005-adb-docs-sync.md)、ADR0025/D030/Baseline20。V0；当前构建/真机结果待证。本次仅文档提交推送，不执行或监控编排。
 
 以下段落为历史任务快照，不覆盖上述当前合同。

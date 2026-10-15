@@ -1,6 +1,6 @@
 # AShell 构建系统 / Build System
 
-2026-10-14：用户Android日志确认AdbStreamCompat导入package-private AdbProtocol导致Java编译失败。1c46e74改为本地编码标准OPEN包，保留固定libadb3.1.1反射及R8规则；不是pub过期提示或字体优化警告导致。其后Android/aarch64 dispatch仅有204接受、未监控；当前7607349的构建/真机结果仍未知。T005只同步文档并推送，不执行编排或本地构建。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+2026-10-16 T001：当前源码4d3c446；构建入口、依赖及工具链未变。此前1c46e74修正AdbStreamCompat访问package-private AdbProtocol的Java编译错误，不能把pub过期或字体优化提示当根因。既有dispatch204仅为接受证据，当前构建/真机结果未知。本轮文档提交推送后按授权单次Build AShell clients（both/aarch64），不监控、不本地构建。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 
 接管基线：2026-07-12  

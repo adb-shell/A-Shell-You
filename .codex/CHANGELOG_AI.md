@@ -2,9 +2,17 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-14（T005文档同步）
+Last Updated：2026-10-16（T001文档同步）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-16-001：ADB绘图、状态展示与回退边界文档同步
+
+- Source：main/4d3c446，初始clean、本地/远端一致；本轮仅Markdown。
+- Delta：节点helper与App绘图分离、App预渲染遮罩PNG/字体回退、layerStack、红色数字与单处启动提示；PC状态分组、移除视频/特殊文字和Shell悬浮小字。已回退无障碍权限控制/开发者菜单明确不属于当前实现。
+- Records：ADR0026 / D031 / Baseline21 / STATE-20261016-001 / WORK-20261016-001 / CE-20261016-T001-01；新增M26—M30待验项。
+- Authority：文档提交推送后单次Build AShell clients both/aarch64，不监控；无业务代码、本地产品验证、版本/发布/生产变化。V0检查与Git/dispatch准确结果见任务/会话交付；不把204写成构建通过。
+- Task：[T001](../docs/tasks/T-2026-10-16-001-adb-docs-sync.md)。下方记录保留原时点含义。
 
 > 本文件记录可由 `.codex/TASK_HISTORY.md` 和交付物证明的 AI-assisted engineering task 结果。它不是产品 changelog、Git history、Decision Log 或逐文件修改日志。2026-07-12 之前的提交没有可靠 AI attribution，因此不补猜；精确修改事件在本日志建立前不可重建，统一标记为 retrospective/backfill。
 

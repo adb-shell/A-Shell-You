@@ -1,5 +1,7 @@
 # AShell Engineering Baseline Index
 
+当前：[AS-BL-2026-10-16-4d3c446-adb-render-ui](21_ADB_RENDER_UI_BASELINE_2026-10-16.md)。T001文档对齐App绘图、黑屏提示及PC展示，包含两次回退后的功能边界；V0，初始clean。本轮文档推送后单次both/aarch64编排、不监控；以下为历史快照，旧授权与验证结论不覆盖本次。
+
 当前：[AS-BL-2026-10-14-7607349-adb-current](20_ADB_CURRENT_BASELINE_2026-10-14.md)。T005补齐ADB当前实现与修复文档，初始clean，V0。本次仅文档提交推送，不执行编排；当前代码构建/真机证据待补。
 
 以下为此前快照索引，按各自日期解释；Baseline19由282b748固化，旧Baseline文件冻结不改。

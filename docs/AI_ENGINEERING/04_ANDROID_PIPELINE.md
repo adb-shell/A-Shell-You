@@ -1,6 +1,6 @@
 # AShell Android 完整链路 / Android Pipeline
 
-ADB当前源码7607349：id -u验证后才connected，独立OPEN兼容层；进程维护触摸及有限恢复，命令各自连接。截图采用普通画质/尺寸基准、最多8fps动态节奏，节点约2fps；黑屏白字与底层画面排除设置共存，OEM待验。T005/Baseline20，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+ADB当前源码4d3c446：UID验证后才connected，独立命令/媒体/触摸保持；截图上限8fps动态节奏，节点目标约2fps。节点采集与App排版分离，源几何跨采集/编码校验；黑屏PNG在App生成，helper黑层绑定真实layerStack并排除自身采集。原MediaProjection/Accessibility链不改，Android11—17/OEM结果待证。2026-10-16 T001/Baseline21，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 
 基线：2026-07-12，`HEAD 77062b4`
