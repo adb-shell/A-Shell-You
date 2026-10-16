@@ -1,4 +1,4 @@
-name: Build AShell clients
+name: Build AShell Clients
 run-name: Build ${{ inputs.Platform }}
 
 on:
