@@ -1,9 +1,11 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261016-001`
-Last Updated / Observed At：2026-10-16（Asia/Tokyo）
+State Revision：`STATE-20261017-001`
+Last Updated / Observed At：2026-10-17（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+最新局部观察：[T-2026-10-17-001](../docs/tasks/T-2026-10-17-001-build-mode-label.md)，起点main/130f748，初始clean。仅将新工作流的“完整编译”统一改名为“原始编译”，默认“常规编译”和运行逻辑保持；十处精确替换V0通过。用户授权本地提交，本次不push、不dispatch、不构建。当前Task/Event：T-2026-10-17-001 / CE-20261017-T001-01，WORK-20261017-001；提交结果以Git和会话交付为准。无Decision/ADR增量，产品与发布验证状态未提升。下方源码/基线表保留2026-10-16观察，未对期间其他提交作全仓复核。
 
 当前[T001](../docs/tasks/T-2026-10-16-001-adb-docs-sync.md)同步截至4d3c446的ADB文档，初始工作区clean、本地/远端一致。节点/字体绘制已迁移到App，PC状态与提示已更新；两次回退后，当前没有无障碍权限控制或开发者选项菜单。本快照写于文档提交前，最终文档SHA、推送及dispatch接受回执见Git/会话交付。
 

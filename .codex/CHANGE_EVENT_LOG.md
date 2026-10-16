@@ -4,9 +4,18 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-16（T001文档同步）
+Last Updated：2026-10-17（构建模式名称调整）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261017-T001-01：构建模式标签同步替换
+
+- Task：T-2026-10-17-001；source main/130f748，初始clean。
+- Scope：`.github/workflows/Build-Clients-New.yml` 十处模式字符串及本任务、Build System和五份工程记忆。
+- Result：选项和所有判断统一为“原始编译”；其他工作流文本与HEAD一致，旧工作流保持。
+- Evidence：V0精确替换等价性、旧标签零匹配、新标签十次、diff检查；无构建或设备证据。
+- Authority：用户当前明确授权修改和本地提交；不push、不dispatch、不执行build/test/analyze/codegen。
+- Decision / external assets：N/A — no decision delta / no asset delta。
 
 > 一个 Change Event 是一次逻辑完整的代码/文档持久化修改批次，不是每次按键、每个 patch hunk、只读调查或对话消息。本文件建立前的精确 edit-event 历史无法重建，只能按已知 Task 做 aggregate backfill。日志自身的创建/追加属于对应事件，不递归生成第二条事件。
 

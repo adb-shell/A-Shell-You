@@ -2,9 +2,18 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-16（T001文档同步）
+Last Updated：2026-10-17（构建模式名称调整）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-17-001：构建模式“原始编译”
+
+- Source：main/130f748，初始clean；仅新工作流标签及必要记录。
+- Delta：BuildMode选项及Android/Windows九处条件统一由“完整编译”改为“原始编译”；默认“常规编译”和构建/缓存命令保持。
+- Verification：V0十处精确替换与diff检查通过；无产品测试或构建。
+- Authority：用户授权修改并本地提交；不push、不执行或监控CI。
+- Records：CE-20261017-T001-01 / STATE-20261017-001 / WORK-20261017-001；N/A — no decision delta。
+- Task：[记录](../docs/tasks/T-2026-10-17-001-build-mode-label.md)。Git提交结果以Git和会话交付为准。
 
 ## T-2026-10-16-001：ADB绘图、状态展示与回退边界文档同步
 

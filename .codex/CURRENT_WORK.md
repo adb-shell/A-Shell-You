@@ -1,15 +1,19 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261016-001`
+Registry Revision：`WORK-20261017-001`
 
-Last Updated：2026-10-16（ADB绘图/PC展示文档同步）
+Last Updated：2026-10-17（构建模式名称调整）
 
 Active Task Count：0
 
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+none。T-2026-10-17-001已完成名称替换及V0检查，按用户授权仅本地提交；不push、不dispatch、不构建。STATE-20261017-001 / CE-20261017-T001-01；[任务](../docs/tasks/T-2026-10-17-001-build-mode-label.md)。
+
+以下为上一任务关闭记录：
 
 none。T-2026-10-16-001文档同步/V0完成；31个Markdown文件、220个本地链接有效、diff检查通过，无业务代码/配置差异。实际commit/push及单次Build AShell clients（both/aarch64）接受结果见Git和会话交付。不监控、不运行本地产品验证。STATE-20261016-001 / CE-20261016-T001-01。
 
@@ -27,6 +31,7 @@ none。T-2026-10-16-001文档同步/V0完成；31个Markdown文件、220个本�
 
 ## 4. Last Closed Task
 
+- T-2026-10-17-001：新工作流选项及九处判断统一改为“原始编译”，默认“常规编译”保持；起点main/130f748、初始clean，V0精确替换通过；仅本地提交，Git结果见交付。
 - 当前T-2026-10-16-001：同步4d3c446的App绘图/黑屏字体/PC状态/提示及两次回退边界；ADR0026/D031/Baseline21，初始clean，仅文档。任务：docs/tasks/T-2026-10-16-001-adb-docs-sync.md；产品验证NOT_RUN，Git/dispatch准确回执见交付。
 - 历史T005：同步7607349的ADB当前合同/修复记录、ADR0025/D030/Baseline20、验证矩阵及记忆。源码工作区初始clean；仅文档。详细任务：docs/tasks/T-2026-10-14-005-adb-docs-sync.md。
 - 下方为此前关闭快照，不代表本次Git/CI权限或当前HEAD。

@@ -1,5 +1,7 @@
 # AShell 构建系统 / Build System
 
+2026-10-17 T001：以main/130f748为起点，将独立新工作流 `.github/workflows/Build-Clients-New.yml` 的 `BuildMode` 选项“完整编译”及全部九处条件统一改为“原始编译”，默认“常规编译”保持。构建命令、缓存策略、工具链与签名行为不变；旧工作流未改。V0精确替换检查通过，本次仅本地提交，不push、不dispatch、不执行构建。见[任务](../tasks/T-2026-10-17-001-build-mode-label.md)。下方为各历史时点记录。
+
 2026-10-16 T001：当前源码4d3c446；构建入口、依赖及工具链未变。此前1c46e74修正AdbStreamCompat访问package-private AdbProtocol的Java编译错误，不能把pub过期或字体优化提示当根因。既有dispatch204仅为接受证据，当前构建/真机结果未知。本轮文档提交推送后按授权单次Build AShell clients（both/aarch64），不监控、不本地构建。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 

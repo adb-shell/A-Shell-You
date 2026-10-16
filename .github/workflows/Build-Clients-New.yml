@@ -13,7 +13,7 @@ on:
       BuildMode:
         description: 构建模式
         type: choice
-        options: [常规编译, 完整编译]
+        options: [常规编译, 原始编译]
         default: 常规编译
         required: false
 
@@ -115,7 +115,7 @@ jobs:
           echo "VCPKG_INSTALLED_ROOT=$RUNNER_TEMP/ashell-vcpkg/installed" >> "$GITHUB_ENV"
           echo "VCPKG_DOWNLOADS=$RUNNER_TEMP/vcpkg-downloads" >> "$GITHUB_ENV"
           access=readwrite
-          if [ "$BUILD_MODE" = '完整编译' ]; then access=write; fi
+          if [ "$BUILD_MODE" = '原始编译' ]; then access=write; fi
           echo "VCPKG_BINARY_SOURCES=clear;files,$RUNNER_TEMP/vcpkg-cache,$access" >> "$GITHUB_ENV"
 
       - name: Restore vcpkg source downloads
@@ -128,7 +128,7 @@ jobs:
 
       - name: Restore compiled native dependencies
         id: native-cache
-        if: inputs.BuildMode != '完整编译'
+        if: inputs.BuildMode != '原始编译'
         uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ${{ runner.temp }}/vcpkg-cache
@@ -158,7 +158,7 @@ jobs:
 
       - name: Restore Rust dependency build cache
         id: rust-cache
-        if: inputs.BuildMode != '完整编译'
+        if: inputs.BuildMode != '原始编译'
         uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
         with:
           prefix-key: ashell-rust-v1
@@ -289,7 +289,7 @@ jobs:
           kotlin.compiler.execution.strategy=in-process
           org.gradle.configuration-cache=false
           EOF
-          if [ "$BUILD_MODE" = '完整编译' ]; then
+          if [ "$BUILD_MODE" = '原始编译' ]; then
             echo 'org.gradle.caching=false' >> "$gradle_home/gradle.properties"
             (cd flutter && flutter clean)
           else
@@ -306,7 +306,7 @@ jobs:
           restore-keys: gradle-downloads-v1-ubuntu22-jdk17-
 
       - name: Cache Gradle task outputs
-        if: inputs.BuildMode != '完整编译'
+        if: inputs.BuildMode != '原始编译'
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ${{ env.GRADLE_USER_HOME }}/caches/build-cache-1
@@ -481,7 +481,7 @@ jobs:
             git -C $env:FLUTTER_ROOT apply $patch
             if ($LASTEXITCODE -ne 0) { throw 'Flutter patch failed' }
           }
-          if ($env:BUILD_MODE -eq '完整编译') {
+          if ($env:BUILD_MODE -eq '原始编译') {
             Push-Location flutter
             try {
               flutter clean
@@ -537,7 +537,7 @@ jobs:
           "VCPKG_DOWNLOADS=$downloadsPath" >> $env:GITHUB_ENV
           'VCPKG_DEFAULT_TRIPLET=x64-windows-static' >> $env:GITHUB_ENV
           'VCPKG_DEFAULT_HOST_TRIPLET=x64-windows-static' >> $env:GITHUB_ENV
-          $access = if ($env:BUILD_MODE -eq '完整编译') { 'write' } else { 'readwrite' }
+          $access = if ($env:BUILD_MODE -eq '原始编译') { 'write' } else { 'readwrite' }
           "VCPKG_BINARY_SOURCES=clear;files,$cachePath,$access" >> $env:GITHUB_ENV
 
       - name: Restore vcpkg source downloads
@@ -550,7 +550,7 @@ jobs:
 
       - name: Restore compiled native dependencies
         id: native-cache
-        if: inputs.BuildMode != '完整编译'
+        if: inputs.BuildMode != '原始编译'
         uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ${{ runner.temp }}/vcpkg-cache
@@ -580,7 +580,7 @@ jobs:
 
       - name: Restore Rust dependency build cache
         id: rust-cache
-        if: inputs.BuildMode != '完整编译'
+        if: inputs.BuildMode != '原始编译'
         uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
         with:
           prefix-key: ashell-rust-v1
