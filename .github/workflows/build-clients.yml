@@ -428,8 +428,15 @@ jobs:
 
       - name: Test-sign and package this run's Release bundle
         shell: powershell
+        timeout-minutes: 45
         run: |
           $ErrorActionPreference = 'Stop'
+          $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+          $principal = [Security.Principal.WindowsPrincipal]::new($identity)
+          if (!$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+            throw 'Test signing requires the elevated GitHub-hosted Windows runner.'
+          }
+          Write-Host "[$(Get-Date -Format o)] Checking the compiled Release bundle"
           $bundle = Join-Path $env:GITHUB_WORKSPACE 'flutter/build/windows/x64/runner/Release'
           foreach ($file in @('ashell.exe', 'ashell.dll', 'flutter_windows.dll', 'dylib_virtual_display.dll', 'data/icudtl.dat', 'data/app.so')) {
             $item = Get-Item -LiteralPath (Join-Path $bundle $file) -ErrorAction Stop
@@ -442,7 +449,9 @@ jobs:
           $certificate = $null
           $signatures = [System.Collections.Generic.List[object]]::new()
           function Add-TestSignature([string]$Path, [string]$Label) {
+            Write-Host "[$(Get-Date -Format o)] Signing $Label"
             Set-AuthenticodeSignature -LiteralPath $Path -Certificate $certificate -HashAlgorithm SHA256 -IncludeChain Signer | Out-Null
+            Write-Host "[$(Get-Date -Format o)] Verifying $Label"
             $signature = Get-AuthenticodeSignature -LiteralPath $Path
             if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Thumbprint -ne $certificate.Thumbprint) {
               throw "Test signature verification failed for ${Label}: $($signature.Status) / $($signature.StatusMessage)"
@@ -454,6 +463,7 @@ jobs:
               not_after_utc = $signature.SignerCertificate.NotAfter.ToUniversalTime().ToString('o')
               sha256 = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
             })
+            Write-Host "[$(Get-Date -Format o)] Signature verified for $Label"
           }
           try {
             $certParameters = @{
@@ -464,16 +474,22 @@ jobs:
               KeyExportPolicy = 'NonExportable'
               NotAfter = (Get-Date).AddDays(30)
             }
+            Write-Host "[$(Get-Date -Format o)] Creating the ephemeral test certificate"
             $certificate = New-SelfSignedCertificate @certParameters
             $publicCertificate = Join-Path $output 'ashell-test-signing.cer'
             Export-Certificate -Cert $certificate -FilePath $publicCertificate -Type CERT | Out-Null
-            # Trust only on the temporary runner so verification requires Valid.
-            Import-Certificate -FilePath $publicCertificate -CertStoreLocation 'Cert:\CurrentUser\Root' | Out-Null
+            # CurrentUser\Root can show a Windows trust dialog in a headless job.
+            # Use the elevated runner's machine store; remove only this cert below.
+            Write-Host "[$(Get-Date -Format o)] Trusting the test certificate on the disposable runner"
+            Import-Certificate -FilePath $publicCertificate -CertStoreLocation 'Cert:\LocalMachine\Root' -Confirm:$false | Out-Null
+            Write-Host "[$(Get-Date -Format o)] Test certificate imported"
             foreach ($file in @('ashell.exe', 'ashell.dll', 'dylib_virtual_display.dll')) {
               Add-TestSignature -Path (Join-Path $bundle $file) -Label "Release/$file"
             }
             # Both the ZIP and self-extractor must contain the signed bundle.
+            Write-Host "[$(Get-Date -Format o)] Creating the Release ZIP"
             Compress-Archive -Path "$bundle/*" -DestinationPath "$output/ashell-windows-x64.zip"
+            Write-Host "[$(Get-Date -Format o)] Release ZIP complete"
             $manifestPath = Join-Path $env:GITHUB_WORKSPACE 'res/manifest.xml'
             $originalManifest = [IO.File]::ReadAllBytes($manifestPath)
             try {
@@ -481,8 +497,10 @@ jobs:
               [IO.File]::WriteAllLines($manifestPath, [string[]]$lines, [Text.UTF8Encoding]::new($false))
               Push-Location libs/portable
               try {
-                python generate.py -f $bundle -o . -e "$bundle/ashell.exe"
+                Write-Host "[$(Get-Date -Format o)] Compressing the portable bundle and compiling its launcher"
+                python -u generate.py -f $bundle -o . -e "$bundle/ashell.exe"
                 if ($LASTEXITCODE -ne 0) { throw 'Portable packer failed' }
+                Write-Host "[$(Get-Date -Format o)] Portable packer complete"
               } finally { Pop-Location }
             } finally { [IO.File]::WriteAllBytes($manifestPath, $originalManifest) }
             $packer = Get-Item -LiteralPath 'target/release/ashell-portable-packer.exe' -ErrorAction Stop
@@ -492,9 +510,13 @@ jobs:
             $signatures | ConvertTo-Json -Depth 4 | Set-Content -Encoding utf8 "$output/signatures.json"
           } finally {
             if ($null -ne $certificate) {
-              $trustedPath = "Cert:\CurrentUser\Root\$($certificate.Thumbprint)"
-              if (Test-Path -LiteralPath $trustedPath) { Remove-Item -LiteralPath $trustedPath -Force }
-              Remove-Item -LiteralPath "Cert:\CurrentUser\My\$($certificate.Thumbprint)" -DeleteKey -Force
+              Write-Host "[$(Get-Date -Format o)] Removing the temporary certificate and private key"
+              $trustedPath = "Cert:\LocalMachine\Root\$($certificate.Thumbprint)"
+              try {
+                if (Test-Path -LiteralPath $trustedPath) { Remove-Item -LiteralPath $trustedPath -Force }
+              } finally {
+                Remove-Item -LiteralPath "Cert:\CurrentUser\My\$($certificate.Thumbprint)" -DeleteKey -Force
+              }
             }
           }
 
