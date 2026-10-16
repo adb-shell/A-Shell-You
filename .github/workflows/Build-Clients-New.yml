@@ -1,5 +1,5 @@
 name: Build AShell Clients-New
-run-name: Build ${{ inputs.Platform }} / ${{ inputs.BuildMode || '正常编译' }} -New
+run-name: Build ${{ inputs.Platform }} / ${{ inputs.BuildMode || '常规编译' }} -New
 
 on:
   workflow_dispatch:
@@ -13,8 +13,8 @@ on:
       BuildMode:
         description: 构建模式
         type: choice
-        options: [正常编译, 完整编译]
-        default: 正常编译
+        options: [常规编译, 完整编译]
+        default: 常规编译
         required: false
 
 # Build/download only. No release, repository write, or production signing secrets.
@@ -31,7 +31,7 @@ env:
   ANDROID_CMDLINE_TOOLS_VERSION: "12266719" # 16.0, compatible with JDK 17
   VCPKG_COMMIT_ID: "6f29f12e82a8293156836ad81cc9bf5af41fe836"
   LLVM_VERSION: "15.0.6"
-  BUILD_MODE: ${{ inputs.BuildMode || '正常编译' }}
+  BUILD_MODE: ${{ inputs.BuildMode || '常规编译' }}
   PORTABLE_COMPRESSION_LEVEL: "6"
   CARGO_TERM_COLOR: always
   CARGO_TARGET_DIR: ${{ github.workspace }}/target
