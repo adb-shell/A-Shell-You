@@ -1,5 +1,5 @@
 name: Build AShell clients
-run-name: Build ${{ inputs.platform }} / test signed
+run-name: Build ${{ inputs.platform }}
 
 on:
   workflow_dispatch:
