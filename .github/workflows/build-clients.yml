@@ -1,15 +1,15 @@
 name: Build AShell clients
-run-name: Build ${{ inputs.platform }}
+run-name: Build ${{ inputs.Platform }}
 
 on:
   workflow_dispatch:
     inputs:
-      platform:
-        description: Client platform
+      Platform:
+        description: 客户端平台
         type: choice
-        options: [both, android, windows]
-        default: both
-        required: true
+        options: [Both, Android, Windows]
+        default: Both
+        required: false
 
 # Build/download only. No release, repository write, or production signing secrets.
 permissions:
@@ -33,7 +33,7 @@ env:
 
 jobs:
   android-native:
-    if: inputs.platform == 'android' || inputs.platform == 'both'
+    if: inputs.Platform == 'Android' || inputs.Platform == 'Both'
     name: Android Native
     runs-on: ubuntu-22.04
     timeout-minutes: 180
@@ -141,7 +141,7 @@ jobs:
           overwrite: true
 
   android:
-    if: inputs.platform == 'android' || inputs.platform == 'both'
+    if: inputs.Platform == 'Android' || inputs.Platform == 'Both'
     name: Android APK
     needs: android-native
     runs-on: ubuntu-22.04
@@ -303,7 +303,7 @@ jobs:
           printf '### Android APK\n[下载 APK](%s)\n\n产物保留 14 天 校验与构建信息另存于 build-info 产物\n' "$APK_URL" >> "$GITHUB_STEP_SUMMARY"
 
   windows:
-    if: inputs.platform == 'windows' || inputs.platform == 'both'
+    if: inputs.Platform == 'Windows' || inputs.Platform == 'Both'
     name: Windows EXE
     runs-on: windows-2022
     timeout-minutes: 240
