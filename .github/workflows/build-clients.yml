@@ -242,11 +242,11 @@ jobs:
           apk=build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
           test -s "$apk"
           mkdir -p ../artifacts/android
-          cp "$apk" "../artifacts/android/ashell-android-$ANDROID_ARCH-test-signed.apk"
+          cp "$apk" "../artifacts/android/ashell-android-$ANDROID_ARCH.apk"
 
       - name: Verify APK contents, signature and provenance
         run: |
-          apk="artifacts/android/ashell-android-$ANDROID_ARCH-test-signed.apk"
+          apk="artifacts/android/ashell-android-$ANDROID_ARCH.apk"
           apksigner verify --verbose --print-certs "$apk" > artifacts/android/signature.txt
           python3 - <<'PY'
           import hashlib, json, os, pathlib, zipfile
@@ -289,8 +289,8 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           # Match the filename so overwrite also works when rerunning this job.
-          name: ashell-android-aarch64-test-signed.apk
-          path: artifacts/android/ashell-android-aarch64-test-signed.apk
+          name: ashell-android-aarch64.apk
+          path: artifacts/android/ashell-android-aarch64.apk
           archive: false
           overwrite: true
           if-no-files-found: error
@@ -300,7 +300,7 @@ jobs:
         env:
           APK_URL: ${{ steps.upload-apk.outputs.artifact-url }}
         run: |
-          printf '### Android APK\n[下载 APK](%s)\n\n直接下载 APK，无外层 ZIP。Release 编译、临时测试签名；每次运行证书不同，替换安装需先卸载。产物保留 14 天；校验与构建信息另存于 build-info 产物。\n' "$APK_URL" >> "$GITHUB_STEP_SUMMARY"
+          printf '### Android APK\n[下载 APK](%s)\n\n产物保留 14 天 校验与构建信息另存于 build-info 产物\n' "$APK_URL" >> "$GITHUB_STEP_SUMMARY"
 
   windows:
     if: inputs.platform == 'windows' || inputs.platform == 'both'
@@ -587,6 +587,5 @@ jobs:
           ### Windows EXE
           [下载 EXE]($env:EXE_URL) | [下载 ZIP]($env:ZIP_URL)
 
-          EXE 为测试签名的自解压程序；ZIP 为完整 Release 目录压缩包。两者分别直接下载，不再额外套一层 ZIP。
-          产物保留 14 天；公钥证书、验签结果、校验和及构建信息另存于 build-info 产物，不包含私钥。测试证书每次运行不同，不属于公开受信任的发行证书。
+          产物保留 14 天 校验与构建信息另存于 build-info 产物
           "@ >> $env:GITHUB_STEP_SUMMARY
