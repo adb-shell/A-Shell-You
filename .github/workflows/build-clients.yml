@@ -1,5 +1,5 @@
 name: Build AShell clients
-run-name: Build ${{ inputs.platform }} / Android ${{ inputs.android_arch }}
+run-name: Build ${{ inputs.platform }} / test signed
 
 on:
   workflow_dispatch:
@@ -9,12 +9,6 @@ on:
         type: choice
         options: [both, android, windows]
         default: both
-        required: true
-      android_arch:
-        description: Android APK (ignored for Windows-only builds)
-        type: choice
-        options: [aarch64, universal]
-        default: aarch64
         required: true
 
 # Build/download only. No release, repository write, or production signing secrets.
@@ -40,13 +34,9 @@ env:
 jobs:
   android-native:
     if: inputs.platform == 'android' || inputs.platform == 'both'
-    name: Android native / ${{ matrix.abi }}
+    name: Android Native
     runs-on: ubuntu-22.04
     timeout-minutes: 180
-    strategy:
-      fail-fast: false
-      matrix:
-        include: ${{ fromJSON(inputs.android_arch == 'universal' && '[{"abi":"arm64-v8a","target":"aarch64-linux-android","triplet":"arm64-android","ndk_triple":"aarch64-linux-android","features":"flutter,hwcodec"},{"abi":"armeabi-v7a","target":"armv7-linux-androideabi","triplet":"arm-neon-android","ndk_triple":"arm-linux-androideabi","features":"flutter,hwcodec"},{"abi":"x86_64","target":"x86_64-linux-android","triplet":"x64-android","ndk_triple":"x86_64-linux-android","features":"flutter"}]' || '[{"abi":"arm64-v8a","target":"aarch64-linux-android","triplet":"arm64-android","ndk_triple":"aarch64-linux-android","features":"flutter,hwcodec"}]') }}
     defaults:
       run:
         shell: bash
@@ -90,7 +80,7 @@ jobs:
 
       - name: Install Rust and cargo-ndk
         run: |
-          rustup toolchain install "$RUST_VERSION" --profile minimal --target '${{ matrix.target }}'
+          rustup toolchain install "$RUST_VERSION" --profile minimal --target aarch64-linux-android
           rustup default "$RUST_VERSION"
           cargo install cargo-ndk --version "$CARGO_NDK_VERSION" --locked
 
@@ -110,46 +100,41 @@ jobs:
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ${{ runner.temp }}/vcpkg-cache
-          key: vcpkg-ubuntu22-${{ matrix.triplet }}-${{ env.NDK_VERSION }}-${{ env.VCPKG_COMMIT_ID }}-${{ hashFiles('vcpkg.json', 'res/vcpkg/**') }}
+          key: vcpkg-ubuntu22-arm64-android-${{ env.NDK_VERSION }}-${{ env.VCPKG_COMMIT_ID }}-${{ hashFiles('vcpkg.json', 'res/vcpkg/**') }}
 
       - name: Build native dependencies
         run: |
-          "$VCPKG_ROOT/vcpkg" install --triplet '${{ matrix.triplet }}' \
+          "$VCPKG_ROOT/vcpkg" install --triplet arm64-android \
             --x-install-root="$VCPKG_INSTALLED_ROOT"
-          # Rust build.rs expects arm-android; retain vcpkg's canonical directory.
-          if [[ '${{ matrix.triplet }}' == arm-neon-android ]]; then
-            ln -s arm-neon-android "$VCPKG_INSTALLED_ROOT/arm-android"
-          fi
 
       - name: Save completed native dependencies
         if: steps.native-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ${{ runner.temp }}/vcpkg-cache
-          key: vcpkg-ubuntu22-${{ matrix.triplet }}-${{ env.NDK_VERSION }}-${{ env.VCPKG_COMMIT_ID }}-${{ hashFiles('vcpkg.json', 'res/vcpkg/**') }}
+          key: vcpkg-ubuntu22-arm64-android-${{ env.NDK_VERSION }}-${{ env.VCPKG_COMMIT_ID }}-${{ hashFiles('vcpkg.json', 'res/vcpkg/**') }}
 
       - name: Compile libashell.so and stage JNI libraries
         run: |
           ndk_sysroot="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
-          rust_target='${{ matrix.target }}'
+          rust_target=aarch64-linux-android
           # Scope bindgen to the Android target; host build scripts keep host headers.
-          # armv7-linux-androideabi uses the NDK's arm-linux-androideabi headers.
-          test -d "$ndk_sysroot/usr/include/${{ matrix.ndk_triple }}"
-          export "BINDGEN_EXTRA_CLANG_ARGS_${rust_target//-/_}=--sysroot=$ndk_sysroot -I$ndk_sysroot/usr/include/${{ matrix.ndk_triple }} -D__ANDROID_API__=$ANDROID_API"
-          cargo ndk --platform "$ANDROID_API" --target '${{ matrix.target }}' \
-            build --release --lib --features '${{ matrix.features }}'
-          destination="native/${{ matrix.abi }}"
+          test -d "$ndk_sysroot/usr/include/$rust_target"
+          export "BINDGEN_EXTRA_CLANG_ARGS_${rust_target//-/_}=--sysroot=$ndk_sysroot -I$ndk_sysroot/usr/include/$rust_target -D__ANDROID_API__=$ANDROID_API"
+          cargo ndk --platform "$ANDROID_API" --target "$rust_target" \
+            build --release --lib --features flutter,hwcodec
+          destination=native/arm64-v8a
           mkdir -p "$destination"
-          cp "target/${{ matrix.target }}/release/libashell.so" "$destination/"
-          cp "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/${{ matrix.ndk_triple }}/libc++_shared.so" "$destination/"
-          cp Cargo.lock 'native/Cargo-${{ matrix.abi }}.lock'
+          cp "target/$rust_target/release/libashell.so" "$destination/"
+          cp "$ndk_sysroot/usr/lib/$rust_target/libc++_shared.so" "$destination/"
+          cp Cargo.lock native/Cargo-arm64-v8a.lock
           test -s "$destination/libashell.so"
           test -s "$destination/libc++_shared.so"
 
       - name: Transfer JNI libraries to the APK job
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-native-${{ matrix.abi }}
+          name: android-native-arm64-v8a
           path: native/
           if-no-files-found: error
           retention-days: 1
@@ -157,10 +142,12 @@ jobs:
 
   android:
     if: inputs.platform == 'android' || inputs.platform == 'both'
-    name: Android APK / ${{ inputs.android_arch }} / test signed
+    name: Android APK
     needs: android-native
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    env:
+      ANDROID_ARCH: aarch64
     defaults:
       run:
         shell: bash
@@ -201,7 +188,7 @@ jobs:
             test -s "$file"
           done
 
-      - name: Configure Gradle memory and APK ABIs
+      - name: Configure Gradle memory
         run: |
           # User-home properties override the project's local 1 GiB heap setting.
           gradle_home="$RUNNER_TEMP/ashell-gradle"
@@ -214,36 +201,24 @@ jobs:
           org.gradle.vfs.watch=false
           kotlin.compiler.execution.strategy=in-process
           EOF
-          # Flutter 3.24's target-platform selects Flutter engines, but does not
-          # filter third-party JNI libraries in a non-split universal APK.
-          mkdir -p "$gradle_home/init.d"
-          cat > "$gradle_home/init.d/ashell-apk-abis.gradle" <<'EOF'
-          if (System.getenv('ANDROID_ARCH') == 'universal') {
-              gradle.beforeProject { project ->
-                  project.pluginManager.withPlugin('com.android.application') {
-                      project.android.defaultConfig.ndk.abiFilters.clear()
-                      project.android.defaultConfig.ndk.abiFilters.addAll(['arm64-v8a', 'armeabi-v7a', 'x86_64'])
-                  }
-              }
-          }
-          EOF
 
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Download native libraries
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          pattern: android-native-*
-          merge-multiple: true
+          name: android-native-arm64-v8a
           path: ${{ runner.temp }}/android-native
 
-      - name: Prepare JNI libraries and resolved Cargo locks
+      - name: Prepare JNI libraries and resolved Cargo lock
         run: |
-          mkdir -p flutter/android/app/src/main/jniLibs artifacts/android
-          for abi in arm64-v8a armeabi-v7a x86_64; do
-            source="$RUNNER_TEMP/android-native/$abi"
-            if [[ -d "$source" ]]; then
-              cp -R "$source" flutter/android/app/src/main/jniLibs/
-              cp "$RUNNER_TEMP/android-native/Cargo-$abi.lock" artifacts/android/
-            fi
+          source="$RUNNER_TEMP/android-native"
+          destination=flutter/android/app/src/main/jniLibs/arm64-v8a
+          mkdir -p "$destination" artifacts/android
+          for library in libashell.so libc++_shared.so; do
+            test -s "$source/arm64-v8a/$library"
+            cp "$source/arm64-v8a/$library" "$destination/"
           done
+          test -s "$source/Cargo-arm64-v8a.lock"
+          cp "$source/Cargo-arm64-v8a.lock" artifacts/android/
 
       - name: Create an ephemeral test signing identity
         run: |
@@ -260,25 +235,16 @@ jobs:
           EOF
 
       - name: Resolve Flutter dependencies and compile Release APK
-        env:
-          ANDROID_ARCH: ${{ inputs.android_arch }}
         run: |
           cd flutter
           flutter pub get
-          if [[ "$ANDROID_ARCH" == aarch64 ]]; then
-            flutter build apk --release --no-pub --target-platform android-arm64 --split-per-abi
-            apk=build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-          else
-            flutter build apk --release --no-pub --target-platform android-arm64,android-arm,android-x64
-            apk=build/app/outputs/flutter-apk/app-release.apk
-          fi
+          flutter build apk --release --no-pub --target-platform android-arm64 --split-per-abi
+          apk=build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
           test -s "$apk"
           mkdir -p ../artifacts/android
           cp "$apk" "../artifacts/android/ashell-android-$ANDROID_ARCH-test-signed.apk"
 
       - name: Verify APK contents, signature and provenance
-        env:
-          ANDROID_ARCH: ${{ inputs.android_arch }}
         run: |
           apk="artifacts/android/ashell-android-$ANDROID_ARCH-test-signed.apk"
           apksigner verify --verbose --print-certs "$apk" > artifacts/android/signature.txt
@@ -287,7 +253,7 @@ jobs:
           root = pathlib.Path('.')
           out = root / 'artifacts/android'
           apk = next(out.glob('*.apk'))
-          expected = {'arm64-v8a'} if os.environ['ANDROID_ARCH'] == 'aarch64' else {'arm64-v8a', 'armeabi-v7a', 'x86_64'}
+          expected = {'arm64-v8a'}
           with zipfile.ZipFile(apk) as archive:
               names = set(archive.namelist())
           abis = {name.split('/')[1] for name in names if name.startswith('lib/') and name.endswith('.so')}
@@ -308,25 +274,37 @@ jobs:
           flutter --version > artifacts/android/flutter-version.txt
           java -version 2> artifacts/android/java-version.txt
 
-      - name: Upload test-signed APK
-        id: upload
+      - name: Upload Android build information
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ashell-android-${{ inputs.android_arch }}-test-signed-${{ github.run_number }}-${{ github.run_attempt }}
-          path: artifacts/android/
+          name: ashell-android-build-info-${{ github.run_number }}-${{ github.run_attempt }}
+          path: |
+            artifacts/android/
+            !artifacts/android/*.apk
           if-no-files-found: error
           retention-days: 14
-          compression-level: 0
+
+      - name: Upload APK directly
+        id: upload-apk
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          # Match the filename so overwrite also works when rerunning this job.
+          name: ashell-android-aarch64-test-signed.apk
+          path: artifacts/android/ashell-android-aarch64-test-signed.apk
+          archive: false
+          overwrite: true
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Download summary
         env:
-          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          APK_URL: ${{ steps.upload-apk.outputs.artifact-url }}
         run: |
-          printf '### Android\n[Download test-signed APK](%s)\n\nRelease build; ephemeral test certificate. A later run uses a different key, so uninstall before replacing it. Artifacts expire after 14 days.\n' "$ARTIFACT_URL" >> "$GITHUB_STEP_SUMMARY"
+          printf '### Android APK\n[下载 APK](%s)\n\n直接下载 APK，无外层 ZIP。Release 编译、临时测试签名；每次运行证书不同，替换安装需先卸载。产物保留 14 天；校验与构建信息另存于 build-info 产物。\n' "$APK_URL" >> "$GITHUB_STEP_SUMMARY"
 
   windows:
     if: inputs.platform == 'windows' || inputs.platform == 'both'
-    name: Windows x64 / unsigned
+    name: Windows EXE
     runs-on: windows-2022
     timeout-minutes: 240
     defaults:
@@ -448,8 +426,10 @@ jobs:
           python build.py --portable --hwcodec --flutter --vram --skip-portable-pack
           if ($LASTEXITCODE -ne 0) { throw 'Windows client build failed' }
 
-      - name: Package only this run's Release bundle
+      - name: Test-sign and package this run's Release bundle
+        shell: powershell
         run: |
+          $ErrorActionPreference = 'Stop'
           $bundle = Join-Path $env:GITHUB_WORKSPACE 'flutter/build/windows/x64/runner/Release'
           foreach ($file in @('ashell.exe', 'ashell.dll', 'flutter_windows.dll', 'dylib_virtual_display.dll', 'data/icudtl.dat', 'data/app.so')) {
             $item = Get-Item -LiteralPath (Join-Path $bundle $file) -ErrorAction Stop
@@ -457,21 +437,66 @@ jobs:
           }
           $output = Join-Path $env:GITHUB_WORKSPACE 'artifacts/windows'
           New-Item -ItemType Directory -Force $output | Out-Null
-          Compress-Archive -Path "$bundle/*" -DestinationPath "$output/ashell-windows-x64.zip"
-          $manifestPath = Join-Path $env:GITHUB_WORKSPACE 'res/manifest.xml'
-          $originalManifest = [IO.File]::ReadAllBytes($manifestPath)
+          # The private key stays in this disposable runner's certificate store.
+          # Only the public certificate and verification results enter artifacts.
+          $certificate = $null
+          $signatures = [System.Collections.Generic.List[object]]::new()
+          function Add-TestSignature([string]$Path, [string]$Label) {
+            Set-AuthenticodeSignature -LiteralPath $Path -Certificate $certificate -HashAlgorithm SHA256 -IncludeChain Signer | Out-Null
+            $signature = Get-AuthenticodeSignature -LiteralPath $Path
+            if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Thumbprint -ne $certificate.Thumbprint) {
+              throw "Test signature verification failed for ${Label}: $($signature.Status) / $($signature.StatusMessage)"
+            }
+            $signatures.Add([ordered]@{
+              file = $Label; status = [string]$signature.Status
+              subject = $signature.SignerCertificate.Subject
+              thumbprint = $signature.SignerCertificate.Thumbprint
+              not_after_utc = $signature.SignerCertificate.NotAfter.ToUniversalTime().ToString('o')
+              sha256 = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+            })
+          }
           try {
-            $lines = [IO.File]::ReadAllLines($manifestPath) | Where-Object { $_ -notmatch 'dpiAware' }
-            [IO.File]::WriteAllLines($manifestPath, [string[]]$lines, [Text.UTF8Encoding]::new($false))
-            Push-Location libs/portable
+            $certParameters = @{
+              Type = 'CodeSigningCert'
+              Subject = 'CN=AShell Test Signing'
+              CertStoreLocation = 'Cert:\CurrentUser\My'
+              KeyAlgorithm = 'RSA'; KeyLength = 2048; HashAlgorithm = 'SHA256'
+              KeyExportPolicy = 'NonExportable'
+              NotAfter = (Get-Date).AddDays(30)
+            }
+            $certificate = New-SelfSignedCertificate @certParameters
+            $publicCertificate = Join-Path $output 'ashell-test-signing.cer'
+            Export-Certificate -Cert $certificate -FilePath $publicCertificate -Type CERT | Out-Null
+            # Trust only on the temporary runner so verification requires Valid.
+            Import-Certificate -FilePath $publicCertificate -CertStoreLocation 'Cert:\CurrentUser\Root' | Out-Null
+            foreach ($file in @('ashell.exe', 'ashell.dll', 'dylib_virtual_display.dll')) {
+              Add-TestSignature -Path (Join-Path $bundle $file) -Label "Release/$file"
+            }
+            # Both the ZIP and self-extractor must contain the signed bundle.
+            Compress-Archive -Path "$bundle/*" -DestinationPath "$output/ashell-windows-x64.zip"
+            $manifestPath = Join-Path $env:GITHUB_WORKSPACE 'res/manifest.xml'
+            $originalManifest = [IO.File]::ReadAllBytes($manifestPath)
             try {
-              python generate.py -f $bundle -o . -e "$bundle/ashell.exe"
-              if ($LASTEXITCODE -ne 0) { throw 'Portable packer failed' }
-            } finally { Pop-Location }
-          } finally { [IO.File]::WriteAllBytes($manifestPath, $originalManifest) }
-          $packer = Get-Item -LiteralPath 'target/release/ashell-portable-packer.exe' -ErrorAction Stop
-          if ($packer.Length -eq 0) { throw 'Empty portable executable' }
-          Copy-Item -LiteralPath $packer.FullName -Destination "$output/ashell-windows-x64.exe"
+              $lines = [IO.File]::ReadAllLines($manifestPath) | Where-Object { $_ -notmatch 'dpiAware' }
+              [IO.File]::WriteAllLines($manifestPath, [string[]]$lines, [Text.UTF8Encoding]::new($false))
+              Push-Location libs/portable
+              try {
+                python generate.py -f $bundle -o . -e "$bundle/ashell.exe"
+                if ($LASTEXITCODE -ne 0) { throw 'Portable packer failed' }
+              } finally { Pop-Location }
+            } finally { [IO.File]::WriteAllBytes($manifestPath, $originalManifest) }
+            $packer = Get-Item -LiteralPath 'target/release/ashell-portable-packer.exe' -ErrorAction Stop
+            if ($packer.Length -eq 0) { throw 'Empty portable executable' }
+            Copy-Item -LiteralPath $packer.FullName -Destination "$output/ashell-windows-x64.exe"
+            Add-TestSignature -Path "$output/ashell-windows-x64.exe" -Label 'ashell-windows-x64.exe'
+            $signatures | ConvertTo-Json -Depth 4 | Set-Content -Encoding utf8 "$output/signatures.json"
+          } finally {
+            if ($null -ne $certificate) {
+              $trustedPath = "Cert:\CurrentUser\Root\$($certificate.Thumbprint)"
+              if (Test-Path -LiteralPath $trustedPath) { Remove-Item -LiteralPath $trustedPath -Force }
+              Remove-Item -LiteralPath "Cert:\CurrentUser\My\$($certificate.Thumbprint)" -DeleteKey -Force
+            }
+          }
 
       - name: Record hashes and build provenance
         run: |
@@ -484,7 +509,8 @@ jobs:
           $info = [ordered]@{
             commit = $env:GITHUB_SHA; run_id = $env:GITHUB_RUN_ID; attempt = $env:GITHUB_RUN_ATTEMPT
             rust = $env:RUST_VERSION; flutter = $env:FLUTTER_VERSION; llvm = $env:LLVM_VERSION
-            vcpkg = $env:VCPKG_COMMIT_ID; signing = 'unsigned; no Authenticode certificate'
+            vcpkg = $env:VCPKG_COMMIT_ID
+            signing = 'ephemeral self-signed Authenticode test certificate; not for production'
             cargo_lock_sha256 = (Get-FileHash Cargo.lock -Algorithm SHA256).Hash
             pubspec_lock_sha256 = (Get-FileHash flutter/pubspec.lock -Algorithm SHA256).Hash
           }
@@ -497,23 +523,48 @@ jobs:
           rustc -Vv | Set-Content -Encoding utf8 "$output/rust-version.txt"
           if ($LASTEXITCODE -ne 0) { throw 'Rust version query failed' }
 
-      - name: Upload Windows client
-        id: upload
+      - name: Upload Windows build information
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ashell-windows-x64-${{ github.run_number }}-${{ github.run_attempt }}
-          path: artifacts/windows/
+          name: ashell-windows-build-info-${{ github.run_number }}-${{ github.run_attempt }}
+          path: |
+            artifacts/windows/
+            !artifacts/windows/*.exe
+            !artifacts/windows/*.zip
           if-no-files-found: error
           retention-days: 14
-          compression-level: 0
+
+      - name: Upload EXE directly
+        id: upload-exe
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ashell-windows-x64.exe
+          path: artifacts/windows/ashell-windows-x64.exe
+          archive: false
+          overwrite: true
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Release ZIP directly
+        id: upload-zip
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ashell-windows-x64.zip
+          path: artifacts/windows/ashell-windows-x64.zip
+          archive: false
+          overwrite: true
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Download summary
         env:
-          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          EXE_URL: ${{ steps.upload-exe.outputs.artifact-url }}
+          ZIP_URL: ${{ steps.upload-zip.outputs.artifact-url }}
         run: |
           @"
-          ### Windows x64
-          [Download EXE and ZIP]($env:ARTIFACT_URL)
+          ### Windows EXE
+          [下载 EXE]($env:EXE_URL) | [下载 ZIP]($env:ZIP_URL)
 
-          Unsigned self-extracting EXE and complete Release ZIP. No extra drivers or injection DLLs. Artifacts expire after 14 days.
+          EXE 为测试签名的自解压程序；ZIP 为完整 Release 目录压缩包。两者分别直接下载，不再额外套一层 ZIP。
+          产物保留 14 天；公钥证书、验签结果、校验和及构建信息另存于 build-info 产物，不包含私钥。测试证书每次运行不同，不属于公开受信任的发行证书。
           "@ >> $env:GITHUB_STEP_SUMMARY
