@@ -29,6 +29,7 @@ class RemoteAdbMirror extends ChangeNotifier {
   bool _watching = false;
   bool _polling = false;
   final Set<RemoteAdbController> _pasteRequests = {};
+  int _accessibilityPasteCount = 0;
   int _epoch = 0;
   int _watchFailures = 0;
   Future<void> _transition = Future<void>.value();
@@ -132,6 +133,32 @@ class RemoteAdbMirror extends ChangeNotifier {
   void _cancelPastes() {
     for (final controller in _pasteRequests) { controller.dispose(); }
     _pasteRequests.clear();
+  }
+
+  bool _canPasteAccessibility(int epoch) => !_disposed && epoch == _epoch &&
+      _watching && ffi.ffiModel.isPeerAndroid && !ffi.ffiModel.viewOnly &&
+      ffi.ffiModel.keyboard && ffi.ffiModel.permissions['clipboard'] != false &&
+      !bind.sessionGetToggleOptionSync(sessionId: ffi.sessionId, arg: 'disable-clipboard') &&
+      sessionState?.snapshot?['connected'] != true;
+
+  Future<void> _pasteAccessibilityClipboard(int epoch) async {
+    if (!_canPasteAccessibility(epoch)) return;
+    if (_accessibilityPasteCount >= 4) { showToast('粘贴正在处理，请稍后重试。'); return; }
+    final instance = _remoteInstance;
+    _accessibilityPasteCount++;
+    try {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      if (!_canPasteAccessibility(epoch) || instance != _remoteInstance) return;
+      final text = data?.text ?? '';
+      if (text.isEmpty) { showToast('电脑剪贴板中没有文本。'); return; }
+      final error = RemoteAdbController.validatePasteText(text);
+      if (error != null) { showToast(error); return; }
+      await bind.sessionInputString(sessionId: ffi.sessionId, value: text);
+    } catch (_) {
+      if (!_disposed && epoch == _epoch) showToast('无法粘贴电脑文本，请重试。');
+    } finally {
+      _accessibilityPasteCount--;
+    }
   }
 
   void _peerChanged() {
@@ -244,6 +271,11 @@ class RemoteAdbMirror extends ChangeNotifier {
       final pasteRequests = ((value['pasteRequests'] as num?)?.toInt() ?? 0).clamp(0, 4);
       for (var i = 0; i < pasteRequests; i++) {
         unawaited(_pasteClipboard(epoch));
+      }
+      final accessibilityPasteRequests =
+          ((value['accessibilityPasteRequests'] as num?)?.toInt() ?? 0).clamp(0, 4);
+      for (var i = 0; i < accessibilityPasteRequests; i++) {
+        unawaited(_pasteAccessibilityClipboard(epoch));
       }
       final next = value['state'] as String? ?? 'idle';
       final nextError = value['error'] as String? ?? '';

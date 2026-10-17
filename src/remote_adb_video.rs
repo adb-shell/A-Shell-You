@@ -199,6 +199,21 @@ pub mod android {
 
     pub fn release_touch(owner: i32) { invoke_ints("releaseTouchOwner", "(I)V", &[owner]); }
 
+    /// Preserve the original KeyEvent (including modifiers) before the Accessibility conversion.
+    pub fn route_key(owner: i32, event: &hbb_common::message_proto::KeyEvent, allowed: bool) -> bool {
+        use hbb_common::protobuf::Message as _;
+        let Ok(bridge) = BRIDGE.lock() else { return false; };
+        let Some(bridge) = bridge.as_ref() else { return false; };
+        let Ok(mut env) = bridge.vm.attach_current_thread() else { return false; };
+        let Ok(data) = event.write_to_bytes() else { return true; };
+        let result = env.with_local_frame(8, |env| -> jni::errors::Result<bool> {
+            let data = env.byte_array_from_slice(&data)?;
+            env.call_method(bridge.manager.as_obj(), "routeAdbKey", "(I[BZ)Z", &[
+                JValue::Int(owner), JValue::Object(&JObject::from(data)), JValue::Bool(allowed as u8)])?.z()
+        });
+        match result { Ok(consumed) => consumed, Err(_) => { let _ = env.exception_clear(); true } }
+    }
+
     /// True consumes this pointer event and prevents any Accessibility injection.
     pub fn route_touch(owner: i32, kind: i32, mask: i32, x: i32, y: i32, allowed: bool) -> bool {
         if kind != 0 && !matches!(mask, 0 | 8 | 16 | 9 | 10 | 17 | 18 | 3 | 4) { return false; }
@@ -327,15 +342,70 @@ pub mod pc {
 
     struct View { generation: u64, revision: u64, adb_state: Option<Value>, state: String, error: String, image: Option<Vec<u8>>, supported: bool,
         adb_priority: bool, touch_ready: bool, input_error: String, format: String, screenshot_supported: bool,
-        privacy_supported: bool, privacy_state: String, privacy_error: String, paste_requests: u8, paste_key_down: bool,
+        privacy_supported: bool, privacy_state: String, privacy_error: String, paste_requests: u8, accessibility_paste_requests: u8, paste_key_down: bool,
         layout_supported: bool, source_width: u32, source_height: u32, rgba_width: u32, rgba_height: u32 }
+    type SessionSender = Arc<std::sync::RwLock<Option<hbb_common::tokio::sync::mpsc::UnboundedSender<Data>>>>;
     struct Entry { peer: String, token: String, queue: SyncSender<RemoteAdbVideo>, view: Arc<Mutex<View>>,
+        sender: SessionSender, clipboard_ready: bool,
         resync: Arc<AtomicBool>, live: Arc<AtomicBool>, since: Instant, last_receive: Instant, last_watch: Instant,
         touch_sequence: u64, command_sequence: u64, privacy_sequence: u64 }
     lazy_static::lazy_static! { static ref ENTRIES: Mutex<HashMap<Uuid, Entry>> = Mutex::new(HashMap::new()); }
 
+    /// Fallback only: leave the existing Accessibility clipboard permission and delivery intact.
+    pub fn clipboard_required<T: crate::ui_session_interface::InvokeUiSession>(
+        session: &crate::ui_session_interface::Session<T>,
+    ) -> bool {
+        if !session.is_default() || !session.peer_platform().eq_ignore_ascii_case("android")
+            || session.server_keyboard_enabled.read().map(|v| *v).unwrap_or(true)
+            || !session.server_clipboard_enabled.read().map(|v| *v).unwrap_or(false)
+            || session.get_toggle_option("view-only".into())
+            || session.get_toggle_option("disable-clipboard".into()) { return false; }
+        ENTRIES.lock().map(|entries| entries.values().any(|entry|
+            Arc::ptr_eq(&entry.sender, &session.sender) && entry.clipboard_ready
+                && entry.live.load(Ordering::Acquire))).unwrap_or(false)
+    }
+
+    pub fn sync_clipboard<T: crate::ui_session_interface::InvokeUiSession>(
+        session: &crate::ui_session_interface::Session<T>, msg: &Message,
+    ) -> bool {
+        use hbb_common::message_proto::{message as wire_message, ClipboardFormat};
+        if !clipboard_required(session) { return false; }
+        let clip = match msg.union.as_ref() {
+            Some(wire_message::Union::Clipboard(clip)) if clip.format.enum_value() == Ok(ClipboardFormat::Text) => clip,
+            Some(wire_message::Union::MultiClipboards(clips)) => {
+                let Some(clip) = clips.clipboards.iter().find(|c| c.format.enum_value() == Ok(ClipboardFormat::Text)) else { return true; };
+                clip
+            }
+            _ => return true,
+        };
+        if clip.content.len() > 16384 { return true; }
+        // This is the local listener's message, not untrusted remote compressed data.
+        let bytes = if clip.compress { hbb_common::compress::decompress(&clip.content) } else { clip.content.to_vec() };
+        if bytes.is_empty() || bytes.len() > 16384 || bytes.contains(&0) { return true; }
+        let Ok(text) = String::from_utf8(bytes) else { return true; };
+        let request = json!({"v":1,"id":Uuid::new_v4().to_string(),"kind":"request",
+            "method":"clipboard","text":text}).to_string();
+        if !clipboard_required(session) { return false; }
+        if request.len() <= 32768 {
+            session.send(Data::Message(crate::remote_adb::message(request)));
+        }
+        true
+    }
+
+    pub fn clipboard_disconnected<T: crate::ui_session_interface::InvokeUiSession>(
+        session: &crate::ui_session_interface::Session<T>,
+    ) {
+        if let Ok(mut entries) = ENTRIES.lock() {
+            for entry in entries.values_mut().filter(|e| Arc::ptr_eq(&e.sender, &session.sender)) {
+                entry.clipboard_ready = false;
+            }
+        }
+        crate::flutter::update_text_clipboard_required();
+    }
+
     // Both native-grab and Flutter keyboard events converge here. Consume only the
-    // paste key; ordinary modifier release and all non-ADB input keep their route.
+    // paste key; modifier release and other keys keep their original route.
+    // Without ADB, explicit paste uses the existing accessibility text-input path.
     pub fn paste_shortcut<T: crate::ui_session_interface::InvokeUiSession>(
         session: &crate::ui_session_interface::Session<T>, event: &KeyEvent,
     ) -> bool {
@@ -356,6 +426,7 @@ pub mod pc {
         let allowed = !session.get_toggle_option("view-only".into())
             && !session.get_toggle_option("disable-clipboard".into())
             && session.server_clipboard_enabled.read().map(|v| *v).unwrap_or(false);
+        let keyboard_enabled = session.server_keyboard_enabled.read().map(|v| *v).unwrap_or(false);
         let modifier = |keys: &[ControlKey]| event.modifiers.iter().any(|key| keys.contains(&key.enum_value_or_default()));
         let (alt, ctrl, shift, meta) = crate::keyboard::client::get_modifiers_state(
             modifier(&[ControlKey::Alt, ControlKey::RAlt]),
@@ -372,9 +443,15 @@ pub mod pc {
         if (!event.down && !event.press) || !allowed || !ctrl || alt || shift || meta { return false; }
         let supported = view.adb_state.as_ref().map(|state| state["supported"] == true
             && state["connected"] == true && state["textInputSupported"] == true).unwrap_or(false);
-        if !supported || !entry.live.load(Ordering::Acquire) { return false; }
+        if !entry.live.load(Ordering::Acquire) { return false; }
+        if !supported && (view.adb_state.as_ref().map(|state| state["connected"] == true).unwrap_or(false)
+            || !keyboard_enabled) { return false; }
         view.paste_key_down = !event.press;
-        view.paste_requests = view.paste_requests.saturating_add(1).min(4);
+        if supported {
+            view.paste_requests = view.paste_requests.saturating_add(1).min(4);
+        } else {
+            view.accessibility_paste_requests = view.accessibility_paste_requests.saturating_add(1).min(4);
+        }
         true
     }
 
@@ -444,11 +521,12 @@ pub mod pc {
             let (tx, rx) = sync_channel::<RemoteAdbVideo>(MAX_PENDING_FRAMES);
             let view = Arc::new(Mutex::new(View { generation: 0, revision: 0, adb_state: None, state: "waiting".into(), error: String::new(), image: None, supported: false,
                 adb_priority: false, touch_ready: false, input_error: String::new(), format: String::new(), screenshot_supported: false,
-                privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(), paste_requests: 0, paste_key_down: false,
+                privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(), paste_requests: 0, accessibility_paste_requests: 0, paste_key_down: false,
                 layout_supported: false, source_width: 0, source_height: 0, rgba_width: 0, rgba_height: 0 }));
             let resync = Arc::new(AtomicBool::new(true));
             let live = Arc::new(AtomicBool::new(true));
             entries.insert(session_id, Entry { peer: session.get_id(), token: token.clone(), queue: tx,
+                sender: session.sender.clone(), clipboard_ready: false,
                 view: view.clone(), resync: resync.clone(), live: live.clone(), since: Instant::now(),
                 last_receive: Instant::now(), last_watch: Instant::now(), touch_sequence: 0, command_sequence: 0, privacy_sequence: 0 });
             let thread_token = token.clone();
@@ -573,8 +651,10 @@ pub mod pc {
                 view.error = "远端未响应 ADB 投屏订阅，请确认两端均已更新并保持连接。".into();
             }
             let paste_requests = std::mem::take(&mut view.paste_requests);
+            let accessibility_paste_requests = std::mem::take(&mut view.accessibility_paste_requests);
             let snapshot = json!({"state":view.state,"error":view.error,"generation":view.generation,"revision":view.revision,"adbState":view.adb_state,"supported":view.supported,
                 "pasteRequests":paste_requests,
+                "accessibilityPasteRequests":accessibility_paste_requests,
                 "adbPriority":view.adb_priority,"touchReady":view.touch_ready,"inputError":view.input_error,
                 "format":view.format,"screenshotSupported":view.screenshot_supported,"layoutSupported":view.layout_supported,
                 "sourceWidth":view.source_width,"sourceHeight":view.source_height,
@@ -619,7 +699,9 @@ pub mod pc {
         if !state.is_object() || !state["supported"].is_boolean() || !state["connected"].is_boolean()
             || state["revision"].as_u64().is_none() { return; }
         let Ok(mut entries) = ENTRIES.lock() else { return; };
-        let Some(entry) = entries.values_mut().find(|e| e.peer == peer && e.token == token) else { return; };
+        let Some((session_id, entry)) = entries.iter_mut().find(|(_, e)| e.peer == peer && e.token == token) else { return; };
+        let session_id = *session_id;
+        let was_clipboard_ready = entry.clipboard_ready;
         entry.last_receive = Instant::now();
         if let Ok(mut view) = entry.view.lock() {
             let restarted = view.adb_state.as_ref().map(|s| s["instance"] != state["instance"])
@@ -637,8 +719,27 @@ pub mod pc {
             } else if view.adb_state.as_ref().and_then(|s| s["revision"].as_u64()).unwrap_or(0)
                 > state["revision"].as_u64().unwrap_or(0) { return; }
             view.adb_state = Some(state.clone());
+            entry.clipboard_ready = state["supported"] == true && state["connected"] == true
+                && state["clipboardSyncSupported"] == true;
             if restarted || state["connected"] != true { view.paste_requests = 0; }
+            if restarted || state["connected"] == true { view.accessibility_paste_requests = 0; }
         };
+        let clipboard_started = !was_clipboard_ready && entry.clipboard_ready;
+        drop(entries);
+        crate::flutter::update_text_clipboard_required();
+        // Honor the existing initial-sync preference when ADB becomes available after login.
+        if clipboard_started {
+            if let Some(session) = sessions::get_session_by_session_id(&session_id) {
+                let initial = session.lc.read().map(|lc| lc.sync_init_clipboard.v).unwrap_or(false);
+                if initial && clipboard_required(&session) {
+                    let info = session.ui_handler.peer_info.read().unwrap().clone();
+                    if let Some(msg) = crate::clipboard::get_current_clipboard_msg(
+                        &info.version, &info.platform, crate::clipboard::ClipboardSide::Client) {
+                        sync_clipboard(&session, &msg);
+                    }
+                }
+            }
+        }
     }
 
     pub fn receive(peer: &str, packet: RemoteAdbVideo) {

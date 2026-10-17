@@ -1,15 +1,23 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261018-003-r3`
+Registry Revision：`WORK-20261018-006-r2`
 
-Last Updated：2026-10-18（静默常亮，无新增入口）
+Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Active Task Count：0
 
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T006 r2 交付续接：用户授权合并提交 T004/T005/T006 并推送 test，单次 Build-Clients-New Both/常规编译、不监控；准确 Git/dispatch 回执见会话交付，V0 与构建/真机待证边界保持。CE-20261018-T006-02。下列为实现阶段记录。
+
+T-2026-10-18-006 / complete / T8（实现与 V0）：补齐仅 ADB 会话复制文本同步，原监听复用，paste=false，自动最新待发/显式优先与权限取消；原无障碍/模拟输入保留，T004/T005 dirty 保留。无 Git/CI/产品验证，构建/真机待证。见 docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md。
+
+T-2026-10-18-005 / complete / T8（实现与 V0）：ADB 普通键盘通过原 KeyEvent 接入独立单 writer，修饰键按 owner 隔离，保留 Ctrl+V；保留 T004 dirty；无 Git/CI/产品验证，构建与设备待证。见 docs/tasks/T-2026-10-18-005-adb-keyboard.md。
+
+T-2026-10-18-004 / complete / T8（实现与 V0）：test/738a3fe clean 起点；Shell 文案“点亮屏”，普通画面光标与触摸同源会话权限，无 ADB 的 Ctrl+V 经现有 Seq 单次提交焦点文本；ADB 优先/权限/媒体/手势保持。最小合同及任务记忆已同步，编译/真机待证，未提交/推送/编排；CE-20261018-T004-01。见 docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md。
 
 T-2026-10-18-003 / complete / T8（实现与 V0）：取消新增齿轮/设置入口，默认静默常亮；HomePage 恢复 HEAD，原链路不改。r3 用户授权提交推送 test 后单次 Build-Clients-New Both/常规编译，不监控；Git/dispatch 回执见会话交付，构建/真机待证。CE-20261018-T003-03；见 docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md。
 

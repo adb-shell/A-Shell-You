@@ -86,7 +86,6 @@ class _RemotePageState extends State<RemotePage>
   late RxBool _showRemoteCursor;
   late RxBool _zoomCursor;
   late RxBool _remoteCursorMoved;
-  late RxBool _keyboardEnabled;
 
   var _blockableOverlayState = BlockableOverlayState();
 
@@ -120,7 +119,6 @@ class _RemotePageState extends State<RemotePage>
   void _initStates(String id) {
     _zoomCursor = PeerBoolOption.find(id, kOptionZoomCursor);
     _showRemoteCursor = ShowRemoteCursorState.find(id);
-    _keyboardEnabled = KeyboardEnabledState.find(id);
     _remoteCursorMoved = RemoteCursorMovedState.find(id);
   }
 
@@ -969,7 +967,6 @@ class _RemotePageState extends State<RemotePage>
                     id: widget.id,
                     zoomCursor: _zoomCursor,
                     cursorOverImage: _cursorOverImage,
-                    keyboardEnabled: _keyboardEnabled,
                     remoteCursorMoved: _remoteCursorMoved,
                     listenerBuilder: (child) => _buildRawTouchAndPointerRegion(
                         child, enterView, leaveView),
@@ -1003,7 +1000,6 @@ class ImagePaint extends StatefulWidget {
   final String id;
   final RxBool zoomCursor;
   final RxBool cursorOverImage;
-  final RxBool keyboardEnabled;
   final RxBool remoteCursorMoved;
   final Widget Function(Widget)? listenerBuilder;
 
@@ -1013,7 +1009,6 @@ class ImagePaint extends StatefulWidget {
       required this.id,
       required this.zoomCursor,
       required this.cursorOverImage,
-      required this.keyboardEnabled,
       required this.remoteCursorMoved,
       this.listenerBuilder})
       : super(key: key);
@@ -1028,13 +1023,13 @@ class _ImagePaintState extends State<ImagePaint> {
   String get id => widget.id;
   RxBool get zoomCursor => widget.zoomCursor;
   RxBool get cursorOverImage => widget.cursorOverImage;
-  RxBool get keyboardEnabled => widget.keyboardEnabled;
   RxBool get remoteCursorMoved => widget.remoteCursorMoved;
   Widget Function(Widget)? get listenerBuilder => widget.listenerBuilder;
 
   @override
   Widget build(BuildContext context) {
     final m = Provider.of<ImageModel>(context);
+    final session = Provider.of<FfiModel>(context);
     var c = Provider.of<CanvasModel>(context);
     final s = c.scale;
 
@@ -1062,8 +1057,8 @@ class _ImagePaintState extends State<ImagePaint> {
               cursor: cursorOverImage.isTrue
                   ? c.cursorEmbedded
                       ? SystemMouseCursors.none
-                      : keyboardEnabled.isTrue || (widget.ffi.inputModel.adbTouchAvailable.value &&
-                          widget.ffi.ffiModel.isPeerAndroid && !widget.ffi.ffiModel.viewOnly)
+                      : !session.viewOnly && (session.keyboard ||
+                          (widget.ffi.inputModel.adbTouchAvailable.value && session.isPeerAndroid))
                           ? (() {
                               if (remoteCursorMoved.isTrue) {
                                 _lastRemoteCursorMoved = true;

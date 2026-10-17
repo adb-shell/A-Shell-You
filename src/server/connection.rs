@@ -662,6 +662,8 @@ impl Connection {
                                 }
                             } else if &name == "clipboard" {
                                 conn.clipboard = enabled;
+                                #[cfg(target_os = "android")]
+                                if !enabled { crate::remote_adb::android::cancel_clipboard(conn.inner.id); }
                                 conn.send_permission(Permission::Clipboard, enabled).await;
                                 if let Some(s) = conn.server.upgrade() {
                                     s.write().unwrap().subscribe(
@@ -2412,6 +2414,11 @@ impl Connection {
                     if self.is_authed_view_camera_conn() {
                         return true;
                     }
+                    if crate::remote_adb_video::android::route_key(self.inner.id, &me,
+                        !self.disable_keyboard && self.file_transfer.is_none() && !self.terminal) {
+                        self.update_auto_disconnect_timer();
+                        return true;
+                    }
                     let key = match me.mode.enum_value() {
                         Ok(KeyboardMode::Map) => {
                             Some(crate::keyboard::keycode_to_rdev_key(me.chr()))
@@ -3032,7 +3039,7 @@ impl Connection {
                             && !self.terminal && !self.view_camera;
                         if let Some(tx) = self.inner.tx.as_ref() {
                             crate::remote_adb::dispatch(self.inner.id, normal_session,
-                                !self.disable_keyboard, &json, tx.clone());
+                                !self.disable_keyboard, self.clipboard_enabled(), &json, tx.clone());
                         }
                     }
                     Some(misc::Union::RemoteAdbVideo(packet)) => {
@@ -3635,6 +3642,8 @@ impl Connection {
         if let Ok(q) = o.disable_clipboard.enum_value() {
             if q != BoolOption::NotSet {
                 self.disable_clipboard = q == BoolOption::Yes;
+                #[cfg(target_os = "android")]
+                if self.disable_clipboard { crate::remote_adb::android::cancel_clipboard(self.inner.id); }
                 if let Some(s) = self.server.upgrade() {
                     s.write().unwrap().subscribe(
                         super::clipboard_service::NAME,

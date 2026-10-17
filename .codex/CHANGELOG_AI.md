@@ -2,9 +2,32 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（静默常亮，无新增入口）
+Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-18-006 r2：test 交付
+
+- 用户授权提交推送 T004/T005/T006 到 test，单次触发 Build-Clients-New Both/常规编译，不监控；无新增产品代码修改。
+- 执行前 test/738a3fe，V0 diff 检查通过；构建/真机待证，准确 Git/dispatch 回执见交付。STATE/WORK-20261018-006-r2 / CE-20261018-T006-02。
+
+## T-2026-10-18-006：ADB 剪贴板同步
+
+- test/738a3fe + T004/T005 dirty；原PC监听增加仅ADB文本同步分支，clipboard/text RPC 与 paste=false，显式粘贴优先；原无障碍/模拟输入/监听实现保留。
+- V0完成；构建/真机待证，未提交/推送/编排。Decision/ADR/资产 N/A — no decision delta。
+- [任务](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)，STATE/WORK-20261018-006 / CE-20261018-T006-01。
+
+## T-2026-10-18-005：ADB 普通键盘输入
+
+- test/738a3fe + T004 dirty；补齐原 KeyEvent→独立 ADB 输入连接与 Flutter gate，owner 修饰键/有界队列，保留 Ctrl+V 和无ADB无障碍回落；不改媒体、认证或协议字段。
+- V0 完成，构建/设备待证；未提交/推送/编排。Decision/ADR/资产 N/A — no decision delta。
+- [任务](../docs/tasks/T-2026-10-18-005-adb-keyboard.md)，STATE/WORK-20261018-005 / CE-20261018-T005-01。
+
+## T-2026-10-18-004：光标与无障碍粘贴
+
+- test/738a3fe clean；“点亮屏”文案、ImagePaint 会话权限同源，Ctrl+V 无 ADB 时按需读取 PC 文本，经现有 Seq 主线程提交 IME/焦点节点；选区替换与单次提交，ADB 优先。
+- V0；媒体/手势/普通剪贴板/协议未改，构建/真机待证；未提交/推送/编排。Decision/ADR/资产：N/A — no decision delta。
+- [任务](../docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，STATE/WORK-20261018-004 / CE-20261018-T004-01。
 
 ## T-2026-10-18-003：静默常亮与默认值
 

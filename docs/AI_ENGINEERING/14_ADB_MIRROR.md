@@ -1,5 +1,9 @@
 # AShell ADB 投屏、无视、穿透、黑屏与触摸
 
+test T005（2026-10-18）：既有 LocalAdbTouch control-only 连接的单 writer 增加 LocalAdbKeyboard，键盘与触摸各自排队，不增加连接/线程或依赖媒体开启。owner 释放与 run 停止同时清键盘队列/修饰键；Flutter 旧 inputKey 入口允许非只读 Android ADB priority。普通/ADB 媒体与无障碍执行保持，Ctrl+V 沿用既有专用通道。详见[输入合同](13_REMOTE_ADB.md)，仅 V0。
+
+test T004（2026-10-18）：Shell 栏唤醒按钮显示“点亮屏”，仍执行 keycode224；普通画面光标改读当前 FfiModel 会话权限，与实际触摸同源，移除 ImagePaint 对设备 ID 共享权限副本的依赖。ADB 优先、只读显示与原手势/媒体链保持。无 ADB 的 Ctrl+V 文本输入见[远程输入合同](13_REMOTE_ADB.md)与[T004](../tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，仅 V0，设备待证。
+
 test 增量（2026-10-18，[T002](../tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)）：Shell 栏新增“点亮屏幕”，复用独立 shell 命令执行 `KEYCODE_WAKEUP`（224），已亮屏时不会反向息屏；无需启动任何媒体源，不自动移除 ADB/无障碍黑屏遮罩或解锁。ADB 辅助保活只设置本应用电池优化豁免，详见[本机 ADB](12_LOCAL_ADB.md)。本轮媒体、触摸及普通传输实现不改；V0，构建/设备待证。
 
 T003画质补充：H.264去掉固定1Mbps截断，沿用ADB的缩放像素量与选中quality ratio计算码率（尺寸/ratio有界、最低200kbps）。大画面Best不会再被同一上限压成Balanced码率；高画质需要相应网络带宽，不代表与普通编码器的码率/实测画质完全等同。

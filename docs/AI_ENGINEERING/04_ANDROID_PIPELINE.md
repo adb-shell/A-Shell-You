@@ -1,5 +1,7 @@
 # AShell Android 完整链路 / Android Pipeline
 
+test T004（2026-10-18）：显式 `KeyEvent.seq` 文本在 AccessibilityService 主线程提交一次，33+ 有 AccessibilityInputConnection 时使用 commitText，否则对当前输入焦点的可编辑节点执行 ACTION_SET_TEXT/SET_SELECTION，按选区替换并将光标移到插入文本后；未知选区追加，不搜索其他字段，不依赖后台手机剪贴板或模拟 EditText。仅修改文本序列入口，其他按键、无障碍手势、采集及 MediaProjection 保持。PC Ctrl+V 无 ADB 时通过既有 sessionInputString 发送文本，ADB 可用时仍走独立 ADB 输入。见[T004](../tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，V0，设备兼容待证。
+
 ADB当前源码4d3c446：UID验证后才connected，独立命令/媒体/触摸保持；截图上限8fps动态节奏，节点目标约2fps。节点采集与App排版分离，源几何跨采集/编码校验；黑屏PNG在App生成，helper黑层绑定真实layerStack并排除自身采集。原MediaProjection/Accessibility链不改，Android11—17/OEM结果待证。2026-10-16 T001/Baseline21，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 

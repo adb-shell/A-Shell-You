@@ -1,9 +1,17 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261018-003-r3`
+State Revision：`STATE-20261018-006-r2`
 Last Updated / Observed At：2026-10-18（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+T006 r2：用户授权将 T004/T005/T006 提交并推送 test，随后单次触发 Build-Clients-New（Both/常规编译），不监控。执行前 test/738a3fe、diff 检查通过；准确 SHA、远端一致性及 dispatch 接受回执见 Git/会话交付，构建与真机仍待证。CE-20261018-T006-02。下列未提交状态为各实现阶段历史。
+
+最新 test 增量：[T006](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)，test/738a3fe + T004/T005 dirty。仅 ADB 时复用原PC监听，经字段40 clipboard/text 更新手机剪贴板；paste=false，不自动输入，显式Ctrl+V队列保持。capability/状态/会话/权限检查及自动最新待发/取消清理；原无障碍剪贴板和模拟输入不改。V0完成，构建/真机待证，未提交/推送/编排。STATE/WORK-20261018-006 / CE-20261018-T006-01，无 Decision/ADR/资产增量。以下为历史。
+
+最新 test 增量：[T005](../docs/tasks/T-2026-10-18-005-adb-keyboard.md)，test/738a3fe + T004 dirty。原 KeyEvent 在 Android 分流到 ADB 常驻输入 socket，新增独立键盘队列与各 PC 修饰键状态，完整按键/释放清理；Ctrl+V/粘贴链保持，Flutter ADB 键盘放行。无媒体/无障碍实现/生成桥变更。V0 完成，构建/真机待证，未提交/推送/编排。STATE/WORK-20261018-005 / CE-20261018-T005-01，无 Decision/ADR/资产增量。以下为历史。
+
+最新 test 增量：[T004](../docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，test/738a3fe clean 起点。Shell 文案“点亮屏”；普通画面光标与实际输入共用会话权限；Ctrl+V 无 ADB 时从 PC 直接经现有 Seq 文本链提交无障碍焦点输入，ADB 路径继续优先。五份源码局部修改，无手势/采集/普通剪贴板/协议变更；V0 完成，编译/真机待证。WORK-20261018-004 / CE-20261018-T004-01；未提交/推送/编排，无 Decision/ADR/资产增量。以下为历史。
 
 最新 test 增量：[T003](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)，test/9e28a90 clean 起点；r2 取消新增齿轮与设置页，主页不展示常亮控件。未配置默认 service-on 静默生效，已有有效选项保留，Kotlin 与 Dart 同步。HomePage 恢复 HEAD，原媒体/无障碍/ADB 不改；V0 完成，构建/真机待证。r3 用户授权提交推送 test 后单次 Build-Clients-New Both/常规编译，不监控，准确 Git/dispatch 回执见交付。WORK-20261018-003-r3 / CE-20261018-T003-03；无 Decision/ADR/资产增量。以下为历史。
 

@@ -6,6 +6,29 @@
 
 > 本文件记录 AI 参与的工程任务、授权边界和验证结果。它不是产品 changelog，也不替代 Git history。
 
+## T-2026-10-18-006 r2：提交推送与编排
+
+- 用户追加 C3 授权：交付既有 T004/T005/T006 到 test，单次 Build-Clients-New Both/常规编译，不监控。无本地产品构建/测试或真机操作。
+- 执行前分支/remote/diff 检查通过；准确 SHA、远端一致性和 dispatch 回执见 Git/会话交付，不提升 V0 验证等级。STATE/WORK-20261018-006-r2 / CE-20261018-T006-02。
+
+## T-2026-10-18-006：ADB 剪贴板同步
+
+- Complete/T8（实现与V0）：新增仅ADB剪贴板文本分支，原监听/无障碍/模拟输入保留；只更新剪贴板、不自动输入，Ctrl+V独立优先，能力协商及权限/生命周期取消。
+- V1—V3 NOT_RUN；T004/T005 dirty保留，无Git/CI操作，无Decision/ADR/资产增量。
+- [任务](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)，STATE/WORK-20261018-006 / CE-20261018-T006-01。
+
+## T-2026-10-18-005：ADB 普通键盘输入
+
+- Complete/T8（实现与 V0）：保留 T004 dirty，新增独立 ADB 键盘模块、原 KeyEvent 前置分流、JNI/混淆签名与 Flutter gate；普通键不写剪贴板，Ctrl+V 保持，修饰键按 PC 隔离。
+- V1—V3 NOT_RUN；未提交/推送/编排，无 Decision/ADR/资产增量。
+- [任务](../docs/tasks/T-2026-10-18-005-adb-keyboard.md)，STATE/WORK-20261018-005 / CE-20261018-T005-01。
+
+## T-2026-10-18-004：光标与无障碍粘贴
+
+- Complete/T8（实现与 V0）：test/738a3fe clean，用户授权按钮文案、禁用光标与无障碍 Ctrl+V 修复。光标与触摸同源权限；文本经既有消息单次输入到当前焦点，ADB 优先与权限检查保持。
+- V0，V2/V3 待证；当前改动未提交、推送或编排。最小合同及任务记忆同步，无 Decision/ADR/资产增量。
+- [任务](../docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，STATE/WORK-20261018-004 / CE-20261018-T004-01。
+
 ## T-2026-10-18-003：静默常亮与默认值
 
 - Complete/T8（r2 续接）：test/9e28a90 clean 起点；用户追加要求不显示齿轮/设置入口，已删除本任务新增页面与路由，主页常亮控件保持隐藏。未配置/未知值默认 service-on 静默生效，保留用户已保存选项。相对 HEAD 仅三份 Flutter/Kotlin 源码与最小合同/记忆更新，无原功能链修改。

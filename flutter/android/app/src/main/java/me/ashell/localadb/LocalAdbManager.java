@@ -122,6 +122,10 @@ public final class LocalAdbManager {
         return touch.legacy(owner, kind, mask, x, y, allowed);
     }
 
+    public boolean routeAdbKey(int owner, byte[] event, boolean allowed) {
+        return touch.key(owner, event, allowed);
+    }
+
     public void injectMirrorTouch(int owner, int action, int x, int y, int width, int height) {
         touch.normalized(owner, action, x, y, width, height);
     }
@@ -133,6 +137,7 @@ public final class LocalAdbManager {
         value.put("supported", Build.VERSION.SDK_INT >= 30);
         value.put("apiVersion", 4);
         value.put("textInputSupported", true);
+        value.put("clipboardSyncSupported", true);
         value.put("mirrorVersion", 2);
         value.put("connected", client.isConnected());
         value.put("paired", Build.VERSION.SDK_INT >= 30
@@ -160,7 +165,8 @@ public final class LocalAdbManager {
     private void execute(String owner, String requestId, String kind, Map<String, Object> args, Reply reply) {
         for (String key : args.keySet()) {
             if (!("port".equals(key) || "connectPort".equals(key)
-                    || "code".equals(key) || "command".equals(key) || "paste".equals(kind) && "text".equals(key)
+                    || "code".equals(key) || "command".equals(key)
+                    || ("paste".equals(kind) || "clipboard".equals(kind)) && "text".equals(key)
                     || "cancel".equals(kind) && "requestId".equals(key))) {
                 reply.failure("invalid", "ADB 请求包含不支持的参数，请更新客户端后使用配对码连接。");
                 return;
@@ -181,7 +187,7 @@ public final class LocalAdbManager {
             reply.failure("unsupported", "配对码无线调试需要 Android 11 或以上版本。");
             return;
         }
-        if ("paste".equals(kind)) {
+        if ("paste".equals(kind) || "clipboard".equals(kind)) {
             Object value = args.get("text");
             if (!(value instanceof String) || ((String) value).isEmpty() || ((String) value).indexOf('\0') >= 0) {
                 reply.failure("invalid", "请输入非空且不含 NUL 的文本。"); return;
@@ -193,7 +199,8 @@ public final class LocalAdbManager {
             if (transportChanging()) {
                 reply.failure("busy", "ADB 连接正在变更，请稍后重试。"); return;
             }
-            touch.paste(owner, requestId, text, reply);
+            if ("clipboard".equals(kind)) touch.syncClipboard(owner, requestId, text, reply);
+            else touch.paste(owner, requestId, text, reply);
             return;
         }
         if (!("pair".equals(kind) || "pairConnect".equals(kind) || "discover".equals(kind)
@@ -525,6 +532,10 @@ public final class LocalAdbManager {
 
     public void disconnectRemote(String owner) {
         main.post(() -> cancelOwner("remote:" + owner));
+    }
+
+    public void cancelClipboardSync(String owner) {
+        main.post(() -> touch.cancelClipboardSync("remote:" + owner));
     }
 
     private static final class Operation {

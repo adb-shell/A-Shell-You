@@ -87,13 +87,13 @@ mod pc {
 pub use pc::{controller, receive};
 
 #[cfg(not(target_os = "ios"))]
-pub fn dispatch(owner: i32, normal_session: bool, control: bool, payload: &str, tx: crate::server::Sender) {
+pub fn dispatch(owner: i32, normal_session: bool, control: bool, clipboard: bool, payload: &str, tx: crate::server::Sender) {
     if payload.len() > MAX_REQUEST { return; }
     let Ok(value) = serde_json::from_str::<Value>(payload) else { return; };
     let Some(id) = value["id"].as_str().filter(|s| s.len() <= 64) else { return; };
     if value["v"] != 1 || value["kind"] != "request" { return; }
     let status_request = value["method"] == "status";
-    let reply = if !normal_session || (!status_request && !control) {
+    let reply = if !normal_session || (!status_request && !control) || (value["method"] == "clipboard" && !clipboard) {
         Some(error(id, "permission", "当前会话没有远程控制权限，不能操作 ADB。"))
     } else {
         #[cfg(target_os = "android")]
@@ -200,5 +200,9 @@ pub mod android {
 
     pub fn cancel_requests(owner: i32) {
         invoke("disconnectRemote", "(Ljava/lang/String;)V", &[&owner.to_string()]);
+    }
+
+    pub fn cancel_clipboard(owner: i32) {
+        invoke("cancelClipboardSync", "(Ljava/lang/String;)V", &[&owner.to_string()]);
     }
 }

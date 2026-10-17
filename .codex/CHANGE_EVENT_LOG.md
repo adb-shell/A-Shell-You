@@ -4,9 +4,34 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（静默常亮，无新增入口）
+Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261018-T006-02：test 提交推送及编排授权
+
+- 用户授权提交推送 test 并执行编排；目标 origin=adb-shell/A-Shell-You，执行前 test/738a3fe。既有 T004/T005/T006 改动统一交付，本轮只补最小交付记录，无新增产品代码修改。
+- git diff --check 通过；Build-Clients-New.yml 已核对，单次 ref=test、Platform=Both、BuildMode=常规编译，不监控。准确 Git/dispatch 回执见交付，构建与设备结果仍未知。
+- STATE/WORK-20261018-006-r2；无 Decision/ADR/资产/依赖/版本增量，无本地产品 build/test/analyze/codegen。
+
+## CE-20261018-T006-01：ADB 剪贴板同步
+
+- Task T-2026-10-18-006，STATE/WORK-20261018-006；test/738a3fe + T004/T005 dirty，实现与V0 complete。
+- PC原监听的会话分发增加ADB fallback，字段40 clipboard RPC/能力标识，Android paste=false与独立最新自动队列，显式paste优先；取消JNI及keep规则匹配。原无障碍/普通剪贴板/媒体保持。
+- V0：调用链/权限/锁序/owner/sequence/分段/清理与diff检查；构建/真机待证。未提交/推送/编排，无ADR/Decision/外部资产增量。
+
+## CE-20261018-T005-01：ADB 普通键盘输入
+
+- Task T-2026-10-18-005；STATE/WORK-20261018-005，test/738a3fe + T004 dirty；实现与 V0 complete。
+- LocalAdbKeyboard + LocalAdbTouch/Manager/keep rule，Rust 原 Android KeyEvent/JNI，Flutter inputKey gate；原 paste hook/ACK、媒体与无障碍实现不改。
+- 证据：类型/调用链/权限/owner释放/单writer/控制协议及 git diff 空白检查；构建/真机待证。无 Git/CI，无 ADR/Decision/外部资产增量；既有 T004 修改保留。
+
+## CE-20261018-T004-01：光标与无障碍 Ctrl+V
+
+- T004，用户 C2 三项修复授权，C1 必要合同/记忆；test/738a3fe clean，未执行 C3。
+- 源码：`flutter/lib/desktop/adb/{remote_adb_sidebar,remote_adb_mirror}.dart`、`flutter/lib/desktop/pages/remote_page.dart`、`src/remote_adb_video.rs`、`flutter/android/app/src/main/kotlin/me/ashell/nZW99cdXQ0COhB2o.kt`。按钮缩字、光标使用会话权限、Ctrl+V 本地请求分流及焦点文本单次提交；无 peer/JNI/生成桥变化。
+- 同步 `docs/AI_ENGINEERING/{04_ANDROID_PIPELINE,13_REMOTE_ADB,14_ADB_MIRROR}.md`、[任务](../docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md)、五份 `.codex` 任务记忆。STATE/WORK-20261018-004；Decision/ADR/资产无增量。
+- V0 数据流/权限/生命周期/选区与 diff 范围检查；V1—V3 NOT_RUN，无 Git/CI，待正式双端构建与手机测试。
 
 ## CE-20261018-T003-03：test 提交推送及编排授权
 
