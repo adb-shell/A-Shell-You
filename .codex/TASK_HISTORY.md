@@ -6,6 +6,12 @@
 
 > 本文件记录 AI 参与的工程任务、授权边界和验证结果。它不是产品 changelog，也不替代 Git history。
 
+## T-2026-10-17-002：test ADB远程输入与媒体性能
+
+- Complete/T8：实现/V0完成，起点main/af1c72d clean，创建并切换test。新增菜单粘贴、原生二进制帧交接、24帧回执窗口、960媒体最长边、原始截图与PNG回退；普通链路保持。
+- 授权提交推送test、Build-Clients-New Both/常规编译单次dispatch，不监控；无本地产品编译/测试/设备操作。构建/流畅度尚待正式验证。
+- [任务](../docs/tasks/T-2026-10-17-002-adb-input-performance.md)，STATE/WORK-20261017-002 / CE-20261017-T002-01；Decision/ADR/资产无增量，Git/dispatch结果见交付。
+
 ## T-2026-10-17-001：构建模式名称调整
 
 - Result：实现/V0完成；将新工作流“完整编译”选项及九处判断改为“原始编译”，其他工作流文本不变。

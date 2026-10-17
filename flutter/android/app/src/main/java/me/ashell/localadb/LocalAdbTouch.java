@@ -80,6 +80,7 @@ final class LocalAdbTouch {
         priority = false;
         queue.clear();
         if (active != null) {
+            active.paste.stop();
             active.cancelled.set(true);
             // Repeated stop requests must not extend the bounded teardown deadline.
             if (active.stopAt == 0) active.stopAt = SystemClock.elapsedRealtime();
@@ -91,6 +92,22 @@ final class LocalAdbTouch {
 
     private void publish(boolean ready, String error) {
         try { status(priority, ready, error); } catch (LinkageError ignored) { }
+    }
+
+    synchronized void paste(String owner, String requestId, byte[] text, LocalAdbManager.Reply reply) {
+        if (!shellReady.get() || port <= 0) {
+            reply.failure("disconnected", "请先连接并验证 ADB Shell。"); return;
+        }
+        enable(port);
+        if (active == null || active.cancelled.get()) {
+            reply.failure("busy", "ADB 输入连接正在恢复，请稍后重试。"); return;
+        }
+        active.paste.submit(owner, requestId, text, reply);
+        notifyAll();
+    }
+
+    synchronized void cancelPaste(String owner, String requestId) {
+        if (active != null) active.paste.cancel(owner, requestId);
     }
 
     /** Cache legacy coordinates even before ADB becomes available. Return true = consume exclusively. */
@@ -204,6 +221,20 @@ final class LocalAdbTouch {
                 if (control == null) throw new IOException("Input socket unavailable");
                 try (AdbStream stream = control) {
                   try {
+                    Thread replies = new Thread(() -> {
+                        try { run.paste.readAcks(stream, run.cancelled); }
+                        catch (IOException ignored) {
+                            synchronized (LocalAdbTouch.this) {
+                                if (active == run && !run.cancelled.get()) {
+                                    run.failure = "ADB 输入连接已中断，正在自动恢复…";
+                                    run.abort();
+                                    publish(false, run.failure);
+                                }
+                            }
+                        }
+                    }, "ashell-adb-input-replies");
+                    replies.setDaemon(true);
+                    replies.start();
                     synchronized (this) {
                         if (active != run || run.cancelled.get()) return;
                         run.ready = true; failures = 0; publish(true, "");
@@ -220,8 +251,9 @@ final class LocalAdbTouch {
                             if (active != run || run.cancelled.get() || !shellReady.get()) break;
                             event = queue.poll();
                         }
-                        if (event == null && owner == null) continue;
                         run.busySince = SystemClock.elapsedRealtime();
+                        run.paste.writeNext(stream);
+                        if (event == null && owner == null) { run.busySince = 0; continue; }
                         DisplayMetrics size = metrics();
                         boolean changed = rotationWidth != size.widthPixels || rotationHeight != size.heightPixels;
                         boolean expired = event != null && SystemClock.elapsedRealtime() - event.at > 1500;
@@ -277,6 +309,7 @@ final class LocalAdbTouch {
         run.abort();
         active = null;
         queue.clear();
+        run.paste.stop();
         failures = Math.min(5, failures + 1);
         int delay = 1000 * failures;
         retryAfter = SystemClock.elapsedRealtime() + delay;
@@ -300,6 +333,7 @@ final class LocalAdbTouch {
         final long id = ++revision;
         final int port = LocalAdbTouch.this.port;
         final AtomicBoolean cancelled = new AtomicBoolean();
+        final LocalAdbPaste paste = new LocalAdbPaste();
         final LocalAdbClient client = new LocalAdbClient(context, true);
         Thread thread, timeout;
         boolean ready;

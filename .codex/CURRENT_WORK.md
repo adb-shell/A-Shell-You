@@ -1,15 +1,17 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261017-001`
+Registry Revision：`WORK-20261017-002`
 
-Last Updated：2026-10-17（构建模式名称调整）
+Last Updated：2026-10-17（test ADB输入与媒体性能）
 
 Active Task Count：0
 
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T-2026-10-17-002 / complete：test/af1c72d起点，独立ADB粘贴及媒体性能实现/V0完成；授权提交推送test、单次Build-Clients-New Both/常规编译，不监控；Git/dispatch回执见最终交付。未运行本地产品验证，普通链路保持。STATE/WORK-20261017-002，见docs/tasks/T-2026-10-17-002-adb-input-performance.md。
 
 none。T-2026-10-17-001已完成名称替换及V0检查，按用户授权仅本地提交；不push、不dispatch、不构建。STATE-20261017-001 / CE-20261017-T001-01；[任务](../docs/tasks/T-2026-10-17-001-build-mode-label.md)。
 

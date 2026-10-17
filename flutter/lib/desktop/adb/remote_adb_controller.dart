@@ -36,6 +36,7 @@ class RemoteAdbController extends ChangeNotifier {
   bool controlAllowed = true;
   bool get ready => supported && controlAllowed && !busy;
   bool get discoverySupported => (state['apiVersion'] as num? ?? 1) >= 2;
+  bool get textInputSupported => state['textInputSupported'] == true;
   String get summary => stale ? '状态未确认' : connected
       ? 'ADB 已连接，Shell 已验证' : state['recovering'] == true
           ? 'ADB 连接中断，正在恢复 Shell' : paired
@@ -199,6 +200,7 @@ class RemoteAdbController extends ChangeNotifier {
                   : '已扫描 Android 本机端口，已填入下方。端口会随系统配对窗口和无线调试开关变化。';
           break;
         case 'connect': output = result?.toString() ?? ''; message = 'ADB 已连接，Shell 验证成功。'; break;
+        case 'paste': message = '手机已处理粘贴请求；请确认当前输入框中的内容。'; break;
         case 'shell':
           final data = result is Map ? result : const {};
           output = data['output']?.toString() ?? '';

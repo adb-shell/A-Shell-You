@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import '../../models/model.dart';
 import '../../models/platform_model.dart' show bind;
 import 'remote_adb_session_state.dart';
+import 'adb_frame_native.dart' if (dart.library.html) 'adb_frame_stub.dart';
 
 /// Separate media subscription; only the dedicated ADB touch capability is shared with input.
 class RemoteAdbMirror extends ChangeNotifier {
@@ -214,7 +215,7 @@ class RemoteAdbMirror extends ChangeNotifier {
       final nextPrivacySupported = value['privacySupported'] == true;
       final nextPrivacyPhase = value['privacyState'] as String? ?? 'idle';
       final nextPrivacyError = value['privacyError'] as String? ?? '';
-      final frame = value['image'] as String?;
+      final frame = next == 'streaming' ? takeAdbFrame(ffi.sessionId.toString(), _owner, nextGeneration) : null;
       // Verified device Shell owns priority even while the private touch transport restarts.
       final priority = adbState is Map ? adbState['supported'] == true && adbState['connected'] == true
           : value['adbPriority'] == true;
@@ -260,11 +261,12 @@ class RemoteAdbMirror extends ChangeNotifier {
       screenshotSupported = nextScreenshotSupported;
       layoutSupported = nextLayoutSupported;
       if (frame != null && phase == 'streaming') {
-        image = base64Decode(frame);
-        rgbaWidth = (value['rgbaWidth'] as num? ?? 0).toInt();
-        rgbaHeight = (value['rgbaHeight'] as num? ?? 0).toInt();
-        sourceWidth = (value['sourceWidth'] as num? ?? 0).toInt();
-        sourceHeight = (value['sourceHeight'] as num? ?? 0).toInt();
+        final dimensions = ByteData.sublistView(frame, 0, 16);
+        rgbaWidth = dimensions.getUint32(0, Endian.little);
+        rgbaHeight = dimensions.getUint32(4, Endian.little);
+        sourceWidth = dimensions.getUint32(8, Endian.little);
+        sourceHeight = dimensions.getUint32(12, Endian.little);
+        image = Uint8List.sublistView(frame, 16);
       }
       hasFrame.value = phase == 'streaming' && image != null;
       if (changed) notifyListeners();

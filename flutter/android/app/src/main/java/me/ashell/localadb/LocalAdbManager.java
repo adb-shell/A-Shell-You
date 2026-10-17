@@ -128,7 +128,8 @@ public final class LocalAdbManager {
     Map<String, Object> status() {
         Map<String, Object> value = new HashMap<>();
         value.put("supported", Build.VERSION.SDK_INT >= 30);
-        value.put("apiVersion", 3);
+        value.put("apiVersion", 4);
+        value.put("textInputSupported", true);
         value.put("mirrorVersion", 2);
         value.put("connected", client.isConnected());
         value.put("paired", Build.VERSION.SDK_INT >= 30
@@ -155,7 +156,7 @@ public final class LocalAdbManager {
     private void execute(String owner, String requestId, String kind, Map<String, Object> args, Reply reply) {
         for (String key : args.keySet()) {
             if (!("port".equals(key) || "connectPort".equals(key)
-                    || "code".equals(key) || "command".equals(key)
+                    || "code".equals(key) || "command".equals(key) || "paste".equals(kind) && "text".equals(key)
                     || "cancel".equals(kind) && "requestId".equals(key))) {
                 reply.failure("invalid", "ADB 请求包含不支持的参数，请更新客户端后使用配对码连接。");
                 return;
@@ -174,6 +175,21 @@ public final class LocalAdbManager {
         }
         if (Build.VERSION.SDK_INT < 30) {
             reply.failure("unsupported", "配对码无线调试需要 Android 11 或以上版本。");
+            return;
+        }
+        if ("paste".equals(kind)) {
+            Object value = args.get("text");
+            if (!(value instanceof String) || ((String) value).isEmpty() || ((String) value).indexOf('\0') >= 0) {
+                reply.failure("invalid", "请输入非空且不含 NUL 的文本。"); return;
+            }
+            byte[] text = ((String) value).getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            if (text.length > 16384) {
+                reply.failure("invalid", "单次输入文本不能超过 16 KiB（UTF-8）。"); return;
+            }
+            if (transportChanging()) {
+                reply.failure("busy", "ADB 连接正在变更，请稍后重试。"); return;
+            }
+            touch.paste(owner, requestId, text, reply);
             return;
         }
         if (!("pair".equals(kind) || "pairConnect".equals(kind) || "discover".equals(kind)
@@ -456,6 +472,7 @@ public final class LocalAdbManager {
 
     private void cancelOwner(String owner, String requestId) {
         commands.cancel(owner, requestId);
+        touch.cancelPaste(owner, requestId);
         Iterator<Operation> pending = queue.iterator();
         while (pending.hasNext()) {
             Operation operation = pending.next();

@@ -119,7 +119,7 @@ final class LocalAdbMirror {
             stop("ADB 投屏启动或画面接收超时，请重试。");
         else if ("h264".equals(run.mode)) {
             try {
-                if (run.profile.maxSize() != AdbCaptureProfile.current(context).maxSize()) {
+                if (run.profile.maxSize() != AdbCaptureProfile.current(context).media().maxSize()) {
                     // Ordinary capture recalculates its integer divisor on rotation; do the same independently.
                     pendingPort = run.port; pendingMode = run.mode; stopCurrent("");
                 }
@@ -200,10 +200,11 @@ final class LocalAdbMirror {
         boolean streaming = false;
         byte[] previous = null;
         long lastSent = 0;
-        try (LocalAdbLayout layout = "layout".equals(run.mode) ? new LocalAdbLayout(context, run.client, run.cancelled) : null) {
+        try (LocalAdbScreenshot capture = new LocalAdbScreenshot();
+             LocalAdbLayout layout = "layout".equals(run.mode) ? new LocalAdbLayout(context, run.client, run.cancelled) : null) {
           while (!run.cancelled.get()) {
             long started = SystemClock.elapsedRealtime();
-            LocalAdbScreenshot.Frame screenshot = layout == null ? LocalAdbScreenshot.capture(run.client, run.cancelled) : layout.read();
+            LocalAdbScreenshot.Frame screenshot = layout == null ? capture.capture(run.client, run.cancelled) : layout.read();
             synchronized (this) {
                 if (active != run || run.cancelled.get()) return;
                 run.lastPacket = SystemClock.elapsedRealtime();
@@ -216,7 +217,7 @@ final class LocalAdbMirror {
                 }
             }
             if (layout == null) {
-                AdbCaptureProfile profile = new AdbCaptureProfile(screenshot.sourceWidth, screenshot.sourceHeight);
+                AdbCaptureProfile profile = new AdbCaptureProfile(screenshot.sourceWidth, screenshot.sourceHeight).media();
                 long interval = profile.screenshotIntervalMs(screenshot.jpeg.length);
                 Thread.sleep(Math.max(1, interval - (SystemClock.elapsedRealtime() - started)));
             }
@@ -337,7 +338,7 @@ final class LocalAdbMirror {
         final long id;
         final int port;
         final String mode;
-        final AdbCaptureProfile profile = AdbCaptureProfile.current(context);
+        final AdbCaptureProfile profile = AdbCaptureProfile.current(context).media();
         final LocalAdbClient client = new LocalAdbClient(context, true);
         final AtomicBoolean cancelled = new AtomicBoolean();
         volatile long lastPacket = SystemClock.elapsedRealtime();

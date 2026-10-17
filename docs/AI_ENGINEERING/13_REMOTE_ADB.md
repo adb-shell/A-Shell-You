@@ -1,5 +1,7 @@
 # AShell PC 远程 ADB
 
+test 分支增量（2026-10-17，[T002](../tasks/T-2026-10-17-002-adb-input-performance.md)）：ADB 菜单新增“远程输入”，显式读取电脑剪贴板或编辑文本后粘贴到手机当前输入框。Android `apiVersion=4` / `textInputSupported`，新增字段40方法 `paste(text)`，沿用会话控制权限；旧手机禁用此入口。UTF-8 上限16 KiB、请求JSON另有边界；不自动监听/同步剪贴板，不把文本拼入shell。scrcpy独立触摸连接发送SET_CLIPBOARD并等待ACK，最多4个请求排队、10秒超时；断开/取消不重放。ACK仅表示控制消息已处理，不保证目标输入框允许粘贴。普通剪贴板、无障碍及采集链无变更。仅V0，构建/设备验收待证；下方为main基线。
+
 当前核对：2026-10-16，main/`4d3c446`；[T001](../tasks/T-2026-10-16-001-adb-docs-sync.md) / [Baseline21](../BASELINE/21_ADB_RENDER_UI_BASELINE_2026-10-16.md)。PC负责远程输入，身份、配对记录、Shell验证和执行均属于Android进程。当前支持配对/连接、命令、撤销、状态推送、Shell栏及[独立ADB画面/触摸](14_ADB_MIRROR.md)。仅V0，未宣称构建或多PC真机验收通过。
 
 ## 配对与连接

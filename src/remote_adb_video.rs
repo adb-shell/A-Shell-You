@@ -2,6 +2,9 @@
 use hbb_common::message_proto::{Message, Misc, RemoteAdbVideo};
 
 const MAX_FRAME: usize = 2 * 1024 * 1024 + 65536;
+// 8 frames exhausted the ACK window at only 267 ms RTT / 30 FPS. Permit relay
+// round-trips up to 800 ms while retaining the independent 8 MiB per-viewer cap.
+const MAX_PENDING_FRAMES: usize = 24;
 
 fn message(packet: RemoteAdbVideo) -> Message {
     let mut misc = Misc::new();
@@ -295,7 +298,7 @@ pub mod android {
             // Allow normal relay RTT without dropping every fourth frame and
             // waiting for another keyframe. Bound bytes as well as frame count.
             let pending_bytes: usize = viewer.pending.iter().map(|(_, size)| *size).sum();
-            if viewer.pending.len() >= 8 || pending_bytes + packet.data.len() > 8 * 1024 * 1024 {
+            if viewer.pending.len() >= MAX_PENDING_FRAMES || pending_bytes + packet.data.len() > 8 * 1024 * 1024 {
                 viewer.need_key = true; continue;
             }
             if viewer.need_key && !keyframe { continue; }
@@ -311,14 +314,14 @@ pub mod android {
 pub mod pc {
     use super::*;
     use crate::{client::{Data, Interface}, flutter::sessions};
-    use hbb_common::{base64::{engine::general_purpose::STANDARD, Engine}, message_proto::{video_frame, EncodedVideoFrame, EncodedVideoFrames}};
+    use hbb_common::message_proto::{video_frame, EncodedVideoFrame, EncodedVideoFrames};
     use scrap::{codec::Decoder, CodecFormat, ImageFormat, ImageRgb, ImageTexture};
     use serde_json::{json, Value};
     use image::ImageDecoder;
     use std::{collections::HashMap, sync::{Arc, Mutex, mpsc::{sync_channel, SyncSender}, atomic::{AtomicBool, Ordering}}, time::{Duration, Instant}};
     use uuid::Uuid;
 
-    struct View { generation: u64, revision: u64, adb_state: Option<Value>, state: String, error: String, image: Option<String>, supported: bool,
+    struct View { generation: u64, revision: u64, adb_state: Option<Value>, state: String, error: String, image: Option<Vec<u8>>, supported: bool,
         adb_priority: bool, touch_ready: bool, input_error: String, format: String, screenshot_supported: bool,
         privacy_supported: bool, privacy_state: String, privacy_error: String,
         layout_supported: bool, source_width: u32, source_height: u32, rgba_width: u32, rgba_height: u32 }
@@ -326,6 +329,47 @@ pub mod pc {
         resync: Arc<AtomicBool>, live: Arc<AtomicBool>, since: Instant, last_receive: Instant, last_watch: Instant,
         touch_sequence: u64, command_sequence: u64, privacy_sequence: u64 }
     lazy_static::lazy_static! { static ref ENTRIES: Mutex<HashMap<Uuid, Entry>> = Mutex::new(HashMap::new()); }
+
+    // Local-only binary frame: four little-endian dimensions followed by JPEG or RGBA.
+    // Keep only the newest decoded frame; no base64 or multi-megabyte JSON on the UI thread.
+    fn binary_frame(data: &[u8], rgba_width: u32, rgba_height: u32, source_width: u32, source_height: u32) -> Vec<u8> {
+        let mut frame = Vec::with_capacity(16 + data.len());
+        for value in [rgba_width, rgba_height, source_width, source_height] { frame.extend_from_slice(&value.to_le_bytes()); }
+        frame.extend_from_slice(data);
+        frame
+    }
+
+    fn take_frame(session: &str, owner: &str, generation: u64) -> Option<Vec<u8>> {
+        let session_id = Uuid::parse_str(session).ok()?;
+        let entries = ENTRIES.lock().ok()?;
+        let entry = entries.get(&session_id)?;
+        if entry.token != owner || !entry.live.load(Ordering::Acquire) { return None; }
+        let mut view = entry.view.lock().ok()?;
+        // A state transition between the JSON poll and this call cannot mix old/new media.
+        if view.generation != generation || view.state != "streaming" { return None; }
+        view.image.take()
+    }
+
+    /// Caller provides valid UTF-8 C strings and a writable length. The returned allocation
+    /// belongs to the caller until ashell_free_adb_frame(ptr, length), exactly once.
+    #[no_mangle]
+    pub unsafe extern "C" fn ashell_take_adb_frame(session: *const std::os::raw::c_char,
+        owner: *const std::os::raw::c_char, generation: u64, length: *mut u32) -> *mut u8 {
+        if length.is_null() { return std::ptr::null_mut(); }
+        *length = 0;
+        if session.is_null() || owner.is_null() { return std::ptr::null_mut(); }
+        let Ok(session) = std::ffi::CStr::from_ptr(session).to_str() else { return std::ptr::null_mut(); };
+        let Ok(owner) = std::ffi::CStr::from_ptr(owner).to_str() else { return std::ptr::null_mut(); };
+        let Some(frame) = take_frame(session, owner, generation) else { return std::ptr::null_mut(); };
+        let frame = frame.into_boxed_slice();
+        *length = frame.len() as u32;
+        Box::into_raw(frame) as *mut u8
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ashell_free_adb_frame(data: *mut u8, length: u32) {
+        if !data.is_null() { drop(Box::from_raw(std::ptr::slice_from_raw_parts_mut(data, length as usize))); }
+    }
 
     fn send(session_id: Uuid, packet: RemoteAdbVideo) -> bool {
         let Some(session) = sessions::get_session_by_session_id(&session_id) else { return false; };
@@ -349,7 +393,7 @@ pub mod pc {
             if entries.len() >= 32 { return None; }
             let session = sessions::get_session_by_session_id(&session_id)?;
             let token = owner.to_owned();
-            let (tx, rx) = sync_channel::<RemoteAdbVideo>(8);
+            let (tx, rx) = sync_channel::<RemoteAdbVideo>(MAX_PENDING_FRAMES);
             let view = Arc::new(Mutex::new(View { generation: 0, revision: 0, adb_state: None, state: "waiting".into(), error: String::new(), image: None, supported: false,
                 adb_priority: false, touch_ready: false, input_error: String::new(), format: String::new(), screenshot_supported: false,
                 privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(),
@@ -393,7 +437,7 @@ pub mod pc {
                             if jpeg.dimensions() != (packet.width, packet.height) { return Err("ADB 截图尺寸无效。".into()); }
                             if let Ok(mut view) = view.lock() {
                                 if view.generation == packet.generation && view.state == "streaming" && live.load(Ordering::Acquire) {
-                                    view.image = Some(STANDARD.encode(&packet.data));
+                                    view.image = Some(binary_frame(&packet.data, 0, 0, packet.source_width, packet.source_height));
                                     view.rgba_width = 0; view.rgba_height = 0;
                                     view.source_width = packet.source_width;
                                     view.source_height = packet.source_height;
@@ -426,7 +470,7 @@ pub mod pc {
                             // ABGR's little-endian memory is RGBA. Pass the decoded
                             // pixels locally instead of JPEG encoding/decoding again.
                             // The network stream remains compressed H.264.
-                            let image = STANDARD.encode(&rgb.raw);
+                            let image = binary_frame(&rgb.raw, rgb.w as u32, rgb.h as u32, packet.source_width, packet.source_height);
                             if let Ok(mut view) = view.lock() {
                                 if view.generation == generation && view.state == "streaming" && live.load(Ordering::Acquire) {
                                     view.image = Some(image);
@@ -480,7 +524,7 @@ pub mod pc {
                 view.state = "error".into();
                 view.error = "远端未响应 ADB 投屏订阅，请确认两端均已更新并保持连接。".into();
             }
-            let snapshot = json!({"state":view.state,"error":view.error,"generation":view.generation,"revision":view.revision,"adbState":view.adb_state,"image":view.image.take(),"supported":view.supported,
+            let snapshot = json!({"state":view.state,"error":view.error,"generation":view.generation,"revision":view.revision,"adbState":view.adb_state,"supported":view.supported,
                 "adbPriority":view.adb_priority,"touchReady":view.touch_ready,"inputError":view.input_error,
                 "format":view.format,"screenshotSupported":view.screenshot_supported,"layoutSupported":view.layout_supported,
                 "sourceWidth":view.source_width,"sourceHeight":view.source_height,

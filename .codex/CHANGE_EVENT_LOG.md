@@ -8,6 +8,12 @@ Last Updated：2026-10-17（构建模式名称调整）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261017-T002-01：test ADB输入与媒体优化
+
+- Task T-2026-10-17-002；起点af1c72d clean，用户授权test分支代码/提交推送/单次CI，不监控。
+- 12份独立ADB源码：UTF-8粘贴及ACK/取消；二进制帧所有权；回执窗口/媒体上限/原始截图。最小合同及任务/记忆同步；普通链路零差异。
+- V0通过，产品编译/真机NOT_RUN；Git及dispatch接受证据见最终交付，不声称CI通过。STATE/WORK-20261017-002；无外部资产或Decision增量。
+
 ## CE-20261017-T001-01：构建模式标签同步替换
 
 - Task：T-2026-10-17-001；source main/130f748，初始clean。

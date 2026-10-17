@@ -1,5 +1,7 @@
 # AShell ADB 投屏、无视、穿透、黑屏与触摸
 
+test 分支增量（2026-10-17，[T002](../tasks/T-2026-10-17-002-adb-input-performance.md)）：PC ADB帧通过独立C ABI传递二进制，状态JSON不再携带base64；按session/owner/generation取最新帧，Dart复制后归还Rust缓冲。ADB每PC回执/解码窗口从8扩为24帧，Android保留8 MiB在途上限。投屏/截图仍用普通width/350比例与选中画质，媒体最长边上限960；穿透绘图/遮罩/物理触摸尺寸保持。截图优先系统原始像素，复用有界缓冲及Bitmap，不支持格式时本次运行回退PNG；网络仍只传缩放JPEG。小截图目标帧率上限12，仍受采集耗时和码率预算约束，不承诺截图等同视频实测帧率。没有改普通视频/截图/无障碍链或协议字段。当前仅V0；下方main基线描述的8帧、1280媒体上限和base64流程被本段的test实现取代。
+
 当前源码核对：2026-10-16，main/`4d3c446`，初始工作区 clean。本文为当前合同；历史任务和基线按各自提交解释。最新 [T001](../tasks/T-2026-10-16-001-adb-docs-sync.md)、[Baseline21](../BASELINE/21_ADB_RENDER_UI_BASELINE_2026-10-16.md)、[ADR-0026](../ADR/0026-adb-app-side-rendering.md) 补录节点采集与App绘制分离、遮罩文字及PC状态UI；[ADR-0025](../ADR/0025-adb-lanes-and-state-sync.md) 的通道隔离与同步继续有效。仅 V0，当前构建和真机兼容性尚未取得通过证据。
 
 ## 使用与界面

@@ -6,6 +6,12 @@ Last Updated：2026-10-17（构建模式名称调整）
 
 Mode：`append-only task-level index`
 
+## T-2026-10-17-002：test ADB远程输入与媒体性能
+
+- 从main/af1c72d创建test，保留既有CI提交；新增显式Unicode粘贴、二进制帧交接、24帧窗口、960媒体上限及原始截图/PNG回退。普通采集/无障碍/剪贴板链保持。
+- V0范围、ABI、编码和diff检查通过；未运行本地产品验证，设备流畅度待证。按当前授权提交推送test并单次Build-Clients-New Both/常规编译，不监控；最终结果见交付。
+- [任务](../docs/tasks/T-2026-10-17-002-adb-input-performance.md) / STATE-20261017-002 / CE-20261017-T002-01。Decision/ADR/资产：N/A — no decision delta，延伸既有ADB边界。
+
 ## T-2026-10-17-001：构建模式“原始编译”
 
 - Source：main/130f748，初始clean；仅新工作流标签及必要记录。

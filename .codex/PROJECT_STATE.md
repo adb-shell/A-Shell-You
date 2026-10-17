@@ -1,9 +1,11 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261017-001`
+State Revision：`STATE-20261017-002`
 Last Updated / Observed At：2026-10-17（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+最新test增量：[T-2026-10-17-002](../docs/tasks/T-2026-10-17-002-adb-input-performance.md)，从main/af1c72d（clean）创建test，保留既有未推送CI文案提交。新增显式ADB Unicode粘贴；ADB媒体二进制本地交接、24帧/8MiB回执窗口、960媒体上限、原始截图/PNG兼容回退。普通采集/无障碍/输入链零修改。V0检查完成；用户授权提交推送test并单次Build-Clients-New（Both/常规编译），不监控。实际SHA/dispatch接受结果见交付；产品构建及流畅度实测待证。WORK-20261017-002 / CE-20261017-T002-01，无Decision/ADR/资产增量。下方为main历史观察。
 
 最新局部观察：[T-2026-10-17-001](../docs/tasks/T-2026-10-17-001-build-mode-label.md)，起点main/130f748，初始clean。仅将新工作流的“完整编译”统一改名为“原始编译”，默认“常规编译”和运行逻辑保持；十处精确替换V0通过。用户授权本地提交，本次不push、不dispatch、不构建。当前Task/Event：T-2026-10-17-001 / CE-20261017-T001-01，WORK-20261017-001；提交结果以Git和会话交付为准。无Decision/ADR增量，产品与发布验证状态未提升。下方源码/基线表保留2026-10-16观察，未对期间其他提交作全仓复核。
 

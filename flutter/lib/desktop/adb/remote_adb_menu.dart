@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'remote_adb_session_state.dart';
 const remoteAdbActions = <String, String>{
   'pair': '远程 ADB 连接配对',
   'shell': '远程 ADB 命令',
+  'paste': '远程输入',
   'revoke': '撤销 ADB 配对',
   'status': '刷新 ADB 状态',
   'disconnect': '断开 ADB 连接',
@@ -38,6 +40,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   final pairCode = TextEditingController();
   final connectPort = TextEditingController();
   final command = TextEditingController(text: 'id');
+  final inputText = TextEditingController();
   late final RemoteAdbController adb = RemoteAdbController(widget.sessionId,
       sessionState: widget.sessionState);
   String mode = 'auto';
@@ -52,6 +55,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   @override void dispose() {
     adb.dispose();
     pairPort.dispose(); pairCode.dispose(); connectPort.dispose(); command.dispose();
+    inputText.dispose();
     super.dispose();
   }
 
@@ -168,10 +172,65 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
             style: const TextStyle(fontFamily: 'monospace')))),
   ];
 
+  Future<void> _readClipboard() async {
+    try {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      if (!mounted) return;
+      final text = data?.text;
+      if (text == null || text.isEmpty) {
+        setState(() => validation = '电脑剪贴板中没有文本。');
+        return;
+      }
+      inputText.text = text;
+      setState(() => validation = '');
+    } catch (_) {
+      if (mounted) setState(() => validation = '无法读取电脑剪贴板，也可直接在文本框中粘贴。');
+    }
+  }
+
+  void _sendText() {
+    final text = inputText.text;
+    if (text.isEmpty || text.contains('\u0000')) {
+      setState(() => validation = '请输入非空且不含 NUL 的文本。');
+      return;
+    }
+    // Reserve space for the remote request envelope as JSON escapes can expand text.
+    if (utf8.encode(text).length > 16384 ||
+        utf8.encode(jsonEncode({'method': 'paste', 'text': text})).length > 30000) {
+      setState(() => validation = '文本过长，请分段输入（单次 UTF-8 最多 16 KiB）。');
+      return;
+    }
+    setState(() => validation = '');
+    adb.run('paste', {'text': text});
+  }
+
+  List<Widget> _paste() => [
+    const Text('先在手机画面中点选输入框，再粘贴文本。支持中文、换行和表情；无需开启普通共享或 ADB 投屏。'),
+    const SizedBox(height: 12),
+    if (!adb.stale && !adb.textInputSupported)
+      const Text('手机版本尚不支持远程输入，请更新 Android 客户端。'),
+    if (!adb.connected)
+      OutlinedButton(onPressed: adb.ready ? () => adb.run('connect', {'port': 0}) : null,
+          child: const Text('连接已配对的 ADB')),
+    TextField(controller: inputText, enabled: !adb.busy, minLines: 4, maxLines: 8,
+        autocorrect: false, enableSuggestions: false,
+        decoration: const InputDecoration(labelText: '输入或粘贴文本', border: OutlineInputBorder())),
+    const SizedBox(height: 12),
+    Wrap(spacing: 12, runSpacing: 8, children: [
+      OutlinedButton.icon(onPressed: adb.busy ? null : _readClipboard,
+          icon: const Icon(Icons.content_paste), label: const Text('读取电脑剪贴板')),
+      ElevatedButton.icon(onPressed: adb.ready && adb.connected && adb.textInputSupported ? _sendText : null,
+          icon: const Icon(Icons.send), label: const Text('粘贴到手机')),
+    ]),
+    const SizedBox(height: 12),
+    const Text('仅发送本次文本，会替换手机剪贴板。输入框须允许粘贴；取消或关闭窗口不能撤回已发送的内容。'),
+  ];
+
   List<Widget> _content() {
     switch (widget.action) {
       case 'pair': return _pairing();
       case 'shell': return _shell();
+      case 'paste': return _paste();
       case 'revoke': return [
         const Text('将清除手机上本应用的 ADB 身份与配对记录、取消排队操作并断开所有 PC 共用的 ADB。之后需要重新配对。'),
         const SizedBox(height: 12),
@@ -199,7 +258,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   @override Widget build(BuildContext context) => AnimatedBuilder(animation: adb, builder: (context, _) {
     return LayoutBuilder(builder: (context, bounds) {
       final width = min(640.0, max(0.0, bounds.maxWidth - 32));
-      final height = min(widget.action == 'pair' || widget.action == 'shell' ? 680.0 : 450.0,
+      final height = min(widget.action == 'pair' || widget.action == 'shell' || widget.action == 'paste' ? 680.0 : 450.0,
           max(0.0, bounds.maxHeight - 32));
       final dx = max(0.0, (bounds.maxWidth - width) / 2 - 8);
       final dy = max(0.0, (bounds.maxHeight - height) / 2 - 8);
