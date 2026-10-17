@@ -9,10 +9,12 @@ import 'remote_adb_mirror_view.dart';
 /// The ordinary canvas stays at (0, 0); only its viewport width changes.
 /// Both children stay mounted when a source closes, preserving their session ownership.
 class RemoteDisplayLayout extends StatefulWidget {
-  const RemoteDisplayLayout({super.key, required this.ffi, required this.mirror, required this.ordinary});
+  const RemoteDisplayLayout({super.key, required this.ffi, required this.mirror, required this.ordinary,
+    required this.onAdbFocusRequested});
   final FFI ffi;
   final RemoteAdbMirror mirror;
   final Widget ordinary;
+  final VoidCallback onAdbFocusRequested;
 
   @override
   State<RemoteDisplayLayout> createState() => _RemoteDisplayLayoutState();
@@ -53,7 +55,8 @@ class _RemoteDisplayLayoutState extends State<RemoteDisplayLayout> {
             child: Offstage(offstage: !adb && _ordinaryVisible,
               child: ClipRect(child: AnimatedBuilder(animation: widget.mirror, builder: (context, _) =>
                 adb || widget.mirror.active || widget.mirror.error.isNotEmpty
-                    ? RemoteAdbMirrorView(mirror: widget.mirror, alignment: both ? Alignment.centerLeft : Alignment.center)
+                    ? RemoteAdbMirrorView(mirror: widget.mirror, onFocusRequested: widget.onAdbFocusRequested,
+                        alignment: both ? Alignment.centerLeft : Alignment.center)
                     : const SizedBox.expand())))),
           if (both) Positioned(left: ordinaryWidth, top: 0, bottom: 0, width: dividerWidth,
             child: ColoredBox(color: Theme.of(context).dividerColor.withOpacity(0.65))),

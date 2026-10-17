@@ -1,5 +1,17 @@
 # AShell PC 远程 ADB
 
+test T006（2026-10-18）：仅 ADB、无原键盘权限时复用 PC 原剪贴板监听，通过字段40 `clipboard(text)` 向 Android 同步纯文本；`clipboardSyncSupported=true` 与真实 connected 协商，尊重只读/剪贴板权限及原首次同步选项。scrcpy SET_CLIPBOARD(paste=false) 只更新手机剪贴板，Ctrl+V 仍为显式 paste=true；自动同步1在途+1最新待发，显式4项队列独立优先，断线/关闭/取消清理。单次UTF-8≤16KiB且JSON≤32KiB，无新增监听或网络轮询。已有无障碍权限时继续原同步/模拟输入链；原双向行为不改，新增通道仅PC→Android文本，不承诺各输入法必定显示建议。见[T006](../tasks/T-2026-10-18-006-adb-clipboard-sync.md)，V0，构建/真机待证。
+
+test T005（2026-10-18）：普通键盘经原 KeyEvent 在 Android 已认证入口分流到独立 ADB 输入连接，保留原 modifiers，覆盖 Map/Legacy/Translate 的字母数字、符号和常用编辑键；无 ADB 仍走原无障碍。各 PC 修饰键独立，键盘队列128项，完整 down/up、不留设备按下；普通输入不写剪贴板，Ctrl+V 仍在 PC 前置截获并走原 Unicode paste/ACK。中文/表情等不在虚拟键盘映射范围的内容继续用 Ctrl+V/远程输入；不声称 UHID/游戏长按或任意输入法支持。无新 peer 字段；新两端配套验证。见[T005](../tasks/T-2026-10-18-005-adb-keyboard.md)，V0，构建/真机待证。
+
+test T004（2026-10-18）：Shell 按钮文案由“点亮屏幕”改为“点亮屏”，命令保持。原本仅供 ADB 的本地 Ctrl+V 分流扩展无 ADB 情况：当前会话具有键盘/剪贴板权限且非只读时，PC 按需读取文本，经既有 `sessionInputString / KeyEvent.seq` 输入到无障碍；ADB 可用继续优先 ADB。新增 `accessibilityPasteRequests` 仅为 PC Rust→Dart 本地 poll 字段，不是 peer 协议。保留大小校验、最多4项、按键重复/释放去重、epoch/instance/权限复查；不增加剪贴板监听或网络轮询，不修改普通剪贴板同步。两端更新后验证，见[T004](../tasks/T-2026-10-18-004-accessibility-paste-cursor.md)；下方各增量按历史时点理解。
+
+test 增量（2026-10-18，[T002](../tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)）：既有状态通道携带本应用电池优化豁免状态，多个 PC 共用 Android 的 PowerManager 回读结果，旧端忽略新增字段；不增加 PC 轮询。“刷新 ADB 状态”弹窗显示辅助保活状态/失败说明。Shell 栏新增“点亮屏幕”，经原鉴权 shell RPC 发送 `input keyevent 224`，不依赖投屏、无视、无障碍；仍受远控权限、ADB 连接与命令队列约束。仅唤醒，不自动解锁或关闭遮罩。V0，正式效果待证。
+
+test 增量（2026-10-18，[T001](../tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)）：已有“远程输入”弹窗自动聚焦，回车/数字键盘回车或“确定”发送，Shift+Enter 换行；输入法组合文字期间不拦截回车，按住回车不重复发送。发送期间只读，成功回执后清空并重新聚焦，失败保留文本。沿用原文本校验、paste RPC 与取消生命周期；普通/ADB 画面的 Ctrl+V 链路不改。V0，Windows 输入法与真机输入效果待验证。
+
+test 分支增量（2026-10-17，[T002](../tasks/T-2026-10-17-002-adb-input-performance.md)、[T003](../tasks/T-2026-10-17-003-adb-paste-shortcut.md)）：远程画面获得焦点后，Ctrl+V 在 Android ADB 可用且支持文本输入时直接粘贴电脑文本；native/Flutter 键盘入口共用分流，按 session 定位，长按/释放不重复。ADB 视口补齐焦点；无 ADB 保留原快捷键路由，遵守只读/禁用剪贴板设置。菜单“远程输入”仍可编辑后发送。Android `apiVersion=4` / `textInputSupported`、字段40 `paste(text)`，UTF-8 最多16 KiB及JSON大小检查；文本不拼入shell、不记录，不增加后台剪贴板监听。沿用独立scrcpy输入连接、4项队列和10秒ACK，关闭/重连/撤销取消待发送操作且不重放。ACK仅表示消息已处理，不保证输入框允许粘贴。普通剪贴板实现、无障碍及采集保持；公共键盘入口仅新增ADB快捷键分流。仅V0，构建/设备验收待证；下方为main基线。
+
 当前核对：2026-10-16，main/`4d3c446`；[T001](../tasks/T-2026-10-16-001-adb-docs-sync.md) / [Baseline21](../BASELINE/21_ADB_RENDER_UI_BASELINE_2026-10-16.md)。PC负责远程输入，身份、配对记录、Shell验证和执行均属于Android进程。当前支持配对/连接、命令、撤销、状态推送、Shell栏及[独立ADB画面/触摸](14_ADB_MIRROR.md)。仅V0，未宣称构建或多PC真机验收通过。
 
 ## 配对与连接

@@ -37,6 +37,7 @@ public final class LocalAdbManager {
     private final LocalAdbTouch touch;
     private final LocalAdbPrivacy privacy;
     private final LocalAdbCommands commands;
+    private final LocalAdbKeepAlive keepAlive;
     private final SharedPreferences records;
     private final ExecutorService worker = Executors.newSingleThreadExecutor(
             task -> new Thread(task, "ashell-local-adb"));
@@ -76,6 +77,7 @@ public final class LocalAdbManager {
         touch = new LocalAdbTouch(context, client::isConnected);
         privacy = new LocalAdbPrivacy(context, client::isConnected);
         commands = new LocalAdbCommands(context, main, client::isConnected, this::changed);
+        keepAlive = new LocalAdbKeepAlive(context, commands, this::changed);
         RemoteAdbNative.attach(this);
         mirror.attach(this);
         changed();
@@ -93,6 +95,7 @@ public final class LocalAdbManager {
         }
         observedConnected = connected;
         if (connected && !transportChanging()) touch.enable(records.getInt("connectPort", 0));
+        keepAlive.update(connected && !transportChanging(), records.getInt("connectPort", 0));
     }
 
     // Independent JNI entry; no long-running video operation occupies the shell queue.
@@ -119,6 +122,10 @@ public final class LocalAdbManager {
         return touch.legacy(owner, kind, mask, x, y, allowed);
     }
 
+    public boolean routeAdbKey(int owner, byte[] event, boolean allowed) {
+        return touch.key(owner, event, allowed);
+    }
+
     public void injectMirrorTouch(int owner, int action, int x, int y, int width, int height) {
         touch.normalized(owner, action, x, y, width, height);
     }
@@ -128,7 +135,9 @@ public final class LocalAdbManager {
     Map<String, Object> status() {
         Map<String, Object> value = new HashMap<>();
         value.put("supported", Build.VERSION.SDK_INT >= 30);
-        value.put("apiVersion", 3);
+        value.put("apiVersion", 4);
+        value.put("textInputSupported", true);
+        value.put("clipboardSyncSupported", true);
         value.put("mirrorVersion", 2);
         value.put("connected", client.isConnected());
         value.put("paired", Build.VERSION.SDK_INT >= 30
@@ -145,6 +154,7 @@ public final class LocalAdbManager {
         value.put("instance", instanceId);
         value.put("phase", current == null ? "" : current.phase);
         value.put("discovery", discovered);
+        keepAlive.addStatus(value);
         return value;
     }
 
@@ -156,6 +166,7 @@ public final class LocalAdbManager {
         for (String key : args.keySet()) {
             if (!("port".equals(key) || "connectPort".equals(key)
                     || "code".equals(key) || "command".equals(key)
+                    || ("paste".equals(kind) || "clipboard".equals(kind)) && "text".equals(key)
                     || "cancel".equals(kind) && "requestId".equals(key))) {
                 reply.failure("invalid", "ADB 请求包含不支持的参数，请更新客户端后使用配对码连接。");
                 return;
@@ -174,6 +185,22 @@ public final class LocalAdbManager {
         }
         if (Build.VERSION.SDK_INT < 30) {
             reply.failure("unsupported", "配对码无线调试需要 Android 11 或以上版本。");
+            return;
+        }
+        if ("paste".equals(kind) || "clipboard".equals(kind)) {
+            Object value = args.get("text");
+            if (!(value instanceof String) || ((String) value).isEmpty() || ((String) value).indexOf('\0') >= 0) {
+                reply.failure("invalid", "请输入非空且不含 NUL 的文本。"); return;
+            }
+            byte[] text = ((String) value).getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            if (text.length > 16384) {
+                reply.failure("invalid", "单次输入文本不能超过 16 KiB（UTF-8）。"); return;
+            }
+            if (transportChanging()) {
+                reply.failure("busy", "ADB 连接正在变更，请稍后重试。"); return;
+            }
+            if ("clipboard".equals(kind)) touch.syncClipboard(owner, requestId, text, reply);
+            else touch.paste(owner, requestId, text, reply);
             return;
         }
         if (!("pair".equals(kind) || "pairConnect".equals(kind) || "discover".equals(kind)
@@ -259,6 +286,7 @@ public final class LocalAdbManager {
             mirror.stop("");
             touch.stop();
             privacy.stop();
+            keepAlive.update(false, 0);
             commands.cancel(null, null);
         }
         current = operation;
@@ -456,6 +484,7 @@ public final class LocalAdbManager {
 
     private void cancelOwner(String owner, String requestId) {
         commands.cancel(owner, requestId);
+        touch.cancelPaste(owner, requestId);
         Iterator<Operation> pending = queue.iterator();
         while (pending.hasNext()) {
             Operation operation = pending.next();
@@ -503,6 +532,10 @@ public final class LocalAdbManager {
 
     public void disconnectRemote(String owner) {
         main.post(() -> cancelOwner("remote:" + owner));
+    }
+
+    public void cancelClipboardSync(String owner) {
+        main.post(() -> touch.cancelClipboardSync("remote:" + owner));
     }
 
     private static final class Operation {

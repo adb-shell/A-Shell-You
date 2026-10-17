@@ -2,20 +2,31 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import '../../common.dart' show isWindows;
 import '../../consts.dart';
+import '../../models/platform_model.dart' show bind;
 import 'remote_adb_mirror.dart';
 
 /// Inline ADB surface. Its pointer events never enter the ordinary image canvas.
 class RemoteAdbMirrorView extends StatelessWidget {
-  const RemoteAdbMirrorView({super.key, required this.mirror, this.alignment = Alignment.center});
+  const RemoteAdbMirrorView({super.key, required this.mirror, required this.onFocusRequested,
+    this.alignment = Alignment.center});
   final RemoteAdbMirror mirror;
+  final VoidCallback onFocusRequested;
   final Alignment alignment;
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: Listenable.merge([mirror, mirror.frameUpdates]),
     builder: (context, _) {
       final error = mirror.error.isNotEmpty ? mirror.error : mirror.inputError;
-      return ColoredBox(color: kColorCanvas, child: Listener(behavior: HitTestBehavior.opaque,
+      return MouseRegion(onEnter: (_) {
+        bind.hostStopSystemKeyPropagate(stopped: false);
+        if (!isWindows) { onFocusRequested(); mirror.ffi.inputModel.enterOrLeave(true); }
+      }, onExit: (_) {
+        bind.hostStopSystemKeyPropagate(stopped: true);
+        if (!isWindows) mirror.ffi.inputModel.enterOrLeave(false);
+      }, child: ColoredBox(color: kColorCanvas, child: Listener(behavior: HitTestBehavior.opaque,
+        onPointerDown: (_) => onFocusRequested(),
         child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () {}, onPanUpdate: (_) {},
           child: Stack(fit: StackFit.expand, children: [
             if (mirror.image != null) _AdbFrame(key: ValueKey(mirror.frameGeneration), bytes: mirror.image!, mirror: mirror,
@@ -30,7 +41,7 @@ class RemoteAdbMirrorView extends StatelessWidget {
                 child: Text(error,
                   textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 11)),
               )))),
-          ]))));
+          ])))));
     });
 }
 

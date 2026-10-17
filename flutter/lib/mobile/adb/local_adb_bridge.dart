@@ -8,6 +8,10 @@ class LocalAdbStatus {
   final bool paired;
   final int connectPort;
   final String phase;
+  final bool keepAliveSupported;
+  final bool? keepAliveExempt;
+  final bool keepAliveBusy;
+  final String keepAliveError;
 
   const LocalAdbStatus({
     this.supported = false,
@@ -17,6 +21,10 @@ class LocalAdbStatus {
     this.paired = false,
     this.connectPort = 0,
     this.phase = '',
+    this.keepAliveSupported = false,
+    this.keepAliveExempt,
+    this.keepAliveBusy = false,
+    this.keepAliveError = '',
   });
 
   factory LocalAdbStatus.fromMap(Map<dynamic, dynamic> value) => LocalAdbStatus(
@@ -27,7 +35,18 @@ class LocalAdbStatus {
         paired: value['paired'] == true,
         connectPort: (value['connectPort'] as num?)?.toInt() ?? 0,
         phase: value['phase'] as String? ?? '',
+        keepAliveSupported: value['keepAliveSupported'] == true,
+        keepAliveExempt: value['keepAliveExempt'] as bool?,
+        keepAliveBusy: value['keepAliveBusy'] == true,
+        keepAliveError: value['keepAliveError'] as String? ?? '',
       );
+
+  String get keepAliveSummary {
+    if (keepAliveExempt == true) return '已豁免电池优化';
+    if (keepAliveBusy) return '正在设置电池优化豁免…';
+    final state = keepAliveExempt == null ? '状态未确认' : '未豁免电池优化';
+    return keepAliveError.isEmpty ? state : '$state：$keepAliveError';
+  }
 }
 
 class LocalAdbOutput {

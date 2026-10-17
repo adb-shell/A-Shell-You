@@ -2,6 +2,9 @@
 use hbb_common::message_proto::{Message, Misc, RemoteAdbVideo};
 
 const MAX_FRAME: usize = 2 * 1024 * 1024 + 65536;
+// 8 frames exhausted the ACK window at only 267 ms RTT / 30 FPS. Permit relay
+// round-trips up to 800 ms while retaining the independent 8 MiB per-viewer cap.
+const MAX_PENDING_FRAMES: usize = 24;
 
 fn message(packet: RemoteAdbVideo) -> Message {
     let mut misc = Misc::new();
@@ -196,6 +199,21 @@ pub mod android {
 
     pub fn release_touch(owner: i32) { invoke_ints("releaseTouchOwner", "(I)V", &[owner]); }
 
+    /// Preserve the original KeyEvent (including modifiers) before the Accessibility conversion.
+    pub fn route_key(owner: i32, event: &hbb_common::message_proto::KeyEvent, allowed: bool) -> bool {
+        use hbb_common::protobuf::Message as _;
+        let Ok(bridge) = BRIDGE.lock() else { return false; };
+        let Some(bridge) = bridge.as_ref() else { return false; };
+        let Ok(mut env) = bridge.vm.attach_current_thread() else { return false; };
+        let Ok(data) = event.write_to_bytes() else { return true; };
+        let result = env.with_local_frame(8, |env| -> jni::errors::Result<bool> {
+            let data = env.byte_array_from_slice(&data)?;
+            env.call_method(bridge.manager.as_obj(), "routeAdbKey", "(I[BZ)Z", &[
+                JValue::Int(owner), JValue::Object(&JObject::from(data)), JValue::Bool(allowed as u8)])?.z()
+        });
+        match result { Ok(consumed) => consumed, Err(_) => { let _ = env.exception_clear(); true } }
+    }
+
     /// True consumes this pointer event and prevents any Accessibility injection.
     pub fn route_touch(owner: i32, kind: i32, mask: i32, x: i32, y: i32, allowed: bool) -> bool {
         if kind != 0 && !matches!(mask, 0 | 8 | 16 | 9 | 10 | 17 | 18 | 3 | 4) { return false; }
@@ -243,12 +261,13 @@ pub mod android {
             .map(|q| (q.latest_quality(), q.fps().clamp(1, 30)))
             .unwrap_or((scrap::codec::Quality::Balanced, 15));
         let ratio = quality.ratio().clamp(0.1, 2.0);
-        // Same selected quality, with a bounded budget for this additional independent stream.
+        // Honor the selected quality at the scaled resolution. A flat 1 Mbps ceiling
+        // made Best and Balanced converge on taller screens. Dimensions/ratio are bounded.
         let bitrate = ((width * height) as f32 * 2.0 * ratio / scrap::codec::BR_BALANCED) as i32;
         let jpeg = match quality { scrap::codec::Quality::Low => 60, scrap::codec::Quality::Best => 85,
             scrap::codec::Quality::Custom(_) => (60.0 + ratio * 20.0).round().clamp(50.0, 90.0) as i32, _ => 75 };
         let Ok(array) = env.new_int_array(3) else { return std::ptr::null_mut(); };
-        if env.set_int_array_region(&array, 0, &[bitrate.clamp(200000, 1000000), fps as i32, jpeg]).is_err() {
+        if env.set_int_array_region(&array, 0, &[bitrate.max(200000), fps as i32, jpeg]).is_err() {
             return std::ptr::null_mut();
         }
         array.into_raw()
@@ -295,7 +314,10 @@ pub mod android {
             // Allow normal relay RTT without dropping every fourth frame and
             // waiting for another keyframe. Bound bytes as well as frame count.
             let pending_bytes: usize = viewer.pending.iter().map(|(_, size)| *size).sum();
-            if viewer.pending.len() >= 8 || pending_bytes + packet.data.len() > 8 * 1024 * 1024 {
+            // Independent screenshots need no reference frames. Keep a short window
+            // so a slow PC cannot accumulate seconds of obsolete still images.
+            let pending_limit = if screenshot != 0 { 4 } else { MAX_PENDING_FRAMES };
+            if viewer.pending.len() >= pending_limit || pending_bytes + packet.data.len() > 8 * 1024 * 1024 {
                 viewer.need_key = true; continue;
             }
             if viewer.need_key && !keyframe { continue; }
@@ -311,21 +333,168 @@ pub mod android {
 pub mod pc {
     use super::*;
     use crate::{client::{Data, Interface}, flutter::sessions};
-    use hbb_common::{base64::{engine::general_purpose::STANDARD, Engine}, message_proto::{video_frame, EncodedVideoFrame, EncodedVideoFrames}};
+    use hbb_common::message_proto::{key_event, video_frame, ControlKey, KeyboardMode, KeyEvent, EncodedVideoFrame, EncodedVideoFrames};
     use scrap::{codec::Decoder, CodecFormat, ImageFormat, ImageRgb, ImageTexture};
     use serde_json::{json, Value};
     use image::ImageDecoder;
     use std::{collections::HashMap, sync::{Arc, Mutex, mpsc::{sync_channel, SyncSender}, atomic::{AtomicBool, Ordering}}, time::{Duration, Instant}};
     use uuid::Uuid;
 
-    struct View { generation: u64, revision: u64, adb_state: Option<Value>, state: String, error: String, image: Option<String>, supported: bool,
+    struct View { generation: u64, revision: u64, adb_state: Option<Value>, state: String, error: String, image: Option<Vec<u8>>, supported: bool,
         adb_priority: bool, touch_ready: bool, input_error: String, format: String, screenshot_supported: bool,
-        privacy_supported: bool, privacy_state: String, privacy_error: String,
+        privacy_supported: bool, privacy_state: String, privacy_error: String, paste_requests: u8, accessibility_paste_requests: u8, paste_key_down: bool,
         layout_supported: bool, source_width: u32, source_height: u32, rgba_width: u32, rgba_height: u32 }
+    type SessionSender = Arc<std::sync::RwLock<Option<hbb_common::tokio::sync::mpsc::UnboundedSender<Data>>>>;
     struct Entry { peer: String, token: String, queue: SyncSender<RemoteAdbVideo>, view: Arc<Mutex<View>>,
+        sender: SessionSender, clipboard_ready: bool,
         resync: Arc<AtomicBool>, live: Arc<AtomicBool>, since: Instant, last_receive: Instant, last_watch: Instant,
         touch_sequence: u64, command_sequence: u64, privacy_sequence: u64 }
     lazy_static::lazy_static! { static ref ENTRIES: Mutex<HashMap<Uuid, Entry>> = Mutex::new(HashMap::new()); }
+
+    /// Fallback only: leave the existing Accessibility clipboard permission and delivery intact.
+    pub fn clipboard_required<T: crate::ui_session_interface::InvokeUiSession>(
+        session: &crate::ui_session_interface::Session<T>,
+    ) -> bool {
+        if !session.is_default() || !session.peer_platform().eq_ignore_ascii_case("android")
+            || session.server_keyboard_enabled.read().map(|v| *v).unwrap_or(true)
+            || !session.server_clipboard_enabled.read().map(|v| *v).unwrap_or(false)
+            || session.get_toggle_option("view-only".into())
+            || session.get_toggle_option("disable-clipboard".into()) { return false; }
+        ENTRIES.lock().map(|entries| entries.values().any(|entry|
+            Arc::ptr_eq(&entry.sender, &session.sender) && entry.clipboard_ready
+                && entry.live.load(Ordering::Acquire))).unwrap_or(false)
+    }
+
+    pub fn sync_clipboard<T: crate::ui_session_interface::InvokeUiSession>(
+        session: &crate::ui_session_interface::Session<T>, msg: &Message,
+    ) -> bool {
+        use hbb_common::message_proto::{message as wire_message, ClipboardFormat};
+        if !clipboard_required(session) { return false; }
+        let clip = match msg.union.as_ref() {
+            Some(wire_message::Union::Clipboard(clip)) if clip.format.enum_value() == Ok(ClipboardFormat::Text) => clip,
+            Some(wire_message::Union::MultiClipboards(clips)) => {
+                let Some(clip) = clips.clipboards.iter().find(|c| c.format.enum_value() == Ok(ClipboardFormat::Text)) else { return true; };
+                clip
+            }
+            _ => return true,
+        };
+        if clip.content.len() > 16384 { return true; }
+        // This is the local listener's message, not untrusted remote compressed data.
+        let bytes = if clip.compress { hbb_common::compress::decompress(&clip.content) } else { clip.content.to_vec() };
+        if bytes.is_empty() || bytes.len() > 16384 || bytes.contains(&0) { return true; }
+        let Ok(text) = String::from_utf8(bytes) else { return true; };
+        let request = json!({"v":1,"id":Uuid::new_v4().to_string(),"kind":"request",
+            "method":"clipboard","text":text}).to_string();
+        if !clipboard_required(session) { return false; }
+        if request.len() <= 32768 {
+            session.send(Data::Message(crate::remote_adb::message(request)));
+        }
+        true
+    }
+
+    pub fn clipboard_disconnected<T: crate::ui_session_interface::InvokeUiSession>(
+        session: &crate::ui_session_interface::Session<T>,
+    ) {
+        if let Ok(mut entries) = ENTRIES.lock() {
+            for entry in entries.values_mut().filter(|e| Arc::ptr_eq(&e.sender, &session.sender)) {
+                entry.clipboard_ready = false;
+            }
+        }
+        crate::flutter::update_text_clipboard_required();
+    }
+
+    // Both native-grab and Flutter keyboard events converge here. Consume only the
+    // paste key; modifier release and other keys keep their original route.
+    // Without ADB, explicit paste uses the existing accessibility text-input path.
+    pub fn paste_shortcut<T: crate::ui_session_interface::InvokeUiSession>(
+        session: &crate::ui_session_interface::Session<T>, event: &KeyEvent,
+    ) -> bool {
+        let is_v = match event.union.as_ref() {
+            Some(key_event::Union::Chr(code)) => match event.mode.enum_value_or_default() {
+                KeyboardMode::Map | KeyboardMode::Translate => *code == 50, // Android KEYCODE_V
+                _ => matches!(*code, 22 | 86 | 118), // Ctrl+V / V / v in legacy mode
+            },
+            // Translate mode can carry the shortcut as text on some keyboard layouts.
+            Some(key_event::Union::Seq(text)) => matches!(text.as_str(), "v" | "V" | "\u{16}"),
+            _ => false,
+        };
+        if !is_v { return false; }
+        if !session.peer_platform().eq_ignore_ascii_case("android") { return false; }
+        let session_id = crate::flutter::get_cur_session_id();
+        let Some(current) = sessions::get_session_by_session_id(&session_id) else { return false; };
+        if !Arc::ptr_eq(&session.sender, &current.sender) { return false; }
+        let allowed = !session.get_toggle_option("view-only".into())
+            && !session.get_toggle_option("disable-clipboard".into())
+            && session.server_clipboard_enabled.read().map(|v| *v).unwrap_or(false);
+        let keyboard_enabled = session.server_keyboard_enabled.read().map(|v| *v).unwrap_or(false);
+        let modifier = |keys: &[ControlKey]| event.modifiers.iter().any(|key| keys.contains(&key.enum_value_or_default()));
+        let (alt, ctrl, shift, meta) = crate::keyboard::client::get_modifiers_state(
+            modifier(&[ControlKey::Alt, ControlKey::RAlt]),
+            modifier(&[ControlKey::Control, ControlKey::RControl]),
+            modifier(&[ControlKey::Shift, ControlKey::RShift]),
+            modifier(&[ControlKey::Meta, ControlKey::RWin]));
+        let Ok(entries) = ENTRIES.lock() else { return false; };
+        let Some(entry) = entries.get(&session_id) else { return false; };
+        let Ok(mut view) = entry.view.lock() else { return false; };
+        if view.paste_key_down {
+            if !event.down || event.press { view.paste_key_down = false; }
+            return true;
+        }
+        if (!event.down && !event.press) || !allowed || !ctrl || alt || shift || meta { return false; }
+        let supported = view.adb_state.as_ref().map(|state| state["supported"] == true
+            && state["connected"] == true && state["textInputSupported"] == true).unwrap_or(false);
+        if !entry.live.load(Ordering::Acquire) { return false; }
+        if !supported && (view.adb_state.as_ref().map(|state| state["connected"] == true).unwrap_or(false)
+            || !keyboard_enabled) { return false; }
+        view.paste_key_down = !event.press;
+        if supported {
+            view.paste_requests = view.paste_requests.saturating_add(1).min(4);
+        } else {
+            view.accessibility_paste_requests = view.accessibility_paste_requests.saturating_add(1).min(4);
+        }
+        true
+    }
+
+    // Local-only binary frame: four little-endian dimensions followed by JPEG or RGBA.
+    // Keep only the newest decoded frame; no base64 or multi-megabyte JSON on the UI thread.
+    fn binary_frame(data: &[u8], rgba_width: u32, rgba_height: u32, source_width: u32, source_height: u32) -> Vec<u8> {
+        let mut frame = Vec::with_capacity(16 + data.len());
+        for value in [rgba_width, rgba_height, source_width, source_height] { frame.extend_from_slice(&value.to_le_bytes()); }
+        frame.extend_from_slice(data);
+        frame
+    }
+
+    fn take_frame(session: &str, owner: &str, generation: u64) -> Option<Vec<u8>> {
+        let session_id = Uuid::parse_str(session).ok()?;
+        let entries = ENTRIES.lock().ok()?;
+        let entry = entries.get(&session_id)?;
+        if entry.token != owner || !entry.live.load(Ordering::Acquire) { return None; }
+        let mut view = entry.view.lock().ok()?;
+        // A state transition between the JSON poll and this call cannot mix old/new media.
+        if view.generation != generation || view.state != "streaming" { return None; }
+        view.image.take()
+    }
+
+    /// Caller provides valid UTF-8 C strings and a writable length. The returned allocation
+    /// belongs to the caller until ashell_free_adb_frame(ptr, length), exactly once.
+    #[no_mangle]
+    pub unsafe extern "C" fn ashell_take_adb_frame(session: *const std::os::raw::c_char,
+        owner: *const std::os::raw::c_char, generation: u64, length: *mut u32) -> *mut u8 {
+        if length.is_null() { return std::ptr::null_mut(); }
+        *length = 0;
+        if session.is_null() || owner.is_null() { return std::ptr::null_mut(); }
+        let Ok(session) = std::ffi::CStr::from_ptr(session).to_str() else { return std::ptr::null_mut(); };
+        let Ok(owner) = std::ffi::CStr::from_ptr(owner).to_str() else { return std::ptr::null_mut(); };
+        let Some(frame) = take_frame(session, owner, generation) else { return std::ptr::null_mut(); };
+        let frame = frame.into_boxed_slice();
+        *length = frame.len() as u32;
+        Box::into_raw(frame) as *mut u8
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn ashell_free_adb_frame(data: *mut u8, length: u32) {
+        if !data.is_null() { drop(Box::from_raw(std::ptr::slice_from_raw_parts_mut(data, length as usize))); }
+    }
 
     fn send(session_id: Uuid, packet: RemoteAdbVideo) -> bool {
         let Some(session) = sessions::get_session_by_session_id(&session_id) else { return false; };
@@ -349,14 +518,15 @@ pub mod pc {
             if entries.len() >= 32 { return None; }
             let session = sessions::get_session_by_session_id(&session_id)?;
             let token = owner.to_owned();
-            let (tx, rx) = sync_channel::<RemoteAdbVideo>(8);
+            let (tx, rx) = sync_channel::<RemoteAdbVideo>(MAX_PENDING_FRAMES);
             let view = Arc::new(Mutex::new(View { generation: 0, revision: 0, adb_state: None, state: "waiting".into(), error: String::new(), image: None, supported: false,
                 adb_priority: false, touch_ready: false, input_error: String::new(), format: String::new(), screenshot_supported: false,
-                privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(),
+                privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(), paste_requests: 0, accessibility_paste_requests: 0, paste_key_down: false,
                 layout_supported: false, source_width: 0, source_height: 0, rgba_width: 0, rgba_height: 0 }));
             let resync = Arc::new(AtomicBool::new(true));
             let live = Arc::new(AtomicBool::new(true));
             entries.insert(session_id, Entry { peer: session.get_id(), token: token.clone(), queue: tx,
+                sender: session.sender.clone(), clipboard_ready: false,
                 view: view.clone(), resync: resync.clone(), live: live.clone(), since: Instant::now(),
                 last_receive: Instant::now(), last_watch: Instant::now(), touch_sequence: 0, command_sequence: 0, privacy_sequence: 0 });
             let thread_token = token.clone();
@@ -393,7 +563,7 @@ pub mod pc {
                             if jpeg.dimensions() != (packet.width, packet.height) { return Err("ADB 截图尺寸无效。".into()); }
                             if let Ok(mut view) = view.lock() {
                                 if view.generation == packet.generation && view.state == "streaming" && live.load(Ordering::Acquire) {
-                                    view.image = Some(STANDARD.encode(&packet.data));
+                                    view.image = Some(binary_frame(&packet.data, 0, 0, packet.source_width, packet.source_height));
                                     view.rgba_width = 0; view.rgba_height = 0;
                                     view.source_width = packet.source_width;
                                     view.source_height = packet.source_height;
@@ -426,7 +596,7 @@ pub mod pc {
                             // ABGR's little-endian memory is RGBA. Pass the decoded
                             // pixels locally instead of JPEG encoding/decoding again.
                             // The network stream remains compressed H.264.
-                            let image = STANDARD.encode(&rgb.raw);
+                            let image = binary_frame(&rgb.raw, rgb.w as u32, rgb.h as u32, packet.source_width, packet.source_height);
                             if let Ok(mut view) = view.lock() {
                                 if view.generation == generation && view.state == "streaming" && live.load(Ordering::Acquire) {
                                     view.image = Some(image);
@@ -480,7 +650,11 @@ pub mod pc {
                 view.state = "error".into();
                 view.error = "远端未响应 ADB 投屏订阅，请确认两端均已更新并保持连接。".into();
             }
-            let snapshot = json!({"state":view.state,"error":view.error,"generation":view.generation,"revision":view.revision,"adbState":view.adb_state,"image":view.image.take(),"supported":view.supported,
+            let paste_requests = std::mem::take(&mut view.paste_requests);
+            let accessibility_paste_requests = std::mem::take(&mut view.accessibility_paste_requests);
+            let snapshot = json!({"state":view.state,"error":view.error,"generation":view.generation,"revision":view.revision,"adbState":view.adb_state,"supported":view.supported,
+                "pasteRequests":paste_requests,
+                "accessibilityPasteRequests":accessibility_paste_requests,
                 "adbPriority":view.adb_priority,"touchReady":view.touch_ready,"inputError":view.input_error,
                 "format":view.format,"screenshotSupported":view.screenshot_supported,"layoutSupported":view.layout_supported,
                 "sourceWidth":view.source_width,"sourceHeight":view.source_height,
@@ -525,7 +699,9 @@ pub mod pc {
         if !state.is_object() || !state["supported"].is_boolean() || !state["connected"].is_boolean()
             || state["revision"].as_u64().is_none() { return; }
         let Ok(mut entries) = ENTRIES.lock() else { return; };
-        let Some(entry) = entries.values_mut().find(|e| e.peer == peer && e.token == token) else { return; };
+        let Some((session_id, entry)) = entries.iter_mut().find(|(_, e)| e.peer == peer && e.token == token) else { return; };
+        let session_id = *session_id;
+        let was_clipboard_ready = entry.clipboard_ready;
         entry.last_receive = Instant::now();
         if let Ok(mut view) = entry.view.lock() {
             let restarted = view.adb_state.as_ref().map(|s| s["instance"] != state["instance"])
@@ -543,7 +719,29 @@ pub mod pc {
             } else if view.adb_state.as_ref().and_then(|s| s["revision"].as_u64()).unwrap_or(0)
                 > state["revision"].as_u64().unwrap_or(0) { return; }
             view.adb_state = Some(state.clone());
+            entry.clipboard_ready = state["supported"] == true && state["connected"] == true
+                && state["clipboardSyncSupported"] == true;
+            if restarted || state["connected"] != true { view.paste_requests = 0; }
+            if restarted || state["connected"] == true { view.accessibility_paste_requests = 0; }
         };
+        let clipboard_started = !was_clipboard_ready && entry.clipboard_ready;
+        drop(entries);
+        crate::flutter::update_text_clipboard_required();
+        // Honor the existing initial-sync preference when ADB becomes available after login.
+        if clipboard_started {
+            if let Some(session) = sessions::get_session_by_session_id(&session_id) {
+                let initial = session.lc.read().map(|lc| lc.sync_init_clipboard.v).unwrap_or(false);
+                if initial && clipboard_required(&session) {
+                    let Some(info) = session.lc.read().ok().and_then(|lc| lc.peer_info.clone()) else {
+                        return;
+                    };
+                    if let Some(msg) = crate::clipboard::get_current_clipboard_msg(
+                        &info.version, &info.platform, crate::clipboard::ClipboardSide::Client) {
+                        sync_clipboard(&session, &msg);
+                    }
+                }
+            }
+        }
     }
 
     pub fn receive(peer: &str, packet: RemoteAdbVideo) {

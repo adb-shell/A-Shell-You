@@ -760,7 +760,8 @@ class InputModel {
   /// [down] indicates the key's state(down or up).
   /// [press] indicates a click event(down and up).
   void inputKey(String name, {bool? down, bool? press}) {
-    if (!keyboardPerm) return;
+    if (isViewOnly) return;
+    if (!keyboardPerm && !(adbTouchPriority && parent.target!.ffiModel.isPeerAndroid)) return;
     if (isViewCamera) return;
     bind.sessionInputKey(
         sessionId: sessionId,

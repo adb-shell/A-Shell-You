@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/main.dart';
-import 'package:flutter_hbb/mobile/pages/settings_page.dart';
 import 'package:flutter_hbb/models/chat_model.dart';
 import 'package:flutter_hbb/models/platform_model.dart';
 import 'package:get/get.dart';
@@ -533,6 +532,7 @@ class ServerModel with ChangeNotifier {
       case "media":
         _mediaOk = value;
         _isStart = value;
+        if (isAndroid) androidUpdatekeepScreenOn();
         break;
       case "input":
         if (_inputOk != value) {
@@ -589,8 +589,8 @@ class ServerModel with ChangeNotifier {
     }
     if (_clients.length != oldClientLenght) {
       notifyListeners();
-      if (isAndroid) androidUpdatekeepScreenOn();
     }
+    if (isAndroid) androidUpdatekeepScreenOn();
   }
 
   void addConnection(Map<String, dynamic> evt) {
@@ -1003,10 +1003,14 @@ class ServerModel with ChangeNotifier {
 
   void sendLoginResponse(Client client, bool res) async {
     if (res) {
-      bind.cmLoginRes(connId: client.id, res: res);
+      final loginResult = bind.cmLoginRes(connId: client.id, res: res);
       parent.target?.invokeMethod("cancel_notification", client.id);
       client.authorized = true;
       notifyListeners();
+      if (isAndroid) {
+        await loginResult;
+        androidUpdatekeepScreenOn();
+      }
     } else {
       bind.cmLoginRes(connId: client.id, res: res);
       parent.target?.invokeMethod("cancel_notification", client.id);
@@ -1170,24 +1174,7 @@ class ServerModel with ChangeNotifier {
 
   void androidUpdatekeepScreenOn() async {
     if (!isAndroid) return;
-    bind.mainSetLocalOption(key: kOptionKeepScreenOn, value: 'service-on');
-    var floatingWindowDisabled =
-        bind.mainGetLocalOption(key: kOptionDisableFloatingWindow) == "Y" ||
-            !await AndroidPermissionManager.check(kSystemAlertWindow);
-    final keepScreenOn = floatingWindowDisabled
-        ? KeepScreenOn.never
-        : optionToKeepScreenOn(
-            bind.mainGetLocalOption(key: kOptionKeepScreenOn));
-    final on = ((keepScreenOn == KeepScreenOn.serviceOn) && _isStart) ||
-        (keepScreenOn == KeepScreenOn.duringControlled &&
-            _clients.any((e) => !e.disconnected));
-    if (on != await WakelockPlus.enabled) {
-      if (on) {
-        WakelockPlus.enable();
-      } else {
-        WakelockPlus.disable();
-      }
-    }
+    await parent.target?.invokeMethod("refresh_keep_screen_on");
   }
 }
 

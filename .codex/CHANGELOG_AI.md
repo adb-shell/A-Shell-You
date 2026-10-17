@@ -2,9 +2,76 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-17（构建模式名称调整）
+Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-18-007：ADB 功能合并 main
+
+- 用户授权 test/82e0f7f → main，--no-ff 合并说明“ADB功能问题完善”，推送后单次 Both/常规编译、不监控。合并无冲突、树与 test 一致，无新增产品修改；准确 Git/dispatch 回执见交付。
+- STATE/WORK-20261018-007 / CE-20261018-T007-01；[任务](../docs/tasks/T-2026-10-18-007-merge-adb-to-main.md)。V0，不宣称构建或运行通过。
+
+## T-2026-10-18-006 r4：Windows 修复交付
+
+- 用户授权提交推送 test 并单次编排 Windows/常规编译、不监控；无新增产品修改。执行前范围/diff 检查通过，准确 Git/dispatch 回执见交付。STATE/WORK-20261018-006-r4 / CE-20261018-T006-04。
+
+## T-2026-10-18-006 r3：Windows 编译修复
+
+- 用户日志证实 de12290 的 remote_adb_video.rs 跨模块读取私有 peer_info 导致 E0616；改为已有公开 Session.lc.peer_info，不调整功能或字段可见性。
+- V0 通过，修复后构建/设备待证，未提交/推送/编排。STATE/WORK-20261018-006-r3 / CE-20261018-T006-03；[任务](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)。
+
+## T-2026-10-18-006 r2：test 交付
+
+- 用户授权提交推送 T004/T005/T006 到 test，单次触发 Build-Clients-New Both/常规编译，不监控；无新增产品代码修改。
+- 执行前 test/738a3fe，V0 diff 检查通过；构建/真机待证，准确 Git/dispatch 回执见交付。STATE/WORK-20261018-006-r2 / CE-20261018-T006-02。
+
+## T-2026-10-18-006：ADB 剪贴板同步
+
+- test/738a3fe + T004/T005 dirty；原PC监听增加仅ADB文本同步分支，clipboard/text RPC 与 paste=false，显式粘贴优先；原无障碍/模拟输入/监听实现保留。
+- V0完成；构建/真机待证，未提交/推送/编排。Decision/ADR/资产 N/A — no decision delta。
+- [任务](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)，STATE/WORK-20261018-006 / CE-20261018-T006-01。
+
+## T-2026-10-18-005：ADB 普通键盘输入
+
+- test/738a3fe + T004 dirty；补齐原 KeyEvent→独立 ADB 输入连接与 Flutter gate，owner 修饰键/有界队列，保留 Ctrl+V 和无ADB无障碍回落；不改媒体、认证或协议字段。
+- V0 完成，构建/设备待证；未提交/推送/编排。Decision/ADR/资产 N/A — no decision delta。
+- [任务](../docs/tasks/T-2026-10-18-005-adb-keyboard.md)，STATE/WORK-20261018-005 / CE-20261018-T005-01。
+
+## T-2026-10-18-004：光标与无障碍粘贴
+
+- test/738a3fe clean；“点亮屏”文案、ImagePaint 会话权限同源，Ctrl+V 无 ADB 时按需读取 PC 文本，经现有 Seq 主线程提交 IME/焦点节点；选区替换与单次提交，ADB 优先。
+- V0；媒体/手势/普通剪贴板/协议未改，构建/真机待证；未提交/推送/编排。Decision/ADR/资产：N/A — no decision delta。
+- [任务](../docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，STATE/WORK-20261018-004 / CE-20261018-T004-01。
+
+## T-2026-10-18-003：静默常亮与默认值
+
+- test/9e28a90 clean 起点；主页移除常亮控件/缓存。r2 按用户补充删除本任务新增 AppSettingsPage 和齿轮路由，HomePage 恢复 HEAD；Kotlin/Dart 默认 service-on 静默生效，保存的有效选项不覆盖，不开放旧设置页。
+- V0 完成，V2/V3 待证；原无障碍/采集/传输/ADB 保持。r3 用户授权提交推送 test 后单次 Build-Clients-New Both/常规编译，不监控；准确回执见交付。Decision/ADR/资产：N/A — no decision delta。
+- [任务](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)，STATE/WORK-20261018-003-r3 / CE-20261018-T003-03（事件01/02保留历史）。
+
+## T-2026-10-18-002：ADB 辅助保活与点亮屏幕
+
+- test/0b5ad99 clean；LocalAdbKeepAlive 通过独立命令设置本应用 Doze 豁免，动态包名、单次尝试/取消、已有豁免保留；PowerManager 回读并在手机/PC 状态中展示。Shell 栏复用鉴权 shell 下发唤醒键224，已亮屏不切换成息屏。
+- V0 完成，原无障碍/采集/传输及媒体链保持，无新依赖/权限/协议；V2/V3 待证。用户授权 test 提交推送及单次 Both/常规编译、不监控。
+- [任务](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)，STATE/WORK-20261018-002、CE-20261018-T002-01；Decision/ADR/资产 N/A，无增量。
+
+## T-2026-10-18-001：主页常亮与 ADB 输入弹窗
+
+- test/00193fa clean；主页三档 keep-screen-on，移除四处覆盖，前后台共用只读 CM 授权连接状态（排除文件等非远控），core-service 档独立于共享。设置持久化、后台权限说明、JNI/R8 保留。
+- ADB 原 paste 弹窗增加自动焦点、回车/确定、Shift+Enter，保留输入法与 Ctrl+V 原链；无媒体/无障碍/普通采集改动。
+- V0 完成，V2/V3 待证；授权提交推送 test、单次 Both/常规编译不监控。见[任务](../docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)，STATE/WORK-20261018-001、CE-20261018-T001-01。Decision/ADR/资产 N/A，无增量。
+
+## T-2026-10-17-003：ADB Ctrl+V与画面参数对齐
+
+- test/8ef006e clean起点。原键盘共用入口仅增加ADB Ctrl+V分流；ADB视口焦点、两种输入来源、按键释放、会话取消及共享文本校验。普通剪贴板/无障碍/采集未改。
+- 移除960限制，恢复统一profile；JPEG对齐普通300ms截图节奏，取消复杂画面的额外码率等待，独立截图在途4帧。性能须真机测量，不能等同编码效果。
+- V0源码及diff复检；授权test提交推送与单次test编排、不监控。见[T003](../docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md)，STATE/WORK-20261017-003、CE-20261017-T003-01。无Decision/ADR/资产变化。
+
+## T-2026-10-17-002：test ADB远程输入与媒体性能
+
+- 从main/af1c72d创建test，保留既有CI提交；新增显式Unicode粘贴、二进制帧交接、24帧窗口、960媒体上限及原始截图/PNG回退。普通采集/无障碍/剪贴板链保持。
+- V0范围、ABI、编码和diff检查通过；未运行本地产品验证，设备流畅度待证。按当前授权提交推送test并单次Build-Clients-New Both/常规编译，不监控；最终结果见交付。
+- [任务](../docs/tasks/T-2026-10-17-002-adb-input-performance.md) / STATE-20261017-002 / CE-20261017-T002-01。Decision/ADR/资产：N/A — no decision delta，延伸既有ADB边界。
 
 ## T-2026-10-17-001：构建模式“原始编译”
 

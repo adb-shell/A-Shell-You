@@ -2,9 +2,77 @@
 
 > 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
 
-最后更新：2026-10-17
+最后更新：2026-10-18
 
 > 本文件记录 AI 参与的工程任务、授权边界和验证结果。它不是产品 changelog，也不替代 Git history。
+
+## T-2026-10-18-007：ADB 功能合并主分支
+
+- 用户授权 test 合并 main、提交说明“ADB功能问题完善”、推送后单次构建；沿用 Both/常规编译、不监控。fetch 后确认 main/origin/main 均是 test/82e0f7f 的祖先，显式合并无冲突。
+- 本轮只合并既有变更与最小记录，源码树与 test 一致；V0 检查通过，构建/设备待证。准确 SHA/dispatch 见交付；STATE/WORK-20261018-007 / CE-20261018-T007-01，[任务](../docs/tasks/T-2026-10-18-007-merge-adb-to-main.md)。
+
+## T-2026-10-18-006 r4：提交修复并编排
+
+- 用户授权交付 r3 到 test，推送后单次 Build-Clients-New Windows/常规编译，不监控。源码与六份任务/记忆文件共七路径，执行前核对通过；Git/dispatch 回执见交付，不代表构建通过。STATE/WORK-20261018-006-r4 / CE-20261018-T006-04。
+
+## T-2026-10-18-006 r3：Windows E0616
+
+- Complete/T8（源码与 V0）：用户报告本次 Windows 构建失败，日志 checkout 对应 test/de12290；修复私有字段访问，沿用原剪贴板使用的公开会话信息。无原无障碍/媒体/输入链变更。
+- 已检查访问级别、类型、cfg、锁生命周期与 diff；未重新构建/提交/推送/编排。STATE/WORK-20261018-006-r3 / CE-20261018-T006-03；[任务](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)。
+
+## T-2026-10-18-006 r2：提交推送与编排
+
+- 用户追加 C3 授权：交付既有 T004/T005/T006 到 test，单次 Build-Clients-New Both/常规编译，不监控。无本地产品构建/测试或真机操作。
+- 执行前分支/remote/diff 检查通过；准确 SHA、远端一致性和 dispatch 回执见 Git/会话交付，不提升 V0 验证等级。STATE/WORK-20261018-006-r2 / CE-20261018-T006-02。
+
+## T-2026-10-18-006：ADB 剪贴板同步
+
+- Complete/T8（实现与V0）：新增仅ADB剪贴板文本分支，原监听/无障碍/模拟输入保留；只更新剪贴板、不自动输入，Ctrl+V独立优先，能力协商及权限/生命周期取消。
+- V1—V3 NOT_RUN；T004/T005 dirty保留，无Git/CI操作，无Decision/ADR/资产增量。
+- [任务](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)，STATE/WORK-20261018-006 / CE-20261018-T006-01。
+
+## T-2026-10-18-005：ADB 普通键盘输入
+
+- Complete/T8（实现与 V0）：保留 T004 dirty，新增独立 ADB 键盘模块、原 KeyEvent 前置分流、JNI/混淆签名与 Flutter gate；普通键不写剪贴板，Ctrl+V 保持，修饰键按 PC 隔离。
+- V1—V3 NOT_RUN；未提交/推送/编排，无 Decision/ADR/资产增量。
+- [任务](../docs/tasks/T-2026-10-18-005-adb-keyboard.md)，STATE/WORK-20261018-005 / CE-20261018-T005-01。
+
+## T-2026-10-18-004：光标与无障碍粘贴
+
+- Complete/T8（实现与 V0）：test/738a3fe clean，用户授权按钮文案、禁用光标与无障碍 Ctrl+V 修复。光标与触摸同源权限；文本经既有消息单次输入到当前焦点，ADB 优先与权限检查保持。
+- V0，V2/V3 待证；当前改动未提交、推送或编排。最小合同及任务记忆同步，无 Decision/ADR/资产增量。
+- [任务](../docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，STATE/WORK-20261018-004 / CE-20261018-T004-01。
+
+## T-2026-10-18-003：静默常亮与默认值
+
+- Complete/T8（r2 续接）：test/9e28a90 clean 起点；用户追加要求不显示齿轮/设置入口，已删除本任务新增页面与路由，主页常亮控件保持隐藏。未配置/未知值默认 service-on 静默生效，保留用户已保存选项。相对 HEAD 仅三份 Flutter/Kotlin 源码与最小合同/记忆更新，无原功能链修改。
+- V0 完成，未运行本地产品 build/test/analyze/codegen/真机。r3 用户授权提交推送 test 并单次 Build-Clients-New Both/常规编译，不监控；准确 Git/dispatch 回执见交付，正式验证清单见[任务](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)。
+- STATE/WORK-20261018-003-r3 / CE-20261018-T003-03；Decision/ADR/资产无增量。
+
+## T-2026-10-18-002：ADB 辅助保活与点亮屏幕
+
+- Complete/T8：test/0b5ad99 clean；ADB 连接后设置当前应用省电豁免，保留已有豁免，回读系统状态、不伪称免杀；独立有界命令通道与取消保持。Shell 栏新增唤醒键224，原无障碍与媒体传输不改。
+- V0；V2/V3 未运行。授权提交推送 test 并单次 Both/常规编译，不监控；实际 Git/dispatch 回执见最终交付。
+- [任务](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)，STATE/WORK-20261018-002、CE-20261018-T002-01；Decision/ADR/资产无增量。
+
+## T-2026-10-18-001：主页常亮与 ADB 输入弹窗
+
+- Complete/T8：test/00193fa clean 起点；主页开放三档常亮，以真实授权远控连接支持多 PC/ADB-only，移除 service-on 强制覆盖。共用窗口策略保留系统息屏设置，后台需悬浮权限。
+- ADB 已有远程输入复用 paste，自动焦点、回车/确定、Shift+Enter，普通/ADB 画面 Ctrl+V 保持。未改普通采集/无障碍/输入传输/生成文件/依赖。
+- V0 检查，V2/V3 待证；用户授权提交推送 test 并单次 Both/常规编译，不监控；实际 Git/dispatch 接受回执见交付。
+- [任务](../docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)，STATE/WORK-20261018-001、CE-20261018-T001-01；无 Decision/ADR/资产变化。
+
+## T-2026-10-17-003：ADB Ctrl+V与画面参数对齐
+
+- Complete/T8：test/8ef006e clean起点，实现直接快捷粘贴与ADB焦点；取消媒体960限制、JPEG最多2秒额外等待，目标采集300ms、截图在途4帧。保留普通链路及两端控制边界。
+- V0复检；V2/V3仍待证。用户授权提交推送test及单次test Both/常规编译，禁止监控。实际commit/dispatch接受结果见交付。
+- [任务](../docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md)，STATE/WORK-20261017-003、CE-20261017-T003-01；无Decision/ADR/资产增量。
+
+## T-2026-10-17-002：test ADB远程输入与媒体性能
+
+- Complete/T8：实现/V0完成，起点main/af1c72d clean，创建并切换test。新增菜单粘贴、原生二进制帧交接、24帧回执窗口、960媒体最长边、原始截图与PNG回退；普通链路保持。
+- 授权提交推送test、Build-Clients-New Both/常规编译单次dispatch，不监控；无本地产品编译/测试/设备操作。构建/流畅度尚待正式验证。
+- [任务](../docs/tasks/T-2026-10-17-002-adb-input-performance.md)，STATE/WORK-20261017-002 / CE-20261017-T002-01；Decision/ADR/资产无增量，Git/dispatch结果见交付。
 
 ## T-2026-10-17-001：构建模式名称调整
 

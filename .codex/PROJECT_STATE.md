@@ -1,9 +1,33 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261017-001`
-Last Updated / Observed At：2026-10-17（Asia/Tokyo）
+State Revision：`STATE-20261018-007`
+Last Updated / Observed At：2026-10-18（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+T007：用户授权 test/82e0f7f 合并 main，提交说明“ADB功能问题完善”，推送后单次 Build-Clients-New/main/Both/常规编译，不监控。fetch 确认本地/远端 main 均为 test 祖先；无冲突合并，写记录前树与 test 一致。无新增业务修改；准确 SHA/远端一致性/dispatch 回执见交付，构建与设备仍待证。CE-20261018-T007-01；[任务](../docs/tasks/T-2026-10-18-007-merge-adb-to-main.md)。下方为历史。
+
+T006 r4：用户授权将 r3 的 Windows E0616 修复提交推送 test，单次 Build-Clients-New Windows/常规编译，不监控。执行前 test/de12290，七路径范围与 diff 检查通过；准确 Git/dispatch 回执见交付，构建/真机待证。CE-20261018-T006-04。
+
+T006 r3：test/de12290 初始 clean；用户日志确认 Windows Rust E0616，ADB 初始剪贴板同步跨模块读取 FlutterHandler 私有字段。已改读公开 Session.lc.peer_info，其他链路不改；V0 检查通过，修复后构建/设备待证，未提交或重新编排。日志中的同提交 Android APK 已产出，不代表运行验证。CE-20261018-T006-03，详情见 T006。
+
+T006 r2：用户授权将 T004/T005/T006 提交并推送 test，随后单次触发 Build-Clients-New（Both/常规编译），不监控。执行前 test/738a3fe、diff 检查通过；准确 SHA、远端一致性及 dispatch 接受回执见 Git/会话交付，构建与真机仍待证。CE-20261018-T006-02。下列未提交状态为各实现阶段历史。
+
+最新 test 增量：[T006](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)，test/738a3fe + T004/T005 dirty。仅 ADB 时复用原PC监听，经字段40 clipboard/text 更新手机剪贴板；paste=false，不自动输入，显式Ctrl+V队列保持。capability/状态/会话/权限检查及自动最新待发/取消清理；原无障碍剪贴板和模拟输入不改。V0完成，构建/真机待证，未提交/推送/编排。STATE/WORK-20261018-006 / CE-20261018-T006-01，无 Decision/ADR/资产增量。以下为历史。
+
+最新 test 增量：[T005](../docs/tasks/T-2026-10-18-005-adb-keyboard.md)，test/738a3fe + T004 dirty。原 KeyEvent 在 Android 分流到 ADB 常驻输入 socket，新增独立键盘队列与各 PC 修饰键状态，完整按键/释放清理；Ctrl+V/粘贴链保持，Flutter ADB 键盘放行。无媒体/无障碍实现/生成桥变更。V0 完成，构建/真机待证，未提交/推送/编排。STATE/WORK-20261018-005 / CE-20261018-T005-01，无 Decision/ADR/资产增量。以下为历史。
+
+最新 test 增量：[T004](../docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，test/738a3fe clean 起点。Shell 文案“点亮屏”；普通画面光标与实际输入共用会话权限；Ctrl+V 无 ADB 时从 PC 直接经现有 Seq 文本链提交无障碍焦点输入，ADB 路径继续优先。五份源码局部修改，无手势/采集/普通剪贴板/协议变更；V0 完成，编译/真机待证。WORK-20261018-004 / CE-20261018-T004-01；未提交/推送/编排，无 Decision/ADR/资产增量。以下为历史。
+
+最新 test 增量：[T003](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)，test/9e28a90 clean 起点；r2 取消新增齿轮与设置页，主页不展示常亮控件。未配置默认 service-on 静默生效，已有有效选项保留，Kotlin 与 Dart 同步。HomePage 恢复 HEAD，原媒体/无障碍/ADB 不改；V0 完成，构建/真机待证。r3 用户授权提交推送 test 后单次 Build-Clients-New Both/常规编译，不监控，准确 Git/dispatch 回执见交付。WORK-20261018-003-r3 / CE-20261018-T003-03；无 Decision/ADR/资产增量。以下为历史。
+
+最新 test 增量：[T002](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)，test/0b5ad99 clean 起点。ADB 验证连接后单次为当前包设置电池优化豁免，复用独立有界命令通道，PowerManager 回读及既有状态推送；Shell 栏新增 keycode224 点亮屏幕，原媒体/无障碍/传输保持。仅 V0，构建/真机待证；授权提交推送 test 后单次 Both/常规编译、不监控。WORK-20261018-002 / CE-20261018-T002-01，无 Decision/ADR/资产增量，实际 Git/dispatch 回执见交付。以下为历史。
+
+最新 test 增量：[T001](../docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)，test/00193fa clean 起点。主页开放三档常亮，移除强制 service-on，前后台共用真实授权 CM 连接判定（多 PC/ADB-only）；后台需悬浮权限，不依赖屏幕共享。已有 ADB 输入弹窗支持回车/确定、Shift+Enter、自动焦点，Ctrl+V 链保持。V0，未本地编译/真机验证；授权提交推送 test 后单次 Both/常规编译，不监控。WORK-20261018-001 / CE-20261018-T001-01，无 Decision/ADR/资产增量。Git/dispatch 回执见交付；以下为历史观察。
+
+最新test增量：[T003](../docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md)，test/8ef006e clean起点。ADB直接Ctrl+V（native/Flutter键盘共用入口、会话/释放/权限检查及取消）、ADB视口焦点；移除960媒体限制、恢复统一1280 profile，JPEG对齐普通300ms采集节奏并限制4帧在途，不再额外按视频码率等待。V0源码/diff复检；无产品构建/真机通过证据。授权提交推送test、单次test Both/常规编译、不监控；实际Git/dispatch回执见最终交付。WORK-20261017-003 / CE-20261017-T003-01。以下T002及main为历史。
+
+最新test增量：[T-2026-10-17-002](../docs/tasks/T-2026-10-17-002-adb-input-performance.md)，从main/af1c72d（clean）创建test，保留既有未推送CI文案提交。新增显式ADB Unicode粘贴；ADB媒体二进制本地交接、24帧/8MiB回执窗口、960媒体上限、原始截图/PNG兼容回退。普通采集/无障碍/输入链零修改。V0检查完成；用户授权提交推送test并单次Build-Clients-New（Both/常规编译），不监控。实际SHA/dispatch接受结果见交付；产品构建及流畅度实测待证。WORK-20261017-002 / CE-20261017-T002-01，无Decision/ADR/资产增量。下方为main历史观察。
 
 最新局部观察：[T-2026-10-17-001](../docs/tasks/T-2026-10-17-001-build-mode-label.md)，起点main/130f748，初始clean。仅将新工作流的“完整编译”统一改名为“原始编译”，默认“常规编译”和运行逻辑保持；十处精确替换V0通过。用户授权本地提交，本次不push、不dispatch、不构建。当前Task/Event：T-2026-10-17-001 / CE-20261017-T001-01，WORK-20261017-001；提交结果以Git和会话交付为准。无Decision/ADR增量，产品与发布验证状态未提升。下方源码/基线表保留2026-10-16观察，未对期间其他提交作全仓复核。
 

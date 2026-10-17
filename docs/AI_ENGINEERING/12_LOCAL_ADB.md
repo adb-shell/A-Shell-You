@@ -1,5 +1,9 @@
 # AShell 本机 ADB / Local ADB
 
+test 增量（2026-10-18，[T002](../tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)）：新增 `LocalAdbKeepAlive`，验证连接后通过独立命令通道执行 `dumpsys deviceidle whitelist +<当前应用包名>`。包名取自 Context 并按单个 shell 参数转义，不使用 PC 传入值；已有豁免跳过。每次连接阶段仅一次尝试，复用原 health loop，不新增 timer/thread/WakeLock，不禁用全局 Doze；失败不撤销共享 Shell、画面或触摸。断开/重配沿用 Commands 的取消与释放，下一连接待旧命令结束后再处理。
+
+状态增加 `keepAliveSupported`、`keepAliveExempt`（PowerManager 回读，无法查询为 null）、`keepAliveBusy`、`keepAliveError`；手机 ADB 页与 PC 状态弹窗显示真实电池优化豁免结果。豁免持久保留，断开 ADB 不撤销，也不删除用户原有豁免；可在系统电池设置恢复。该能力减少后台省电限制，不保证进程免杀。原前台服务/无障碍/采集/传输保持；仅 V0，OEM 命令兼容与后台效果待 V2/V3。
+
 当前核对：2026-10-16，main/4d3c446，文档同步开始时工作区clean。当前配对/连接/独立命令、进程状态推送与有限断链恢复保持既有合同；最新 [T001](../tasks/T-2026-10-16-001-adb-docs-sync.md) / [Baseline21](../BASELINE/21_ADB_RENDER_UI_BASELINE_2026-10-16.md) 补齐App侧绘图与PC展示变化。[13_REMOTE_ADB](13_REMOTE_ADB.md)与[14_ADB_MIRROR](14_ADB_MIRROR.md)分别记录PC控制及媒体/触摸；旧任务为历史快照。
 
 当前实现是 Android App 内的独立无线调试客户端：配对、连接、验证 shell 身份和执行单次命令。主页向左滑到右侧 ADB 页，向右滑返回。采用 `libadb-android:3.1.1`；没有恢复旧 LADB 进程、`libadb.so`、旧通道或无障碍自动配对。T004增加PC远程ADB；2026-10-14 T001新增[独立scrcpy投屏与ADB优先触摸](14_ADB_MIRROR.md)，共用身份、独立媒体/控制连接。仅V0，构建/运行待验证。

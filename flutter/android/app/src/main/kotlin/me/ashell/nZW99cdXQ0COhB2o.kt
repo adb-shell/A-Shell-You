@@ -1095,14 +1095,22 @@ class nZW99cdXQ0COhB2o : AccessibilityService() {
         val keyEvent = KeyEvent.parseFrom(data)
         val keyboardMode = keyEvent.getMode()
 
+        // Explicit remote text (including Ctrl+V) must be committed once, without
+        // relying on background clipboard access or a synthetic key-up event.
+        if (keyEvent.hasSeq()) {
+            val text = keyEvent.getSeq()
+            Handler(Looper.getMainLooper()).post {
+                if (ctx === this) commitRemoteText(text)
+            }
+            return
+        }
+
         var textToCommit: String? = null
 
         // [down] indicates the key's state(down or up).
         // [press] indicates a click event(down and up).
         // https://github.com/rustdesk/rustdesk/blob/3a7594755341f023f56fa4b6a43b60d6b47df88d/flutter/lib/models/input_model.dart#L688
-        if (keyEvent.hasSeq()) {
-            textToCommit = keyEvent.getSeq()
-        } else if (keyboardMode == KeyboardMode.Legacy) {
+        if (keyboardMode == KeyboardMode.Legacy) {
             if (keyEvent.hasChr() && (keyEvent.getDown() || keyEvent.getPress())) {
                 val chr = keyEvent.getChr()
                 if (chr != null) {
@@ -1162,6 +1170,43 @@ class nZW99cdXQ0COhB2o : AccessibilityService() {
                     }
                 }
             }
+        }
+    }
+
+    private fun commitRemoteText(text: String) {
+        if (text.isEmpty()) return
+        if (Build.VERSION.SDK_INT >= 33) {
+            val connection = getInputMethod()?.getCurrentInputConnection()
+            if (connection != null) {
+                connection.commitText(text, 1, null)
+                return
+            }
+        }
+
+        // Older Android, or an editor without an accessibility input connection.
+        // Use only the current input focus; never pick a different editable field.
+        val node = findFocus(AccessibilityNodeInfo.FOCUS_INPUT) ?: return
+        try {
+            if (!node.refresh() || !node.isEditable || !node.isEnabled || !node.isFocused) return
+            val current = if (Build.VERSION.SDK_INT >= 26 && node.isShowingHintText) ""
+                else node.text?.toString().orEmpty()
+            val start = node.textSelectionStart.takeIf { it >= 0 }?.coerceAtMost(current.length) ?: current.length
+            val end = node.textSelectionEnd.takeIf { it >= 0 }?.coerceAtMost(current.length) ?: start
+            val from = minOf(start, end)
+            val to = maxOf(start, end)
+            val arguments = Bundle().apply {
+                putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
+                    current.replaceRange(from, to, text))
+            }
+            if (node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)) {
+                val cursor = from + text.length
+                node.performAction(AccessibilityNodeInfo.ACTION_SET_SELECTION, Bundle().apply {
+                    putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, cursor)
+                    putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, cursor)
+                })
+            }
+        } finally {
+            if (Build.VERSION.SDK_INT < 33) node.recycle()
         }
     }
 

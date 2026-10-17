@@ -11,6 +11,7 @@ import 'remote_adb_session_state.dart';
 const remoteAdbActions = <String, String>{
   'pair': '远程 ADB 连接配对',
   'shell': '远程 ADB 命令',
+  'paste': '远程输入',
   'revoke': '撤销 ADB 配对',
   'status': '刷新 ADB 状态',
   'disconnect': '断开 ADB 连接',
@@ -38,6 +39,8 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   final pairCode = TextEditingController();
   final connectPort = TextEditingController();
   final command = TextEditingController(text: 'id');
+  final inputText = TextEditingController();
+  final inputFocus = FocusNode();
   late final RemoteAdbController adb = RemoteAdbController(widget.sessionId,
       sessionState: widget.sessionState);
   String mode = 'auto';
@@ -52,6 +55,8 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   @override void dispose() {
     adb.dispose();
     pairPort.dispose(); pairCode.dispose(); connectPort.dispose(); command.dispose();
+    inputText.dispose();
+    inputFocus.dispose();
     super.dispose();
   }
 
@@ -168,10 +173,81 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
             style: const TextStyle(fontFamily: 'monospace')))),
   ];
 
+  Future<void> _readClipboard() async {
+    try {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      if (!mounted) return;
+      final text = data?.text;
+      if (text == null || text.isEmpty) {
+        setState(() => validation = '电脑剪贴板中没有文本。');
+        return;
+      }
+      inputText.text = text;
+      setState(() => validation = '');
+    } catch (_) {
+      if (mounted) setState(() => validation = '无法读取电脑剪贴板，也可直接在文本框中粘贴。');
+    }
+  }
+
+  Future<void> _sendText() async {
+    if (!adb.ready || !adb.connected || !adb.textInputSupported) return;
+    final text = inputText.text;
+    final error = RemoteAdbController.validatePasteText(text);
+    if (error != null) {
+      setState(() => validation = error);
+      return;
+    }
+    setState(() => validation = '');
+    final result = await adb.run('paste', {'text': text});
+    if (!mounted) return;
+    if (result != null) inputText.clear();
+    inputFocus.requestFocus();
+  }
+
+  KeyEventResult _inputKey(FocusNode node, KeyEvent event) {
+    if (event.logicalKey != LogicalKeyboardKey.enter &&
+        event.logicalKey != LogicalKeyboardKey.numpadEnter) {
+      return KeyEventResult.ignored;
+    }
+    // Let the IME finish composition; Shift+Enter keeps normal multiline input.
+    if (HardwareKeyboard.instance.isShiftPressed ||
+        !inputText.value.composing.isCollapsed) {
+      return KeyEventResult.ignored;
+    }
+    if (event is KeyDownEvent) _sendText();
+    return KeyEventResult.handled;
+  }
+
+  List<Widget> _paste() => [
+    const Text('在远程手机输入框中点击后，可直接按 Ctrl+V 粘贴电脑文本；此窗口用于编辑后发送。支持中文、换行和表情。'),
+    const Text('在下方输入框按回车或点击“确定”发送，Shift+Enter 换行。'),
+    const SizedBox(height: 12),
+    if (!adb.stale && !adb.textInputSupported)
+      const Text('手机版本尚不支持远程输入，请更新 Android 客户端。'),
+    if (!adb.connected)
+      OutlinedButton(onPressed: adb.ready ? () => adb.run('connect', {'port': 0}) : null,
+          child: const Text('连接已配对的 ADB')),
+    Focus(canRequestFocus: false, onKeyEvent: _inputKey, child: TextField(
+        controller: inputText, focusNode: inputFocus, autofocus: true,
+        readOnly: adb.busy, minLines: 4, maxLines: 8,
+        autocorrect: false, enableSuggestions: false,
+        decoration: const InputDecoration(labelText: '输入或粘贴文本', border: OutlineInputBorder()))),
+    const SizedBox(height: 12),
+    Wrap(spacing: 12, runSpacing: 8, children: [
+      OutlinedButton.icon(onPressed: adb.busy ? null : _readClipboard,
+          icon: const Icon(Icons.content_paste), label: const Text('读取电脑剪贴板')),
+      ElevatedButton.icon(onPressed: adb.ready && adb.connected && adb.textInputSupported ? _sendText : null,
+          icon: const Icon(Icons.send), label: const Text('确定')),
+    ]),
+    const SizedBox(height: 12),
+    const Text('仅发送本次文本，会替换手机剪贴板。输入框须允许粘贴；取消或关闭窗口不能撤回已发送的内容。'),
+  ];
+
   List<Widget> _content() {
     switch (widget.action) {
       case 'pair': return _pairing();
       case 'shell': return _shell();
+      case 'paste': return _paste();
       case 'revoke': return [
         const Text('将清除手机上本应用的 ADB 身份与配对记录、取消排队操作并断开所有 PC 共用的 ADB。之后需要重新配对。'),
         const SizedBox(height: 12),
@@ -190,6 +266,11 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
         Text('配对记录：' + (adb.stale ? '状态未确认' : adb.paired ? '已保存' : '无记录')),
         Text('Shell 状态：' + (adb.connected ? '连接并验证成功' : '尚未连接或状态失效')),
         Text('上次成功连接端口：' + (adb.state['connectPort'] ?? 0).toString()),
+        if (adb.state['keepAliveSupported'] == true) ...[
+          const SizedBox(height: 12),
+          Text('ADB 辅助保活：${adb.keepAliveSummary}'),
+          const Text('连接后自动为本应用设置电池优化豁免；不保证进程免杀。断开 ADB 保留已有豁免，可在手机系统电池设置中恢复。'),
+        ],
         const SizedBox(height: 12),
         const Text('打开弹窗时查询状态，本次操作返回后更新。手机本地或其他 PC 操作后，请点击刷新按钮查询最新状态。配对记录不代表系统尚未撤销授权，连接时会重新验证。'),
       ];
@@ -199,7 +280,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   @override Widget build(BuildContext context) => AnimatedBuilder(animation: adb, builder: (context, _) {
     return LayoutBuilder(builder: (context, bounds) {
       final width = min(640.0, max(0.0, bounds.maxWidth - 32));
-      final height = min(widget.action == 'pair' || widget.action == 'shell' ? 680.0 : 450.0,
+      final height = min(widget.action == 'pair' || widget.action == 'shell' || widget.action == 'paste' ? 680.0 : 450.0,
           max(0.0, bounds.maxHeight - 32));
       final dx = max(0.0, (bounds.maxWidth - width) / 2 - 8);
       final dy = max(0.0, (bounds.maxHeight - height) / 2 - 8);

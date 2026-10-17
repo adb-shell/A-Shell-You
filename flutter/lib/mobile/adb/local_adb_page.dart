@@ -204,14 +204,20 @@ class _LocalAdbPageState extends State<LocalAdbPage>
       _card(_stale ? '状态未确认' : _status.connected ? '已连接 · Shell 已验证' : _status.paired ? '已配对 · 等待连接' : '尚未配对', [
         const Text('配对记录和连接由本手机保存，所有 PC 共用。本页每 3 秒查询状态；新版 PC 会接收状态变化，也可手动刷新。'),
         if (_status.connectPort != 0) Text('上次成功连接端口：' + _status.connectPort.toString()),
+        if (_status.keepAliveSupported) ...[
+          const SizedBox(height: 8),
+          Text('ADB 辅助保活：${_stale ? '状态未确认' : _status.keepAliveSummary}'),
+          const Text('ADB 连接后自动为本应用设置电池优化豁免，减少息屏后的后台限制；不保证进程永不被结束。可在系统电池设置中恢复，断开 ADB 不撤销已有豁免。'),
+        ],
         const SizedBox(height: 8),
         Text(_message, style: TextStyle(color: _error ? Theme.of(context).colorScheme.error : null)),
         if (busy) ...[
           const SizedBox(height: 8), const LinearProgressIndicator(),
-          Text(_status.phase.isEmpty ? '正在处理 ADB 请求…' : _status.phase),
+          Text(_status.phase.isNotEmpty ? _status.phase
+              : _status.keepAliveBusy ? '正在设置 ADB 辅助保活…' : '正在处理 ADB 请求…'),
           if (_busy) Align(alignment: Alignment.centerRight,
               child: TextButton(onPressed: _cancel, child: const Text('取消本页请求')))
-          else const Text('其他 PC 正在操作共享 ADB。'),
+          else if (!_status.keepAliveBusy) const Text('其他 PC 正在操作共享 ADB。'),
         ],
       ]),
       _card('配对与连接', [

@@ -200,10 +200,11 @@ final class LocalAdbMirror {
         boolean streaming = false;
         byte[] previous = null;
         long lastSent = 0;
-        try (LocalAdbLayout layout = "layout".equals(run.mode) ? new LocalAdbLayout(context, run.client, run.cancelled) : null) {
+        try (LocalAdbScreenshot capture = new LocalAdbScreenshot();
+             LocalAdbLayout layout = "layout".equals(run.mode) ? new LocalAdbLayout(context, run.client, run.cancelled) : null) {
           while (!run.cancelled.get()) {
             long started = SystemClock.elapsedRealtime();
-            LocalAdbScreenshot.Frame screenshot = layout == null ? LocalAdbScreenshot.capture(run.client, run.cancelled) : layout.read();
+            LocalAdbScreenshot.Frame screenshot = layout == null ? capture.capture(run.client, run.cancelled) : layout.read();
             synchronized (this) {
                 if (active != run || run.cancelled.get()) return;
                 run.lastPacket = SystemClock.elapsedRealtime();
@@ -217,7 +218,7 @@ final class LocalAdbMirror {
             }
             if (layout == null) {
                 AdbCaptureProfile profile = new AdbCaptureProfile(screenshot.sourceWidth, screenshot.sourceHeight);
-                long interval = profile.screenshotIntervalMs(screenshot.jpeg.length);
+                long interval = profile.screenshotIntervalMs();
                 Thread.sleep(Math.max(1, interval - (SystemClock.elapsedRealtime() - started)));
             }
           }

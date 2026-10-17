@@ -35,7 +35,26 @@ class RemoteAdbController extends ChangeNotifier {
   bool get supported => !stale && state['supported'] == true;
   bool controlAllowed = true;
   bool get ready => supported && controlAllowed && !busy;
+
+  String get keepAliveSummary {
+    if (stale || state['keepAliveSupported'] != true) return '状态未确认';
+    if (state['keepAliveExempt'] == true) return '已豁免电池优化';
+    if (state['keepAliveBusy'] == true) return '正在设置电池优化豁免…';
+    final status = state['keepAliveExempt'] == null ? '状态未确认' : '未豁免电池优化';
+    final error = state['keepAliveError'];
+    return error is String && error.isNotEmpty ? '$status：$error' : status;
+  }
   bool get discoverySupported => (state['apiVersion'] as num? ?? 1) >= 2;
+  bool get textInputSupported => state['textInputSupported'] == true;
+  static String? validatePasteText(String text) {
+    if (text.isEmpty || text.contains('\u0000')) return '请输入非空且不含 NUL 的文本。';
+    // Leave room for the request envelope when JSON escaping expands the text.
+    if (utf8.encode(text).length > 16384 ||
+        utf8.encode(jsonEncode({'method': 'paste', 'text': text})).length > 30000) {
+      return '文本过长，请分段输入（单次 UTF-8 最多 16 KiB）。';
+    }
+    return null;
+  }
   String get summary => stale ? '状态未确认' : connected
       ? 'ADB 已连接，Shell 已验证' : state['recovering'] == true
           ? 'ADB 连接中断，正在恢复 Shell' : paired
@@ -199,6 +218,7 @@ class RemoteAdbController extends ChangeNotifier {
                   : '已扫描 Android 本机端口，已填入下方。端口会随系统配对窗口和无线调试开关变化。';
           break;
         case 'connect': output = result?.toString() ?? ''; message = 'ADB 已连接，Shell 验证成功。'; break;
+        case 'paste': message = '手机已处理粘贴请求；请确认当前输入框中的内容。'; break;
         case 'shell':
           final data = result is Map ? result : const {};
           output = data['output']?.toString() ?? '';

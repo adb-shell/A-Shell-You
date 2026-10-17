@@ -1,15 +1,39 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261017-001`
+Registry Revision：`WORK-20261018-007`
 
-Last Updated：2026-10-17（构建模式名称调整）
+Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Active Task Count：0
 
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T007 合并交付：用户授权将 test/82e0f7f 合并并推送 main，说明“ADB功能问题完善”，单次 Both/常规编译、不监控。祖先/无冲突/合并树 V0 已核对，仅新增最小记录；准确 Git/dispatch 回执见交付，构建/设备待证。CE-20261018-T007-01；见 docs/tasks/T-2026-10-18-007-merge-adb-to-main.md。
+
+T006 r4 交付续接：用户授权提交推送 r3 修复到 test，单次 Build-Clients-New Windows/常规编译，不监控。准确 SHA 与 dispatch 回执见交付；修复后构建/设备待证。CE-20261018-T006-04。
+
+T006 r3 / complete / T8（源码修复与 V0）：按用户 Windows 失败日志修复 ADB 初始剪贴板同步的 E0616，使用现有公开会话信息；单处源码修改，原链路保持。test/de12290 + 本轮 dirty，修复后未构建/提交/推送/编排。CE-20261018-T006-03；见 docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md。
+
+T006 r2 交付续接：用户授权合并提交 T004/T005/T006 并推送 test，单次 Build-Clients-New Both/常规编译、不监控；准确 Git/dispatch 回执见会话交付，V0 与构建/真机待证边界保持。CE-20261018-T006-02。下列为实现阶段记录。
+
+T-2026-10-18-006 / complete / T8（实现与 V0）：补齐仅 ADB 会话复制文本同步，原监听复用，paste=false，自动最新待发/显式优先与权限取消；原无障碍/模拟输入保留，T004/T005 dirty 保留。无 Git/CI/产品验证，构建/真机待证。见 docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md。
+
+T-2026-10-18-005 / complete / T8（实现与 V0）：ADB 普通键盘通过原 KeyEvent 接入独立单 writer，修饰键按 owner 隔离，保留 Ctrl+V；保留 T004 dirty；无 Git/CI/产品验证，构建与设备待证。见 docs/tasks/T-2026-10-18-005-adb-keyboard.md。
+
+T-2026-10-18-004 / complete / T8（实现与 V0）：test/738a3fe clean 起点；Shell 文案“点亮屏”，普通画面光标与触摸同源会话权限，无 ADB 的 Ctrl+V 经现有 Seq 单次提交焦点文本；ADB 优先/权限/媒体/手势保持。最小合同及任务记忆已同步，编译/真机待证，未提交/推送/编排；CE-20261018-T004-01。见 docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md。
+
+T-2026-10-18-003 / complete / T8（实现与 V0）：取消新增齿轮/设置入口，默认静默常亮；HomePage 恢复 HEAD，原链路不改。r3 用户授权提交推送 test 后单次 Build-Clients-New Both/常规编译，不监控；Git/dispatch 回执见会话交付，构建/真机待证。CE-20261018-T003-03；见 docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md。
+
+T-2026-10-18-002 / complete：test/0b5ad99 clean 起点；仅 ADB 模块添加本应用电池优化豁免、真实状态与 Shell 栏唤醒键，实现与 V0 完成；用户授权提交推送 test、单次 Both/常规编译、不监控。构建/真机待证，准确 Git/dispatch 回执见交付。见 docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md。
+
+T-2026-10-18-001 / complete：test/00193fa clean 起点；主页常亮、真实连接判定和 ADB 弹窗回车/确定实现与 V0 完成，保留 Ctrl+V。用户授权提交推送 test 后单次 Both/常规编译，不监控；无本地产品验证，V2/V3 待证，准确 Git/dispatch 回执见交付。见 docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md。
+
+T-2026-10-17-003 / complete：test/8ef006e clean起点，直接Ctrl+V及ADB媒体参数对齐实现/V0完成；用户授权test提交推送、单次test Both/常规编译不监控。构建/真机待证，Git/dispatch回执见交付。见docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md。
+
+T-2026-10-17-002 / complete：test/af1c72d起点，独立ADB粘贴及媒体性能实现/V0完成；授权提交推送test、单次Build-Clients-New Both/常规编译，不监控；Git/dispatch回执见最终交付。未运行本地产品验证，普通链路保持。STATE/WORK-20261017-002，见docs/tasks/T-2026-10-17-002-adb-input-performance.md。
 
 none。T-2026-10-17-001已完成名称替换及V0检查，按用户授权仅本地提交；不push、不dispatch、不构建。STATE-20261017-001 / CE-20261017-T001-01；[任务](../docs/tasks/T-2026-10-17-001-build-mode-label.md)。
 

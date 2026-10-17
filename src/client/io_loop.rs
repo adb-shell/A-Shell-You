@@ -363,6 +363,9 @@ impl<T: InvokeUiSession> Remote<T> {
             .unwrap()
             .set_disconnected(round);
 
+        #[cfg(all(feature = "flutter", not(any(target_os = "android", target_os = "ios"))))]
+        if _set_disconnected_ok { crate::remote_adb_video::pc::clipboard_disconnected(&self.handler); }
+
         #[cfg(not(target_os = "ios"))]
         if self.handler.is_default() && _set_disconnected_ok {
             Client::try_stop_clipboard();

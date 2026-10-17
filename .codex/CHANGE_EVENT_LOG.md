@@ -4,9 +4,94 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-17（构建模式名称调整）
+Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261018-T007-01：test 合并 main 与编排授权
+
+- 用户授权合并、提交“ADB功能问题完善”、推送 origin/main 及构建一次；单次 Build-Clients-New/main/Both/常规编译，不监控。
+- 起点 test/82e0f7f clean；fetch 后 main/af1c72d、origin/main/130f748 均为 test 祖先，无冲突合并，写记录前暂存树与 test 相同。仅补任务与五份最小记忆，无额外业务/依赖/工作流/协议/资产改变。
+- STATE/WORK-20261018-007；V0 祖先/树/范围/diff 检查，准确提交/推送/dispatch 回执见 Git/交付，不将触发视为构建或设备验证通过。
+
+## CE-20261018-T006-04：Windows 修复提交推送及编排授权
+
+- 用户追加提交/编排授权，目标 adb-shell/A-Shell-You/test；单次 Build-Clients-New.yml、Windows/常规编译，不监控。执行前 test/de12290，七路径均为 r3 及本次记录，diff 检查通过。
+- 无新增产品代码、工作流或依赖修改；STATE/WORK-20261018-006-r4。准确 SHA/远端一致性/dispatch 接受结果见 Git 与交付；构建和设备验证待证。
+
+## CE-20261018-T006-03：修复 Windows 私有字段访问编译错误
+
+- 用户提供 logs_105834405459.zip：de12290 Windows Rust E0616，src/remote_adb_video.rs:735；日志作为诊断数据处理。初始 test/de12290 clean，本次局部修复该任务回归。
+- 源码仅初始剪贴板同步读取 PeerInfo 的来源从 FlutterHandler 私有字段改为公开 Session.lc.peer_info，缺失时跳过初始同步，原权限/偏好和正常同步保持。
+- V0 访问级别/写入清理/类型/锁序/cfg/差异检查通过；修复后构建/真机待证。仅最小任务与五份记忆同步，STATE/WORK-20261018-006-r3；无 Git/CI、本地产品执行、依赖/协议/工作流/ADR/资产变化。
+
+## CE-20261018-T006-02：test 提交推送及编排授权
+
+- 用户授权提交推送 test 并执行编排；目标 origin=adb-shell/A-Shell-You，执行前 test/738a3fe。既有 T004/T005/T006 改动统一交付，本轮只补最小交付记录，无新增产品代码修改。
+- git diff --check 通过；Build-Clients-New.yml 已核对，单次 ref=test、Platform=Both、BuildMode=常规编译，不监控。准确 Git/dispatch 回执见交付，构建与设备结果仍未知。
+- STATE/WORK-20261018-006-r2；无 Decision/ADR/资产/依赖/版本增量，无本地产品 build/test/analyze/codegen。
+
+## CE-20261018-T006-01：ADB 剪贴板同步
+
+- Task T-2026-10-18-006，STATE/WORK-20261018-006；test/738a3fe + T004/T005 dirty，实现与V0 complete。
+- PC原监听的会话分发增加ADB fallback，字段40 clipboard RPC/能力标识，Android paste=false与独立最新自动队列，显式paste优先；取消JNI及keep规则匹配。原无障碍/普通剪贴板/媒体保持。
+- V0：调用链/权限/锁序/owner/sequence/分段/清理与diff检查；构建/真机待证。未提交/推送/编排，无ADR/Decision/外部资产增量。
+
+## CE-20261018-T005-01：ADB 普通键盘输入
+
+- Task T-2026-10-18-005；STATE/WORK-20261018-005，test/738a3fe + T004 dirty；实现与 V0 complete。
+- LocalAdbKeyboard + LocalAdbTouch/Manager/keep rule，Rust 原 Android KeyEvent/JNI，Flutter inputKey gate；原 paste hook/ACK、媒体与无障碍实现不改。
+- 证据：类型/调用链/权限/owner释放/单writer/控制协议及 git diff 空白检查；构建/真机待证。无 Git/CI，无 ADR/Decision/外部资产增量；既有 T004 修改保留。
+
+## CE-20261018-T004-01：光标与无障碍 Ctrl+V
+
+- T004，用户 C2 三项修复授权，C1 必要合同/记忆；test/738a3fe clean，未执行 C3。
+- 源码：`flutter/lib/desktop/adb/{remote_adb_sidebar,remote_adb_mirror}.dart`、`flutter/lib/desktop/pages/remote_page.dart`、`src/remote_adb_video.rs`、`flutter/android/app/src/main/kotlin/me/ashell/nZW99cdXQ0COhB2o.kt`。按钮缩字、光标使用会话权限、Ctrl+V 本地请求分流及焦点文本单次提交；无 peer/JNI/生成桥变化。
+- 同步 `docs/AI_ENGINEERING/{04_ANDROID_PIPELINE,13_REMOTE_ADB,14_ADB_MIRROR}.md`、[任务](../docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md)、五份 `.codex` 任务记忆。STATE/WORK-20261018-004；Decision/ADR/资产无增量。
+- V0 数据流/权限/生命周期/选区与 diff 范围检查；V1—V3 NOT_RUN，无 Git/CI，待正式双端构建与手机测试。
+
+## CE-20261018-T003-03：test 提交推送及编排授权
+
+- 用户明确“推送test并编译”；对当前 T003 三份源码及七份合同/任务记忆执行提交推送 origin/test，随后单次 Build-Clients-New.yml / ref=test / Platform=Both / BuildMode=常规编译，不监控。
+- 交付前复查分支、diff、无入口残留及工作流参数；此批仅同步任务与五份 `.codex` 的授权/交付边界，不追加源码或构建配置修改。STATE/WORK-20261018-003-r3；无 Decision/ADR/资产增量。
+- 准确 SHA、push/dispatch 接受回执见最终会话交付；不宣称 CI 通过，不执行本地编译或真机操作。
+
+## CE-20261018-T003-02：取消新增常亮设置入口
+
+- T003/r2；用户明确要求取消顶栏齿轮和设置入口，默认静默常亮。在上一轮自身未提交改动上移除 `flutter/lib/mobile/pages/home_page.dart` 的新增 import/路由，删除本任务新增 `flutter/lib/mobile/pages/app_settings_page.dart`；不删除原文件，无其他并行改动。
+- 默认 service-on 与主页常亮控件移除保留；已有有效配置兼容，无强制写配置/新权限请求。静态复检无入口/引用残留、HomePage 与 HEAD 一致、diff 范围/空白；无构建/真机/Git/CI。
+- 同步 Android 合同、[任务](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)及五份记忆；STATE/WORK-20261018-003-r2。无 Decision/ADR/资产增量；事件01为已被 r2 更新的历史方案。
+
+## CE-20261018-T003-01：常亮设置迁移与 service-on 默认
+
+- T-2026-10-18-003，test/9e28a90 clean；用户 C2 授权 UI 迁移及默认值调整，必要 C1 合同/记忆；无 C3 操作。
+- 源码路径：`flutter/lib/mobile/pages/{app_settings_page,home_page,server_page,settings_page}.dart`、`flutter/android/app/src/main/kotlin/me/ashell/KeepScreenOnState.kt`；主页移除专用控件与状态，独立设置入口，仅默认分支调整，旧有效配置保留。
+- 同步 `docs/AI_ENGINEERING/04_ANDROID_PIPELINE.md`、`docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md` 与 `.codex/{PROJECT_STATE,CURRENT_WORK,CHANGELOG_AI,TASK_HISTORY,CHANGE_EVENT_LOG}.md`。STATE/WORK-20261018-003；Decision/ADR/资产无增量。
+- V0 差异/引用/入口与配置链检查；无编译/真机/Git/CI，当前改动未提交。见[任务](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)。
+
+## CE-20261018-T002-01：ADB 豁免省电与唤醒键
+
+- T-2026-10-18-002，test/0b5ad99 clean；新增包级电池优化豁免任务及真实状态，Shell 栏唤醒键复用独立命令链；普通链路、协议、构建无改动。
+- V0，V2/V3 待证；用户授权 test 提交推送及单次 Both/常规编译，不监控。STATE/WORK-20261018-002；无 Decision/ADR/资产增量；Git/dispatch 接受回执见交付。
+- [任务与正式验证清单](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)。
+
+## CE-20261018-T001-01：真实连接常亮与输入弹窗
+
+- T-2026-10-18-001，test/00193fa clean；主页保持常亮设置、CM 只读 JNI 与共用前后台策略，已有 ADB 弹窗回车/确定发送，Ctrl+V 保持。
+- 用户授权代码/必要记忆、test 提交推送、单次 Both/常规编译、不监控；V0，不执行本地产品验证。STATE/WORK-20261018-001；Decision/ADR/资产无增量，准确 Git/dispatch 回执见交付。
+- [任务与验证边界](../docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)。
+
+## CE-20261017-T003-01：ADB快捷粘贴及截图节奏
+
+- T-2026-10-17-003，test/8ef006e clean，用户授权Ctrl+V、画面参数对齐、test提交推送、单次test编排不监控。
+- 共用键盘入口2行ADB分流，独立模块处理快捷键/剪贴板/焦点；统一文本校验。移除960 profile、JPEG额外码率等待，300ms目标间隔与4帧回执窗口。
+- V0静态审查，无产品编译/设备测试；原采集/无障碍/剪贴板实现与协议/生成代码保持。最小合同/任务/记忆同步，STATE/WORK-20261017-003。实际Git和dispatch接受回执见交付，不作为构建通过证据。
+
+## CE-20261017-T002-01：test ADB输入与媒体优化
+
+- Task T-2026-10-17-002；起点af1c72d clean，用户授权test分支代码/提交推送/单次CI，不监控。
+- 12份独立ADB源码：UTF-8粘贴及ACK/取消；二进制帧所有权；回执窗口/媒体上限/原始截图。最小合同及任务/记忆同步；普通链路零差异。
+- V0通过，产品编译/真机NOT_RUN；Git及dispatch接受证据见最终交付，不声称CI通过。STATE/WORK-20261017-002；无外部资产或Decision增量。
 
 ## CE-20261017-T001-01：构建模式标签同步替换
 

@@ -8,8 +8,10 @@
 -keepclassmembers class me.ashell.localadb.LocalAdbManager {
     public void dispatchRemote(java.lang.String, java.lang.String, java.lang.String);
     public void disconnectRemote(java.lang.String);
+    public void cancelClipboardSync(java.lang.String);
     public void controlMirror(java.lang.String);
     public boolean routeAdbTouch(int, int, int, int, int, boolean);
+    public boolean routeAdbKey(int, byte[], boolean);
     public void injectMirrorTouch(int, int, int, int, int, int);
     public void releaseTouchOwner(int);
 }

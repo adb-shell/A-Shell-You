@@ -1424,7 +1424,11 @@ fn try_send_close_event(event_stream: &Option<StreamSink<EventToUI>>) {
 pub fn update_text_clipboard_required() {
     let is_required = sessions::get_sessions()
         .iter()
-        .any(|s| s.is_text_clipboard_required());
+        .any(|s| {
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
+            if crate::remote_adb_video::pc::clipboard_required(s) { return true; }
+            s.is_text_clipboard_required()
+        });
     #[cfg(target_os = "android")]
     let _ = scrap::android::pkg2230::call_clipboard_manager_enable_client_clipboard(is_required);
     Client::set_is_text_clipboard_required(is_required);
@@ -1450,6 +1454,8 @@ pub fn send_clipboard_msg(msg: Message, _is_file: bool) {
             }
             continue;
         }
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
+        if crate::remote_adb_video::pc::sync_clipboard(&s, &msg) { continue; }
         if s.is_text_clipboard_required() {
             // Check if the client supports multi clipboards
             if let Some(message::Union::MultiClipboards(multi_clipboards)) = &msg.union {

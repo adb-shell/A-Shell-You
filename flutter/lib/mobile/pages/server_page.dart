@@ -613,7 +613,6 @@ class _PermissionCheckerState extends State<PermissionChecker> {
         !await AndroidPermissionManager.check(kSystemAlertWindow);
 
     bind.mainSetOption(key: kOptionEnableClipboard, value: defaultOptionYes);
-    bind.mainSetLocalOption(key: kOptionKeepScreenOn, value: 'service-on');
     gFFI.serverModel.androidUpdatekeepScreenOn();
 
     if (mounted) {
@@ -1148,7 +1147,8 @@ class EnhancementsSection extends StatefulWidget {
   _EnhancementsSectionState createState() => _EnhancementsSectionState();
 }
 
-class _EnhancementsSectionState extends State<EnhancementsSection> {
+class _EnhancementsSectionState extends State<EnhancementsSection>
+    with WidgetsBindingObserver {
   var _hasIgnoreBattery = false;
   var _ignoreBatteryOpt = false;
   var _enableStartOnBoot = false;
@@ -1158,7 +1158,30 @@ class _EnhancementsSectionState extends State<EnhancementsSection> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initSettings();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refreshFloatingWindowSettings();
+  }
+
+  Future<void> _refreshFloatingWindowSettings() async {
+    final floatingWindowDisabled =
+        bind.mainGetLocalOption(key: kOptionDisableFloatingWindow) == 'Y' ||
+            !await AndroidPermissionManager.check(kSystemAlertWindow);
+    gFFI.serverModel.androidUpdatekeepScreenOn();
+    if (!mounted) return;
+    setState(() {
+      _floatingWindowDisabled = floatingWindowDisabled;
+    });
   }
 
   @override
@@ -1192,7 +1215,6 @@ class _EnhancementsSectionState extends State<EnhancementsSection> {
         !await AndroidPermissionManager.check(kSystemAlertWindow);
 
     bind.mainSetOption(key: kOptionEnableClipboard, value: defaultOptionYes);
-    bind.mainSetLocalOption(key: kOptionKeepScreenOn, value: 'service-on');
     gFFI.serverModel.androidUpdatekeepScreenOn();
 
     if (mounted) {
@@ -1291,11 +1313,13 @@ class _EnhancementsSectionState extends State<EnhancementsSection> {
                       }
                     }
                     final disable = !value;
-                    bind.mainSetLocalOption(
+                    await bind.mainSetLocalOption(
                         key: kOptionDisableFloatingWindow,
                         value: disable ? 'Y' : defaultOptionNo);
-                    setState(() => _floatingWindowDisabled = disable);
                     gFFI.serverModel.androidUpdatekeepScreenOn();
+                    if (mounted) {
+                      setState(() => _floatingWindowDisabled = disable);
+                    }
                   },
           ),
         ],

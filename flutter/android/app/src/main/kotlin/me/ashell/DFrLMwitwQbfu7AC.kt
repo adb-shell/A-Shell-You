@@ -43,7 +43,6 @@ class DFrLMwitwQbfu7AC : Service(), View.OnTouchListener {
     private var lastDownX = 0f
     private var lastDownY = 0f
     private var viewCreated = false;
-    private var keepScreenOn = KeepScreenOn.DURING_CONTROLLED
 
     companion object {
         private val logTag = p50.a(byteArrayOf(45, -94, 123, 104, -21, -30, 37, -87, 71, 108, -19, -3, 34, -83, 113), byteArrayOf(75, -50, 20, 9, -97, -117))
@@ -67,6 +66,7 @@ class DFrLMwitwQbfu7AC : Service(), View.OnTouchListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        refreshKeepScreenOn()
         return START_STICKY
     }
 
@@ -175,13 +175,6 @@ class DFrLMwitwQbfu7AC : Service(), View.OnTouchListener {
         layoutParams.gravity = Gravity.TOP or Gravity.START
         layoutParams.x = lastLayoutX
         layoutParams.y = lastLayoutY
-
-        val keepScreenOnOption = ClsFx9V0S.OCpC4h8m(p50.a(byteArrayOf(27, -75, 4, 121, 34, 62, -52, -101, 46, 21, 53, 93, -65, 15), byteArrayOf(112, -48, 97, 9, 15, 77, -81, -23, 75, 112, 91))).lowercase()
-        keepScreenOn = when (keepScreenOnOption) {
-            p50.a(byteArrayOf(-78, -117, 55, 34, 21), byteArrayOf(-36, -18, 65, 71, 103, -55, -128, -21, 109)) -> KeepScreenOn.NEVER
-            p50.a(byteArrayOf(66, -2, -42, 87, 32, 30, -87, -127, 70, -103), byteArrayOf(49, -101, -92, 33, 73, 125, -52, -84, 41, -9)) -> KeepScreenOn.SERVICE_ON
-            else -> KeepScreenOn.DURING_CONTROLLED
-        }
 
         updateKeepScreenOnLayoutParams()
 
@@ -375,29 +368,27 @@ class DFrLMwitwQbfu7AC : Service(), View.OnTouchListener {
         oFtTiPzsqzBHGigp.flutterMethodChannel?.invokeMethod(p50.a(byteArrayOf(66, -30, 105, 31, 121, -4, 62, 16, -126, 88, -11, 99), byteArrayOf(49, -106, 6, 111, 38, -113, 91, 98, -12)), null)
     }
 
-    enum class KeepScreenOn {
-        NEVER,
-        DURING_CONTROLLED,
-        SERVICE_ON,
-    }
-
     private val handler = Handler(Looper.getMainLooper())
     private val runnable = object : Runnable {
         override fun run() {
-            try {
-                if (viewCreated && updateKeepScreenOnLayoutParams()) {
-                    windowManager.updateViewLayout(floatingView, layoutParams)
-                }
-            } catch (e: Exception) {
-                Log.e(logTag, "floating window keep-screen refresh failed", e)
-            }
+            refreshKeepScreenOn()
             handler.postDelayed(this, 1000) // 1000 milliseconds = 1 second
+        }
+    }
+
+    private fun refreshKeepScreenOn() {
+        try {
+            if (viewCreated && updateKeepScreenOnLayoutParams()) {
+                windowManager.updateViewLayout(floatingView, layoutParams)
+            }
+        } catch (e: Exception) {
+            Log.e(logTag, "floating window keep-screen refresh failed", e)
         }
     }
 
     private fun updateKeepScreenOnLayoutParams(): Boolean {
         val oldOn = layoutParams.flags and FLAG_KEEP_SCREEN_ON != 0
-        val newOn = keepScreenOn == KeepScreenOn.SERVICE_ON ||  (keepScreenOn == KeepScreenOn.DURING_CONTROLLED  &&  DFm8Y8iMScvB2YDw.isStart)
+        val newOn = KeepScreenOnState.shouldKeepScreenOn()
         if (oldOn != newOn) {
           
             if (newOn) {

@@ -59,10 +59,10 @@ KeepScreenOn optionToKeepScreenOn(String value) {
   switch (value) {
     case 'never':
       return KeepScreenOn.never;
-    case 'service-on':
-      return KeepScreenOn.serviceOn;
-    default:
+    case 'during-controlled':
       return KeepScreenOn.duringControlled;
+    default:
+      return KeepScreenOn.serviceOn;
   }
 }
 
@@ -73,7 +73,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   var _enableStartOnBoot = false;
   var _checkUpdateOnStartup = false;
   var _floatingWindowDisabled = false;
-  var _keepScreenOn = KeepScreenOn.duringControlled; // relay on floating window
+  var _keepScreenOn = KeepScreenOn.serviceOn; // rely on floating window
   var _enableClipboard = true;
   var _enableAbr = false;
   var _denyLANDiscovery = false;
@@ -190,9 +190,8 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
         _floatingWindowDisabled = floatingWindowDisabled;
       }
 
-      bind.mainSetLocalOption(key: kOptionKeepScreenOn, value: 'service-on');
-      final keepScreenOn =
-          _floatingWindowDisabled ? KeepScreenOn.never : KeepScreenOn.serviceOn;
+      final keepScreenOn = optionToKeepScreenOn(
+          bind.mainGetLocalOption(key: kOptionKeepScreenOn));
       if (keepScreenOn != _keepScreenOn) {
         update = true;
         _keepScreenOn = keepScreenOn;
@@ -653,10 +652,8 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
         _RadioEntry('During service is on',
             _keepScreenOnToOption(KeepScreenOn.serviceOn)),
       ],
-      getter: () => _keepScreenOnToOption(_floatingWindowDisabled
-          ? KeepScreenOn.never
-          : _keepScreenOn),
-      asyncSetter: isOptionFixed(kOptionKeepScreenOn) || _floatingWindowDisabled
+      getter: () => _keepScreenOnToOption(_keepScreenOn),
+      asyncSetter: isOptionFixed(kOptionKeepScreenOn)
           ? null
           : (value) async {
               await bind.mainSetLocalOption(
