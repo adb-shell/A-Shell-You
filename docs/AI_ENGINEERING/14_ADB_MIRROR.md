@@ -1,6 +1,8 @@
 # AShell ADB 投屏、无视、穿透、黑屏与触摸
 
-test 分支增量（2026-10-17，[T002](../tasks/T-2026-10-17-002-adb-input-performance.md)）：PC ADB帧通过独立C ABI传递二进制，状态JSON不再携带base64；按session/owner/generation取最新帧，Dart复制后归还Rust缓冲。ADB每PC回执/解码窗口从8扩为24帧，Android保留8 MiB在途上限。投屏/截图仍用普通width/350比例与选中画质，媒体最长边上限960；穿透绘图/遮罩/物理触摸尺寸保持。截图优先系统原始像素，复用有界缓冲及Bitmap，不支持格式时本次运行回退PNG；网络仍只传缩放JPEG。小截图目标帧率上限12，仍受采集耗时和码率预算约束，不承诺截图等同视频实测帧率。没有改普通视频/截图/无障碍链或协议字段。当前仅V0；下方main基线描述的8帧、1280媒体上限和base64流程被本段的test实现取代。
+T003画质补充：H.264去掉固定1Mbps截断，沿用ADB的缩放像素量与选中quality ratio计算码率（尺寸/ratio有界、最低200kbps）。大画面Best不会再被同一上限压成Balanced码率；高画质需要相应网络带宽，不代表与普通编码器的码率/实测画质完全等同。
+
+test 分支增量（2026-10-17，[T002](../tasks/T-2026-10-17-002-adb-input-performance.md)、[T003](../tasks/T-2026-10-17-003-adb-paste-shortcut.md)）：PC ADB帧通过独立C ABI交接二进制，状态JSON不携带base64；按session/owner/generation取最新帧，Dart复制后释放Rust缓冲。H.264每PC在途/解码窗口24帧，独立JPEG/layout在途窗口4帧，均保留8 MiB上限。T003移除T002的额外960限制，统一width/350比例、最长边1280安全边界，H.264尺寸按8对齐；普通尺寸范围内与普通共享采用同一缩放策略。画质/FPS读取普通QoS的当前选择但不写入它，编码格式及实际效果不保证相同。截图优先原始像素、复用有界缓冲/Bitmap，不兼容时回退PNG，网络传缩放JPEG。无视截图目标间隔对齐普通无障碍300ms，低QoS FPS可延长；扣除采集耗时，不再按H.264码率预算额外等待最多2秒。原无障碍截图走视频编码，与独立JPEG的带宽/帧率不同，需同设备同网络实测。普通视频/截图/无障碍与协议不改；仅V0。下方main的8帧和base64描述由本段test实现取代。
 
 当前源码核对：2026-10-16，main/`4d3c446`，初始工作区 clean。本文为当前合同；历史任务和基线按各自提交解释。最新 [T001](../tasks/T-2026-10-16-001-adb-docs-sync.md)、[Baseline21](../BASELINE/21_ADB_RENDER_UI_BASELINE_2026-10-16.md)、[ADR-0026](../ADR/0026-adb-app-side-rendering.md) 补录节点采集与App绘制分离、遮罩文字及PC状态UI；[ADR-0025](../ADR/0025-adb-lanes-and-state-sync.md) 的通道隔离与同步继续有效。仅 V0，当前构建和真机兼容性尚未取得通过证据。
 

@@ -36,7 +36,7 @@ final class LocalAdbScreenshot implements AutoCloseable {
                 raw.begin();
                 readScreenshot(client, cancelled, false, raw, MAX_RAW + 16);
                 Bitmap source = raw.bitmap();
-                return encode(source, new AdbCaptureProfile(source.getWidth(), source.getHeight()).media(), cancelled);
+                return encode(source, new AdbCaptureProfile(source.getWidth(), source.getHeight()), cancelled);
             } catch (UnsupportedRawFormat ignored) {
                 // Vendor pixel/header formats may differ. Probe once per run, then use PNG.
                 raw.close();
@@ -94,7 +94,7 @@ final class LocalAdbScreenshot implements AutoCloseable {
         BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
         if (options.outWidth <= 0 || options.outHeight <= 0 || options.outWidth > 8192 || options.outHeight > 8192
                 || (long) options.outWidth * options.outHeight > 32L * 1024 * 1024) throw new IOException("Invalid screenshot dimensions");
-        AdbCaptureProfile profile = new AdbCaptureProfile(options.outWidth, options.outHeight).media();
+        AdbCaptureProfile profile = new AdbCaptureProfile(options.outWidth, options.outHeight);
         options.inSampleSize = 1;
         // Decode near the transmission size, avoiding a full-resolution intermediate.
         while (options.outWidth / (options.inSampleSize * 2) >= profile.width

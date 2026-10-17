@@ -735,6 +735,8 @@ impl<T: InvokeUiSession> Session<T> {
 
     pub fn send_key_event(&self, evt: &KeyEvent) {
         // mode: legacy(0), map(1), translate(2), auto(3)
+        #[cfg(all(feature = "flutter", not(any(target_os = "android", target_os = "ios"))))]
+        if crate::remote_adb_video::pc::paste_shortcut(self, evt) { return; }
 
         let mut msg = evt.clone();
         self.swap_modifier_key(&mut msg);

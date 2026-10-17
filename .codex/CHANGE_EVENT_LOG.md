@@ -8,6 +8,12 @@ Last Updated：2026-10-17（构建模式名称调整）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261017-T003-01：ADB快捷粘贴及截图节奏
+
+- T-2026-10-17-003，test/8ef006e clean，用户授权Ctrl+V、画面参数对齐、test提交推送、单次test编排不监控。
+- 共用键盘入口2行ADB分流，独立模块处理快捷键/剪贴板/焦点；统一文本校验。移除960 profile、JPEG额外码率等待，300ms目标间隔与4帧回执窗口。
+- V0静态审查，无产品编译/设备测试；原采集/无障碍/剪贴板实现与协议/生成代码保持。最小合同/任务/记忆同步，STATE/WORK-20261017-003。实际Git和dispatch接受回执见交付，不作为构建通过证据。
+
 ## CE-20261017-T002-01：test ADB输入与媒体优化
 
 - Task T-2026-10-17-002；起点af1c72d clean，用户授权test分支代码/提交推送/单次CI，不监控。

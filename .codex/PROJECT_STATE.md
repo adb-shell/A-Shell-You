@@ -1,9 +1,11 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261017-002`
+State Revision：`STATE-20261017-003`
 Last Updated / Observed At：2026-10-17（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+最新test增量：[T003](../docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md)，test/8ef006e clean起点。ADB直接Ctrl+V（native/Flutter键盘共用入口、会话/释放/权限检查及取消）、ADB视口焦点；移除960媒体限制、恢复统一1280 profile，JPEG对齐普通300ms采集节奏并限制4帧在途，不再额外按视频码率等待。V0源码/diff复检；无产品构建/真机通过证据。授权提交推送test、单次test Both/常规编译、不监控；实际Git/dispatch回执见最终交付。WORK-20261017-003 / CE-20261017-T003-01。以下T002及main为历史。
 
 最新test增量：[T-2026-10-17-002](../docs/tasks/T-2026-10-17-002-adb-input-performance.md)，从main/af1c72d（clean）创建test，保留既有未推送CI文案提交。新增显式ADB Unicode粘贴；ADB媒体二进制本地交接、24帧/8MiB回执窗口、960媒体上限、原始截图/PNG兼容回退。普通采集/无障碍/输入链零修改。V0检查完成；用户授权提交推送test并单次Build-Clients-New（Both/常规编译），不监控。实际SHA/dispatch接受结果见交付；产品构建及流畅度实测待证。WORK-20261017-002 / CE-20261017-T002-01，无Decision/ADR/资产增量。下方为main历史观察。
 

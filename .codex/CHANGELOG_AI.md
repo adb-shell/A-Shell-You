@@ -6,6 +6,12 @@ Last Updated：2026-10-17（构建模式名称调整）
 
 Mode：`append-only task-level index`
 
+## T-2026-10-17-003：ADB Ctrl+V与画面参数对齐
+
+- test/8ef006e clean起点。原键盘共用入口仅增加ADB Ctrl+V分流；ADB视口焦点、两种输入来源、按键释放、会话取消及共享文本校验。普通剪贴板/无障碍/采集未改。
+- 移除960限制，恢复统一profile；JPEG对齐普通300ms截图节奏，取消复杂画面的额外码率等待，独立截图在途4帧。性能须真机测量，不能等同编码效果。
+- V0源码及diff复检；授权test提交推送与单次test编排、不监控。见[T003](../docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md)，STATE/WORK-20261017-003、CE-20261017-T003-01。无Decision/ADR/资产变化。
+
 ## T-2026-10-17-002：test ADB远程输入与媒体性能
 
 - 从main/af1c72d创建test，保留既有CI提交；新增显式Unicode粘贴、二进制帧交接、24帧窗口、960媒体上限及原始截图/PNG回退。普通采集/无障碍/剪贴板链保持。

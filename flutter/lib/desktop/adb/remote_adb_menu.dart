@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -190,14 +189,9 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
 
   void _sendText() {
     final text = inputText.text;
-    if (text.isEmpty || text.contains('\u0000')) {
-      setState(() => validation = '请输入非空且不含 NUL 的文本。');
-      return;
-    }
-    // Reserve space for the remote request envelope as JSON escapes can expand text.
-    if (utf8.encode(text).length > 16384 ||
-        utf8.encode(jsonEncode({'method': 'paste', 'text': text})).length > 30000) {
-      setState(() => validation = '文本过长，请分段输入（单次 UTF-8 最多 16 KiB）。');
+    final error = RemoteAdbController.validatePasteText(text);
+    if (error != null) {
+      setState(() => validation = error);
       return;
     }
     setState(() => validation = '');
@@ -205,7 +199,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   }
 
   List<Widget> _paste() => [
-    const Text('先在手机画面中点选输入框，再粘贴文本。支持中文、换行和表情；无需开启普通共享或 ADB 投屏。'),
+    const Text('在远程手机输入框中点击后，可直接按 Ctrl+V 粘贴电脑文本；此窗口用于编辑后发送。支持中文、换行和表情。'),
     const SizedBox(height: 12),
     if (!adb.stale && !adb.textInputSupported)
       const Text('手机版本尚不支持远程输入，请更新 Android 客户端。'),

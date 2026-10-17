@@ -37,6 +37,15 @@ class RemoteAdbController extends ChangeNotifier {
   bool get ready => supported && controlAllowed && !busy;
   bool get discoverySupported => (state['apiVersion'] as num? ?? 1) >= 2;
   bool get textInputSupported => state['textInputSupported'] == true;
+  static String? validatePasteText(String text) {
+    if (text.isEmpty || text.contains('\u0000')) return '请输入非空且不含 NUL 的文本。';
+    // Leave room for the request envelope when JSON escaping expands the text.
+    if (utf8.encode(text).length > 16384 ||
+        utf8.encode(jsonEncode({'method': 'paste', 'text': text})).length > 30000) {
+      return '文本过长，请分段输入（单次 UTF-8 最多 16 KiB）。';
+    }
+    return null;
+  }
   String get summary => stale ? '状态未确认' : connected
       ? 'ADB 已连接，Shell 已验证' : state['recovering'] == true
           ? 'ADB 连接中断，正在恢复 Shell' : paired

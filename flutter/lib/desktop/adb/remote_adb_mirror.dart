@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../common.dart' show showToast;
 import '../../models/model.dart';
 import '../../models/platform_model.dart' show bind;
 import 'remote_adb_session_state.dart';
+import 'remote_adb_controller.dart';
 import 'adb_frame_native.dart' if (dart.library.html) 'adb_frame_stub.dart';
 
 /// Separate media subscription; only the dedicated ADB touch capability is shared with input.
@@ -25,6 +28,7 @@ class RemoteAdbMirror extends ChangeNotifier {
   bool _ready = false;
   bool _watching = false;
   bool _polling = false;
+  final Set<RemoteAdbController> _pasteRequests = {};
   int _epoch = 0;
   int _watchFailures = 0;
   Future<void> _transition = Future<void>.value();
@@ -98,6 +102,38 @@ class RemoteAdbMirror extends ChangeNotifier {
         if (sequence != null) 'sequence': sequence}))
       .timeout(const Duration(seconds: 5));
 
+  bool _canPaste(int epoch) => !_disposed && epoch == _epoch && _watching &&
+      !ffi.ffiModel.viewOnly && ffi.ffiModel.permissions['clipboard'] != false &&
+      !bind.sessionGetToggleOptionSync(sessionId: ffi.sessionId, arg: 'disable-clipboard') &&
+      sessionState?.snapshot?['connected'] == true && sessionState?.snapshot?['textInputSupported'] == true;
+
+  Future<void> _pasteClipboard(int epoch) async {
+    if (!_canPaste(epoch)) return;
+    if (_pasteRequests.length >= 4) { showToast('粘贴正在处理，请稍后重试。'); return; }
+    final controller = RemoteAdbController(ffi.sessionId, sessionState: sessionState);
+    _pasteRequests.add(controller);
+    try {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      if (!_canPaste(epoch) || !_pasteRequests.contains(controller)) return;
+      final text = data?.text ?? '';
+      if (text.isEmpty) { showToast('电脑剪贴板中没有文本。'); return; }
+      final error = RemoteAdbController.validatePasteText(text);
+      if (error != null) { showToast(error); return; }
+      final result = await controller.run('paste', {'text': text});
+      if (result == null && !_disposed && epoch == _epoch) showToast(controller.message);
+    } catch (_) {
+      if (!_disposed && epoch == _epoch) showToast('无法读取电脑剪贴板，请重试。');
+    } finally {
+      // Reconnect/disposal may already have cancelled and disposed this request.
+      if (_pasteRequests.remove(controller)) controller.dispose();
+    }
+  }
+
+  void _cancelPastes() {
+    for (final controller in _pasteRequests) { controller.dispose(); }
+    _pasteRequests.clear();
+  }
+
   void _peerChanged() {
     final model = ffi.ffiModel;
     final ready = model.isPeerAndroid && model.pi.isSet.value;
@@ -105,6 +141,7 @@ class RemoteAdbMirror extends ChangeNotifier {
     _peer = model.pi;
     _ready = ready;
     final epoch = ++_epoch;
+    _cancelPastes();
     final oldOwner = _owner;
     final newOwner = _owner = Uuid().v4();
     _timer?.cancel();
@@ -195,6 +232,7 @@ class RemoteAdbMirror extends ChangeNotifier {
       final adbState = value['adbState'];
       final instance = adbState is Map ? adbState['instance'] as String? : null;
       if (_remoteInstance != null && instance != null && instance != _remoteInstance) {
+        _cancelPastes();
         _desiredEnabled = null; _desiredPrivacyEnabled = null;
         _commandDeadline?.cancel(); _privacyDeadline?.cancel();
         _touchQueue.clear();
@@ -202,6 +240,11 @@ class RemoteAdbMirror extends ChangeNotifier {
       }
       if (instance != null) _remoteInstance = instance;
       if (adbState is Map) sessionState?.acceptSnapshot(Map<String, dynamic>.from(adbState));
+      if (adbState is Map && adbState['connected'] != true) _cancelPastes();
+      final pasteRequests = ((value['pasteRequests'] as num?)?.toInt() ?? 0).clamp(0, 4);
+      for (var i = 0; i < pasteRequests; i++) {
+        unawaited(_pasteClipboard(epoch));
+      }
       final next = value['state'] as String? ?? 'idle';
       final nextError = value['error'] as String? ?? '';
       final nextGeneration = (value['generation'] as num? ?? 0).toInt();
@@ -386,6 +429,7 @@ class RemoteAdbMirror extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _cancelPastes();
     _touchQueue.clear();
     ffi.inputModel.adbTouchPriority = false;
     _epoch++;

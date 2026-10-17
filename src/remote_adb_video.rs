@@ -246,12 +246,13 @@ pub mod android {
             .map(|q| (q.latest_quality(), q.fps().clamp(1, 30)))
             .unwrap_or((scrap::codec::Quality::Balanced, 15));
         let ratio = quality.ratio().clamp(0.1, 2.0);
-        // Same selected quality, with a bounded budget for this additional independent stream.
+        // Honor the selected quality at the scaled resolution. A flat 1 Mbps ceiling
+        // made Best and Balanced converge on taller screens. Dimensions/ratio are bounded.
         let bitrate = ((width * height) as f32 * 2.0 * ratio / scrap::codec::BR_BALANCED) as i32;
         let jpeg = match quality { scrap::codec::Quality::Low => 60, scrap::codec::Quality::Best => 85,
             scrap::codec::Quality::Custom(_) => (60.0 + ratio * 20.0).round().clamp(50.0, 90.0) as i32, _ => 75 };
         let Ok(array) = env.new_int_array(3) else { return std::ptr::null_mut(); };
-        if env.set_int_array_region(&array, 0, &[bitrate.clamp(200000, 1000000), fps as i32, jpeg]).is_err() {
+        if env.set_int_array_region(&array, 0, &[bitrate.max(200000), fps as i32, jpeg]).is_err() {
             return std::ptr::null_mut();
         }
         array.into_raw()
@@ -298,7 +299,10 @@ pub mod android {
             // Allow normal relay RTT without dropping every fourth frame and
             // waiting for another keyframe. Bound bytes as well as frame count.
             let pending_bytes: usize = viewer.pending.iter().map(|(_, size)| *size).sum();
-            if viewer.pending.len() >= MAX_PENDING_FRAMES || pending_bytes + packet.data.len() > 8 * 1024 * 1024 {
+            // Independent screenshots need no reference frames. Keep a short window
+            // so a slow PC cannot accumulate seconds of obsolete still images.
+            let pending_limit = if screenshot != 0 { 4 } else { MAX_PENDING_FRAMES };
+            if viewer.pending.len() >= pending_limit || pending_bytes + packet.data.len() > 8 * 1024 * 1024 {
                 viewer.need_key = true; continue;
             }
             if viewer.need_key && !keyframe { continue; }
@@ -314,7 +318,7 @@ pub mod android {
 pub mod pc {
     use super::*;
     use crate::{client::{Data, Interface}, flutter::sessions};
-    use hbb_common::message_proto::{video_frame, EncodedVideoFrame, EncodedVideoFrames};
+    use hbb_common::message_proto::{key_event, video_frame, ControlKey, KeyboardMode, KeyEvent, EncodedVideoFrame, EncodedVideoFrames};
     use scrap::{codec::Decoder, CodecFormat, ImageFormat, ImageRgb, ImageTexture};
     use serde_json::{json, Value};
     use image::ImageDecoder;
@@ -323,12 +327,56 @@ pub mod pc {
 
     struct View { generation: u64, revision: u64, adb_state: Option<Value>, state: String, error: String, image: Option<Vec<u8>>, supported: bool,
         adb_priority: bool, touch_ready: bool, input_error: String, format: String, screenshot_supported: bool,
-        privacy_supported: bool, privacy_state: String, privacy_error: String,
+        privacy_supported: bool, privacy_state: String, privacy_error: String, paste_requests: u8, paste_key_down: bool,
         layout_supported: bool, source_width: u32, source_height: u32, rgba_width: u32, rgba_height: u32 }
     struct Entry { peer: String, token: String, queue: SyncSender<RemoteAdbVideo>, view: Arc<Mutex<View>>,
         resync: Arc<AtomicBool>, live: Arc<AtomicBool>, since: Instant, last_receive: Instant, last_watch: Instant,
         touch_sequence: u64, command_sequence: u64, privacy_sequence: u64 }
     lazy_static::lazy_static! { static ref ENTRIES: Mutex<HashMap<Uuid, Entry>> = Mutex::new(HashMap::new()); }
+
+    // Both native-grab and Flutter keyboard events converge here. Consume only the
+    // paste key; ordinary modifier release and all non-ADB input keep their route.
+    pub fn paste_shortcut<T: crate::ui_session_interface::InvokeUiSession>(
+        session: &crate::ui_session_interface::Session<T>, event: &KeyEvent,
+    ) -> bool {
+        let is_v = match event.union.as_ref() {
+            Some(key_event::Union::Chr(code)) => match event.mode.enum_value_or_default() {
+                KeyboardMode::Map | KeyboardMode::Translate => *code == 50, // Android KEYCODE_V
+                _ => matches!(*code, 22 | 86 | 118), // Ctrl+V / V / v in legacy mode
+            },
+            // Translate mode can carry the shortcut as text on some keyboard layouts.
+            Some(key_event::Union::Seq(text)) => matches!(text.as_str(), "v" | "V" | "\u{16}"),
+            _ => false,
+        };
+        if !is_v { return false; }
+        if !session.peer_platform().eq_ignore_ascii_case("android") { return false; }
+        let session_id = crate::flutter::get_cur_session_id();
+        let Some(current) = sessions::get_session_by_session_id(&session_id) else { return false; };
+        if !Arc::ptr_eq(&session.sender, &current.sender) { return false; }
+        let allowed = !session.get_toggle_option("view-only".into())
+            && !session.get_toggle_option("disable-clipboard".into())
+            && session.server_clipboard_enabled.read().map(|v| *v).unwrap_or(false);
+        let modifier = |keys: &[ControlKey]| event.modifiers.iter().any(|key| keys.contains(&key.enum_value_or_default()));
+        let (alt, ctrl, shift, meta) = crate::keyboard::client::get_modifiers_state(
+            modifier(&[ControlKey::Alt, ControlKey::RAlt]),
+            modifier(&[ControlKey::Control, ControlKey::RControl]),
+            modifier(&[ControlKey::Shift, ControlKey::RShift]),
+            modifier(&[ControlKey::Meta, ControlKey::RWin]));
+        let Ok(entries) = ENTRIES.lock() else { return false; };
+        let Some(entry) = entries.get(&session_id) else { return false; };
+        let Ok(mut view) = entry.view.lock() else { return false; };
+        if view.paste_key_down {
+            if !event.down || event.press { view.paste_key_down = false; }
+            return true;
+        }
+        if (!event.down && !event.press) || !allowed || !ctrl || alt || shift || meta { return false; }
+        let supported = view.adb_state.as_ref().map(|state| state["supported"] == true
+            && state["connected"] == true && state["textInputSupported"] == true).unwrap_or(false);
+        if !supported || !entry.live.load(Ordering::Acquire) { return false; }
+        view.paste_key_down = !event.press;
+        view.paste_requests = view.paste_requests.saturating_add(1).min(4);
+        true
+    }
 
     // Local-only binary frame: four little-endian dimensions followed by JPEG or RGBA.
     // Keep only the newest decoded frame; no base64 or multi-megabyte JSON on the UI thread.
@@ -396,7 +444,7 @@ pub mod pc {
             let (tx, rx) = sync_channel::<RemoteAdbVideo>(MAX_PENDING_FRAMES);
             let view = Arc::new(Mutex::new(View { generation: 0, revision: 0, adb_state: None, state: "waiting".into(), error: String::new(), image: None, supported: false,
                 adb_priority: false, touch_ready: false, input_error: String::new(), format: String::new(), screenshot_supported: false,
-                privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(),
+                privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(), paste_requests: 0, paste_key_down: false,
                 layout_supported: false, source_width: 0, source_height: 0, rgba_width: 0, rgba_height: 0 }));
             let resync = Arc::new(AtomicBool::new(true));
             let live = Arc::new(AtomicBool::new(true));
@@ -524,7 +572,9 @@ pub mod pc {
                 view.state = "error".into();
                 view.error = "远端未响应 ADB 投屏订阅，请确认两端均已更新并保持连接。".into();
             }
+            let paste_requests = std::mem::take(&mut view.paste_requests);
             let snapshot = json!({"state":view.state,"error":view.error,"generation":view.generation,"revision":view.revision,"adbState":view.adb_state,"supported":view.supported,
+                "pasteRequests":paste_requests,
                 "adbPriority":view.adb_priority,"touchReady":view.touch_ready,"inputError":view.input_error,
                 "format":view.format,"screenshotSupported":view.screenshot_supported,"layoutSupported":view.layout_supported,
                 "sourceWidth":view.source_width,"sourceHeight":view.source_height,
@@ -587,6 +637,7 @@ pub mod pc {
             } else if view.adb_state.as_ref().and_then(|s| s["revision"].as_u64()).unwrap_or(0)
                 > state["revision"].as_u64().unwrap_or(0) { return; }
             view.adb_state = Some(state.clone());
+            if restarted || state["connected"] != true { view.paste_requests = 0; }
         };
     }
 

@@ -6,6 +6,12 @@
 
 > 本文件记录 AI 参与的工程任务、授权边界和验证结果。它不是产品 changelog，也不替代 Git history。
 
+## T-2026-10-17-003：ADB Ctrl+V与画面参数对齐
+
+- Complete/T8：test/8ef006e clean起点，实现直接快捷粘贴与ADB焦点；取消媒体960限制、JPEG最多2秒额外等待，目标采集300ms、截图在途4帧。保留普通链路及两端控制边界。
+- V0复检；V2/V3仍待证。用户授权提交推送test及单次test Both/常规编译，禁止监控。实际commit/dispatch接受结果见交付。
+- [任务](../docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md)，STATE/WORK-20261017-003、CE-20261017-T003-01；无Decision/ADR/资产增量。
+
 ## T-2026-10-17-002：test ADB远程输入与媒体性能
 
 - Complete/T8：实现/V0完成，起点main/af1c72d clean，创建并切换test。新增菜单粘贴、原生二进制帧交接、24帧回执窗口、960媒体最长边、原始截图与PNG回退；普通链路保持。

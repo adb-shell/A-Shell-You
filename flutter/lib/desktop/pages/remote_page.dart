@@ -369,7 +369,11 @@ class _RemotePageState extends State<RemotePage>
                   },
                   inputModel: _ffi.inputModel,
                   child: !isWeb && _ffi.connType == ConnType.defaultConn && _ffi.ffiModel.isPeerAndroid
-                      ? RemoteDisplayLayout(ffi: _ffi, mirror: _remoteAdbMirror, ordinary: getBodyForDesktop(context))
+                      ? RemoteDisplayLayout(ffi: _ffi, mirror: _remoteAdbMirror, ordinary: getBodyForDesktop(context),
+                          onAdbFocusRequested: () {
+                            _isWindowBlur = false;
+                            if (!_rawKeyFocusNode.hasFocus) _rawKeyFocusNode.requestFocus();
+                          })
                       : getBodyForDesktop(context))),
           Positioned(top: 10, right: 10,
             child: IgnorePointer(child: _buildStatusMonitors())),
