@@ -40,6 +40,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   final connectPort = TextEditingController();
   final command = TextEditingController(text: 'id');
   final inputText = TextEditingController();
+  final inputFocus = FocusNode();
   late final RemoteAdbController adb = RemoteAdbController(widget.sessionId,
       sessionState: widget.sessionState);
   String mode = 'auto';
@@ -55,6 +56,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
     adb.dispose();
     pairPort.dispose(); pairCode.dispose(); connectPort.dispose(); command.dispose();
     inputText.dispose();
+    inputFocus.dispose();
     super.dispose();
   }
 
@@ -187,7 +189,8 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
     }
   }
 
-  void _sendText() {
+  Future<void> _sendText() async {
+    if (!adb.ready || !adb.connected || !adb.textInputSupported) return;
     final text = inputText.text;
     final error = RemoteAdbController.validatePasteText(text);
     if (error != null) {
@@ -195,26 +198,46 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
       return;
     }
     setState(() => validation = '');
-    adb.run('paste', {'text': text});
+    final result = await adb.run('paste', {'text': text});
+    if (!mounted) return;
+    if (result != null) inputText.clear();
+    inputFocus.requestFocus();
+  }
+
+  KeyEventResult _inputKey(FocusNode node, KeyEvent event) {
+    if (event.logicalKey != LogicalKeyboardKey.enter &&
+        event.logicalKey != LogicalKeyboardKey.numpadEnter) {
+      return KeyEventResult.ignored;
+    }
+    // Let the IME finish composition; Shift+Enter keeps normal multiline input.
+    if (HardwareKeyboard.instance.isShiftPressed ||
+        !inputText.value.composing.isCollapsed) {
+      return KeyEventResult.ignored;
+    }
+    if (event is KeyDownEvent) _sendText();
+    return KeyEventResult.handled;
   }
 
   List<Widget> _paste() => [
     const Text('在远程手机输入框中点击后，可直接按 Ctrl+V 粘贴电脑文本；此窗口用于编辑后发送。支持中文、换行和表情。'),
+    const Text('在下方输入框按回车或点击“确定”发送，Shift+Enter 换行。'),
     const SizedBox(height: 12),
     if (!adb.stale && !adb.textInputSupported)
       const Text('手机版本尚不支持远程输入，请更新 Android 客户端。'),
     if (!adb.connected)
       OutlinedButton(onPressed: adb.ready ? () => adb.run('connect', {'port': 0}) : null,
           child: const Text('连接已配对的 ADB')),
-    TextField(controller: inputText, enabled: !adb.busy, minLines: 4, maxLines: 8,
+    Focus(canRequestFocus: false, onKeyEvent: _inputKey, child: TextField(
+        controller: inputText, focusNode: inputFocus, autofocus: true,
+        readOnly: adb.busy, minLines: 4, maxLines: 8,
         autocorrect: false, enableSuggestions: false,
-        decoration: const InputDecoration(labelText: '输入或粘贴文本', border: OutlineInputBorder())),
+        decoration: const InputDecoration(labelText: '输入或粘贴文本', border: OutlineInputBorder()))),
     const SizedBox(height: 12),
     Wrap(spacing: 12, runSpacing: 8, children: [
       OutlinedButton.icon(onPressed: adb.busy ? null : _readClipboard,
           icon: const Icon(Icons.content_paste), label: const Text('读取电脑剪贴板')),
       ElevatedButton.icon(onPressed: adb.ready && adb.connected && adb.textInputSupported ? _sendText : null,
-          icon: const Icon(Icons.send), label: const Text('粘贴到手机')),
+          icon: const Icon(Icons.send), label: const Text('确定')),
     ]),
     const SizedBox(height: 12),
     const Text('仅发送本次文本，会替换手机剪贴板。输入框须允许粘贴；取消或关闭窗口不能撤回已发送的内容。'),

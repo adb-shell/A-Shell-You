@@ -36,6 +36,14 @@ Android 不是“Flutter 应用加一个 Service”，而是四层共同组成�
 
 当前 Android 非 outgoing-only 主页直接装载 `ServerPage` 与右侧 `LocalAdbPage`，向左滑进入本机 ADB。Remote、file、terminal、camera、settings 等移动页面仍有源码，但不是当前主页的直接导航入口。
 
+### test：主页保持常亮（2026-10-18 / T001）
+
+主页“设置”提供 `keep-screen-on` 三档：`never` 从不、`during-controlled` 远程连接期间、`service-on` 连接服务运行期间。移除四处强制写入 service-on，保留已有选项；空值沿用 during-controlled 默认。该选项不启动屏幕共享，不改系统息屏时间或主动解锁。
+
+`KeepScreenOnState` 共用于 Activity 和既有悬浮窗：during-controlled 通过只读 JNI 查询 Rust CM `CLIENTS`，仅计入 authorized 且未 disconnected 的远控连接（排除文件、摄像头、终端、端口转发）；service-on 判断 core `isReady`。因此 ADB-only 与多 PC 同样适用，最后一个远控断开后恢复系统息屏。前台使用窗口 FLAG_KEEP_SCREEN_ON，后台沿用原悬浮窗 1 秒刷新，需允许悬浮权限；无权限时主页明确提示，仅前台常亮。用户选项保存后立即应用，应用恢复前台时重读，悬浮窗不再缓存旧模式。
+
+本增量只改变常亮策略与入口；MediaProjection、无障碍、采集、触摸、连接授权规则保持。JNI 不保存对象引用，不在 CM 锁内回调 Android；类名/native 方法有 R8 保留规则。见[任务](../tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)，V0；后台/ROM、多 PC、断线、重启恢复与 Release JNI 仍需 V2/V3 验证。
+
 ## 2. 总体链路
 
 ```mermaid

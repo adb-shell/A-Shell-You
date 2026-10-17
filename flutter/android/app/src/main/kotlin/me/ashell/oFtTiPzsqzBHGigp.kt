@@ -191,6 +191,10 @@ class oFtTiPzsqzBHGigp : FlutterActivity() {
         flutterMethodChannel.setMethodCallHandler { call, result ->
             // make sure result will be invoked, otherwise flutter will await forever
             when (call.method) {
+                "refresh_keep_screen_on" -> {
+                    refreshKeepScreenOn()
+                    result.success(true)
+                }
                 "ensure_core_service", "init_service" -> {
                     ensureMainServiceStarted()
                     result.success(true)
@@ -521,7 +525,12 @@ class oFtTiPzsqzBHGigp : FlutterActivity() {
 
     override fun onStart() {
         super.onStart()
-        val disableFloatingWindow = ClsFx9V0S.OCpC4h8m(p50.a(byteArrayOf(-101, 29, 106, 61, -15, -107, -76, -103, 52, -47, -112, 21, 109, 53, -3, -98, -4, -61, 59, -45, -101, 27, 110), byteArrayOf(-1, 116, 25, 92, -109, -7, -47, -76, 82, -67))) == p50.a(byteArrayOf(-38), byteArrayOf(-125, -112, -117, 6, 85, -44, -6, 57, 93))
+        refreshKeepScreenOn()
+    }
+
+    private fun refreshKeepScreenOn() {
+        KeepScreenOnState.applyTo(window)
+        val disableFloatingWindow = ClsFx9V0S.OCpC4h8m("disable-floating-window") == "Y"
         if (canKeepFloatingWindow(disableFloatingWindow)) {
             startFloatingWindowServiceSafely()
         } else {

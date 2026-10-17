@@ -88,6 +88,29 @@ lazy_static::lazy_static! {
 
 static CLICK_TIME: AtomicI64 = AtomicI64::new(0);
 
+// Read the same authorized connection registry used by CM. No JNI references
+// escape this call, and no Android callback is made while holding the lock.
+#[cfg(target_os = "android")]
+#[no_mangle]
+pub extern "system" fn Java_me_ashell_KeepScreenOnState_hasRemoteConnection(
+    _env: jni::JNIEnv,
+    _object: jni::objects::JObject,
+) -> jni::sys::jboolean {
+    CLIENTS
+        .read()
+        .map(|clients| {
+            clients.values().any(|client| {
+                client.authorized
+                    && !client.disconnected
+                    && !client.is_file_transfer
+                    && !client.is_view_camera
+                    && !client.is_terminal
+                    && client.port_forward.is_empty()
+            })
+        })
+        .unwrap_or(false) as jni::sys::jboolean
+}
+
 #[derive(Clone)]
 pub struct ConnectionManager<T: InvokeUiCM> {
     pub ui_handler: T,

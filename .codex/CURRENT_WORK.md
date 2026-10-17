@@ -1,15 +1,17 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261017-003`
+Registry Revision：`WORK-20261018-001`
 
-Last Updated：2026-10-17（test ADB Ctrl+V与画面参数对齐）
+Last Updated：2026-10-18（test 主页常亮与 ADB 输入弹窗）
 
 Active Task Count：0
 
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T-2026-10-18-001 / complete：test/00193fa clean 起点；主页常亮、真实连接判定和 ADB 弹窗回车/确定实现与 V0 完成，保留 Ctrl+V。用户授权提交推送 test 后单次 Both/常规编译，不监控；无本地产品验证，V2/V3 待证，准确 Git/dispatch 回执见交付。见 docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md。
 
 T-2026-10-17-003 / complete：test/8ef006e clean起点，直接Ctrl+V及ADB媒体参数对齐实现/V0完成；用户授权test提交推送、单次test Both/常规编译不监控。构建/真机待证，Git/dispatch回执见交付。见docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md。
 

@@ -4,9 +4,15 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-17（构建模式名称调整）
+Last Updated：2026-10-18（主页常亮与 ADB 输入弹窗）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261018-T001-01：真实连接常亮与输入弹窗
+
+- T-2026-10-18-001，test/00193fa clean；主页保持常亮设置、CM 只读 JNI 与共用前后台策略，已有 ADB 弹窗回车/确定发送，Ctrl+V 保持。
+- 用户授权代码/必要记忆、test 提交推送、单次 Both/常规编译、不监控；V0，不执行本地产品验证。STATE/WORK-20261018-001；Decision/ADR/资产无增量，准确 Git/dispatch 回执见交付。
+- [任务与验证边界](../docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)。
 
 ## CE-20261017-T003-01：ADB快捷粘贴及截图节奏
 

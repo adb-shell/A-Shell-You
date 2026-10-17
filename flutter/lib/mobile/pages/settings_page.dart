@@ -190,9 +190,8 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
         _floatingWindowDisabled = floatingWindowDisabled;
       }
 
-      bind.mainSetLocalOption(key: kOptionKeepScreenOn, value: 'service-on');
-      final keepScreenOn =
-          _floatingWindowDisabled ? KeepScreenOn.never : KeepScreenOn.serviceOn;
+      final keepScreenOn = optionToKeepScreenOn(
+          bind.mainGetLocalOption(key: kOptionKeepScreenOn));
       if (keepScreenOn != _keepScreenOn) {
         update = true;
         _keepScreenOn = keepScreenOn;
@@ -653,10 +652,8 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
         _RadioEntry('During service is on',
             _keepScreenOnToOption(KeepScreenOn.serviceOn)),
       ],
-      getter: () => _keepScreenOnToOption(_floatingWindowDisabled
-          ? KeepScreenOn.never
-          : _keepScreenOn),
-      asyncSetter: isOptionFixed(kOptionKeepScreenOn) || _floatingWindowDisabled
+      getter: () => _keepScreenOnToOption(_keepScreenOn),
+      asyncSetter: isOptionFixed(kOptionKeepScreenOn)
           ? null
           : (value) async {
               await bind.mainSetLocalOption(

@@ -1,9 +1,11 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261017-003`
-Last Updated / Observed At：2026-10-17（Asia/Tokyo）
+State Revision：`STATE-20261018-001`
+Last Updated / Observed At：2026-10-18（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+最新 test 增量：[T001](../docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)，test/00193fa clean 起点。主页开放三档常亮，移除强制 service-on，前后台共用真实授权 CM 连接判定（多 PC/ADB-only）；后台需悬浮权限，不依赖屏幕共享。已有 ADB 输入弹窗支持回车/确定、Shift+Enter、自动焦点，Ctrl+V 链保持。V0，未本地编译/真机验证；授权提交推送 test 后单次 Both/常规编译，不监控。WORK-20261018-001 / CE-20261018-T001-01，无 Decision/ADR/资产增量。Git/dispatch 回执见交付；以下为历史观察。
 
 最新test增量：[T003](../docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md)，test/8ef006e clean起点。ADB直接Ctrl+V（native/Flutter键盘共用入口、会话/释放/权限检查及取消）、ADB视口焦点；移除960媒体限制、恢复统一1280 profile，JPEG对齐普通300ms采集节奏并限制4帧在途，不再额外按视频码率等待。V0源码/diff复检；无产品构建/真机通过证据。授权提交推送test、单次test Both/常规编译、不监控；实际Git/dispatch回执见最终交付。WORK-20261017-003 / CE-20261017-T003-01。以下T002及main为历史。
 

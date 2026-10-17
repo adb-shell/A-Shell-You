@@ -1,5 +1,7 @@
 # AShell PC 远程 ADB
 
+test 增量（2026-10-18，[T001](../tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)）：已有“远程输入”弹窗自动聚焦，回车/数字键盘回车或“确定”发送，Shift+Enter 换行；输入法组合文字期间不拦截回车，按住回车不重复发送。发送期间只读，成功回执后清空并重新聚焦，失败保留文本。沿用原文本校验、paste RPC 与取消生命周期；普通/ADB 画面的 Ctrl+V 链路不改。V0，Windows 输入法与真机输入效果待验证。
+
 test 分支增量（2026-10-17，[T002](../tasks/T-2026-10-17-002-adb-input-performance.md)、[T003](../tasks/T-2026-10-17-003-adb-paste-shortcut.md)）：远程画面获得焦点后，Ctrl+V 在 Android ADB 可用且支持文本输入时直接粘贴电脑文本；native/Flutter 键盘入口共用分流，按 session 定位，长按/释放不重复。ADB 视口补齐焦点；无 ADB 保留原快捷键路由，遵守只读/禁用剪贴板设置。菜单“远程输入”仍可编辑后发送。Android `apiVersion=4` / `textInputSupported`、字段40 `paste(text)`，UTF-8 最多16 KiB及JSON大小检查；文本不拼入shell、不记录，不增加后台剪贴板监听。沿用独立scrcpy输入连接、4项队列和10秒ACK，关闭/重连/撤销取消待发送操作且不重放。ACK仅表示消息已处理，不保证输入框允许粘贴。普通剪贴板实现、无障碍及采集保持；公共键盘入口仅新增ADB快捷键分流。仅V0，构建/设备验收待证；下方为main基线。
 
 当前核对：2026-10-16，main/`4d3c446`；[T001](../tasks/T-2026-10-16-001-adb-docs-sync.md) / [Baseline21](../BASELINE/21_ADB_RENDER_UI_BASELINE_2026-10-16.md)。PC负责远程输入，身份、配对记录、Shell验证和执行均属于Android进程。当前支持配对/连接、命令、撤销、状态推送、Shell栏及[独立ADB画面/触摸](14_ADB_MIRROR.md)。仅V0，未宣称构建或多PC真机验收通过。

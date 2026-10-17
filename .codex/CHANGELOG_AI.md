@@ -2,9 +2,15 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-17（构建模式名称调整）
+Last Updated：2026-10-18（主页常亮与 ADB 输入弹窗）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-18-001：主页常亮与 ADB 输入弹窗
+
+- test/00193fa clean；主页三档 keep-screen-on，移除四处覆盖，前后台共用只读 CM 授权连接状态（排除文件等非远控），core-service 档独立于共享。设置持久化、后台权限说明、JNI/R8 保留。
+- ADB 原 paste 弹窗增加自动焦点、回车/确定、Shift+Enter，保留输入法与 Ctrl+V 原链；无媒体/无障碍/普通采集改动。
+- V0 完成，V2/V3 待证；授权提交推送 test、单次 Both/常规编译不监控。见[任务](../docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)，STATE/WORK-20261018-001、CE-20261018-T001-01。Decision/ADR/资产 N/A，无增量。
 
 ## T-2026-10-17-003：ADB Ctrl+V与画面参数对齐
 

@@ -9,6 +9,9 @@
     public static void checkNotNull(java.lang.Object);
 }
 
+# Read-only connection state for Android keep-screen-on policy.
+-keep class me.ashell.KeepScreenOnState { *; }
+
 # Standalone shell entry and its independent JNI state callback.
 -keep class me.ashell.localadb.AdbPrivacyOverlay { *; }
 -keep class me.ashell.localadb.AdbLayoutCapture { *; }
