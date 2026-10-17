@@ -14,8 +14,8 @@ object KeepScreenOnState {
         // This existing bridge also ensures libashell is loaded before our JNI call.
         return when (ClsFx9V0S.OCpC4h8m("keep-screen-on")) {
             "never" -> false
-            "service-on" -> DFm8Y8iMScvB2YDw.isReady
-            else -> hasRemoteConnection()
+            "during-controlled" -> hasRemoteConnection()
+            else -> DFm8Y8iMScvB2YDw.isReady
         }
     }
 

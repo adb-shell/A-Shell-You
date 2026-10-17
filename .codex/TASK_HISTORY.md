@@ -6,6 +6,12 @@
 
 > 本文件记录 AI 参与的工程任务、授权边界和验证结果。它不是产品 changelog，也不替代 Git history。
 
+## T-2026-10-18-003：静默常亮与默认值
+
+- Complete/T8（r2 续接）：test/9e28a90 clean 起点；用户追加要求不显示齿轮/设置入口，已删除本任务新增页面与路由，主页常亮控件保持隐藏。未配置/未知值默认 service-on 静默生效，保留用户已保存选项。相对 HEAD 仅三份 Flutter/Kotlin 源码与最小合同/记忆更新，无原功能链修改。
+- V0 完成，未运行本地产品 build/test/analyze/codegen/真机。r3 用户授权提交推送 test 并单次 Build-Clients-New Both/常规编译，不监控；准确 Git/dispatch 回执见交付，正式验证清单见[任务](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)。
+- STATE/WORK-20261018-003-r3 / CE-20261018-T003-03；Decision/ADR/资产无增量。
+
 ## T-2026-10-18-002：ADB 辅助保活与点亮屏幕
 
 - Complete/T8：test/0b5ad99 clean；ADB 连接后设置当前应用省电豁免，保留已有豁免，回读系统状态、不伪称免杀；独立有界命令通道与取消保持。Shell 栏新增唤醒键224，原无障碍与媒体传输不改。

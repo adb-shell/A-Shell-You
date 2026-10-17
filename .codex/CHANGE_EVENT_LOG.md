@@ -4,9 +4,28 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（ADB 辅助保活与点亮屏幕）
+Last Updated：2026-10-18（静默常亮，无新增入口）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261018-T003-03：test 提交推送及编排授权
+
+- 用户明确“推送test并编译”；对当前 T003 三份源码及七份合同/任务记忆执行提交推送 origin/test，随后单次 Build-Clients-New.yml / ref=test / Platform=Both / BuildMode=常规编译，不监控。
+- 交付前复查分支、diff、无入口残留及工作流参数；此批仅同步任务与五份 `.codex` 的授权/交付边界，不追加源码或构建配置修改。STATE/WORK-20261018-003-r3；无 Decision/ADR/资产增量。
+- 准确 SHA、push/dispatch 接受回执见最终会话交付；不宣称 CI 通过，不执行本地编译或真机操作。
+
+## CE-20261018-T003-02：取消新增常亮设置入口
+
+- T003/r2；用户明确要求取消顶栏齿轮和设置入口，默认静默常亮。在上一轮自身未提交改动上移除 `flutter/lib/mobile/pages/home_page.dart` 的新增 import/路由，删除本任务新增 `flutter/lib/mobile/pages/app_settings_page.dart`；不删除原文件，无其他并行改动。
+- 默认 service-on 与主页常亮控件移除保留；已有有效配置兼容，无强制写配置/新权限请求。静态复检无入口/引用残留、HomePage 与 HEAD 一致、diff 范围/空白；无构建/真机/Git/CI。
+- 同步 Android 合同、[任务](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)及五份记忆；STATE/WORK-20261018-003-r2。无 Decision/ADR/资产增量；事件01为已被 r2 更新的历史方案。
+
+## CE-20261018-T003-01：常亮设置迁移与 service-on 默认
+
+- T-2026-10-18-003，test/9e28a90 clean；用户 C2 授权 UI 迁移及默认值调整，必要 C1 合同/记忆；无 C3 操作。
+- 源码路径：`flutter/lib/mobile/pages/{app_settings_page,home_page,server_page,settings_page}.dart`、`flutter/android/app/src/main/kotlin/me/ashell/KeepScreenOnState.kt`；主页移除专用控件与状态，独立设置入口，仅默认分支调整，旧有效配置保留。
+- 同步 `docs/AI_ENGINEERING/04_ANDROID_PIPELINE.md`、`docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md` 与 `.codex/{PROJECT_STATE,CURRENT_WORK,CHANGELOG_AI,TASK_HISTORY,CHANGE_EVENT_LOG}.md`。STATE/WORK-20261018-003；Decision/ADR/资产无增量。
+- V0 差异/引用/入口与配置链检查；无编译/真机/Git/CI，当前改动未提交。见[任务](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)。
 
 ## CE-20261018-T002-01：ADB 豁免省电与唤醒键
 

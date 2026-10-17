@@ -1154,7 +1154,6 @@ class _EnhancementsSectionState extends State<EnhancementsSection>
   var _enableStartOnBoot = false;
   var _checkUpdateOnStartup = false;
   var _floatingWindowDisabled = false;
-  var _keepScreenOn = 'during-controlled';
 
   @override
   void initState() {
@@ -1171,21 +1170,17 @@ class _EnhancementsSectionState extends State<EnhancementsSection>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _refreshKeepScreenOnSettings();
+    if (state == AppLifecycleState.resumed) _refreshFloatingWindowSettings();
   }
 
-  Future<void> _refreshKeepScreenOnSettings() async {
+  Future<void> _refreshFloatingWindowSettings() async {
     final floatingWindowDisabled =
         bind.mainGetLocalOption(key: kOptionDisableFloatingWindow) == 'Y' ||
             !await AndroidPermissionManager.check(kSystemAlertWindow);
-    final keepScreenOn = bind.mainGetLocalOption(key: kOptionKeepScreenOn);
     gFFI.serverModel.androidUpdatekeepScreenOn();
     if (!mounted) return;
     setState(() {
       _floatingWindowDisabled = floatingWindowDisabled;
-      _keepScreenOn = const ['never', 'service-on'].contains(keepScreenOn)
-          ? keepScreenOn
-          : 'during-controlled';
     });
   }
 
@@ -1220,10 +1215,6 @@ class _EnhancementsSectionState extends State<EnhancementsSection>
         !await AndroidPermissionManager.check(kSystemAlertWindow);
 
     bind.mainSetOption(key: kOptionEnableClipboard, value: defaultOptionYes);
-    final keepScreenOn = bind.mainGetLocalOption(key: kOptionKeepScreenOn);
-    _keepScreenOn = const ['never', 'service-on'].contains(keepScreenOn)
-        ? keepScreenOn
-        : 'during-controlled';
     gFFI.serverModel.androidUpdatekeepScreenOn();
 
     if (mounted) {
@@ -1331,39 +1322,6 @@ class _EnhancementsSectionState extends State<EnhancementsSection>
                     }
                   },
           ),
-          const SizedBox(height: 8),
-          const Text('保持屏幕常亮'),
-          DropdownButton<String>(
-            isExpanded: true,
-            value: _keepScreenOn,
-            items: const [
-              DropdownMenuItem(value: 'never', child: Text('从不')),
-              DropdownMenuItem(
-                  value: 'during-controlled', child: Text('远程连接期间')),
-              DropdownMenuItem(
-                  value: 'service-on', child: Text('连接服务运行期间')),
-            ],
-            onChanged: bind.mainIsOptionFixed(key: kOptionKeepScreenOn)
-                ? null
-                : (value) async {
-                    if (value == null) return;
-                    await bind.mainSetLocalOption(
-                        key: kOptionKeepScreenOn, value: value);
-                    gFFI.serverModel.androidUpdatekeepScreenOn();
-                    if (mounted) setState(() => _keepScreenOn = value);
-                  },
-          ),
-          Text(
-            _keepScreenOn == 'never'
-                ? '按系统设置自动息屏。'
-                : _keepScreenOn == 'service-on'
-                    ? '连接服务运行时保持常亮，即使没有 PC 连接。'
-                    : '有已授权的 PC 远程连接时保持常亮，全部断开后恢复系统息屏；无需开启屏幕共享。',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          if (_floatingWindowDisabled && _keepScreenOn != 'never')
-            Text('切到其他应用后保持常亮，需要开启上方的悬浮权限。',
-                style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );

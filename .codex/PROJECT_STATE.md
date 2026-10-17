@@ -1,9 +1,11 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261018-002`
+State Revision：`STATE-20261018-003-r3`
 Last Updated / Observed At：2026-10-18（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+最新 test 增量：[T003](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)，test/9e28a90 clean 起点；r2 取消新增齿轮与设置页，主页不展示常亮控件。未配置默认 service-on 静默生效，已有有效选项保留，Kotlin 与 Dart 同步。HomePage 恢复 HEAD，原媒体/无障碍/ADB 不改；V0 完成，构建/真机待证。r3 用户授权提交推送 test 后单次 Build-Clients-New Both/常规编译，不监控，准确 Git/dispatch 回执见交付。WORK-20261018-003-r3 / CE-20261018-T003-03；无 Decision/ADR/资产增量。以下为历史。
 
 最新 test 增量：[T002](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)，test/0b5ad99 clean 起点。ADB 验证连接后单次为当前包设置电池优化豁免，复用独立有界命令通道，PowerManager 回读及既有状态推送；Shell 栏新增 keycode224 点亮屏幕，原媒体/无障碍/传输保持。仅 V0，构建/真机待证；授权提交推送 test 后单次 Both/常规编译、不监控。WORK-20261018-002 / CE-20261018-T002-01，无 Decision/ADR/资产增量，实际 Git/dispatch 回执见交付。以下为历史。
 

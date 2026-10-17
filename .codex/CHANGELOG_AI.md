@@ -2,9 +2,15 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（ADB 辅助保活与点亮屏幕）
+Last Updated：2026-10-18（静默常亮，无新增入口）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-18-003：静默常亮与默认值
+
+- test/9e28a90 clean 起点；主页移除常亮控件/缓存。r2 按用户补充删除本任务新增 AppSettingsPage 和齿轮路由，HomePage 恢复 HEAD；Kotlin/Dart 默认 service-on 静默生效，保存的有效选项不覆盖，不开放旧设置页。
+- V0 完成，V2/V3 待证；原无障碍/采集/传输/ADB 保持。r3 用户授权提交推送 test 后单次 Build-Clients-New Both/常规编译，不监控；准确回执见交付。Decision/ADR/资产：N/A — no decision delta。
+- [任务](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)，STATE/WORK-20261018-003-r3 / CE-20261018-T003-03（事件01/02保留历史）。
 
 ## T-2026-10-18-002：ADB 辅助保活与点亮屏幕
 
