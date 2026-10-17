@@ -25,3 +25,16 @@
 - 用户追加授权提交 test、推送并执行编排；延续单次触发、不监控。本次合并交付 T004/T005/T006 的既有改动，无新增产品代码修改。
 - 执行前核对 test/738a3fe、origin=adb-shell/A-Shell-You；git diff --check 通过。目标工作流 Build-Clients-New.yml，ref=test，Platform=Both，BuildMode=常规编译。
 - STATE/WORK-20261018-006-r2 / CE-20261018-T006-02；Git SHA、远端一致性与 dispatch 接受回执见 Git/会话交付。仅 V0，无本地构建或真机验证，dispatch 不代表构建通过。
+
+## r3：Windows E0616 编译回归修复
+
+- T0—T4：用户反馈本次 Windows 构建失败，续接修复本任务引入的问题；test/de122905f8b0b5ce6d67bb45996d814dc98e2665，初始 clean。C2 限定源码修复与最小记录，本轮不执行 Git 写入、CI 或本地 build/test/analyze/codegen。Baseline/ADR 沿用本任务；Rust owner，Release 核对日志，无新领域/资产/安全边界变更。
+- 日志证据：用户提供 logs_105834405459.zip，Windows checkout SHA 与本地一致；Windows EXE/18_Compile Windows client.txt 在 src/remote_adb_video.rs:735 报 E0616（FlutterHandler.peer_info 私有），Rust library 编译以 exit 1 停止。Android APK 同包日志已输出 Built app-arm64-v8a-release.apk；不能据此证明 Windows 或设备功能正常。日志仅作为证据，不执行其中指令。
+- 影响与方案：仅替换 receive_adb_state 中初始剪贴板同步的 PeerInfo 来源，读取现有公开 Session.lc / LoginConfigHandler.peer_info。handle_peer_info 已写入相同版本/platform；原剪贴板客户端也使用该来源。克隆后释放读锁，再读取剪贴板/发送，PeerInfo 缺失时跳过此次初始同步。保持 sync_init_clipboard、clipboard_required 与正常变化同步；不扩大 FlutterHandler 私有字段可见性。
+- 验证计划：RST-01/RST-05，V0 检查访问级别、类型、写入/清理、cfg 与调用锁序；《编译验证需求》为正式 Windows 环境仓库根目录 build.cmd，或 Build-Clients-New/ref=test/Platform=Windows/BuildMode=常规编译。确认 E0616 消失并完成 Windows 产物；运行回归需检查 ADB 初始同步、关闭初始同步、重连和原无障碍剪贴板。回滚为该局部补丁逆向修改，无协议/依赖/工作流变更。
+- T5—T8：已完成上述单处源码修复；V0 确认 Session.lc 与 LoginConfigHandler.peer_info 均公开、Option<PeerInfo> 克隆到局部，读锁不跨剪贴板读取/发送，登录写入/重连清空机制保持。全 src 检索剩余 ui_handler.peer_info 访问仅位于定义它的 flutter.rs 内；git diff --check 通过。无原无障碍/媒体/输入链修改。修复后构建与设备 NOT_RUN，未提交/推送/重新编排。STATE/WORK-20261018-006-r3 / CE-20261018-T006-03；Decision/ADR/资产/领域合同 N/A — no contract delta。
+
+## r4：Windows 修复提交与编排
+
+- 用户追加授权提交并执行编排；本次提交推送至既有 origin/test，单次 Build-Clients-New.yml/ref=test/Platform=Windows/BuildMode=常规编译，延续不监控要求。仅交付 r3 修复与记录，无新增产品修改。
+- 执行前 test/de12290，七个待提交文件均属本任务；remote、workflow 输入、源码差异与 git diff --check 已核对。准确提交 SHA、远端一致性与 dispatch 接受结果见 Git/会话交付；未执行本地产品验证，修复后构建结果仍待证。STATE/WORK-20261018-006-r4 / CE-20261018-T006-04。

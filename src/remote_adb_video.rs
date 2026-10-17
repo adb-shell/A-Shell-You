@@ -732,7 +732,9 @@ pub mod pc {
             if let Some(session) = sessions::get_session_by_session_id(&session_id) {
                 let initial = session.lc.read().map(|lc| lc.sync_init_clipboard.v).unwrap_or(false);
                 if initial && clipboard_required(&session) {
-                    let info = session.ui_handler.peer_info.read().unwrap().clone();
+                    let Some(info) = session.lc.read().ok().and_then(|lc| lc.peer_info.clone()) else {
+                        return;
+                    };
                     if let Some(msg) = crate::clipboard::get_current_clipboard_msg(
                         &info.version, &info.platform, crate::clipboard::ClipboardSide::Client) {
                         sync_clipboard(&session, &msg);

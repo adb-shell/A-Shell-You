@@ -1,7 +1,7 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261018-006-r2`
+Registry Revision：`WORK-20261018-006-r4`
 
 Last Updated：2026-10-18（ADB 剪贴板同步）
 
@@ -10,6 +10,10 @@ Active Task Count：0
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T006 r4 交付续接：用户授权提交推送 r3 修复到 test，单次 Build-Clients-New Windows/常规编译，不监控。准确 SHA 与 dispatch 回执见交付；修复后构建/设备待证。CE-20261018-T006-04。
+
+T006 r3 / complete / T8（源码修复与 V0）：按用户 Windows 失败日志修复 ADB 初始剪贴板同步的 E0616，使用现有公开会话信息；单处源码修改，原链路保持。test/de12290 + 本轮 dirty，修复后未构建/提交/推送/编排。CE-20261018-T006-03；见 docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md。
 
 T006 r2 交付续接：用户授权合并提交 T004/T005/T006 并推送 test，单次 Build-Clients-New Both/常规编译、不监控；准确 Git/dispatch 回执见会话交付，V0 与构建/真机待证边界保持。CE-20261018-T006-02。下列为实现阶段记录。
 

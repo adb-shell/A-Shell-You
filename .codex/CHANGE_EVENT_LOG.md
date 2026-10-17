@@ -8,6 +8,17 @@ Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261018-T006-04：Windows 修复提交推送及编排授权
+
+- 用户追加提交/编排授权，目标 adb-shell/A-Shell-You/test；单次 Build-Clients-New.yml、Windows/常规编译，不监控。执行前 test/de12290，七路径均为 r3 及本次记录，diff 检查通过。
+- 无新增产品代码、工作流或依赖修改；STATE/WORK-20261018-006-r4。准确 SHA/远端一致性/dispatch 接受结果见 Git 与交付；构建和设备验证待证。
+
+## CE-20261018-T006-03：修复 Windows 私有字段访问编译错误
+
+- 用户提供 logs_105834405459.zip：de12290 Windows Rust E0616，src/remote_adb_video.rs:735；日志作为诊断数据处理。初始 test/de12290 clean，本次局部修复该任务回归。
+- 源码仅初始剪贴板同步读取 PeerInfo 的来源从 FlutterHandler 私有字段改为公开 Session.lc.peer_info，缺失时跳过初始同步，原权限/偏好和正常同步保持。
+- V0 访问级别/写入清理/类型/锁序/cfg/差异检查通过；修复后构建/真机待证。仅最小任务与五份记忆同步，STATE/WORK-20261018-006-r3；无 Git/CI、本地产品执行、依赖/协议/工作流/ADR/资产变化。
+
 ## CE-20261018-T006-02：test 提交推送及编排授权
 
 - 用户授权提交推送 test 并执行编排；目标 origin=adb-shell/A-Shell-You，执行前 test/738a3fe。既有 T004/T005/T006 改动统一交付，本轮只补最小交付记录，无新增产品代码修改。

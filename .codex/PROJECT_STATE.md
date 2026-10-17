@@ -1,9 +1,13 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261018-006-r2`
+State Revision：`STATE-20261018-006-r4`
 Last Updated / Observed At：2026-10-18（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+T006 r4：用户授权将 r3 的 Windows E0616 修复提交推送 test，单次 Build-Clients-New Windows/常规编译，不监控。执行前 test/de12290，七路径范围与 diff 检查通过；准确 Git/dispatch 回执见交付，构建/真机待证。CE-20261018-T006-04。
+
+T006 r3：test/de12290 初始 clean；用户日志确认 Windows Rust E0616，ADB 初始剪贴板同步跨模块读取 FlutterHandler 私有字段。已改读公开 Session.lc.peer_info，其他链路不改；V0 检查通过，修复后构建/设备待证，未提交或重新编排。日志中的同提交 Android APK 已产出，不代表运行验证。CE-20261018-T006-03，详情见 T006。
 
 T006 r2：用户授权将 T004/T005/T006 提交并推送 test，随后单次触发 Build-Clients-New（Both/常规编译），不监控。执行前 test/738a3fe、diff 检查通过；准确 SHA、远端一致性及 dispatch 接受回执见 Git/会话交付，构建与真机仍待证。CE-20261018-T006-02。下列未提交状态为各实现阶段历史。
 

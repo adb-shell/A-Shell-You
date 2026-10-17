@@ -6,6 +6,15 @@ Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Mode：`append-only task-level index`
 
+## T-2026-10-18-006 r4：Windows 修复交付
+
+- 用户授权提交推送 test 并单次编排 Windows/常规编译、不监控；无新增产品修改。执行前范围/diff 检查通过，准确 Git/dispatch 回执见交付。STATE/WORK-20261018-006-r4 / CE-20261018-T006-04。
+
+## T-2026-10-18-006 r3：Windows 编译修复
+
+- 用户日志证实 de12290 的 remote_adb_video.rs 跨模块读取私有 peer_info 导致 E0616；改为已有公开 Session.lc.peer_info，不调整功能或字段可见性。
+- V0 通过，修复后构建/设备待证，未提交/推送/编排。STATE/WORK-20261018-006-r3 / CE-20261018-T006-03；[任务](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)。
+
 ## T-2026-10-18-006 r2：test 交付
 
 - 用户授权提交推送 T004/T005/T006 到 test，单次触发 Build-Clients-New Both/常规编译，不监控；无新增产品代码修改。
