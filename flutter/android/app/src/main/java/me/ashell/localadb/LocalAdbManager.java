@@ -37,6 +37,7 @@ public final class LocalAdbManager {
     private final LocalAdbTouch touch;
     private final LocalAdbPrivacy privacy;
     private final LocalAdbCommands commands;
+    private final LocalAdbKeepAlive keepAlive;
     private final SharedPreferences records;
     private final ExecutorService worker = Executors.newSingleThreadExecutor(
             task -> new Thread(task, "ashell-local-adb"));
@@ -76,6 +77,7 @@ public final class LocalAdbManager {
         touch = new LocalAdbTouch(context, client::isConnected);
         privacy = new LocalAdbPrivacy(context, client::isConnected);
         commands = new LocalAdbCommands(context, main, client::isConnected, this::changed);
+        keepAlive = new LocalAdbKeepAlive(context, commands, this::changed);
         RemoteAdbNative.attach(this);
         mirror.attach(this);
         changed();
@@ -93,6 +95,7 @@ public final class LocalAdbManager {
         }
         observedConnected = connected;
         if (connected && !transportChanging()) touch.enable(records.getInt("connectPort", 0));
+        keepAlive.update(connected && !transportChanging(), records.getInt("connectPort", 0));
     }
 
     // Independent JNI entry; no long-running video operation occupies the shell queue.
@@ -146,6 +149,7 @@ public final class LocalAdbManager {
         value.put("instance", instanceId);
         value.put("phase", current == null ? "" : current.phase);
         value.put("discovery", discovered);
+        keepAlive.addStatus(value);
         return value;
     }
 
@@ -275,6 +279,7 @@ public final class LocalAdbManager {
             mirror.stop("");
             touch.stop();
             privacy.stop();
+            keepAlive.update(false, 0);
             commands.cancel(null, null);
         }
         current = operation;

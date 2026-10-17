@@ -266,6 +266,11 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
         Text('配对记录：' + (adb.stale ? '状态未确认' : adb.paired ? '已保存' : '无记录')),
         Text('Shell 状态：' + (adb.connected ? '连接并验证成功' : '尚未连接或状态失效')),
         Text('上次成功连接端口：' + (adb.state['connectPort'] ?? 0).toString()),
+        if (adb.state['keepAliveSupported'] == true) ...[
+          const SizedBox(height: 12),
+          Text('ADB 辅助保活：${adb.keepAliveSummary}'),
+          const Text('连接后自动为本应用设置电池优化豁免；不保证进程免杀。断开 ADB 保留已有豁免，可在手机系统电池设置中恢复。'),
+        ],
         const SizedBox(height: 12),
         const Text('打开弹窗时查询状态，本次操作返回后更新。手机本地或其他 PC 操作后，请点击刷新按钮查询最新状态。配对记录不代表系统尚未撤销授权，连接时会重新验证。'),
       ];

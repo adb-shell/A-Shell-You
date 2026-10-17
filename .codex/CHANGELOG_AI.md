@@ -2,9 +2,15 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（主页常亮与 ADB 输入弹窗）
+Last Updated：2026-10-18（ADB 辅助保活与点亮屏幕）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-18-002：ADB 辅助保活与点亮屏幕
+
+- test/0b5ad99 clean；LocalAdbKeepAlive 通过独立命令设置本应用 Doze 豁免，动态包名、单次尝试/取消、已有豁免保留；PowerManager 回读并在手机/PC 状态中展示。Shell 栏复用鉴权 shell 下发唤醒键224，已亮屏不切换成息屏。
+- V0 完成，原无障碍/采集/传输及媒体链保持，无新依赖/权限/协议；V2/V3 待证。用户授权 test 提交推送及单次 Both/常规编译、不监控。
+- [任务](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)，STATE/WORK-20261018-002、CE-20261018-T002-01；Decision/ADR/资产 N/A，无增量。
 
 ## T-2026-10-18-001：主页常亮与 ADB 输入弹窗
 

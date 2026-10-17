@@ -1,9 +1,11 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261018-001`
+State Revision：`STATE-20261018-002`
 Last Updated / Observed At：2026-10-18（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+最新 test 增量：[T002](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)，test/0b5ad99 clean 起点。ADB 验证连接后单次为当前包设置电池优化豁免，复用独立有界命令通道，PowerManager 回读及既有状态推送；Shell 栏新增 keycode224 点亮屏幕，原媒体/无障碍/传输保持。仅 V0，构建/真机待证；授权提交推送 test 后单次 Both/常规编译、不监控。WORK-20261018-002 / CE-20261018-T002-01，无 Decision/ADR/资产增量，实际 Git/dispatch 回执见交付。以下为历史。
 
 最新 test 增量：[T001](../docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)，test/00193fa clean 起点。主页开放三档常亮，移除强制 service-on，前后台共用真实授权 CM 连接判定（多 PC/ADB-only）；后台需悬浮权限，不依赖屏幕共享。已有 ADB 输入弹窗支持回车/确定、Shift+Enter、自动焦点，Ctrl+V 链保持。V0，未本地编译/真机验证；授权提交推送 test 后单次 Both/常规编译，不监控。WORK-20261018-001 / CE-20261018-T001-01，无 Decision/ADR/资产增量。Git/dispatch 回执见交付；以下为历史观察。
 

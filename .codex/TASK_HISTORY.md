@@ -6,6 +6,12 @@
 
 > 本文件记录 AI 参与的工程任务、授权边界和验证结果。它不是产品 changelog，也不替代 Git history。
 
+## T-2026-10-18-002：ADB 辅助保活与点亮屏幕
+
+- Complete/T8：test/0b5ad99 clean；ADB 连接后设置当前应用省电豁免，保留已有豁免，回读系统状态、不伪称免杀；独立有界命令通道与取消保持。Shell 栏新增唤醒键224，原无障碍与媒体传输不改。
+- V0；V2/V3 未运行。授权提交推送 test 并单次 Both/常规编译，不监控；实际 Git/dispatch 回执见最终交付。
+- [任务](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)，STATE/WORK-20261018-002、CE-20261018-T002-01；Decision/ADR/资产无增量。
+
 ## T-2026-10-18-001：主页常亮与 ADB 输入弹窗
 
 - Complete/T8：test/00193fa clean 起点；主页开放三档常亮，以真实授权远控连接支持多 PC/ADB-only，移除 service-on 强制覆盖。共用窗口策略保留系统息屏设置，后台需悬浮权限。

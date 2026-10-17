@@ -210,6 +210,10 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
                           button(Icons.home, 'ADB 主页', 3),
                           button(Icons.more_horiz, 'ADB 多任务', 187),
                           _divider(),
+                          // KEYCODE_WAKEUP only wakes; POWER would toggle a lit screen off.
+                          _modeButton(scale, '点亮屏幕', Colors.blue, enabled,
+                              () => _navigate(224)),
+                          _divider(),
                           _modeButton(scale, '开投屏', Colors.blue, widget.mirror.canStart,
                               () => widget.mirror.setEnabled(true)),
                           _modeButton(scale, '关投屏', Colors.red, widget.mirror.canStopVideo,

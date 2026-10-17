@@ -4,9 +4,15 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（主页常亮与 ADB 输入弹窗）
+Last Updated：2026-10-18（ADB 辅助保活与点亮屏幕）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261018-T002-01：ADB 豁免省电与唤醒键
+
+- T-2026-10-18-002，test/0b5ad99 clean；新增包级电池优化豁免任务及真实状态，Shell 栏唤醒键复用独立命令链；普通链路、协议、构建无改动。
+- V0，V2/V3 待证；用户授权 test 提交推送及单次 Both/常规编译，不监控。STATE/WORK-20261018-002；无 Decision/ADR/资产增量；Git/dispatch 接受回执见交付。
+- [任务与正式验证清单](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)。
 
 ## CE-20261018-T001-01：真实连接常亮与输入弹窗
 

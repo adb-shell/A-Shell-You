@@ -35,6 +35,15 @@ class RemoteAdbController extends ChangeNotifier {
   bool get supported => !stale && state['supported'] == true;
   bool controlAllowed = true;
   bool get ready => supported && controlAllowed && !busy;
+
+  String get keepAliveSummary {
+    if (stale || state['keepAliveSupported'] != true) return '状态未确认';
+    if (state['keepAliveExempt'] == true) return '已豁免电池优化';
+    if (state['keepAliveBusy'] == true) return '正在设置电池优化豁免…';
+    final status = state['keepAliveExempt'] == null ? '状态未确认' : '未豁免电池优化';
+    final error = state['keepAliveError'];
+    return error is String && error.isNotEmpty ? '$status：$error' : status;
+  }
   bool get discoverySupported => (state['apiVersion'] as num? ?? 1) >= 2;
   bool get textInputSupported => state['textInputSupported'] == true;
   static String? validatePasteText(String text) {
