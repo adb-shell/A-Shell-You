@@ -4,9 +4,18 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-19（关闭ADB后的普通纹理恢复）
+Last Updated：2026-10-19（移除功能启动提示）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261019-T003-02：移除功能启动提示交付
+
+- 用户授权提交并构建编排；执行前本地/远端test均2bbdf50，10路径包含三份Dart与必要任务记录。提交推送后单次Build-Clients-New/Both/常规编译，不监控；沿用测试签名及Actions产物下载。
+- 无新增业务/配置或本地产品验证；准确Git/dispatch见会话交付，不预写构建/真机通过。STATE/WORK-20261019-003-r2；docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md。
+
+## CE-20261019-T003-01：移除功能启动提示
+
+- 用户仅授权移除无障碍功能启动小字并保护原链；test/2bbdf50 clean，三份Dart删除专用提示，连接等待/ADB/T002恢复保持。V0原命令一致性、残留/词法/diff检查通过；无Git/CI/产品验证。STATE/WORK-20261019-003；docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md。
 
 ## CE-20261019-T002-02：等待提示与显示恢复交付
 

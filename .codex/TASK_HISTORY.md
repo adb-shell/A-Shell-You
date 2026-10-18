@@ -6,6 +6,12 @@
 
 > 本文件记录 AI 参与的工程任务、授权边界和验证结果。它不是产品 changelog，也不替代 Git history。
 
+## T-2026-10-19-003：移除功能启动提示
+
+- r2：用户授权提交推送test、单次Build-Clients-New/Both/常规编译，不监控；V0范围/diff复检通过，准确Git/dispatch回执见交付，构建及设备验证待证。CE-20261019-T003-02。
+
+- 按用户要求移除无障碍栏开共享/无视/穿透启动小字，原命令与8e26f0b忽略空白后完全一致；连接等帧和ADB显示恢复保持。test/2bbdf50 clean起点，仅三份Dart与必要记录；V0完成，未Git/CI/构建/真机。STATE/WORK-20261019-003 / CE-20261019-T003-01，[任务](../docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md)。
+
 ## T-2026-10-19-002：关闭ADB后的普通纹理恢复
 
 - r2：用户授权推送并构建，提交包含T001等待提示和T002显示恢复到test，单次Build-Clients-New/Both/常规编译，不监控。V0范围/diff复检，准确Git/CI回执见交付，设备效果待证；CE-20261019-T002-02。

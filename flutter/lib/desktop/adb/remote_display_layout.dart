@@ -76,14 +76,11 @@ class _RemoteDisplayLayoutState extends State<RemoteDisplayLayout> {
       }
       // Unknown/stale status preserves the last picture during the original reconnect window.
       final adb = widget.mirror.hasFrame.value;
-      final requestedWait = model.androidFrameWaitMessage;
       final waitingForFirstFrame = model.androidConnectedWaitingForImage.value &&
           model.waitForFirstImage.value;
-      // ADB-only startup/frames keep their own surface. An explicit ordinary
-      // source request gets its own waiting area beside an existing ADB picture.
-      final waitingText = requestedWait ??
-          (waitingForFirstFrame && !adb && !widget.mirror.active &&
-              widget.mirror.error.isEmpty ? '已连接，等待画面传输' : null);
+      // Keep the connection hint separate from ADB's own startup/frames.
+      final waitingText = waitingForFirstFrame && !adb && !widget.mirror.active &&
+          widget.mirror.error.isEmpty ? '已连接，等待画面传输' : null;
       final showOrdinary = _ordinaryVisible || waitingText != null;
       final both = adb && showOrdinary;
       _trackOrdinaryLayout(both);

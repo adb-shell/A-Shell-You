@@ -106,8 +106,6 @@ class CachedPeerData {
   }
 }
 
-enum AndroidFrameWaitMode { video, screenshot, penetrate }
-
 class FfiModel with ChangeNotifier {
   CachedPeerData cachedPeerData = CachedPeerData();
   PeerInfo _pi = PeerInfo();
@@ -137,54 +135,13 @@ class FfiModel with ChangeNotifier {
   RxBool waitForFirstImage = true.obs;
   bool isRefreshing = false;
 
-  // Presentation-only state. Never reset the real first-frame/remote capture state
-  // when the user requests a different ordinary Android frame source.
+  // Presentation-only connection hint; real frames clear it without changing capture.
   final androidConnectedWaitingForImage = false.obs;
-  final androidFrameWaitMode = Rxn<AndroidFrameWaitMode>();
-  int _androidFrameWaitGeneration = 0;
 
   bool get usesInlineAndroidFrameWait => isDesktop && !isWeb && isPeerAndroid &&
       parent.target?.connType == ConnType.defaultConn;
 
-  String? get androidFrameWaitMessage {
-    switch (androidFrameWaitMode.value) {
-      case AndroidFrameWaitMode.video:
-        return '正在启动共享，等待画面传输…';
-      case AndroidFrameWaitMode.screenshot:
-        return '正在启动无视，等待画面传输…';
-      case AndroidFrameWaitMode.penetrate:
-        return '正在启动穿透，等待画面传输…';
-      case null:
-        return null;
-    }
-  }
-
-  int? beginAndroidFrameWait(AndroidFrameWaitMode mode) {
-    final target = parent.target;
-    if (!usesInlineAndroidFrameWait || target == null || target.closed ||
-        !_pi.isSet.value || viewOnly) return null;
-    cancelAndroidFrameWait();
-    final status = target.ashellStatusModel.data;
-    final alreadyActive = switch (mode) {
-      AndroidFrameWaitMode.video => status.video == true,
-      AndroidFrameWaitMode.screenshot => status.screenshot == true,
-      AndroidFrameWaitMode.penetrate => status.penetrate == true,
-    };
-    // An already-running source with a picture needs no artificial startup hint.
-    if (alreadyActive && !waitForFirstImage.value) return null;
-    androidFrameWaitMode.value = mode;
-    return _androidFrameWaitGeneration;
-  }
-
-  void cancelAndroidFrameWait({AndroidFrameWaitMode? mode, int? generation}) {
-    if (mode != null && androidFrameWaitMode.value != mode) return;
-    if (generation != null && generation != _androidFrameWaitGeneration) return;
-    _androidFrameWaitGeneration++;
-    androidFrameWaitMode.value = null;
-  }
-
   void resetAndroidFrameWait() {
-    cancelAndroidFrameWait();
     androidConnectedWaitingForImage.value = false;
   }
 

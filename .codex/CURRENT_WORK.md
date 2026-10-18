@@ -1,15 +1,19 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261019-002-r2`
+Registry Revision：`WORK-20261019-003-r2`
 
-Last Updated：2026-10-19（关闭ADB后的普通纹理恢复）
+Last Updated：2026-10-19（移除功能启动提示）
 
 Active Task Count：0
 
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T003 r2交付续接：用户授权提交推送test、单次Build-Clients-New/Both/常规编译，不监控；无新增源码修改，准确SHA/dispatch回执见交付，构建与设备结果待证。STATE/WORK-20261019-003-r2 / CE-20261019-T003-02。
+
+T003 / complete / T8（源码及V0）：移除无障碍栏功能启动小字，恢复原直接命令发送；连接等待、ADB提示和T002恢复保留，原native链不改。未Git/CI/构建/真机。STATE/WORK-20261019-003 / CE-20261019-T003-01；docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md。
 
 T002 r2交付续接：用户授权T001/T002合并提交推送test、单次Build-Clients-New/Both/常规编译，沿用不监控要求；准确SHA/dispatch回执见交付，构建/设备结果待证。STATE/WORK-20261019-002-r2 / CE-20261019-T002-02。
 

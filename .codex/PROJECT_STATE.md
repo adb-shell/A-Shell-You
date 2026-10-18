@@ -1,9 +1,13 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261019-002-r2`
+State Revision：`STATE-20261019-003-r2`
 Last Updated / Observed At：2026-10-19（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+T003 r2交付：用户授权提交推送test并单次Build-Clients-New/Both/常规编译，沿用不监控要求。执行前本地/远端2bbdf50、10路径范围与diff检查通过；准确Git/dispatch回执见交付，构建/设备结果待证。CE-20261019-T003-02；下方为实现阶段记录。
+
+T003：test/2bbdf50初始clean；按用户要求移除无障碍栏开共享/无视/穿透启动小字和专用提示逻辑，InputModel与添加提示前实现一致。连接等帧提示、ADB自身提示及T002恢复保持；V0完成，无Git/CI/产品执行。[任务](../docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md)，CE-20261019-T003-01；无新Decision/ADR/资产。下方为历史。
 
 T002 r2交付：用户授权T001/T002提交推送test后单次Build-Clients-New/Both/常规编译，不监控。执行前本地/远端8e26f0b，15路径范围与diff检查通过；实际SHA/dispatch见交付，不预写构建/真机通过。CE-20261019-T002-02；下方为实现阶段记录。
 

@@ -292,14 +292,14 @@ waiting/reconnect 不得自动开启这条链。
 
 `FFI.onEvent2UIRgba()` 对 RGBA 和 Texture 共用：
 
-- 立即清理会话内的普通画面/显式功能启动等待提示，不设置最短展示时间。
+- 立即清理会话内的连接等待画面提示，不设置最短展示时间。
 - cancel `waitForImageTimer`
 - dismiss waiting dialog
 - 清 action overlay waiting entry
 - `waitForFirstImage=false`
 - 更新 view style 并执行 first-image callbacks
 
-2026-10-19 [T001](../tasks/T-2026-10-19-001-inline-frame-wait.md)：PC显式开共享/无视/穿透后，尚未收到后续普通画面时显示对应小字；不清旧帧、不改首帧或远端功能状态，关同一模式/失败/重连/关闭取消。复用原 `sessionOnWaitingForImageDialogShow` 让下一次真实Texture提交产生通知（RGBA本来逐帧通知），该桥只重置本机通知标记，不触发采集。通知调用不阻塞原控制命令发送；无新增timer、刷新、权限或协议。ADB等待独立，只有普通帧清理普通等待。V0，正式构建/慢网和双源交互待证。
+2026-10-19 [T003](../tasks/T-2026-10-19-003-remove-feature-start-hints.md)按用户要求移除[T001](../tasks/T-2026-10-19-001-inline-frame-wait.md)的开共享/无视/穿透启动小字及专用状态/命令提示钩子。InputModel恢复原命令直接发送，不再因功能启动提示调用本地Texture通知桥；连接后的“已连接，等待画面传输”及真实帧清理保持。ADB自身等待提示、T002关闭ADB后的普通纹理恢复保持；无Android/Rust/权限/采集/协议变更。V0，正式运行待验证。
 
 ## 9. 状态包
 

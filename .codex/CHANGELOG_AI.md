@@ -2,9 +2,15 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-19（关闭ADB后的普通纹理恢复）
+Last Updated：2026-10-19（移除功能启动提示）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-19-003：移除功能启动提示
+
+- r2：用户授权提交推送test并单次Both/常规编译，不监控；本地/远端起点2bbdf50、10路径范围和diff复检通过，无新增源码修改。准确Git/dispatch见交付；CE-20261019-T003-02 / STATE/WORK-20261019-003-r2。
+
+- 移除T001开共享/无视/穿透启动小字及专用状态/发送钩子；连接等帧提示与T002恢复保留。V0确认原InputModel实现一致，native/协议/ADB不改；未Git/CI/产品执行。STATE/WORK-20261019-003 / CE-20261019-T003-01，[任务](../docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md)。
 
 ## T-2026-10-19-002：关闭ADB后的普通纹理恢复
 

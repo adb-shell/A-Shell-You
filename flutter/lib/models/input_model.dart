@@ -891,18 +891,6 @@ class InputModel {
     if (!keyboardPerm && !isAndroidControlCommand && !adbPointer) return;
     if (isViewCamera) return;
 
-    final frameMode = isAndroidControlCommand ? switch (type) {
-      'wheelstart' => AndroidFrameWaitMode.video,
-      'wheelback' => AndroidFrameWaitMode.screenshot,
-      'wheelanalysis' => AndroidFrameWaitMode.penetrate,
-      _ => null,
-    } : null;
-    final frameModel = parent.target?.ffiModel;
-    final frameWaitGeneration = frameMode != null && url.contains('开')
-        ? frameModel?.beginAndroidFrameWait(frameMode) : null;
-    if (frameMode != null && url.contains('关')) {
-      frameModel?.cancelAndroidFrameWait(mode: frameMode);
-    }
     
 
     if(type == "wheelbrowser")
@@ -1006,25 +994,9 @@ class InputModel {
           url = 'DevSelector_Management|$url';
     }
     
-    try {
-      if (frameWaitGeneration != null) {
-        // Re-arm the next real Texture notification; RGBA already notifies per
-        // frame. Do not await here: UI notification must not reorder a rapid
-        // open/close pair of the existing control commands.
-        unawaited(bind.sessionOnWaitingForImageDialogShow(sessionId: sessionId)
-            .catchError((_) {
-          frameModel?.cancelAndroidFrameWait(generation: frameWaitGeneration);
-        }));
-      }
-      await bind.sessionSendMouse(
-          sessionId: sessionId,
-          msg: json.encode(modify({'type': type, 'buttons': button.value,'url': url})));
-    } catch (_) {
-      if (frameWaitGeneration != null) {
-        frameModel?.cancelAndroidFrameWait(generation: frameWaitGeneration);
-      }
-      rethrow;
-    }
+    await bind.sessionSendMouse(
+        sessionId: sessionId,
+        msg: json.encode(modify({'type': type, 'buttons': button.value,'url': url})));
   }
 
   
