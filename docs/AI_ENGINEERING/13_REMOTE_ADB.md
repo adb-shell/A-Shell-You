@@ -1,5 +1,7 @@
 # AShell PC 远程 ADB
 
+test T008（2026-10-18）：命令使用 `AdbStreamCompat` 的UTF-8 OPEN直接执行，不再把脚本送给嵌套sh的stdin；非交互输入关闭，真实退出码/输出保留。libadb大写入按4KiB逐包等待OKAY，用于scrcpy同步文件。侧栏失败显示有界实际输出，命令连接失败区分握手/UID验证与通道异常，不重放命令。255不能单凭码值归因为配对或权限成功。弹窗位移独立ValueNotifier/RepaintBoundary，拖动不重建表单。参见[T008](../tasks/T-2026-10-18-008-adb-runtime-performance.md)；仅V0，设备复现/构建待证。
+
 test T006（2026-10-18）：仅 ADB、无原键盘权限时复用 PC 原剪贴板监听，通过字段40 `clipboard(text)` 向 Android 同步纯文本；`clipboardSyncSupported=true` 与真实 connected 协商，尊重只读/剪贴板权限及原首次同步选项。scrcpy SET_CLIPBOARD(paste=false) 只更新手机剪贴板，Ctrl+V 仍为显式 paste=true；自动同步1在途+1最新待发，显式4项队列独立优先，断线/关闭/取消清理。单次UTF-8≤16KiB且JSON≤32KiB，无新增监听或网络轮询。已有无障碍权限时继续原同步/模拟输入链；原双向行为不改，新增通道仅PC→Android文本，不承诺各输入法必定显示建议。见[T006](../tasks/T-2026-10-18-006-adb-clipboard-sync.md)，V0，构建/真机待证。
 
 test T005（2026-10-18）：普通键盘经原 KeyEvent 在 Android 已认证入口分流到独立 ADB 输入连接，保留原 modifiers，覆盖 Map/Legacy/Translate 的字母数字、符号和常用编辑键；无 ADB 仍走原无障碍。各 PC 修饰键独立，键盘队列128项，完整 down/up、不留设备按下；普通输入不写剪贴板，Ctrl+V 仍在 PC 前置截获并走原 Unicode paste/ACK。中文/表情等不在虚拟键盘映射范围的内容继续用 Ctrl+V/远程输入；不声称 UHID/游戏长按或任意输入法支持。无新 peer 字段；新两端配套验证。见[T005](../tasks/T-2026-10-18-005-adb-keyboard.md)，V0，构建/真机待证。

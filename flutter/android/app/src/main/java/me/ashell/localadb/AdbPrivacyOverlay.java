@@ -24,6 +24,7 @@ public final class AdbPrivacyOverlay {
     public static void main(String[] args) {
         Object surface = null;
         Object hintControl = null;
+        Surface blackSurface = null;
         Surface hintSurface = null;
         Bitmap hint = null;
         Object transaction = null;
@@ -71,17 +72,13 @@ public final class AdbPrivacyOverlay {
             tx = Class.forName("android.view.SurfaceControl$Transaction");
             Object builder = builderClass.getConstructor().newInstance();
             builderClass.getMethod("setName", String.class).invoke(builder, "AShell ADB privacy overlay");
-            builderClass.getMethod("setHidden", boolean.class).invoke(builder, true);
-            builderClass.getMethod("setColorLayer").invoke(builder);
+            excludeCapture(builder, builderClass, sc);
+            builderClass.getMethod("setBufferSize", int.class, int.class).invoke(builder, 1, 1);
+            builderClass.getMethod("setFormat", int.class).invoke(builder, PixelFormat.RGBA_8888);
             Method skip = null;
             if (Build.VERSION.SDK_INT >= 31) {
                 // Resolve before building/showing: never substitute FLAG_SECURE (which captures black).
                 skip = tx.getMethod("setSkipScreenshot", sc, boolean.class);
-            } else {
-                // Android 11 predecessor of SKIP_SCREENSHOT, read platform constants rather than magic flags.
-                int key = sc.getField("METADATA_WINDOW_TYPE").getInt(null);
-                int type = sc.getField("WINDOW_TYPE_DONT_SCREENSHOT").getInt(null);
-                builderClass.getMethod("setMetadata", int.class, int.class).invoke(builder, key, type);
             }
             Class<?> displays = Class.forName("android.hardware.display.DisplayManagerGlobal");
             Object global = displays.getMethod("getInstance").invoke(null);
@@ -92,38 +89,41 @@ public final class AdbPrivacyOverlay {
             transaction = tx.getConstructor().newInstance();
             if (skip != null) skip.invoke(transaction, surface, true);
             if (Build.VERSION.SDK_INT >= 31) {
-                // Own color layer only: allow input below this overlay, without disabling the
+                // Own layer only: allow input below this overlay, without disabling the
                 // system-wide untrusted-touch protection or giving the layer an input channel.
                 tx.getMethod("setTrustedOverlay", sc, boolean.class).invoke(transaction, surface, true);
             }
             tx.getMethod("setLayerStack", sc, int.class).invoke(transaction, surface, layerStack);
-            tx.getMethod("setLayer", sc, int.class).invoke(transaction, surface, Integer.MAX_VALUE);
-            tx.getMethod("setColor", sc, float[].class).invoke(transaction, surface, new float[]{0f, 0f, 0f});
-            // A color layer has no pixel buffer; a square crop covers rotation without reallocations.
-            tx.getMethod("setWindowCrop", sc, int.class, int.class).invoke(transaction, surface, 16384, 16384);
+            tx.getMethod("setLayer", sc, int.class).invoke(transaction, surface, Integer.MAX_VALUE - 1);
+            // Use a real buffer layer, not a 16384px effect-layer crop: both the
+            // compositor and screenshot exclusion now operate on submitted pixels.
+            // A single black pixel scales without allocating a full-screen bitmap.
+            int displayWidth = info.getClass().getField("logicalWidth").getInt(info);
+            int displayHeight = info.getClass().getField("logicalHeight").getInt(info);
+            Method matrix = tx.getMethod("setMatrix", sc, float.class, float.class, float.class, float.class);
+            matrix.invoke(transaction, surface, (float) displayWidth, 0f, 0f, (float) displayHeight);
             tx.getMethod("setAlpha", sc, float.class).invoke(transaction, surface, 1f);
+            blackSurface = Surface.class.getConstructor().newInstance();
+            Surface.class.getMethod("copyFrom", sc).invoke(blackSurface, surface);
+            Canvas blackCanvas = blackSurface.lockCanvas(null);
+            try { blackCanvas.drawColor(Color.BLACK); }
+            finally { blackSurface.unlockCanvasAndPost(blackCanvas); }
 
             // Show only pixels here, with the existing 60dp margin + 20dp padding.
             stage = 4;
             float density = info.getClass().getField("logicalDensityDpi").getInt(info) / 160f;
-            int displayHeight = info.getClass().getField("logicalHeight").getInt(info);
             float inset = 80f * density;
             Object hintBuilder = builderClass.getConstructor().newInstance();
             builderClass.getMethod("setName", String.class).invoke(hintBuilder, "AShell ADB privacy hint");
-            builderClass.getMethod("setHidden", boolean.class).invoke(hintBuilder, true);
-            builderClass.getMethod("setParent", sc).invoke(hintBuilder, surface);
+            excludeCapture(hintBuilder, builderClass, sc);
             builderClass.getMethod("setBufferSize", int.class, int.class).invoke(hintBuilder, hint.getWidth(), hintHeight);
             builderClass.getMethod("setFormat", int.class).invoke(hintBuilder, PixelFormat.RGBA_8888);
-            if (skip == null) {
-                builderClass.getMethod("setMetadata", int.class, int.class).invoke(hintBuilder,
-                        sc.getField("METADATA_WINDOW_TYPE").getInt(null),
-                        sc.getField("WINDOW_TYPE_DONT_SCREENSHOT").getInt(null));
-            }
             hintControl = builderClass.getMethod("build").invoke(hintBuilder);
             if (skip != null) skip.invoke(transaction, hintControl, true);
             if (Build.VERSION.SDK_INT >= 31)
                 tx.getMethod("setTrustedOverlay", sc, boolean.class).invoke(transaction, hintControl, true);
-            tx.getMethod("setLayer", sc, int.class).invoke(transaction, hintControl, 1);
+            tx.getMethod("setLayerStack", sc, int.class).invoke(transaction, hintControl, layerStack);
+            tx.getMethod("setLayer", sc, int.class).invoke(transaction, hintControl, Integer.MAX_VALUE);
             Method position = tx.getMethod("setPosition", sc, float.class, float.class);
             position.invoke(transaction, hintControl, inset, Math.max(0f, displayHeight - inset - hintHeight));
             // Surface's empty constructor/copyFrom are framework APIs, not public SDK APIs.
@@ -148,8 +148,11 @@ public final class AdbPrivacyOverlay {
                 Object currentInfo = displays.getMethod("getDisplayInfo", int.class).invoke(global, 0);
                 if (currentInfo == null) continue;
                 int height = currentInfo.getClass().getField("logicalHeight").getInt(currentInfo);
-                if (height != displayHeight) {
+                int width = currentInfo.getClass().getField("logicalWidth").getInt(currentInfo);
+                if (height != displayHeight || width != displayWidth) {
                     displayHeight = height;
+                    displayWidth = width;
+                    matrix.invoke(transaction, surface, (float) width, 0f, 0f, (float) height);
                     position.invoke(transaction, hintControl, inset, Math.max(0f, height - inset - hintHeight));
                     tx.getMethod("apply", boolean.class).invoke(transaction, true);
                 }
@@ -171,6 +174,7 @@ public final class AdbPrivacyOverlay {
                     tx.getMethod("apply", boolean.class).invoke(transaction, true);
                 }
                 if (hintSurface != null) hintSurface.release();
+                if (blackSurface != null) blackSurface.release();
                 if (hintControl != null) sc.getMethod("release").invoke(hintControl);
                 if (surface != null) sc.getMethod("release").invoke(surface);
                 if (transaction != null) tx.getMethod("close").invoke(transaction);
@@ -178,6 +182,19 @@ public final class AdbPrivacyOverlay {
             System.out.println("ASHELL_OVERLAY_OFF");
             System.out.flush();
             System.exit(0); // also releases the SurfaceControl session if remove failed
+        }
+    }
+
+    private static void excludeCapture(Object builder, Class<?> type, Class<?> sc) throws Exception {
+        // Set exclusion at CREATION as well as in the first transaction. BufferQueue
+        // adapters/ROM mirror implementations may snapshot the layer's creation flags.
+        int flags = sc.getField("HIDDEN").getInt(null);
+        if (Build.VERSION.SDK_INT >= 31) flags |= sc.getField("SKIP_SCREENSHOT").getInt(null);
+        type.getMethod("setFlags", int.class).invoke(builder, flags);
+        if (Build.VERSION.SDK_INT == 30) {
+            type.getMethod("setMetadata", int.class, int.class).invoke(builder,
+                    sc.getField("METADATA_WINDOW_TYPE").getInt(null),
+                    sc.getField("WINDOW_TYPE_DONT_SCREENSHOT").getInt(null));
         }
     }
 }

@@ -6,6 +6,11 @@ Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Mode：`append-only task-level index`
 
+## T-2026-10-18-008：ADB运行与性能排查
+
+- 独立截图常驻Shell压缩及兼容回退、穿透刷新/缓存、视频独立帧率、黑屏buffer创建排除、命令协议分包/实际诊断、PC弹窗位移与重绘优化；原共享/无障碍/输入实现未改。
+- V0实现复检；255具体设备原因、厂商黑屏与流畅度实测未取得，不宣称全部运行通过。授权test推送后单次Both/常规编译、不监控，回执见交付。STATE/WORK-20261018-008 / CE-20261018-T008-01；[任务](../docs/tasks/T-2026-10-18-008-adb-runtime-performance.md)。Decision/ADR/资产：N/A — no decision delta。
+
 ## T-2026-10-18-007：ADB 功能合并 main
 
 - 用户授权 test/82e0f7f → main，--no-ff 合并说明“ADB功能问题完善”，推送后单次 Both/常规编译、不监控。合并无冲突、树与 test 一致，无新增产品修改；准确 Git/dispatch 回执见交付。

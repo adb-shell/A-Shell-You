@@ -19,7 +19,7 @@ class RemoteAdbMirrorView extends StatelessWidget {
     animation: Listenable.merge([mirror, mirror.frameUpdates]),
     builder: (context, _) {
       final error = mirror.error.isNotEmpty ? mirror.error : mirror.inputError;
-      return MouseRegion(onEnter: (_) {
+      return RepaintBoundary(child: MouseRegion(onEnter: (_) {
         bind.hostStopSystemKeyPropagate(stopped: false);
         if (!isWindows) { onFocusRequested(); mirror.ffi.inputModel.enterOrLeave(true); }
       }, onExit: (_) {
@@ -41,7 +41,7 @@ class RemoteAdbMirrorView extends StatelessWidget {
                 child: Text(error,
                   textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 11)),
               )))),
-          ])))));
+          ]))))));
     });
 }
 

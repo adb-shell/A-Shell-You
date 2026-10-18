@@ -1,9 +1,11 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261018-007`
+State Revision：`STATE-20261018-008`
 Last Updated / Observed At：2026-10-18（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+T008：main/e3b4454 clean后test快进至该基线；独立ADB截图常驻压缩、穿透80ms/缓存、视频30fps上限、黑屏buffer/创建排除、命令直接OPEN/分包及诊断、PC弹窗位移和重绘优化。原媒体/无障碍/输入实现未改。V0完成，未本地构建/操作设备；255设备根因与黑屏/流畅度仍待实测。用户授权test提交推送后单次Both/常规编译、不监控，准确SHA/dispatch见交付。CE-20261018-T008-01；[任务](../docs/tasks/T-2026-10-18-008-adb-runtime-performance.md)。下方为历史。
 
 T007：用户授权 test/82e0f7f 合并 main，提交说明“ADB功能问题完善”，推送后单次 Build-Clients-New/main/Both/常规编译，不监控。fetch 确认本地/远端 main 均为 test 祖先；无冲突合并，写记录前树与 test 一致。无新增业务修改；准确 SHA/远端一致性/dispatch 回执见交付，构建与设备仍待证。CE-20261018-T007-01；[任务](../docs/tasks/T-2026-10-18-007-merge-adb-to-main.md)。下方为历史。
 

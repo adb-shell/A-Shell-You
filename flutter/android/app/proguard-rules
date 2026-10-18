@@ -15,6 +15,7 @@
 # Standalone shell entry and its independent JNI state callback.
 -keep class me.ashell.localadb.AdbPrivacyOverlay { *; }
 -keep class me.ashell.localadb.AdbLayoutCapture { *; }
+-keep class me.ashell.localadb.AdbScreenshotCapture { *; }
 -keep class me.ashell.localadb.AdbCaptureProfile { native <methods>; }
 -keep class me.ashell.localadb.LocalAdbPrivacy { native <methods>; }
 

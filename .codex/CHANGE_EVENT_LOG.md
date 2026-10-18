@@ -8,6 +8,12 @@ Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261018-T008-01：独立ADB性能与兼容修复
+
+- 当前用户C2/C3授权；test快进main/e3b4454，初始clean。修改localadb媒体/截图/遮罩/命令类、proguard-rules、desktop/adb弹窗/媒体/侧栏及src/remote_adb_video.rs，新增AdbScreenshotCapture/LocalAdbScreenshotSession。字段/依赖/原链路/构建脚本不改。
+- 常驻截图、80ms节点与事件缓存、独立30fps、buffer遮罩及创建时排除、UTF-8直接命令/逐包ACK/真实错误、位移局部更新；最小13/14合同、本任务和五份记忆同事件。无外部资产或长期决定增量。
+- V0引用、括号、资源/取消、diff检查；未本地产品验证。255与黑屏设备原因未获复现，实测待证。test推送及单次Both/常规编译获准，不监控；Git/dispatch回执见交付。
+
 ## CE-20261018-T007-01：test 合并 main 与编排授权
 
 - 用户授权合并、提交“ADB功能问题完善”、推送 origin/main 及构建一次；单次 Build-Clients-New/main/Both/常规编译，不监控。

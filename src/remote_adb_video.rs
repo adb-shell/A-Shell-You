@@ -257,9 +257,12 @@ pub mod android {
     pub extern "system" fn Java_me_ashell_localadb_AdbCaptureProfile_quality(env: JNIEnv, _class: JClass,
         width: jint, height: jint) -> jni::sys::jintArray {
         if width <= 0 || height <= 0 || width > 1280 || height > 1280 { return std::ptr::null_mut(); }
-        let (quality, fps) = crate::server::video_service::VIDEO_QOS.lock()
-            .map(|q| (q.latest_quality(), q.fps().clamp(1, 30)))
-            .unwrap_or((scrap::codec::Quality::Balanced, 15));
+        let quality = crate::server::video_service::VIDEO_QOS.lock()
+            .map(|q| q.latest_quality()).unwrap_or(scrap::codec::Quality::Balanced);
+        // Ordinary-video congestion feedback is not feedback for this independent stream.
+        // Latching its temporarily reduced FPS at scrcpy startup could cap ADB at 1 FPS
+        // for the entire run. Use the ordinary encoder's default frame-rate ceiling.
+        let fps = 30;
         let ratio = quality.ratio().clamp(0.1, 2.0);
         // Honor the selected quality at the scaled resolution. A flat 1 Mbps ceiling
         // made Best and Balanced converge on taller screens. Dimensions/ratio are bounded.

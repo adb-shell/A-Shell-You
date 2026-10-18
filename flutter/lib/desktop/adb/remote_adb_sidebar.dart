@@ -129,7 +129,10 @@ class _RemoteAdbSidebarState extends State<RemoteAdbSidebar> {
       if (!widget.state.available || widget.ffi.ffiModel.viewOnly) return;
       final result = await _adb.run('shell', {'command': command});
       if (!mounted) return;
-      if (result == null || result['exitCode'] != 0) showToast(_adb.message);
+      if (result == null || result['exitCode'] != 0) {
+        final detail = _adb.output.trim();
+        showToast(detail.isEmpty ? _adb.message : '${_adb.message}\n${detail.length > 512 ? detail.substring(0, 512) : detail}');
+      }
     } finally {
       if (mounted) setState(() => _sending = false);
     }

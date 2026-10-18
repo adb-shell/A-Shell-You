@@ -9,7 +9,7 @@ import android.view.WindowManager;
 final class AdbCaptureProfile {
     static final int MAX_EDGE = 1280;
     static final int JPEG_QUALITY = 75;
-    static final int FRAME_INTERVAL_MS = 500;
+    static final int FRAME_INTERVAL_MS = 80;
     // Same capture cadence as the ordinary Accessibility screenshot loop (300 ms).
     private static final int SCREENSHOT_INTERVAL_MS = 300;
     final int sourceWidth, sourceHeight, width, height;
@@ -40,20 +40,18 @@ final class AdbCaptureProfile {
     int maxSize() { return Math.max(8, Math.max(width, height) & ~7); }
 
     long screenshotIntervalMs() {
-        int[] settings = encoding();
-        int fps = Math.max(1, settings[1]);
         // JPEG is intra-frame; applying the H.264 bitrate budget here made detailed
         // screens wait up to two seconds. Slow viewers are bounded by their ACK window.
-        return Math.max(SCREENSHOT_INTERVAL_MS, (1000L + fps - 1) / fps);
+        return SCREENSHOT_INTERVAL_MS;
     }
     private static native int[] quality(int width, int height);
 
     int[] encoding() {
-        // Read the ordinary stream's selected quality/FPS without changing its QoS state.
+        // Read selected quality without borrowing ordinary-video congestion FPS.
         try {
             int[] value = quality(width, height);
             if (value != null && value.length == 3) return value;
         } catch (LinkageError ignored) { }
-        return new int[]{Math.max(200000, width * height * 2), 15, JPEG_QUALITY};
+        return new int[]{Math.max(200000, width * height * 2), 30, JPEG_QUALITY};
     }
 }
