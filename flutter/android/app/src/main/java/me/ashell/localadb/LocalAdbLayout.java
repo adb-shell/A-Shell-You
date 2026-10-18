@@ -65,7 +65,7 @@ final class LocalAdbLayout implements AutoCloseable {
         int appStage = 3;
         try {
             while (!closed.get() && !cancelled.get()) {
-                long delay = AdbCaptureProfile.FRAME_INTERVAL_MS - (SystemClock.elapsedRealtime() - lastRequest);
+                long delay = AdbCaptureProfile.current(context).layoutIntervalMs() - (SystemClock.elapsedRealtime() - lastRequest);
                 if (lastRequest != 0 && delay > 0) Thread.sleep(delay);
                 appStage = 3;
                 Geometry before = new Geometry(context);

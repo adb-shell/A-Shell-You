@@ -1,15 +1,35 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261018-007`
+Registry Revision：`WORK-20261019-004`
 
-Last Updated：2026-10-18（ADB 剪贴板同步）
+Last Updated：2026-10-19（ADB优化合并main）
 
 Active Task Count：0
 
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T004交付：用户授权test合并main、提交“完整优化adb投屏”、推送后单次Build-Clients-New/main/Both/常规编译，不监控。无冲突合并，业务及编排与test一致，仅补交付记录；准确SHA/dispatch见交付，构建/真机待证。STATE/WORK-20261019-004 / CE-20261019-T004-01；docs/tasks/T-2026-10-19-004-merge-adb-to-main.md。
+
+T003 r2交付续接：用户授权提交推送test、单次Build-Clients-New/Both/常规编译，不监控；无新增源码修改，准确SHA/dispatch回执见交付，构建与设备结果待证。STATE/WORK-20261019-003-r2 / CE-20261019-T003-02。
+
+T003 / complete / T8（源码及V0）：移除无障碍栏功能启动小字，恢复原直接命令发送；连接等待、ADB提示和T002恢复保留，原native链不改。未Git/CI/构建/真机。STATE/WORK-20261019-003 / CE-20261019-T003-01；docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md。
+
+T002 r2交付续接：用户授权T001/T002合并提交推送test、单次Build-Clients-New/Both/常规编译，沿用不监控要求；准确SHA/dispatch回执见交付，构建/设备结果待证。STATE/WORK-20261019-002-r2 / CE-20261019-T002-02。
+
+T002 / complete / T8（显示恢复修复与V0）：双栏回普通单栏后本地纹理重绘，下一真实Texture再刷新一次；原采集/编码/网络/ADB命令保持，保留T001 dirty。未Git/CI/产品执行，冻结根因和修复效果仍待设备复测。STATE/WORK-20261019-002 / CE-20261019-T002-01；docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md。
+
+T001 / complete / T8（实现与V0）：普通Android画面区域内连接/显式功能启动等待提示，真实RGBA/Texture立即清理；原传输/采集/命令编码与发送顺序保持。无Git/CI/产品执行，正式交互待证。STATE/WORK-20261019-001 / CE-20261019-T001-01；docs/tasks/T-2026-10-19-001-inline-frame-wait.md。
+
+T010 r2交付续接：用户授权提交推送test、单次Build-Clients-New/Both/常规编译，沿用不监控要求。准确SHA和dispatch回执见交付；构建/运行待证。STATE/WORK-20261018-010-r2 / CE-20261019-T010-02。
+
+T010 / complete / T8（名称实现与V0）：跨平台显示“一个壳子”，内部身份/旧快捷方式名/2FA/署名保持；已有Android名称修改保留。未Git/CI/构建/设备验证，正式运行待证。STATE/WORK-20261018-010 / CE-20261018-T010-01 / D-032；docs/tasks/T-2026-10-18-010-display-name.md。
+
+T009 / complete / T8（实现与V0）：ADB参数对齐、独立GPU编码和运行时码率/帧率更新；普通源不改。用户授权test提交推送、单次Both/常规编译、不监控。GPU/ROM、双源与多PC实际性能待证，准确Git/CI回执见交付。STATE/WORK-20261018-009 / CE-20261018-T009-01；docs/tasks/T-2026-10-18-009-adb-media-alignment.md。
+
+T008 / complete / T8（源码与V0）：独立ADB媒体/黑屏/命令诊断/弹窗修复，原链路保持；255设备根因、黑屏及流畅度实测待证。用户授权推送test并单次Both/常规编译、不监控；准确Git/dispatch回执见交付，不预写构建通过。STATE/WORK-20261018-008 / CE-20261018-T008-01；见 docs/tasks/T-2026-10-18-008-adb-runtime-performance.md。
 
 T007 合并交付：用户授权将 test/82e0f7f 合并并推送 main，说明“ADB功能问题完善”，单次 Both/常规编译、不监控。祖先/无冲突/合并树 V0 已核对，仅新增最小记录；准确 Git/dispatch 回执见交付，构建/设备待证。CE-20261018-T007-01；见 docs/tasks/T-2026-10-18-007-merge-adb-to-main.md。
 

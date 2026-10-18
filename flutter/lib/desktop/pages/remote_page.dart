@@ -314,7 +314,8 @@ class _RemotePageState extends State<RemotePage>
         underlying: ValueListenableBuilder<bool>(
           valueListenable: _remoteAdbMirror.hasFrame,
           builder: (context, hasFrame, _) => Obx(() => IgnorePointer(
-                ignoring: _ffi.ffiModel.pi.isSet.isTrue && hasFrame,
+                ignoring: _ffi.ffiModel.pi.isSet.isTrue &&
+                    (hasFrame || _ffi.ffiModel.androidConnectedWaitingForImage.value),
                 child: Container(color: Colors.transparent),
               )),
         ),
@@ -1158,7 +1159,9 @@ class _ImagePaintState extends State<ImagePaint> {
           top: (displays[i].y - rect.top) * s + offset.dy,
           width: displays[i].width * s,
           height: displays[i].height * s,
+          // A layout restore can need a new Flutter layer with the same native ID.
           child: Obx(() => Texture(
+                key: ValueKey(widget.ffi.textureModel.repaintRevision.value),
                 textureId: textureId.value,
                 filterQuality:
                     isViewOriginal ? FilterQuality.none : FilterQuality.low,

@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
-import java.lang.reflect.Method;
 import java.util.concurrent.Semaphore;
 
 /** Shell-only node reader. Rendering belongs to the app, not this standalone app_process VM. */
@@ -87,30 +86,15 @@ public final class AdbLayoutCapture {
 
             stage = 4;
             progress(output, stage);
-            // API 34+: UiAutomation.clearCache(); API 33: per-connection client cache;
-            // API 30-32: process-local client cache. No cache in the product process is touched.
-            Method clearCache;
-            Object cacheOwner;
-            Object[] cacheArgs = new Object[0];
-            try {
-                clearCache = UiAutomation.class.getMethod("clearCache");
-                cacheOwner = automation;
-            } catch (NoSuchMethodException oldApi) {
-                Class<?> client = Class.forName("android.view.accessibility.AccessibilityInteractionClient");
-                cacheOwner = client.getMethod("getInstance").invoke(null);
-                try { clearCache = client.getMethod("clearCache"); }
-                catch (NoSuchMethodException perConnection) {
-                    clearCache = client.getMethod("clearCache", int.class);
-                    cacheArgs = new Object[]{UiAutomation.class.getMethod("getConnectionId").invoke(automation)};
-                }
-            }
+            // Accessibility events invalidate this connection's node cache. Clearing it
+            // before every traversal forced every child back through Binder, even on
+            // unchanged screens, and defeated the platform's descendant prefetch.
             while (true) {
                 // The app requests exactly one snapshot after consuming/rendering the last.
                 // No unsolicited frames can accumulate in libadb's input queue.
                 requests.acquire();
                 stage = 4;
                 progress(output, stage);
-                clearCache.invoke(cacheOwner, cacheArgs);
                 AdbLayoutSnapshot snapshot = new AdbLayoutNodes().read(automation);
                 stage = 6;
                 progress(output, stage);

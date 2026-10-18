@@ -2,9 +2,48 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（ADB 剪贴板同步）
+Last Updated：2026-10-19（ADB优化合并main）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-19-004：ADB优化合并main
+
+- 用户授权将test/f28055c合并main、提交“完整优化adb投屏”、推送后单次Both/常规编译，不监控。保留test五项提交，仅补交付记录；V0祖先关系及合并树一致性通过，准确Git/dispatch见交付。STATE/WORK-20261019-004 / CE-20261019-T004-01；[任务](../docs/tasks/T-2026-10-19-004-merge-adb-to-main.md)。
+
+## T-2026-10-19-003：移除功能启动提示
+
+- r2：用户授权提交推送test并单次Both/常规编译，不监控；本地/远端起点2bbdf50、10路径范围和diff复检通过，无新增源码修改。准确Git/dispatch见交付；CE-20261019-T003-02 / STATE/WORK-20261019-003-r2。
+
+- 移除T001开共享/无视/穿透启动小字及专用状态/发送钩子；连接等帧提示与T002恢复保留。V0确认原InputModel实现一致，native/协议/ADB不改；未Git/CI/产品执行。STATE/WORK-20261019-003 / CE-20261019-T003-01，[任务](../docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md)。
+
+## T-2026-10-19-002：关闭ADB后的普通纹理恢复
+
+- r2：用户授权T001/T002提交推送test后单次Both/常规编译，不监控；本地/远端起点和15路径范围复检，无额外源码修改。准确Git/dispatch见交付；CE-20261019-T002-02 / STATE/WORK-20261019-002-r2。
+
+- 双栏退回普通单栏后本地重绘Texture层，复用原桥获取下一真实帧通知；native纹理/解码器和Android普通采集不变，无远程刷新。保留T001等待提示。
+- V0词法/diff/原链边界检查完成；未Git/CI/构建/设备验证，原冻结根因和修复效果待复测。STATE/WORK-20261019-002 / CE-20261019-T002-01，[任务](../docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md)；沿用D030，无新ADR/资产。
+
+## T-2026-10-19-001：PC画面区域等待提示
+
+- 移除PC普通Android等待画面弹窗，改区域内小字；开共享/无视/穿透使用仅展示的等待状态，下一真实普通帧即清，无强制时长。原命令、Android/Rust、协议与ADB独立链保持。
+- V0词法/diff/身份与控制边界检查完成，未产品构建/运行/Git/CI。STATE/WORK-20261019-001 / CE-20261019-T001-01，[任务](../docs/tasks/T-2026-10-19-001-inline-frame-wait.md)；无Decision/ADR/资产增量。
+
+## T-2026-10-18-010：产品显示名
+
+- 2026-10-19 r2：授权提交推送test后单次Both/常规编译、不监控；无产品实现增量，实际Git/CI回执见交付。CE-20261019-T010-02 / STATE/WORK-20261018-010-r2。
+
+- 界面/通知/窗口/产品描述显示“一个壳子”，保留原运行身份、翻译键、署名、2FA和快捷方式名；Windows旧标题兼容，MSI文字编码同步。V0通过，构建/运行待证；无Git/CI。
+- STATE/WORK-20261018-010 / CE-20261018-T010-01 / D-032，[任务](../docs/tasks/T-2026-10-18-010-display-name.md)。
+
+## T-2026-10-18-009：ADB媒体参数对齐
+
+- 对齐普通整数缩放、实时QoS帧率/质量与码率预算；新增独立GPU/MediaCodec helper复用已固定scrcpy采集，参数更新不重启视频，无视/布局节奏动态跟随。原采集/无障碍保持，字段41不变。
+- V0/DEX签名/hash/资源复检，构建与真机待证；授权test推送后单次Both/常规编译、不监控。STATE/WORK-20261018-009 / CE-20261018-T009-01，[任务](../docs/tasks/T-2026-10-18-009-adb-media-alignment.md)。参数一致不等于编码结果/实测性能一致。
+
+## T-2026-10-18-008：ADB运行与性能排查
+
+- 独立截图常驻Shell压缩及兼容回退、穿透刷新/缓存、视频独立帧率、黑屏buffer创建排除、命令协议分包/实际诊断、PC弹窗位移与重绘优化；原共享/无障碍/输入实现未改。
+- V0实现复检；255具体设备原因、厂商黑屏与流畅度实测未取得，不宣称全部运行通过。授权test推送后单次Both/常规编译、不监控，回执见交付。STATE/WORK-20261018-008 / CE-20261018-T008-01；[任务](../docs/tasks/T-2026-10-18-008-adb-runtime-performance.md)。Decision/ADR/资产：N/A — no decision delta。
 
 ## T-2026-10-18-007：ADB 功能合并 main
 

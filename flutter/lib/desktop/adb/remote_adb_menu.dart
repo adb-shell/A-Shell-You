@@ -45,7 +45,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
       sessionState: widget.sessionState);
   String mode = 'auto';
   String validation = '';
-  Offset offset = Offset.zero;
+  final offset = ValueNotifier<Offset>(Offset.zero);
 
   @override void initState() {
     super.initState();
@@ -57,6 +57,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
     pairPort.dispose(); pairCode.dispose(); connectPort.dispose(); command.dispose();
     inputText.dispose();
     inputFocus.dispose();
+    offset.dispose();
     super.dispose();
   }
 
@@ -284,19 +285,20 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
           max(0.0, bounds.maxHeight - 32));
       final dx = max(0.0, (bounds.maxWidth - width) / 2 - 8);
       final dy = max(0.0, (bounds.maxHeight - height) / 2 - 8);
-      final position = Offset(offset.dx.clamp(-dx, dx).toDouble(), offset.dy.clamp(-dy, dy).toDouble());
+      Offset clampOffset(Offset value) => Offset(
+          value.dx.clamp(-dx, dx).toDouble(), value.dy.clamp(-dy, dy).toDouble());
       return CallbackShortcuts(bindings: {
         const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.pop(context),
-      }, child: Center(child: Transform.translate(offset: position, child: SizedBox(
+      }, child: Center(child: ValueListenableBuilder<Offset>(valueListenable: offset,
+        builder: (context, position, child) => Transform.translate(offset: clampOffset(position), child: child),
+        child: RepaintBoundary(child: SizedBox(
         width: width, height: height,
         child: Material(elevation: 24, color: Theme.of(context).dialogBackgroundColor,
           borderRadius: BorderRadius.circular(16), clipBehavior: Clip.antiAlias,
           child: Column(children: [
             MouseRegion(cursor: SystemMouseCursors.move, child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onPanUpdate: (event) => setState(() => offset = Offset(
-                  (position.dx + event.delta.dx).clamp(-dx, dx).toDouble(),
-                  (position.dy + event.delta.dy).clamp(-dy, dy).toDouble())),
+              onPanUpdate: (event) => offset.value = clampOffset(clampOffset(offset.value) + event.delta),
               child: Padding(padding: const EdgeInsets.fromLTRB(20, 10, 8, 10), child: Row(children: [
                 const Icon(Icons.adb), const SizedBox(width: 10),
                 Expanded(child: Text(remoteAdbActions[widget.action] ?? 'ADB',
@@ -338,7 +340,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
             ])),
           ]),
         ),
-      ))));
+      )))));
     });
   });
 }

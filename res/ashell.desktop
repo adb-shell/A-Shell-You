@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=A Shell You
+Name=一个壳子
 GenericName=Remote Desktop
 Comment=Remote Desktop
 Exec=ashell %u

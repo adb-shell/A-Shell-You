@@ -4125,7 +4125,7 @@ String _appName = '';
 String get appName {
   if (_appName.isEmpty) {
     _appName = bind.mainGetAppNameSync();
-    if (_appName == 'AShell') _appName = 'A Shell You';
+    if (_appName == 'AShell') _appName = '一个壳子';
   }
   return _appName;
 }

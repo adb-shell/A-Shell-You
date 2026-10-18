@@ -1,5 +1,6 @@
 package me.ashell.localadb;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ColorSpace;
@@ -10,16 +11,28 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.github.muntashirakon.adb.AdbStream;
 
 /** Bounded, binary shell-v2 screenshots. No Accessibility, MediaProjection or disk files. */
 final class LocalAdbScreenshot implements AutoCloseable {
+    static final class Failure extends IOException {
+        Failure(int code, String detail) {
+            super("ADB 系统截图失败（退出码 " + code + "）。" + (detail.isEmpty() ? "" : "\n" + detail));
+        }
+    }
     private static final int MAX_PNG = 16 * 1024 * 1024;
     private static final int MAX_RAW = 24 * 1024 * 1024;
     private boolean pngFallback;
     private final RawCapture raw = new RawCapture();
+    private LocalAdbScreenshotSession session;
+    private boolean screencapFallback;
+    private final Context context;
+    private final int port;
+
+    LocalAdbScreenshot(Context context, int port) { this.context = context; this.port = port; }
 
     static final class Frame {
         final int width, height, sourceWidth, sourceHeight;
@@ -31,6 +44,19 @@ final class LocalAdbScreenshot implements AutoCloseable {
     }
 
     Frame capture(LocalAdbClient client, AtomicBoolean cancelled) throws Exception {
+        if (!screencapFallback) {
+            try {
+                if (session == null) session = new LocalAdbScreenshotSession(context, client, cancelled);
+                return session.read(AdbCaptureProfile.current(context).encoding()[2]);
+            } catch (Exception | LinkageError unsupported) {
+                if (session != null) { session.close(); session = null; }
+                if (cancelled.get() || Thread.currentThread().isInterrupted()) throw new IOException("Stopped", unsupported);
+                // Probe only once per run. OEMs lacking UiAutomation screenshot support
+                // retain the existing independent system screencap implementation.
+                screencapFallback = true;
+                client.connect(port, cancelled);
+            }
+        }
         if (!pngFallback) {
             try {
                 raw.begin();
@@ -53,6 +79,7 @@ final class LocalAdbScreenshot implements AutoCloseable {
             byte[] buffer = new byte[32768];
             int stderr = 0;
             int stdout = 0;
+            ByteArrayOutputStream diagnostics = new ByteArrayOutputStream();
             while (true) {
                 readFully(stream, header, header.length, cancelled);
                 int channel = header[0] & 255;
@@ -61,7 +88,8 @@ final class LocalAdbScreenshot implements AutoCloseable {
                 if (channel == 3) {
                     if (size != 1) throw new IOException("Invalid screenshot exit");
                     readFully(stream, buffer, 1, cancelled);
-                    if (buffer[0] != 0) throw new IOException("System screenshot failed");
+                    if (buffer[0] != 0) throw new Failure(buffer[0] & 255,
+                            new String(diagnostics.toByteArray(), StandardCharsets.UTF_8).trim());
                     break;
                 }
                 if (channel == 1) {
@@ -76,6 +104,7 @@ final class LocalAdbScreenshot implements AutoCloseable {
                     int count = Math.min(size, buffer.length);
                     readFully(stream, buffer, count, cancelled);
                     if (channel == 1) output.write(buffer, 0, count);
+                    else if (diagnostics.size() < 512) diagnostics.write(buffer, 0, Math.min(count, 512 - diagnostics.size()));
                     size -= count;
                 }
             }
@@ -123,7 +152,10 @@ final class LocalAdbScreenshot implements AutoCloseable {
         }
     }
 
-    @Override public void close() { raw.close(); }
+    @Override public void close() throws IOException {
+        try { if (session != null) { session.close(); session = null; } }
+        finally { raw.close(); }
+    }
 
     private static final class UnsupportedRawFormat extends IOException { }
 

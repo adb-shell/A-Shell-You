@@ -1,5 +1,5 @@
 [Unit]
-Description=A Shell You
+Description=一个壳子
 Requires=network.target
 After=systemd-user-sessions.service
 

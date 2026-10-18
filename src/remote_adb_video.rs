@@ -2,6 +2,13 @@
 use hbb_common::message_proto::{Message, Misc, RemoteAdbVideo};
 
 const MAX_FRAME: usize = 2 * 1024 * 1024 + 65536;
+const MAX_DIMENSION: u32 = 4096;
+const MAX_PIXELS: u32 = 4 * 1024 * 1024;
+
+fn valid_dimensions(width: u32, height: u32) -> bool {
+    width > 0 && height > 0 && width <= MAX_DIMENSION && height <= MAX_DIMENSION
+        && width * height <= MAX_PIXELS
+}
 // 8 frames exhausted the ACK window at only 267 ms RTT / 30 FPS. Permit relay
 // round-trips up to 800 ms while retaining the independent 8 MiB per-viewer cap.
 const MAX_PENDING_FRAMES: usize = 24;
@@ -255,19 +262,34 @@ pub mod android {
 
     #[no_mangle]
     pub extern "system" fn Java_me_ashell_localadb_AdbCaptureProfile_quality(env: JNIEnv, _class: JClass,
-        width: jint, height: jint) -> jni::sys::jintArray {
-        if width <= 0 || height <= 0 || width > 1280 || height > 1280 { return std::ptr::null_mut(); }
-        let (quality, fps) = crate::server::video_service::VIDEO_QOS.lock()
-            .map(|q| (q.latest_quality(), q.fps().clamp(1, 30)))
-            .unwrap_or((scrap::codec::Quality::Balanced, 15));
-        let ratio = quality.ratio().clamp(0.1, 2.0);
-        // Honor the selected quality at the scaled resolution. A flat 1 Mbps ceiling
-        // made Best and Balanced converge on taller screens. Dimensions/ratio are bounded.
-        let bitrate = ((width * height) as f32 * 2.0 * ratio / scrap::codec::BR_BALANCED) as i32;
-        let jpeg = match quality { scrap::codec::Quality::Low => 60, scrap::codec::Quality::Best => 85,
-            scrap::codec::Quality::Custom(_) => (60.0 + ratio * 20.0).round().clamp(50.0, 90.0) as i32, _ => 75 };
+        width: jint, height: jint, source_width: jint) -> jni::sys::jintArray {
+        if !valid_dimensions(width as u32, height as u32) { return std::ptr::null_mut(); }
+        if source_width <= 0 || source_width > 16384 { return std::ptr::null_mut(); }
+        let Ok(mut qos) = crate::server::video_service::VIDEO_QOS.lock() else { return std::ptr::null_mut(); };
+        let fps = qos.fps();
+        let ratio = qos.ratio();
+        let quality = qos.latest_quality();
+        drop(qos);
+        // Reuse the ordinary Android encoder's bitrate calculation. Its base
+        // includes the normal capturer's scale; substitute this source's scale
+        // without changing SCREEN_SIZE or requiring MediaProjection to be active.
+        let scale = (source_width / 350).max(1) as f32;
+        let encoder_ratio = ratio * scale * scale / scrap::Display::fix_quality().max(1) as f32;
+        let kbps = (scrap::codec::base_bitrate(width as u32, height as u32) as f32 * encoder_ratio) as u32;
+        #[cfg(feature = "hwcodec")]
+        let kbps = {
+            let format = scrap::codec::Encoder::negotiated_codec();
+            if matches!(format, scrap::CodecFormat::H264 | scrap::CodecFormat::H265)
+                && scrap::hwcodec::HwRamEncoder::try_get(format).is_some() {
+                scrap::hwcodec::HwRamEncoder::calc_bitrate(width as usize, height as usize, encoder_ratio, true)
+            } else { kbps }
+        };
+        let bitrate = kbps.saturating_mul(1000).clamp(1000, i32::MAX as u32) as i32;
+        let selected_jpeg = match quality { scrap::codec::Quality::Low => 60.0, scrap::codec::Quality::Best => 85.0,
+            scrap::codec::Quality::Custom(_) => (60.0 + quality.ratio() * 20.0).clamp(50.0, 90.0), _ => 75.0 };
+        let jpeg = (selected_jpeg * (ratio / quality.ratio()).min(1.0)).round().clamp(30.0, 90.0) as i32;
         let Ok(array) = env.new_int_array(3) else { return std::ptr::null_mut(); };
-        if env.set_int_array_region(&array, 0, &[bitrate.max(200000), fps as i32, jpeg]).is_err() {
+        if env.set_int_array_region(&array, 0, &[bitrate, fps as i32, jpeg]).is_err() {
             return std::ptr::null_mut();
         }
         array.into_raw()
@@ -288,7 +310,7 @@ pub mod android {
     pub extern "system" fn Java_me_ashell_localadb_LocalAdbMirror_frame(env: JNIEnv, _class: JClass,
         generation: jlong, width: jint, height: jint, config: jboolean, key: jboolean, data: JByteArray, screenshot: jboolean,
         source_width: jint, source_height: jint) {
-        if width <= 0 || height <= 0 || width > 1280 || height > 1280 { return; }
+        if !valid_dimensions(width as u32, height as u32) { return; }
         if source_width <= 0 || source_height <= 0 || source_width > 16384 || source_height > 16384 { return; }
         let Ok(size) = env.get_array_length(&data) else { return; };
         if size <= 0 || size as usize > MAX_FRAME || (config != 0 && size > 65536) { return; }
@@ -590,7 +612,7 @@ pub mod pc {
                         let decoded = decoder.handle_video_frame(&video_frame::Union::H264s(frames),
                             &mut rgb, &mut ImageTexture::default(), &mut true, &mut None).map_err(|_| "ADB 视频解码失败，等待关键帧恢复。".to_string())?;
                         if decoded {
-                            if rgb.w == 0 || rgb.h == 0 || rgb.w > 1280 || rgb.h > 1280 || rgb.raw.len() != rgb.w * rgb.h * 4 {
+                            if !valid_dimensions(rgb.w as u32, rgb.h as u32) || rgb.raw.len() != rgb.w * rgb.h * 4 {
                                 return Err("ADB 视频尺寸无效。".into());
                             }
                             // ABGR's little-endian memory is RGBA. Pass the decoded
@@ -777,7 +799,7 @@ pub mod pc {
                 view.error = packet.error;
             }
         } else if packet.action == "frame" {
-            if packet.width == 0 || packet.height == 0 || packet.width > 1280 || packet.height > 1280 || packet.data.is_empty() { return; }
+            if !valid_dimensions(packet.width, packet.height) || packet.data.is_empty() { return; }
             if let Err(error) = entry.queue.try_send(packet) {
                 entry.resync.store(true, Ordering::Release);
                 let packet = match error { std::sync::mpsc::TrySendError::Full(p) | std::sync::mpsc::TrySendError::Disconnected(p) => p };

@@ -62,7 +62,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   std::vector<std::string> rust_args(c_args, c_args + args_len);
   free_c_args(c_args, args_len);
 
-  std::wstring app_name = L"A Shell You";
+  std::wstring app_name = L"\u4e00\u4e2a\u58f3\u5b50";
   FUNC_ASHELL_GET_APP_NAME get_ashell_app_name = (FUNC_ASHELL_GET_APP_NAME)GetProcAddress(hInstance, "get_ashell_app_name");
   if (get_ashell_app_name) {
     wchar_t app_name_buffer[512] = {0};
@@ -73,6 +73,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   // Uri links dispatch
   HWND hwnd = ::FindWindowW(getWindowClassName(), app_name.c_str());
+  // Recognize an already-running client with the previous default title.
+  if (hwnd == NULL && app_name == L"\u4e00\u4e2a\u58f3\u5b50") {
+    hwnd = ::FindWindowW(getWindowClassName(), L"A Shell You");
+  }
   if (hwnd != NULL) {
     // Allow multiple flutter instances when being executed by parameters
     // contained in whitelists.

@@ -3,6 +3,7 @@ package me.ashell.localadb;
 import android.content.Context;
 import android.os.SystemClock;
 
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -106,6 +107,7 @@ final class LocalAdbMirror {
         // Abort only this private ADB transport; its close unblocks every pending stream.
         run.client.abort();
         if (run.thread != null) run.thread.interrupt();
+        if (run.profileThread != null) run.profileThread.interrupt();
     }
 
     private synchronized void checkHealth(Run run) {
@@ -155,19 +157,14 @@ final class LocalAdbMirror {
             String path = "/data/local/tmp/ashell-scrcpy-5.0.1.jar";
             push(context, run.client, run.cancelled, path);
             // All arguments are fixed or generated locally. No peer-controlled shell interpolation.
-            String command = "CLASSPATH=" + path + " app_process / com.genymobile.scrcpy.Server 5.0.1"
+            String apk = context.getApplicationInfo().sourceDir.replace("'", "'\\''");
+            String command = "CLASSPATH='" + path + ":" + apk + "' exec app_process / me.ashell.localadb.AdbVideoCapture 5.0.1"
                     + " scid=" + scid + " tunnel_forward=true audio=false control=false"
                     + " video_codec=h264 max_size=" + run.profile.maxSize() + " max_fps=" + encoding[1]
                     + " video_bit_rate=" + encoding[0]
-                    + " video_codec_options=i-frame-interval=1,repeat-previous-frame-after:long=100000"
                     + " send_device_meta=false send_dummy_byte=false power_on=false"
                     + " cleanup=true log_level=error";
-            try (AdbStream process = run.client.openMirrorStream("shell,v2,raw:sh")) {
-                byte[] script = (command + "\n").getBytes(StandardCharsets.US_ASCII);
-                byte[] input = ByteBuffer.allocate(script.length + 10).order(ByteOrder.LITTLE_ENDIAN)
-                        .put((byte) 0).putInt(script.length).put(script).put((byte) 4).putInt(0).array();
-                process.write(input, 0, input.length);
-                process.flush();
+            try (AdbStream process = run.client.openMirrorStream("shell,v2,raw:" + command)) {
                 Thread output = new Thread(() -> drainProcess(run, process), "ashell-scrcpy-output");
                 output.setDaemon(true);
                 output.start();
@@ -178,11 +175,16 @@ final class LocalAdbMirror {
                     catch (IOException e) { Thread.sleep(150); }
                 }
                 if (video == null) throw new IOException("Server socket unavailable");
-                try (AdbStream stream = video) { readVideo(run, stream); }
+                try (AdbStream stream = video) {
+                    run.profileThread = new Thread(() -> updateProfile(run, stream), "ashell-adb-video-profile");
+                    run.profileThread.setDaemon(true); run.profileThread.start();
+                    readVideo(run, stream);
+                }
                 finally { output.interrupt(); }
             }
         } catch (Exception | LinkageError e) {
-            if (!run.cancelled.get()) run.failure = e instanceof LocalAdbLayout.Failure ? e.getMessage() : "layout".equals(run.mode)
+            if (!run.cancelled.get()) run.failure = e instanceof LocalAdbLayout.Failure || e instanceof LocalAdbScreenshot.Failure
+                    ? e.getMessage() : "layout".equals(run.mode)
                     ? "ADB 穿透独立 Shell 通道建立失败，请确认无线调试及 ADB Shell 连接后重试。"
                     : "jpeg".equals(run.mode) ? "ADB 系统截图失败，请确认无线调试及 Shell 连接。系统保护内容仍受截图限制。"
                     : "ADB 投屏失败，请确认无线调试仍开启并重新连接。设备编码器可能不支持当前采集。";
@@ -191,8 +193,31 @@ final class LocalAdbMirror {
         } finally {
             // Clear interruption before joining the private ADB reader during close.
             Thread.interrupted();
+            run.profileClosed = true;
+            if (run.profileThread != null) run.profileThread.interrupt();
             run.client.disconnect();
+            if (run.profileThread != null) {
+                try { run.profileThread.join(1000); }
+                catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            }
             finish(run);
+        }
+    }
+
+    private void updateProfile(Run run, AdbStream video) {
+        try {
+            while (!run.cancelled.get() && !run.profileClosed) {
+                int[] encoding = AdbCaptureProfile.current(context).encoding();
+                byte[] update = ByteBuffer.allocate(12).putInt(AdbVideoCapture.PROFILE_MAGIC)
+                        .putInt(encoding[0]).putInt(encoding[1]).array();
+                AdbStreamCompat.write(video, update);
+                Thread.sleep(1000);
+            }
+        } catch (Exception | LinkageError error) {
+            synchronized (this) {
+                if (active == run && !run.cancelled.get() && !run.profileClosed)
+                    stopCurrent("ADB 投屏参数通道已断开，请重新开启投屏。");
+            }
         }
     }
 
@@ -200,7 +225,7 @@ final class LocalAdbMirror {
         boolean streaming = false;
         byte[] previous = null;
         long lastSent = 0;
-        try (LocalAdbScreenshot capture = new LocalAdbScreenshot();
+        try (LocalAdbScreenshot capture = new LocalAdbScreenshot(context, run.port);
              LocalAdbLayout layout = "layout".equals(run.mode) ? new LocalAdbLayout(context, run.client, run.cancelled) : null) {
           while (!run.cancelled.get()) {
             long started = SystemClock.elapsedRealtime();
@@ -226,6 +251,8 @@ final class LocalAdbMirror {
     }
 
     private void drainProcess(Run run, AdbStream stream) {
+        ByteArrayOutputStream diagnostics = new ByteArrayOutputStream();
+        Integer exitCode = null;
         try {
             byte[] header = new byte[5];
             byte[] discard = new byte[4096];
@@ -234,16 +261,24 @@ final class LocalAdbMirror {
                 int channel = header[0] & 255;
                 int size = ByteBuffer.wrap(header, 1, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
                 if (size < 0 || size > 65536 || channel < 1 || channel > 3) throw new IOException();
+                if (channel == 3 && size != 1) throw new IOException("Invalid scrcpy exit packet");
                 while (size > 0) {
                     int count = stream.read(discard, 0, Math.min(size, discard.length));
                     if (count <= 0) throw new EOFException();
+                    if (channel == 3) exitCode = discard[0] & 255;
+                    else if (diagnostics.size() < 512)
+                        diagnostics.write(discard, 0, Math.min(count, 512 - diagnostics.size()));
                     size -= count;
                 }
                 if (channel == 3) break;
             }
         } catch (Exception ignored) { }
         synchronized (this) {
-            if (active == run && !run.cancelled.get()) stop("scrcpy 服务端已退出，请重新开启投屏。");
+            if (active == run && !run.cancelled.get()) {
+                String detail = new String(diagnostics.toByteArray(), StandardCharsets.UTF_8).trim();
+                stop("scrcpy 服务端已退出" + (exitCode == null ? "。" : "（退出码 " + exitCode + "）。")
+                        + (detail.isEmpty() ? "请重新开启投屏。" : "\n" + detail));
+            }
         }
     }
 
@@ -262,7 +297,8 @@ final class LocalAdbMirror {
             if ((flags & Long.MIN_VALUE) != 0) {
                 width = ByteBuffer.wrap(header, 4, 4).getInt();
                 height = size;
-                if (width <= 0 || height <= 0 || width > 1280 || height > 1280) throw new IOException("Invalid size");
+                if (width <= 0 || height <= 0 || width > AdbCaptureProfile.MAX_EDGE || height > AdbCaptureProfile.MAX_EDGE
+                        || (long) width * height > AdbCaptureProfile.MAX_PIXELS) throw new IOException("Invalid size");
                 continue;
             }
             if (width == 0 || size <= 0 || size > MAX_PACKET) throw new IOException("Invalid packet");
@@ -320,8 +356,7 @@ final class LocalAdbMirror {
     private static void writeSync(AdbStream stream, String id, byte[] data, int size) throws IOException {
         byte[] packet = ByteBuffer.allocate(size + 8).order(ByteOrder.LITTLE_ENDIAN)
                 .put(id.getBytes(StandardCharsets.US_ASCII)).putInt(size).put(data, 0, size).array();
-        stream.write(packet, 0, packet.length);
-        stream.flush();
+        AdbStreamCompat.write(stream, packet);
     }
 
     private static void readFully(Run run, AdbStream stream, byte[] bytes) throws IOException {
@@ -342,6 +377,8 @@ final class LocalAdbMirror {
         final LocalAdbClient client = new LocalAdbClient(context, true);
         final AtomicBoolean cancelled = new AtomicBoolean();
         volatile long lastPacket = SystemClock.elapsedRealtime();
+        volatile Thread profileThread;
+        volatile boolean profileClosed;
         volatile String failure = "";
         long stopAt;
         Thread thread;

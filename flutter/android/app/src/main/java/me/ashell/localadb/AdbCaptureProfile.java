@@ -7,9 +7,9 @@ import android.view.WindowManager;
 
 /** Read-only counterpart of MainService's width / 350 integer scaling. */
 final class AdbCaptureProfile {
-    static final int MAX_EDGE = 1280;
-    static final int JPEG_QUALITY = 75;
-    static final int FRAME_INTERVAL_MS = 500;
+    static final int MAX_EDGE = 4096;
+    static final int MAX_PIXELS = 4 * 1024 * 1024;
+    static final int FRAME_INTERVAL_MS = 80;
     // Same capture cadence as the ordinary Accessibility screenshot loop (300 ms).
     private static final int SCREENSHOT_INTERVAL_MS = 300;
     final int sourceWidth, sourceHeight, width, height;
@@ -20,9 +20,10 @@ final class AdbCaptureProfile {
         this.sourceWidth = sourceWidth;
         this.sourceHeight = sourceHeight;
         int divisor = Math.max(1, sourceWidth / 350);
-        double scale = Math.min(1.0 / divisor, (double) MAX_EDGE / Math.max(sourceWidth, sourceHeight));
-        width = Math.max(1, (int) (sourceWidth * scale));
-        height = Math.max(1, (int) (sourceHeight * scale));
+        width = Math.max(1, sourceWidth / divisor);
+        height = Math.max(1, sourceHeight / divisor);
+        if (width > MAX_EDGE || height > MAX_EDGE || (long) width * height > MAX_PIXELS)
+            throw new IllegalArgumentException("Scaled display exceeds ADB frame bounds");
     }
 
     @SuppressWarnings("deprecation")
@@ -37,23 +38,25 @@ final class AdbCaptureProfile {
         return new AdbCaptureProfile(size.x, size.y);
     }
 
-    int maxSize() { return Math.max(8, Math.max(width, height) & ~7); }
+    int maxSize() { return Math.max(width, height); }
 
     long screenshotIntervalMs() {
-        int[] settings = encoding();
-        int fps = Math.max(1, settings[1]);
-        // JPEG is intra-frame; applying the H.264 bitrate budget here made detailed
-        // screens wait up to two seconds. Slow viewers are bounded by their ACK window.
-        return Math.max(SCREENSHOT_INTERVAL_MS, (1000L + fps - 1) / fps);
+        // Same source cadence as Accessibility; also respect the current video
+        // delivery rate. Re-read each frame so temporary congestion can recover.
+        return Math.max(SCREENSHOT_INTERVAL_MS, deliveryIntervalMs());
     }
-    private static native int[] quality(int width, int height);
+    long layoutIntervalMs() { return Math.max(FRAME_INTERVAL_MS, deliveryIntervalMs()); }
+    private long deliveryIntervalMs() {
+        int fps = encoding()[1];
+        return (1000L + fps - 1) / fps;
+    }
+    private static native int[] quality(int width, int height, int sourceWidth);
 
     int[] encoding() {
-        // Read the ordinary stream's selected quality/FPS without changing its QoS state.
-        try {
-            int[] value = quality(width, height);
-            if (value != null && value.length == 3) return value;
-        } catch (LinkageError ignored) { }
-        return new int[]{Math.max(200000, width * height * 2), 15, JPEG_QUALITY};
+        // Called in the app process, including while streaming. Never load the
+        // product native library in a shell helper or invent a fallback profile.
+        int[] value = quality(width, height, sourceWidth);
+        if (value == null || value.length != 3) throw new IllegalStateException("ADB media profile unavailable");
+        return value;
     }
 }

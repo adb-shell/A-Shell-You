@@ -890,6 +890,7 @@ class InputModel {
         const ['down', 'up', 'wheel', 'trackpad'].contains(type);
     if (!keyboardPerm && !isAndroidControlCommand && !adbPointer) return;
     if (isViewCamera) return;
+
     
 
     if(type == "wheelbrowser")

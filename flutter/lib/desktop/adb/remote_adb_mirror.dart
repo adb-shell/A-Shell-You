@@ -241,10 +241,12 @@ class RemoteAdbMirror extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _schedulePoll(int epoch) {
-    _timer = Timer(Duration(milliseconds: phase == 'streaming' ? 16 : 100), () async {
+  void _schedulePoll(int epoch, [int elapsed = 0]) {
+    final interval = phase == 'streaming' ? 16 : 100;
+    _timer = Timer(Duration(milliseconds: (interval - elapsed).clamp(1, interval).toInt()), () async {
+      final started = Stopwatch()..start();
       await _poll(epoch);
-      if (!_disposed && epoch == _epoch && _watching) _schedulePoll(epoch);
+      if (!_disposed && epoch == _epoch && _watching) _schedulePoll(epoch, started.elapsedMilliseconds);
     });
   }
 

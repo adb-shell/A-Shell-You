@@ -396,7 +396,7 @@ UINT __stdcall CreateStartService(__in MSIHANDLE hInstall)
     svcBinary += 1;
 
     hr = StringCchPrintfW(szSvcDisplayName, cchSvcDisplayName, L"%ls Service",
-        lstrcmpW(svcName, L"AShell") == 0 ? L"A Shell You" : svcName);
+        lstrcmpW(svcName, L"AShell") == 0 ? L"\u4e00\u4e2a\u58f3\u5b50" : svcName);
     ExitOnFailure(hr, "Failed to compose a resource identifier string");
     if (MyCreateServiceW(svcName, szSvcDisplayName, svcBinary)) {
         WcaLog(LOGMSG_STANDARD, "Service \"%ls\" is created.", svcName);

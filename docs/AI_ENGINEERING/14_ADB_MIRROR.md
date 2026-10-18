@@ -1,5 +1,11 @@
 # AShell ADB 投屏、无视、穿透、黑屏与触摸
 
+test T002（2026-10-19，[任务](../tasks/T-2026-10-19-002-ordinary-surface-resume.md)）：针对关闭ADB后普通画面冻结，PC双栏退回普通单栏时在布局完成后校准视口，并用会话内revision重新挂载普通Flutter Texture层；native texture ID/指针、解码器和普通采集保持。现有本地通知桥重置notify_render_type，让下一张真实Texture事件再刷新一次，随后回到原通知频率；软件RGBA保持原帧更新。mounted/布局代次/peer校验使旧回调失效，不触发远程sessionRefreshVideo、重新授权或采集模式切换。T001等待提示保留。此为显示恢复路径的针对性修复，仅V0；用户尚未尝试重开ADB观察恢复，冻结根因与修复效果仍需设备复测。
+
+test T009（2026-10-18，[任务](../tasks/T-2026-10-18-009-adb-media-alignment.md)）覆盖下方旧参数策略：ADB采用与普通画面相同的width/350整数缩放，取消额外1280缩放；两端尺寸校验统一为单边4096、总4Mi像素。读取VideoQoS当前fps/ratio与画质档位，复用scrap基础码率/当前普通编码器类型对应预算，并用ADB source scale校正，普通共享未启动也可计算。视频通过新AdbVideoCapture复用固定scrcpy 5.0.1的ScreenCapture，在独立MediaCodec/GPU输入表面编码；App每秒经本机私有socket发送12字节SHPF参数，码率动态setParameters、帧率在编码前控制，避免锁死启动帧率或丢弃编码参考帧。普通QoS策略和状态不由ADB写入。无视至少300ms、穿透至少80ms，受当前fps节奏约束并逐帧重读；JPEG质量按实时ratio调整，不按JPEG大小推导长等待。多PC窗口、字段41、独立PC解码保持；旧PC仍仅接受1280内尺寸，较长画面需更新两端。视频helper只接受shell/root本机连接，关闭/EOF/10秒心跳丢失回收；App取消关闭自己的transport。编码器硬件对齐/码率范围、JPEG与H.264差异仍存在，“参数对齐”不等于像素、字节码率或实测帧率一致。仅V0，GPU/编码器/旋转/双源/多PC需真机验证。
+
+test T008（2026-10-18，[任务](../tasks/T-2026-10-18-008-adb-runtime-performance.md)）取代下方旧采集参数描述：无视优先常驻 `AdbScreenshotCapture`，Shell 缩放/JPEG后传输；以 `FLAG_DONT_USE_ACCESSIBILITY | FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES` 连接，不接管原无障碍。不支持时本次运行回退既有 screencap raw/PNG。一次一帧，请求/心跳串行，旧writer关闭后才回退重连。视频独立30fps上限，不再锁定普通视频拥塞后的瞬时fps；无视300ms、穿透80ms目标节奏，节点缓存由系统事件失效。PC串行取帧扣除调用耗时，画面重绘隔离；弹窗只更新位移。黑屏改为单个黑像素的buffer层缩放覆盖屏幕，白字为独立顶层；两层创建时设排除采集标记、事务再次设置，保持无输入通道、无Shell字体初始化、无FLAG_SECURE。原媒体/无障碍链路未改。仅V0：帧率是目标，黑屏ROM兼容及实际流畅度待实测，不能声称所有设备均通过。
+
 test T005（2026-10-18）：既有 LocalAdbTouch control-only 连接的单 writer 增加 LocalAdbKeyboard，键盘与触摸各自排队，不增加连接/线程或依赖媒体开启。owner 释放与 run 停止同时清键盘队列/修饰键；Flutter 旧 inputKey 入口允许非只读 Android ADB priority。普通/ADB 媒体与无障碍执行保持，Ctrl+V 沿用既有专用通道。详见[输入合同](13_REMOTE_ADB.md)，仅 V0。
 
 test T004（2026-10-18）：Shell 栏唤醒按钮显示“点亮屏”，仍执行 keycode224；普通画面光标改读当前 FfiModel 会话权限，与实际触摸同源，移除 ImagePaint 对设备 ID 共享权限副本的依赖。ADB 优先、只读显示与原手势/媒体链保持。无 ADB 的 Ctrl+V 文本输入见[远程输入合同](13_REMOTE_ADB.md)与[T004](../tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，仅 V0，设备待证。
@@ -70,7 +76,7 @@ PC H.264 使用独立解码器，输出 RGBA，经 base64 本机桥直接交给 
 
 `LocalAdbLayout` 在独立 ADB 连接上运行 APK 内 `AdbLayoutCapture.main`。当前helper只连接UiAutomation和读取节点，不再调用 `ActivityThread.systemMain`、获取系统context、初始化字体或绘制JPEG。以 `FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES` 连接，并请求交互窗口、view id和非重要节点；原无障碍服务保持独立。
 
-`AdbLayoutNodes` 枚举默认显示的窗口，并始终补读活动窗口根节点，按window id去重；活动根不可用再尝试输入/无障碍焦点。每轮清理helper自己的节点缓存，兼容无参和connectionId入口。Android13+尝试预取根节点；不按visible标记直接排除有有效bounds的节点。单个过期节点允许跳过，查询全部失败不能冒充“无节点”。
+`AdbLayoutNodes` 枚举默认显示的窗口，并始终补读活动窗口根节点，按window id去重；活动根不可用再尝试输入/无障碍焦点。helper订阅全部节点事件，由平台失效缓存，不再每帧清空后重复Binder查询。Android13+尝试预取根节点；不按visible标记直接排除有有效bounds的节点。单个过期节点允许跳过，查询全部失败不能冒充“无节点”。
 
 `AdbLayoutSnapshot` 每帧最多4096节点、64层；每节点文本最多1024个UTF-16单元、合计256Ki单元，序列化最多2MiB。读取bounds、clickable和文字，密码字段遮盖，文字缺失依次尝试contentDescription/hint。`LAYN / LAYP / LAYE` 是App与helper的私有节点/进度/错误帧，不新增网络协议字段。App按请求读取一帧，再请求下一帧；初始租约先发送，心跳与采集请求共用串行写锁。
 
@@ -82,9 +88,9 @@ PC H.264 使用独立解码器，输出 RGBA，经 base64 本机桥直接交给 
 
 ## 黑色遮罩与白字
 
-`LocalAdbPrivacy` 通过自己的 ADB 连接运行 `AdbPrivacyOverlay.main`，创建不透明黑色 SurfaceControl color layer，手机保持物理亮屏。不修改系统亮度，不使用原无障碍黑屏，不设置 `FLAG_SECURE`。
+`LocalAdbPrivacy` 通过自己的 ADB 连接运行 `AdbPrivacyOverlay.main`，创建不透明黑色 SurfaceControl buffer layer，单像素缩放覆盖屏幕，手机保持物理亮屏。不修改系统亮度，不使用原无障碍黑屏，不设置 `FLAG_SECURE`。
 
-白色子图层显示：
+独立白字图层显示：
 
 ```text
 正在对接服务中心
@@ -94,7 +100,7 @@ PC H.264 使用独立解码器，输出 RGBA，经 base64 本机桥直接交给 
 
 `AdbPrivacyHint` 在App进程以16.5sp、`Typeface.SANS_SERIF`及Android字体回退排版，生成最多1024×512、256KiB的PNG。`LocalAdbPrivacy` 先将启动字节、长度及PNG写入helper的私有stdin，再维持心跳。helper校验尺寸后只解码并显示像素，不初始化文字排版或厂商字体文件。位置为左下方约80dp，心跳更新旋转后的纵向位置。
 
-黑层显式绑定默认显示的真实 `layerStack`，白字层作为其子层；事务应用后输出 `ASHELL_OVERLAY_READY` 才确认开启。黑层与文字层均使用截图排除设置：Android11采用 `WINDOW_TYPE_DONT_SCREENSHOT` 元数据，Android12+采用 `setSkipScreenshot`；12+同时标记自身 `setTrustedOverlay(true)`，没有输入窗口或触摸拦截通道。目标是手机看到遮罩/文字，PC继续看到底层真实画面；该目标需OEM真机验证，不能据静态标记保证所有ROM一致。
+黑层与白字层分别绑定默认显示的真实 `layerStack` 和顶层Z序；事务应用后输出 `ASHELL_OVERLAY_READY` 才确认开启。两层创建时即设置采集排除：Android11采用 `WINDOW_TYPE_DONT_SCREENSHOT` 元数据，Android12+采用 `SKIP_SCREENSHOT` 创建标记并调用 `setSkipScreenshot`；12+同时标记自身 `setTrustedOverlay(true)`，没有输入窗口或触摸拦截通道。目标是手机看到遮罩/文字，PC继续看到底层真实画面；该目标需OEM真机验证，不能据静态标记保证所有ROM一致。
 
 隐藏API缺失时真实失败并清理，不降级为会遮住采集的普通覆盖窗。停止等待helper退出确认或本机10秒租约到期，旧Run不能回写新状态；快速关后开保留待开启意图，后续关会清掉该意图。图层、Surface、私有连接随各自生命周期释放。仅排除ADB自己的图层，用户另行开启的无障碍黑屏仍按原逻辑运行。
 

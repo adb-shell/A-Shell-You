@@ -135,6 +135,16 @@ class FfiModel with ChangeNotifier {
   RxBool waitForFirstImage = true.obs;
   bool isRefreshing = false;
 
+  // Presentation-only connection hint; real frames clear it without changing capture.
+  final androidConnectedWaitingForImage = false.obs;
+
+  bool get usesInlineAndroidFrameWait => isDesktop && !isWeb && isPeerAndroid &&
+      parent.target?.connType == ConnType.defaultConn;
+
+  void resetAndroidFrameWait() {
+    androidConnectedWaitingForImage.value = false;
+  }
+
   Timer? timerScreenshot;
 
   Rect? get rect => _rect;
@@ -234,6 +244,7 @@ class FfiModel with ChangeNotifier {
     if (_androidAutoReconnectTimer != null) {
       return;
     }
+    resetAndroidFrameWait();
     _stopAndroidAutoReconnect();
     _reconnects = 1;
     _lastAndroidAutoReconnectPasswordSubmitAt = null;
@@ -382,6 +393,7 @@ class FfiModel with ChangeNotifier {
   bool get keyboard => _permissions['keyboard'] != false;
 
   clear() {
+    resetAndroidFrameWait();
     _pi = PeerInfo();
     _secure = null;
     _direct = null;
@@ -1109,6 +1121,7 @@ class FfiModel with ChangeNotifier {
   showMsgBox(SessionID sessionId, String type, String title, String text,
       String link, bool hasRetry, OverlayDialogManager dialogManager,
       {bool? hasCancel}) {
+    if (isPeerAndroid && type == 'error') resetAndroidFrameWait();
     if (hasRetry && _isRecoverableAndroidConnectionError(type, title, text)) {
       _timer?.cancel();
       _startAndroidAutoReconnect(dialogManager, sessionId);
@@ -1131,6 +1144,7 @@ class FfiModel with ChangeNotifier {
 
   void reconnect(OverlayDialogManager dialogManager, SessionID sessionId,
       bool forceRelay) {
+    resetAndroidFrameWait();
     final effectiveForceRelay = isPeerAndroid || forceRelay;
     bind.sessionReconnect(sessionId: sessionId, forceRelay: effectiveForceRelay);
     if (!isPeerAndroid) {
@@ -1199,17 +1213,22 @@ class FfiModel with ChangeNotifier {
     if (waitForFirstImage.isFalse) return;
     if (isPeerAndroid) {
       dialogManager.dismissAll();
-      dialogManager.show(
-        (setState, close, context) => CustomAlertDialog(
-            title: null,
-            content: SelectionArea(child: msgboxContent(type, title, text)),
-            actions: [
-              dialogButton("Cancel", onPressed: onClose, isOutline: true)
-            ],
-            onCancel: onClose),
-        tag: '$sessionId-waiting-for-image',
-      );
-      waitForImageDialogShow.value = true;
+      if (usesInlineAndroidFrameWait) {
+        androidConnectedWaitingForImage.value = true;
+        waitForImageDialogShow.value = false;
+      } else {
+        dialogManager.show(
+          (setState, close, context) => CustomAlertDialog(
+              title: null,
+              content: SelectionArea(child: msgboxContent(type, title, text)),
+              actions: [
+                dialogButton("Cancel", onPressed: onClose, isOutline: true)
+              ],
+              onCancel: onClose),
+          tag: '$sessionId-waiting-for-image',
+        );
+        waitForImageDialogShow.value = true;
+      }
       waitForImageTimer?.cancel();
       _showAndroidActionsOverlayAboveDialogs(delayMSecs: 100);
       waitForImageTimer = Timer(_androidFirstFrameFallbackDelay, () {
@@ -1391,6 +1410,9 @@ class FfiModel with ChangeNotifier {
     }
 
     _pi.isSet.value = true;
+    if (!isCache && usesInlineAndroidFrameWait) {
+      androidConnectedWaitingForImage.value = waitForFirstImage.value;
+    }
     stateGlobal.resetLastResolutionGroupValues(peerId);
 
     if (isDesktop || isWebDesktop) {
@@ -3442,6 +3464,7 @@ class FFI {
 
   /// Mobile reuse FFI
   void mobileReset() {
+    ffiModel.resetAndroidFrameWait();
     ffiModel.waitForFirstImage.value = true;
     ffiModel.isRefreshing = false;
     ffiModel.waitForImageDialogShow.value = true;
@@ -3652,6 +3675,7 @@ class FFI {
   }
 
   void onEvent2UIRgba() async {
+    ffiModel.resetAndroidFrameWait();
     ffiModel.waitForImageTimer?.cancel();
     ffiModel.waitForImageTimer = null;
     if (ffiModel.waitForImageDialogShow.isTrue) {

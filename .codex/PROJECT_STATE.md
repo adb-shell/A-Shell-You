@@ -1,9 +1,29 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261018-007`
-Last Updated / Observed At：2026-10-18（Asia/Tokyo）
+State Revision：`STATE-20261019-004`
+Last Updated / Observed At：2026-10-19（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+T004：用户授权将test/f28055c合并main，提交说明“完整优化adb投屏”，推送后单次Build-Clients-New/main/Both/常规编译，不监控。fetch确认本地/远端main均e3b4454且为test祖先；无冲突合并，补记录前暂存树与test一致。无新增业务修改；准确SHA/dispatch见交付，构建/设备结果待证。CE-20261019-T004-01；[任务](../docs/tasks/T-2026-10-19-004-merge-adb-to-main.md)。下方为历史。
+
+T003 r2交付：用户授权提交推送test并单次Build-Clients-New/Both/常规编译，沿用不监控要求。执行前本地/远端2bbdf50、10路径范围与diff检查通过；准确Git/dispatch回执见交付，构建/设备结果待证。CE-20261019-T003-02；下方为实现阶段记录。
+
+T003：test/2bbdf50初始clean；按用户要求移除无障碍栏开共享/无视/穿透启动小字和专用提示逻辑，InputModel与添加提示前实现一致。连接等帧提示、ADB自身提示及T002恢复保持；V0完成，无Git/CI/产品执行。[任务](../docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md)，CE-20261019-T003-01；无新Decision/ADR/资产。下方为历史。
+
+T002 r2交付：用户授权T001/T002提交推送test后单次Build-Clients-New/Both/常规编译，不监控。执行前本地/远端8e26f0b，15路径范围与diff检查通过；实际SHA/dispatch见交付，不预写构建/真机通过。CE-20261019-T002-02；下方为实现阶段记录。
+
+T002：test/8e26f0b + T001 dirty；关闭ADB后普通单栏重新挂载Flutter Texture层并重获一次真实帧通知，native纹理/解码器/Android采集/传输保持。三份Dart局部修改、V0完成；这是显示恢复修复，用户设备冻结根因与效果仍需复测。未Git/CI/构建/设备操作；[任务](../docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md)，CE-20261019-T002-01。下方为历史。
+
+T001：test/8e26f0b clean起点；PC Android等待弹窗改为普通画面区域小字，显式开共享/无视/穿透等下一张真实RGBA/Texture即清提示，无强制停留/清空画面。原命令与Android/Rust/协议/编排保持；复用本地Texture通知，不阻塞发送。V0完成，未构建/真机/提交/推送/编排。[任务](../docs/tasks/T-2026-10-19-001-inline-frame-wait.md)，CE-20261019-T001-01；无Decision/ADR/资产增量。下方为历史。
+
+T010 r2交付续接：用户授权提交推送名称变更到test，单次Build-Clients-New/Both/常规编译，不监控；已核对本地/远端起点4b729dd和33路径范围。准确Git与dispatch回执见交付，未本地构建，构建/运行结果待证。CE-20261019-T010-02；下方为实现阶段记录。
+
+T010：test/4b729dd，保留既有Android app_name修改；跨平台显示名统一“一个壳子”，保留内部身份、翻译键、2FA、署名和旧快捷方式名，Windows查找兼容旧标题。V0格式/身份/快捷方式检查通过，构建/运行待证；未提交/推送/编排。[任务](../docs/tasks/T-2026-10-18-010-display-name.md)，D-032 / CE-20261018-T010-01。下方为历史观察。
+
+T009：test/66d0657 clean起点；ADB对齐普通整数缩放、QoS实时fps/ratio和码率预算；独立GPU/MediaCodec复用固定scrcpy采集接口，参数运行中生效，无视/穿透同步节奏。原媒体/无障碍实现不改。V0源码/DEX接口/hash/资源复检，未本地构建或真机。授权test提交推送后单次Both/常规编译、不监控；准确回执见交付。[任务](../docs/tasks/T-2026-10-18-009-adb-media-alignment.md)，CE-20261018-T009-01。下方为历史。
+
+T008：main/e3b4454 clean后test快进至该基线；独立ADB截图常驻压缩、穿透80ms/缓存、视频30fps上限、黑屏buffer/创建排除、命令直接OPEN/分包及诊断、PC弹窗位移和重绘优化。原媒体/无障碍/输入实现未改。V0完成，未本地构建/操作设备；255设备根因与黑屏/流畅度仍待实测。用户授权test提交推送后单次Both/常规编译、不监控，准确SHA/dispatch见交付。CE-20261018-T008-01；[任务](../docs/tasks/T-2026-10-18-008-adb-runtime-performance.md)。下方为历史。
 
 T007：用户授权 test/82e0f7f 合并 main，提交说明“ADB功能问题完善”，推送后单次 Build-Clients-New/main/Both/常规编译，不监控。fetch 确认本地/远端 main 均为 test 祖先；无冲突合并，写记录前树与 test 一致。无新增业务修改；准确 SHA/远端一致性/dispatch 回执见交付，构建与设备仍待证。CE-20261018-T007-01；[任务](../docs/tasks/T-2026-10-18-007-merge-adb-to-main.md)。下方为历史。
 

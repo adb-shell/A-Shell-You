@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "A Shell You" "\0"
-            VALUE "FileDescription", "A Shell You" "\0"
+            VALUE "FileDescription", "一个壳子" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "AShell" "\0"
             VALUE "LegalCopyright", "Copyright © 2025 A Shell You contributors. All rights reserved." "\0"
             VALUE "OriginalFilename", "ashell.exe" "\0"
-            VALUE "ProductName", "A Shell You" "\0"
+            VALUE "ProductName", "一个壳子" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

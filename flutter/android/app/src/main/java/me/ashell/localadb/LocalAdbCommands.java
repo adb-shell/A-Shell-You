@@ -89,13 +89,14 @@ final class LocalAdbCommands {
 
     private void execute(Job job) {
         Object result = null;
-        boolean failed = false;
+        String failure = null;
         try {
             job.client.connect(job.port, job.cancelled);
             if (!shellReady.get() || job.cancelled.get()) throw new InterruptedException();
             result = job.client.runShell(job.command, job.cancelled);
         } catch (Exception | LinkageError error) {
-            failed = true;
+            failure = error instanceof LocalAdbClient.ConnectionFailure
+                    ? error.getMessage() : "ADB 命令通道失败（" + error.getClass().getSimpleName() + "）。";
         } finally {
             job.command = "";
             job.client.abort();
@@ -103,7 +104,7 @@ final class LocalAdbCommands {
             job.client.disconnect();
         }
         Object value = result;
-        boolean error = failed;
+        String error = failure;
         main.post(() -> {
             main.removeCallbacks(job.timeout);
             running.remove(job);
@@ -111,7 +112,7 @@ final class LocalAdbCommands {
             if (job.cancelled.get()) job.reply.failure(job.reason,
                     "timeout".equals(job.reason) ? "ADB 命令超时，已关闭本次命令通道；其他 ADB 功能不受影响。"
                             : "ADB 命令已取消。");
-            else if (error) job.reply.failure("adb_failed", "ADB 命令执行失败，请确认无线调试连接；命令不会自动重放。");
+            else if (error != null) job.reply.failure("adb_failed", error + " 命令不会自动重放。");
             else job.reply.success(value);
             startNext();
         });

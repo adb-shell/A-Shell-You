@@ -48,7 +48,7 @@ echo ============================================================
 echo AShell PC build script
 echo ============================================================
 echo [INFO] Source root : "%ROOT_FOLDER%"
-echo [INFO] App name    : "A Shell You"
+echo [INFO] App name    : "一个壳子"
 echo [INFO] DEVENV   : "%DEVENV%"
 echo [INFO] DEVTOOL  : "%DEVTOOL%"
 echo [INFO] VC vars     : "%VCVARS%"

@@ -4,9 +4,60 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（ADB 剪贴板同步）
+Last Updated：2026-10-19（ADB优化合并main）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261019-T004-01：ADB优化合并main
+
+- 用户明确授权合并、提交、推送main并执行编排；本地/远端test=f28055c、main=e3b4454，初始clean。采用--no-ff合并保留五项提交，说明“完整优化adb投屏”；补记录前暂存树与test一致，diff检查通过。
+- 本轮仅新增docs/tasks/T-2026-10-19-004-merge-adb-to-main.md并同步五份任务/记忆索引；业务及工作流无额外修改。推送后单次Build-Clients-New/main/Both/常规编译，不监控；准确Git/dispatch见交付，未本地产品验证，不预写构建成功。STATE/WORK-20261019-004。
+
+## CE-20261019-T003-02：移除功能启动提示交付
+
+- 用户授权提交并构建编排；执行前本地/远端test均2bbdf50，10路径包含三份Dart与必要任务记录。提交推送后单次Build-Clients-New/Both/常规编译，不监控；沿用测试签名及Actions产物下载。
+- 无新增业务/配置或本地产品验证；准确Git/dispatch见会话交付，不预写构建/真机通过。STATE/WORK-20261019-003-r2；docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md。
+
+## CE-20261019-T003-01：移除功能启动提示
+
+- 用户仅授权移除无障碍功能启动小字并保护原链；test/2bbdf50 clean，三份Dart删除专用提示，连接等待/ADB/T002恢复保持。V0原命令一致性、残留/词法/diff检查通过；无Git/CI/产品验证。STATE/WORK-20261019-003；docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md。
+
+## CE-20261019-T002-02：等待提示与显示恢复交付
+
+- 用户授权推送并构建；本地/远端test均8e26f0b，15路径包含T001/T002源码与记录。提交推送后单次Build-Clients-New/Both/常规编译，不监控；测试签名/Actions下载沿用原编排。
+- 无新增业务/配置或本地产品验证；准确Git/dispatch见会话交付，构建/真机不预写PASS。STATE/WORK-20261019-002-r2；docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md。
+
+## CE-20261019-T002-01：关闭ADB后的普通纹理恢复
+
+- test/8e26f0b + T001 dirty，用户授权修复关闭ADB后三种模式共用的普通画面恢复；三份Dart增加本地Texture层重绘和下一帧通知，保留native生命周期、协议及原采集/输入。T001修改完整保留。
+- V0完成；原报告未本机复现，用户也尚未试过重开ADB，冻结根因/效果待正式验证。无Git/CI/构建/设备操作。STATE/WORK-20261019-002；docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md。
+
+## CE-20261019-T001-01：PC画面区域等待提示
+
+- test/8e26f0b初始clean，用户授权两项等待显示并强调不得破坏传输/功能；仅四份Dart展示与本机通知处理，原命令和native/protocol不改。无最短停留、清旧画面或新增采集操作。
+- V0完成；Android合同、任务和五份索引同步。无Git/CI/构建/真机，无Decision/ADR/外部资产增量。STATE/WORK-20261019-001；docs/tasks/T-2026-10-19-001-inline-frame-wait.md。
+
+## CE-20261019-T010-02：名称变更交付续接
+
+- 用户授权提交推送并编译；test/4b729dd与远端一致，33个本任务文件。提交推送test后单次Build-Clients-New/Both/常规编译，不监控；无额外业务或构建配置修改。
+- V0 diff与范围复检；准确Git/dispatch回执见交付，不预写构建通过。STATE/WORK-20261018-010-r2；docs/tasks/T-2026-10-18-010-display-name.md。
+
+## CE-20261018-T010-01：产品显示名
+
+- test/4b729dd + 既有Android app_name dirty；用户授权安全范围的显示名修改。产品显示“一个壳子”，默认品牌映射/平台元数据同步，Windows快捷方式和旧标题兼容；业务/权限/协议/身份保持。
+- V0静态检查；未Git/CI/产品执行。当前总览、项目记忆、任务/决定/事件索引同步；无外部资产或依赖增量。STATE/WORK-20261018-010 / D-032；docs/tasks/T-2026-10-18-010-display-name.md。
+
+## CE-20261018-T009-01：ADB媒体参数对齐
+
+- 用户授权试验对齐后test提交推送、单次编排；test/66d0657初始clean。新增AdbVideoCapture/AdbVideoSurface、独立JNI参数/尺寸、ADB视图尺寸；原采集/无障碍/输入/协议/构建/资产版本不改。
+- 普通QoS fps/ratio与码率公式、整数缩放；GPU编码前限帧，MediaCodec实时码率，私有socket参数/续租，逐帧截图节奏。最小14合同、任务与五份记忆同步。
+- V0源代码/DEX接口/hash/取消回收/diff；本地产品验证NOT_RUN。参数对齐不代表实际图像/码率/帧率相同，GPU/设备/多PC仍待证。准确Git/dispatch回执见交付。
+
+## CE-20261018-T008-01：独立ADB性能与兼容修复
+
+- 当前用户C2/C3授权；test快进main/e3b4454，初始clean。修改localadb媒体/截图/遮罩/命令类、proguard-rules、desktop/adb弹窗/媒体/侧栏及src/remote_adb_video.rs，新增AdbScreenshotCapture/LocalAdbScreenshotSession。字段/依赖/原链路/构建脚本不改。
+- 常驻截图、80ms节点与事件缓存、独立30fps、buffer遮罩及创建时排除、UTF-8直接命令/逐包ACK/真实错误、位移局部更新；最小13/14合同、本任务和五份记忆同事件。无外部资产或长期决定增量。
+- V0引用、括号、资源/取消、diff检查；未本地产品验证。255与黑屏设备原因未获复现，实测待证。test推送及单次Both/常规编译获准，不监控；Git/dispatch回执见交付。
 
 ## CE-20261018-T007-01：test 合并 main 与编排授权
 
