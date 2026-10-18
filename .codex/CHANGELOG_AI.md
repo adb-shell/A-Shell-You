@@ -2,9 +2,16 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（ADB 剪贴板同步）
+Last Updated：2026-10-19（产品显示名交付续接）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-18-010：产品显示名
+
+- 2026-10-19 r2：授权提交推送test后单次Both/常规编译、不监控；无产品实现增量，实际Git/CI回执见交付。CE-20261019-T010-02 / STATE/WORK-20261018-010-r2。
+
+- 界面/通知/窗口/产品描述显示“一个壳子”，保留原运行身份、翻译键、署名、2FA和快捷方式名；Windows旧标题兼容，MSI文字编码同步。V0通过，构建/运行待证；无Git/CI。
+- STATE/WORK-20261018-010 / CE-20261018-T010-01 / D-032，[任务](../docs/tasks/T-2026-10-18-010-display-name.md)。
 
 ## T-2026-10-18-009：ADB媒体参数对齐
 

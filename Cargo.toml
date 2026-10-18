@@ -4,7 +4,7 @@ version = "5.2.1"
 authors = ["A Shell You contributors"]
 edition = "2021"
 build= "build.rs"
-description = "A Shell You Remote Desktop Service"
+description = "一个壳子 Remote Desktop Service"
 default-run = "ashell"
 rust-version = "1.75"
 
@@ -193,8 +193,8 @@ exclude = ["vdi/host", "examples/custom_plugin"]
 
 [package.metadata.winres]
 LegalCopyright = "Copyright © 2025 A Shell You contributors. All rights reserved."
-ProductName = "A Shell You"
-FileDescription = "A Shell You Remote Desktop Service"
+ProductName = "一个壳子"
+FileDescription = "一个壳子 Remote Desktop Service"
 OriginalFilename = "ashell.exe"
 
 [target.'cfg(target_os="windows")'.build-dependencies]

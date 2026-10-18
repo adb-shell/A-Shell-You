@@ -1,15 +1,19 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261018-009`
+Registry Revision：`WORK-20261018-010-r2`
 
-Last Updated：2026-10-18（ADB 剪贴板同步）
+Last Updated：2026-10-19（产品显示名交付续接）
 
 Active Task Count：0
 
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T010 r2交付续接：用户授权提交推送test、单次Build-Clients-New/Both/常规编译，沿用不监控要求。准确SHA和dispatch回执见交付；构建/运行待证。STATE/WORK-20261018-010-r2 / CE-20261019-T010-02。
+
+T010 / complete / T8（名称实现与V0）：跨平台显示“一个壳子”，内部身份/旧快捷方式名/2FA/署名保持；已有Android名称修改保留。未Git/CI/构建/设备验证，正式运行待证。STATE/WORK-20261018-010 / CE-20261018-T010-01 / D-032；docs/tasks/T-2026-10-18-010-display-name.md。
 
 T009 / complete / T8（实现与V0）：ADB参数对齐、独立GPU编码和运行时码率/帧率更新；普通源不改。用户授权test提交推送、单次Both/常规编译、不监控。GPU/ROM、双源与多PC实际性能待证，准确Git/CI回执见交付。STATE/WORK-20261018-009 / CE-20261018-T009-01；docs/tasks/T-2026-10-18-009-adb-media-alignment.md。
 

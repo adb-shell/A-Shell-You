@@ -20,13 +20,16 @@ AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一�
 | Rust version | `5.2.1` | `Cargo.toml` |
 | Flutter package/version | `flutter_hbb` / `5.2.1+59`；内部包名保留 | `flutter/pubspec.yaml` |
 | Runtime app name | `AShell` | `libs/hbb_common/src/config.rs::APP_NAME` |
+| Product display name | `一个壳子` | `src/common.rs::get_display_app_name`、Flutter `appName` |
 | Android package | `me.ashell` | `flutter/android/app/build.gradle` |
-| Android labels | application/后台 `A Shell You`；launcher `一个壳子` | strings.xml + manifest activity-alias |
+| Android labels | application/后台/launcher `一个壳子` | strings.xml + manifest activity-alias |
 | Android scheme | `ashell` | `flutter/android/app/src/main/AndroidManifest.xml` |
 | Android native library | `libashell.so` | `build.sh`, `pkg2230.kt`, `native_model.dart` |
 | Windows native library | `ashell.dll` | `flutter/windows/CMakeLists.txt`, `native_model.dart` |
 
 2026-10-12 [身份迁移](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)将 `ORG` 改为 `me`。RustDesk内部类型名、第三方仓库URL、驱动名及外部兼容字段按用途保留，不做无差别替换。Flutter内部package明确保留flutter_hbb；当前身份基线为 `AS-BL-2026-10-12-a036f31-worktree`，只完成V0。
+
+2026-10-18 [T010显示名调整](../tasks/T-2026-10-18-010-display-name.md)：跨平台可见产品名统一为“一个壳子”；内部身份保持，旧Windows快捷方式文件名、2FA issuer及作者/版权仍为原值。D-032，仅V0，构建与运行待证。
 
 ## 2. 来源与可追溯性
 

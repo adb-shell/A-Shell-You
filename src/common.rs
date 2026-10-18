@@ -990,7 +990,7 @@ pub fn get_app_name() -> String {
 pub fn get_display_app_name() -> String {
     let name = get_app_name();
     if name == "AShell" {
-        "A Shell You".to_owned()
+        "一个壳子".to_owned()
     } else {
         name
     }

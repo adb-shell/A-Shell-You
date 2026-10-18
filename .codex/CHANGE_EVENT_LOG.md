@@ -4,9 +4,19 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-18（ADB 剪贴板同步）
+Last Updated：2026-10-19（产品显示名交付续接）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261019-T010-02：名称变更交付续接
+
+- 用户授权提交推送并编译；test/4b729dd与远端一致，33个本任务文件。提交推送test后单次Build-Clients-New/Both/常规编译，不监控；无额外业务或构建配置修改。
+- V0 diff与范围复检；准确Git/dispatch回执见交付，不预写构建通过。STATE/WORK-20261018-010-r2；docs/tasks/T-2026-10-18-010-display-name.md。
+
+## CE-20261018-T010-01：产品显示名
+
+- test/4b729dd + 既有Android app_name dirty；用户授权安全范围的显示名修改。产品显示“一个壳子”，默认品牌映射/平台元数据同步，Windows快捷方式和旧标题兼容；业务/权限/协议/身份保持。
+- V0静态检查；未Git/CI/产品执行。当前总览、项目记忆、任务/决定/事件索引同步；无外部资产或依赖增量。STATE/WORK-20261018-010 / D-032；docs/tasks/T-2026-10-18-010-display-name.md。
 
 ## CE-20261018-T009-01：ADB媒体参数对齐
 

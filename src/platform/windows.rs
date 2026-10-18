@@ -1340,8 +1340,19 @@ fn get_after_install(
     ", create_service=get_create_service(&exe))
 }
 
+// Existing shortcut filenames and publisher attribution must survive UI renames.
+fn get_legacy_display_app_name() -> String {
+    let name = crate::get_app_name();
+    if name == "AShell" {
+        "A Shell You".to_owned()
+    } else {
+        name
+    }
+}
+
 pub fn install_me(options: &str, path: String, silent: bool, debug: bool) -> ResultType<()> {
-    let display_name = crate::common::get_display_app_name();
+    let display_name = get_legacy_display_app_name();
+    let product_name = crate::common::get_display_app_name();
     let uninstall_str = get_uninstall(false, false);
     let mut path = path.trim_end_matches('\\').to_owned();
     let (subkey, _path, start_menu, exe) = get_default_install_info();
@@ -1486,7 +1497,7 @@ md \"{path}\"
 {copy_exe}
 reg add {subkey} /f
 reg add {subkey} /f /v DisplayIcon /t REG_SZ /d \"{exe}\"
-reg add {subkey} /f /v DisplayName /t REG_SZ /d \"{display_name}\"
+reg add {subkey} /f /v DisplayName /t REG_SZ /d \"{product_name}\"
 reg add {subkey} /f /v DisplayVersion /t REG_SZ /d \"{version}\"
 reg add {subkey} /f /v Version /t REG_SZ /d \"{version}\"
 reg add {subkey} /f /v BuildDate /t REG_SZ /d \"{build_date}\"
@@ -1576,7 +1587,7 @@ fn get_before_uninstall(kill_self: bool) -> String {
 /// is included in the generated uninstall script. If `uninstall_printer` is `false`, the printer
 /// related command is omitted from the script.
 fn get_uninstall(kill_self: bool, uninstall_printer: bool) -> String {
-    let display_name = crate::common::get_display_app_name();
+    let display_name = get_legacy_display_app_name();
     let reg_uninstall_string = get_reg("UninstallString");
     if reg_uninstall_string.to_lowercase().contains("msiexec.exe") {
         return reg_uninstall_string;
@@ -2440,7 +2451,7 @@ impl Drop for WakeLock {
 }
 
 pub fn uninstall_service(show_new_window: bool, _: bool) -> bool {
-    let display_name = crate::common::get_display_app_name();
+    let display_name = get_legacy_display_app_name();
     log::info!("Uninstalling service...");
     let filter = format!(" /FI \"PID ne {}\"", get_current_pid());
     Config::set_option("stop-service".into(), "Y".into());
@@ -2466,7 +2477,7 @@ pub fn uninstall_service(show_new_window: bool, _: bool) -> bool {
 }
 
 pub fn install_service() -> bool {
-    let display_name = crate::common::get_display_app_name();
+    let display_name = get_legacy_display_app_name();
     log::info!("Installing service...");
     let _installing = crate::platform::InstallingService::new();
     let (_, _, _, exe) = get_install_info();
@@ -2680,7 +2691,7 @@ pub fn update_me_msi(msi: &str, quiet: bool) -> ResultType<()> {
 }
 
 pub fn get_tray_shortcut(exe: &str, tmp_path: &str) -> ResultType<String> {
-    let display_name = crate::common::get_display_app_name();
+    let display_name = get_legacy_display_app_name();
     Ok(write_cmds(
         format!(
             "
@@ -2726,6 +2737,7 @@ fn get_create_service(exe: &str) -> String {
     }
     let stop = Config::get_option("stop-service") == "Y";
     if stop {
+        let display_name = get_legacy_display_app_name();
         format!("
 if exist \"%PROGRAMDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\{display_name} Tray.lnk\" del /f /q \"%PROGRAMDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\{display_name} Tray.lnk\"
 ")

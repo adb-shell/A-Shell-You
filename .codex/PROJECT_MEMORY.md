@@ -1,10 +1,12 @@
 # AShell Project Memory
 
-最后更新：2026-10-16（ADB绘图、PC展示与回退边界同步）
+最后更新：2026-10-18（产品显示名；下方ADB快照保留原时点）
 
 用途：AI 会话的稳定入口，不替代源码和完整工程文档。
 
 ## 0. Latest Recovery Snapshot
+
+2026-10-18 T010：test/4b729dd + 既有Android名称dirty；产品显示名统一“一个壳子”，内部身份、旧快捷方式名、2FA issuer及署名保持。STATE/WORK-20261018-010 / CE-20261018-T010-01 / D-032；[任务](../docs/tasks/T-2026-10-18-010-display-name.md)。仅V0，未Git/CI/产品构建；ADB等其他增量见PROJECT_STATE/CURRENT_WORK，以下为历史快照。
 
 2026-10-16 T001：源码main/4d3c446、初始clean，本地/远端一致；本次仅文档，按用户要求提交推送后单次Build AShell clients both/aarch64，不监控。当前指针STATE-20261016-001 / WORK-20261016-001 / CE-20261016-T001-01 / D031 / ADR0026 / Baseline21；[任务](../docs/tasks/T-2026-10-16-001-adb-docs-sync.md)记录验证与授权边界。
 
@@ -49,8 +51,8 @@ ADB当前：双NSD配对和id -u验证，独立2路Shell命令、Android真实�
 
 ## 2. Stable Identity
 
-- 产品显示名：`A Shell You`；内部runtime：`AShell`；ORG：`me`。
-- Android application/后台：`A Shell You`；launcher：`一个壳子`。
+- 产品显示名：`一个壳子`；内部runtime：`AShell`；ORG：`me`。
+- Android application/后台/launcher：`一个壳子`。Windows旧快捷方式文件名、2FA issuer及作者/版权保留 `A Shell You`，不作全局替换。
 - 来源：RustDesk 深度二次开发；本地初始化与后续记忆提交，2026-04-13一次性导入来自上节映射的历史源仓；准确 upstream fork commit 未确认。
 - Rust crate/library：`ashell`。
 - Flutter package：`flutter_hbb`。用户明确要求保留此内部包名及 `package:flutter_hbb/` 导入，与产品品牌无绑定关系。

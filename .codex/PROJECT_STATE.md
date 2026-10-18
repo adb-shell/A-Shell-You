@@ -1,9 +1,13 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261018-009`
-Last Updated / Observed At：2026-10-18（Asia/Tokyo）
+State Revision：`STATE-20261018-010-r2`
+Last Updated / Observed At：2026-10-19（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+T010 r2交付续接：用户授权提交推送名称变更到test，单次Build-Clients-New/Both/常规编译，不监控；已核对本地/远端起点4b729dd和33路径范围。准确Git与dispatch回执见交付，未本地构建，构建/运行结果待证。CE-20261019-T010-02；下方为实现阶段记录。
+
+T010：test/4b729dd，保留既有Android app_name修改；跨平台显示名统一“一个壳子”，保留内部身份、翻译键、2FA、署名和旧快捷方式名，Windows查找兼容旧标题。V0格式/身份/快捷方式检查通过，构建/运行待证；未提交/推送/编排。[任务](../docs/tasks/T-2026-10-18-010-display-name.md)，D-032 / CE-20261018-T010-01。下方为历史观察。
 
 T009：test/66d0657 clean起点；ADB对齐普通整数缩放、QoS实时fps/ratio和码率预算；独立GPU/MediaCodec复用固定scrcpy采集接口，参数运行中生效，无视/穿透同步节奏。原媒体/无障碍实现不改。V0源码/DEX接口/hash/资源复检，未本地构建或真机。授权test提交推送后单次Both/常规编译、不监控；准确回执见交付。[任务](../docs/tasks/T-2026-10-18-009-adb-media-alignment.md)，CE-20261018-T009-01。下方为历史。
 

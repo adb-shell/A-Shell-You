@@ -151,6 +151,11 @@ def gen_auto_component(app_name, dist_dir):
 
 
 def display_app_name(app_name):
+    return "一个壳子" if app_name == "AShell" else app_name
+
+
+def shortcut_app_name(app_name):
+    # Preserve filenames used by existing installs, startup and uninstall cleanup.
     return "A Shell You" if app_name == "AShell" else app_name
 
 
@@ -164,6 +169,7 @@ def gen_pre_vars(args, dist_dir):
             f'{indent}<?define Manufacturer="{args.manufacturer}" ?>\n',
             f'{indent}<?define Product="{args.app_name}" ?>\n',
             f'{indent}<?define ProductDisplay="{display_app_name(args.app_name)}" ?>\n',
+            f'{indent}<?define ProductShortcut="{shortcut_app_name(args.app_name)}" ?>\n',
             f'{indent}<?define Description="{display_app_name(args.app_name)} Installer" ?>\n',
             f'{indent}<?define ProductLower="{args.app_name.lower()}" ?>\n',
             f'{indent}<?define RegKeyRoot=".$(var.ProductLower)" ?>\n',
@@ -190,7 +196,15 @@ def replace_app_name_in_langs(app_name):
         with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
         for i, line in enumerate(lines):
-            lines[i] = line.replace("RustDesk", display_app_name(app_name))
+            is_shortcut_name = re.search(
+                r'\bId="(?:SC_Client|SC_Client_Tray|SC_Uninstall)"', line
+            )
+            name = (
+                shortcut_app_name(app_name)
+                if is_shortcut_name
+                else display_app_name(app_name)
+            )
+            lines[i] = line.replace("RustDesk", name)
         with open(file_path, "w", encoding="utf-8") as f:
             f.writelines(lines)
 
