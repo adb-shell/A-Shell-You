@@ -25,7 +25,7 @@ Uint8List? takeAdbFrame(String session, String owner, int generation) {
     frame = _take(sessionPtr, ownerPtr, generation, length);
     if (frame == nullptr) return null;
     final count = length.value;
-    if (count < 17 || count > 16 + 1280 * 1280 * 4) throw StateError('Invalid ADB frame size');
+    if (count < 17 || count > 16 + 4 * 1024 * 1024 * 4) throw StateError('Invalid ADB frame size');
     // Own the Dart copy before releasing Rust's allocation, including on decode failure.
     return Uint8List.fromList(frame.asTypedList(count));
   } finally {

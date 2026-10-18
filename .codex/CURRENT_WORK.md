@@ -1,7 +1,7 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261018-008`
+Registry Revision：`WORK-20261018-009`
 
 Last Updated：2026-10-18（ADB 剪贴板同步）
 
@@ -10,6 +10,8 @@ Active Task Count：0
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T009 / complete / T8（实现与V0）：ADB参数对齐、独立GPU编码和运行时码率/帧率更新；普通源不改。用户授权test提交推送、单次Both/常规编译、不监控。GPU/ROM、双源与多PC实际性能待证，准确Git/CI回执见交付。STATE/WORK-20261018-009 / CE-20261018-T009-01；docs/tasks/T-2026-10-18-009-adb-media-alignment.md。
 
 T008 / complete / T8（源码与V0）：独立ADB媒体/黑屏/命令诊断/弹窗修复，原链路保持；255设备根因、黑屏及流畅度实测待证。用户授权推送test并单次Both/常规编译、不监控；准确Git/dispatch回执见交付，不预写构建通过。STATE/WORK-20261018-008 / CE-20261018-T008-01；见 docs/tasks/T-2026-10-18-008-adb-runtime-performance.md。
 

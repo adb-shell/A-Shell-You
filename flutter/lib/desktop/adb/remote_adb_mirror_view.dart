@@ -75,7 +75,7 @@ class _AdbFrameState extends State<_AdbFrame> {
     // Match ordinary capture dimensions, then the ordinary canvas's selected view scale.
     final divisor = math.max(1, _sourceWidth ~/ 350);
     final captureScale = _physicalGeometry
-        ? math.min(1.0 / divisor, 1280.0 / math.max(_sourceWidth, _sourceHeight)) : 1.0;
+        ? 1.0 / divisor : 1.0;
     final width = _sourceWidth * captureScale;
     final height = _sourceHeight * captureScale;
     final canvas = widget.mirror.ffi.canvasModel;
@@ -122,7 +122,8 @@ class _AdbFrameState extends State<_AdbFrame> {
     ui.ImageDescriptor? descriptor;
     try {
       if (rgbaWidth != 0 || rgbaHeight != 0) {
-        if (rgbaWidth <= 0 || rgbaHeight <= 0 || rgbaWidth > 1280 || rgbaHeight > 1280 ||
+        if (rgbaWidth <= 0 || rgbaHeight <= 0 || rgbaWidth > 4096 || rgbaHeight > 4096 ||
+            rgbaWidth * rgbaHeight > 4 * 1024 * 1024 ||
             bytes.length != rgbaWidth * rgbaHeight * 4) throw StateError('Invalid ADB pixels');
         buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
         descriptor = ui.ImageDescriptor.raw(buffer, width: rgbaWidth, height: rgbaHeight,

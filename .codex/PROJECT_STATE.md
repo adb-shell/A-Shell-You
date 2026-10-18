@@ -1,9 +1,11 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261018-008`
+State Revision：`STATE-20261018-009`
 Last Updated / Observed At：2026-10-18（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+T009：test/66d0657 clean起点；ADB对齐普通整数缩放、QoS实时fps/ratio和码率预算；独立GPU/MediaCodec复用固定scrcpy采集接口，参数运行中生效，无视/穿透同步节奏。原媒体/无障碍实现不改。V0源码/DEX接口/hash/资源复检，未本地构建或真机。授权test提交推送后单次Both/常规编译、不监控；准确回执见交付。[任务](../docs/tasks/T-2026-10-18-009-adb-media-alignment.md)，CE-20261018-T009-01。下方为历史。
 
 T008：main/e3b4454 clean后test快进至该基线；独立ADB截图常驻压缩、穿透80ms/缓存、视频30fps上限、黑屏buffer/创建排除、命令直接OPEN/分包及诊断、PC弹窗位移和重绘优化。原媒体/无障碍/输入实现未改。V0完成，未本地构建/操作设备；255设备根因与黑屏/流畅度仍待实测。用户授权test提交推送后单次Both/常规编译、不监控，准确SHA/dispatch见交付。CE-20261018-T008-01；[任务](../docs/tasks/T-2026-10-18-008-adb-runtime-performance.md)。下方为历史。
 

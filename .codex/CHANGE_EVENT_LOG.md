@@ -8,6 +8,12 @@ Last Updated：2026-10-18（ADB 剪贴板同步）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261018-T009-01：ADB媒体参数对齐
+
+- 用户授权试验对齐后test提交推送、单次编排；test/66d0657初始clean。新增AdbVideoCapture/AdbVideoSurface、独立JNI参数/尺寸、ADB视图尺寸；原采集/无障碍/输入/协议/构建/资产版本不改。
+- 普通QoS fps/ratio与码率公式、整数缩放；GPU编码前限帧，MediaCodec实时码率，私有socket参数/续租，逐帧截图节奏。最小14合同、任务与五份记忆同步。
+- V0源代码/DEX接口/hash/取消回收/diff；本地产品验证NOT_RUN。参数对齐不代表实际图像/码率/帧率相同，GPU/设备/多PC仍待证。准确Git/dispatch回执见交付。
+
 ## CE-20261018-T008-01：独立ADB性能与兼容修复
 
 - 当前用户C2/C3授权；test快进main/e3b4454，初始clean。修改localadb媒体/截图/遮罩/命令类、proguard-rules、desktop/adb弹窗/媒体/侧栏及src/remote_adb_video.rs，新增AdbScreenshotCapture/LocalAdbScreenshotSession。字段/依赖/原链路/构建脚本不改。
