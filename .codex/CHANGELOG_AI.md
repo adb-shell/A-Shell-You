@@ -2,9 +2,21 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-19（产品显示名交付续接）
+Last Updated：2026-10-19（关闭ADB后的普通纹理恢复）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-19-002：关闭ADB后的普通纹理恢复
+
+- r2：用户授权T001/T002提交推送test后单次Both/常规编译，不监控；本地/远端起点和15路径范围复检，无额外源码修改。准确Git/dispatch见交付；CE-20261019-T002-02 / STATE/WORK-20261019-002-r2。
+
+- 双栏退回普通单栏后本地重绘Texture层，复用原桥获取下一真实帧通知；native纹理/解码器和Android普通采集不变，无远程刷新。保留T001等待提示。
+- V0词法/diff/原链边界检查完成；未Git/CI/构建/设备验证，原冻结根因和修复效果待复测。STATE/WORK-20261019-002 / CE-20261019-T002-01，[任务](../docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md)；沿用D030，无新ADR/资产。
+
+## T-2026-10-19-001：PC画面区域等待提示
+
+- 移除PC普通Android等待画面弹窗，改区域内小字；开共享/无视/穿透使用仅展示的等待状态，下一真实普通帧即清，无强制时长。原命令、Android/Rust、协议与ADB独立链保持。
+- V0词法/diff/身份与控制边界检查完成，未产品构建/运行/Git/CI。STATE/WORK-20261019-001 / CE-20261019-T001-01，[任务](../docs/tasks/T-2026-10-19-001-inline-frame-wait.md)；无Decision/ADR/资产增量。
 
 ## T-2026-10-18-010：产品显示名
 

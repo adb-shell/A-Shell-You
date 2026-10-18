@@ -286,17 +286,20 @@ waiting/reconnect 不得自动开启这条链。
 
 `showConnectedWaitingForImage()`：
 
-- 显示 waiting dialog，并把 Android action overlay 提到对话框之上。
+- PC普通Android会话在普通画面区域显示“已连接，等待画面传输”，不再显示waiting dialog；其他会话路径保留原对话框。Android action overlay继续可操作。
 - 在约 200ms、1200ms 和 10 秒调用 normal `sessionRefreshVideo()`。
 - 不发送“开无视”，不请求 screenshot fallback，不重绑 VirtualDisplay。
 
 `FFI.onEvent2UIRgba()` 对 RGBA 和 Texture 共用：
 
+- 立即清理会话内的普通画面/显式功能启动等待提示，不设置最短展示时间。
 - cancel `waitForImageTimer`
 - dismiss waiting dialog
 - 清 action overlay waiting entry
 - `waitForFirstImage=false`
 - 更新 view style 并执行 first-image callbacks
+
+2026-10-19 [T001](../tasks/T-2026-10-19-001-inline-frame-wait.md)：PC显式开共享/无视/穿透后，尚未收到后续普通画面时显示对应小字；不清旧帧、不改首帧或远端功能状态，关同一模式/失败/重连/关闭取消。复用原 `sessionOnWaitingForImageDialogShow` 让下一次真实Texture提交产生通知（RGBA本来逐帧通知），该桥只重置本机通知标记，不触发采集。通知调用不阻塞原控制命令发送；无新增timer、刷新、权限或协议。ADB等待独立，只有普通帧清理普通等待。V0，正式构建/慢网和双源交互待证。
 
 ## 9. 状态包
 

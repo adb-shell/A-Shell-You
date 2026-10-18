@@ -4,9 +4,24 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-19（产品显示名交付续接）
+Last Updated：2026-10-19（关闭ADB后的普通纹理恢复）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261019-T002-02：等待提示与显示恢复交付
+
+- 用户授权推送并构建；本地/远端test均8e26f0b，15路径包含T001/T002源码与记录。提交推送后单次Build-Clients-New/Both/常规编译，不监控；测试签名/Actions下载沿用原编排。
+- 无新增业务/配置或本地产品验证；准确Git/dispatch见会话交付，构建/真机不预写PASS。STATE/WORK-20261019-002-r2；docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md。
+
+## CE-20261019-T002-01：关闭ADB后的普通纹理恢复
+
+- test/8e26f0b + T001 dirty，用户授权修复关闭ADB后三种模式共用的普通画面恢复；三份Dart增加本地Texture层重绘和下一帧通知，保留native生命周期、协议及原采集/输入。T001修改完整保留。
+- V0完成；原报告未本机复现，用户也尚未试过重开ADB，冻结根因/效果待正式验证。无Git/CI/构建/设备操作。STATE/WORK-20261019-002；docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md。
+
+## CE-20261019-T001-01：PC画面区域等待提示
+
+- test/8e26f0b初始clean，用户授权两项等待显示并强调不得破坏传输/功能；仅四份Dart展示与本机通知处理，原命令和native/protocol不改。无最短停留、清旧画面或新增采集操作。
+- V0完成；Android合同、任务和五份索引同步。无Git/CI/构建/真机，无Decision/ADR/外部资产增量。STATE/WORK-20261019-001；docs/tasks/T-2026-10-19-001-inline-frame-wait.md。
 
 ## CE-20261019-T010-02：名称变更交付续接
 

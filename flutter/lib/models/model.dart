@@ -106,6 +106,8 @@ class CachedPeerData {
   }
 }
 
+enum AndroidFrameWaitMode { video, screenshot, penetrate }
+
 class FfiModel with ChangeNotifier {
   CachedPeerData cachedPeerData = CachedPeerData();
   PeerInfo _pi = PeerInfo();
@@ -134,6 +136,57 @@ class FfiModel with ChangeNotifier {
   Timer? waitForImageTimer;
   RxBool waitForFirstImage = true.obs;
   bool isRefreshing = false;
+
+  // Presentation-only state. Never reset the real first-frame/remote capture state
+  // when the user requests a different ordinary Android frame source.
+  final androidConnectedWaitingForImage = false.obs;
+  final androidFrameWaitMode = Rxn<AndroidFrameWaitMode>();
+  int _androidFrameWaitGeneration = 0;
+
+  bool get usesInlineAndroidFrameWait => isDesktop && !isWeb && isPeerAndroid &&
+      parent.target?.connType == ConnType.defaultConn;
+
+  String? get androidFrameWaitMessage {
+    switch (androidFrameWaitMode.value) {
+      case AndroidFrameWaitMode.video:
+        return '正在启动共享，等待画面传输…';
+      case AndroidFrameWaitMode.screenshot:
+        return '正在启动无视，等待画面传输…';
+      case AndroidFrameWaitMode.penetrate:
+        return '正在启动穿透，等待画面传输…';
+      case null:
+        return null;
+    }
+  }
+
+  int? beginAndroidFrameWait(AndroidFrameWaitMode mode) {
+    final target = parent.target;
+    if (!usesInlineAndroidFrameWait || target == null || target.closed ||
+        !_pi.isSet.value || viewOnly) return null;
+    cancelAndroidFrameWait();
+    final status = target.ashellStatusModel.data;
+    final alreadyActive = switch (mode) {
+      AndroidFrameWaitMode.video => status.video == true,
+      AndroidFrameWaitMode.screenshot => status.screenshot == true,
+      AndroidFrameWaitMode.penetrate => status.penetrate == true,
+    };
+    // An already-running source with a picture needs no artificial startup hint.
+    if (alreadyActive && !waitForFirstImage.value) return null;
+    androidFrameWaitMode.value = mode;
+    return _androidFrameWaitGeneration;
+  }
+
+  void cancelAndroidFrameWait({AndroidFrameWaitMode? mode, int? generation}) {
+    if (mode != null && androidFrameWaitMode.value != mode) return;
+    if (generation != null && generation != _androidFrameWaitGeneration) return;
+    _androidFrameWaitGeneration++;
+    androidFrameWaitMode.value = null;
+  }
+
+  void resetAndroidFrameWait() {
+    cancelAndroidFrameWait();
+    androidConnectedWaitingForImage.value = false;
+  }
 
   Timer? timerScreenshot;
 
@@ -234,6 +287,7 @@ class FfiModel with ChangeNotifier {
     if (_androidAutoReconnectTimer != null) {
       return;
     }
+    resetAndroidFrameWait();
     _stopAndroidAutoReconnect();
     _reconnects = 1;
     _lastAndroidAutoReconnectPasswordSubmitAt = null;
@@ -382,6 +436,7 @@ class FfiModel with ChangeNotifier {
   bool get keyboard => _permissions['keyboard'] != false;
 
   clear() {
+    resetAndroidFrameWait();
     _pi = PeerInfo();
     _secure = null;
     _direct = null;
@@ -1109,6 +1164,7 @@ class FfiModel with ChangeNotifier {
   showMsgBox(SessionID sessionId, String type, String title, String text,
       String link, bool hasRetry, OverlayDialogManager dialogManager,
       {bool? hasCancel}) {
+    if (isPeerAndroid && type == 'error') resetAndroidFrameWait();
     if (hasRetry && _isRecoverableAndroidConnectionError(type, title, text)) {
       _timer?.cancel();
       _startAndroidAutoReconnect(dialogManager, sessionId);
@@ -1131,6 +1187,7 @@ class FfiModel with ChangeNotifier {
 
   void reconnect(OverlayDialogManager dialogManager, SessionID sessionId,
       bool forceRelay) {
+    resetAndroidFrameWait();
     final effectiveForceRelay = isPeerAndroid || forceRelay;
     bind.sessionReconnect(sessionId: sessionId, forceRelay: effectiveForceRelay);
     if (!isPeerAndroid) {
@@ -1199,17 +1256,22 @@ class FfiModel with ChangeNotifier {
     if (waitForFirstImage.isFalse) return;
     if (isPeerAndroid) {
       dialogManager.dismissAll();
-      dialogManager.show(
-        (setState, close, context) => CustomAlertDialog(
-            title: null,
-            content: SelectionArea(child: msgboxContent(type, title, text)),
-            actions: [
-              dialogButton("Cancel", onPressed: onClose, isOutline: true)
-            ],
-            onCancel: onClose),
-        tag: '$sessionId-waiting-for-image',
-      );
-      waitForImageDialogShow.value = true;
+      if (usesInlineAndroidFrameWait) {
+        androidConnectedWaitingForImage.value = true;
+        waitForImageDialogShow.value = false;
+      } else {
+        dialogManager.show(
+          (setState, close, context) => CustomAlertDialog(
+              title: null,
+              content: SelectionArea(child: msgboxContent(type, title, text)),
+              actions: [
+                dialogButton("Cancel", onPressed: onClose, isOutline: true)
+              ],
+              onCancel: onClose),
+          tag: '$sessionId-waiting-for-image',
+        );
+        waitForImageDialogShow.value = true;
+      }
       waitForImageTimer?.cancel();
       _showAndroidActionsOverlayAboveDialogs(delayMSecs: 100);
       waitForImageTimer = Timer(_androidFirstFrameFallbackDelay, () {
@@ -1391,6 +1453,9 @@ class FfiModel with ChangeNotifier {
     }
 
     _pi.isSet.value = true;
+    if (!isCache && usesInlineAndroidFrameWait) {
+      androidConnectedWaitingForImage.value = waitForFirstImage.value;
+    }
     stateGlobal.resetLastResolutionGroupValues(peerId);
 
     if (isDesktop || isWebDesktop) {
@@ -3442,6 +3507,7 @@ class FFI {
 
   /// Mobile reuse FFI
   void mobileReset() {
+    ffiModel.resetAndroidFrameWait();
     ffiModel.waitForFirstImage.value = true;
     ffiModel.isRefreshing = false;
     ffiModel.waitForImageDialogShow.value = true;
@@ -3652,6 +3718,7 @@ class FFI {
   }
 
   void onEvent2UIRgba() async {
+    ffiModel.resetAndroidFrameWait();
     ffiModel.waitForImageTimer?.cancel();
     ffiModel.waitForImageTimer = null;
     if (ffiModel.waitForImageDialogShow.isTrue) {

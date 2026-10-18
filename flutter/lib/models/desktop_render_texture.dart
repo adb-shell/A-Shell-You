@@ -144,8 +144,17 @@ class TextureModel {
   final Map<int, _Control> _control = {};
   final Map<int, _PixelbufferTexture> _pixelbufferRenderTextures = {};
   final Map<int, _GpuTexture> _gpuRenderTextures = {};
+  final repaintRevision = 0.obs;
+  bool _repaintOnNextFrame = false;
 
   TextureModel(this.parent);
+
+  // Reattach Flutter's texture layers after a pane transition. The native
+  // textures and decoder keep their identity and continue receiving frames.
+  void repaintTextures() {
+    _repaintOnNextFrame = true;
+    repaintRevision.value++;
+  }
 
   setTextureType({required int display, required bool gpuTexture}) {
     debugPrint("setTextureType: display=$display, isGpuTexture=$gpuTexture");
@@ -162,6 +171,10 @@ class TextureModel {
         ensureControl(currentDisplay);
         _control[currentDisplay]?.setTextureType(gpuTexture: gpuTexture);
       }
+    }
+    if (_repaintOnNextFrame) {
+      _repaintOnNextFrame = false;
+      repaintRevision.value++;
     }
   }
 
@@ -225,6 +238,7 @@ class TextureModel {
   }
 
   onRemotePageDispose(bool closeSession) async {
+    _repaintOnNextFrame = false;
     final ffi = parent.target;
     if (ffi == null) return;
     for (final texture in _pixelbufferRenderTextures.values) {

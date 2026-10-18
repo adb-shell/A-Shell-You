@@ -311,6 +311,8 @@
 
 ## D-030 — 补录ADB执行隔离、状态推送与模式化停止
 
+- 2026-10-19 T002补注：隔离决定保持；关闭ADB后的普通显示恢复仅重绘PC Flutter Texture层并重获本地下一真实帧通知，不恢复历史的sessionRefreshVideo自动调用。用户设备冻结根因/效果仍需复测，见docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md。
+
 - 2026-10-14 / T005 / retrospective backfill；对应80887c1、f7bcb70、ee4c99b既有实现，当前7607349。本轮用户授权文档同步与提交推送，不新增业务行为。
 - Android继续拥有身份；命令最多2并发/总计8项且每项私有连接，按owner/requestId取消。画面、黑屏、触摸各自资源，不用Shell命令忙状态撤销共享能力。
 - instance/revision真实变化经JNI/字段40推送，沿用字段41订阅token；替代ADR0020“无push”的历史描述，保持无PC周期status/无QR。有限恢复只用于此前成功连接后的意外断链，不重放命令/配对或重开画面。

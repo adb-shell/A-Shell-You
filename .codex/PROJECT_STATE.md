@@ -1,9 +1,15 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261018-010-r2`
+State Revision：`STATE-20261019-002-r2`
 Last Updated / Observed At：2026-10-19（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+
+T002 r2交付：用户授权T001/T002提交推送test后单次Build-Clients-New/Both/常规编译，不监控。执行前本地/远端8e26f0b，15路径范围与diff检查通过；实际SHA/dispatch见交付，不预写构建/真机通过。CE-20261019-T002-02；下方为实现阶段记录。
+
+T002：test/8e26f0b + T001 dirty；关闭ADB后普通单栏重新挂载Flutter Texture层并重获一次真实帧通知，native纹理/解码器/Android采集/传输保持。三份Dart局部修改、V0完成；这是显示恢复修复，用户设备冻结根因与效果仍需复测。未Git/CI/构建/设备操作；[任务](../docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md)，CE-20261019-T002-01。下方为历史。
+
+T001：test/8e26f0b clean起点；PC Android等待弹窗改为普通画面区域小字，显式开共享/无视/穿透等下一张真实RGBA/Texture即清提示，无强制停留/清空画面。原命令与Android/Rust/协议/编排保持；复用本地Texture通知，不阻塞发送。V0完成，未构建/真机/提交/推送/编排。[任务](../docs/tasks/T-2026-10-19-001-inline-frame-wait.md)，CE-20261019-T001-01；无Decision/ADR/资产增量。下方为历史。
 
 T010 r2交付续接：用户授权提交推送名称变更到test，单次Build-Clients-New/Both/常规编译，不监控；已核对本地/远端起点4b729dd和33路径范围。准确Git与dispatch回执见交付，未本地构建，构建/运行结果待证。CE-20261019-T010-02；下方为实现阶段记录。
 

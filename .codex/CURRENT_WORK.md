@@ -1,15 +1,21 @@
 # AShell Current Work
 
 Schema Version：`1.0`  
-Registry Revision：`WORK-20261018-010-r2`
+Registry Revision：`WORK-20261019-002-r2`
 
-Last Updated：2026-10-19（产品显示名交付续接）
+Last Updated：2026-10-19（关闭ADB后的普通纹理恢复）
 
 Active Task Count：0
 
 > 本文件是支持 0..N 个并行 Codex 会话的协作 registry，不是锁、不是真相层，也不是授权凭证。任何新会话都必须重新执行 T0；历史 C1/C2/C3 不能继承。每个会话只更新自己的 Task ID 段，并在写入前重新读取 revision，防止覆盖其他会话。
 
 ## 1. Active Tasks
+
+T002 r2交付续接：用户授权T001/T002合并提交推送test、单次Build-Clients-New/Both/常规编译，沿用不监控要求；准确SHA/dispatch回执见交付，构建/设备结果待证。STATE/WORK-20261019-002-r2 / CE-20261019-T002-02。
+
+T002 / complete / T8（显示恢复修复与V0）：双栏回普通单栏后本地纹理重绘，下一真实Texture再刷新一次；原采集/编码/网络/ADB命令保持，保留T001 dirty。未Git/CI/产品执行，冻结根因和修复效果仍待设备复测。STATE/WORK-20261019-002 / CE-20261019-T002-01；docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md。
+
+T001 / complete / T8（实现与V0）：普通Android画面区域内连接/显式功能启动等待提示，真实RGBA/Texture立即清理；原传输/采集/命令编码与发送顺序保持。无Git/CI/产品执行，正式交互待证。STATE/WORK-20261019-001 / CE-20261019-T001-01；docs/tasks/T-2026-10-19-001-inline-frame-wait.md。
 
 T010 r2交付续接：用户授权提交推送test、单次Build-Clients-New/Both/常规编译，沿用不监控要求。准确SHA和dispatch回执见交付；构建/运行待证。STATE/WORK-20261018-010-r2 / CE-20261019-T010-02。
 
