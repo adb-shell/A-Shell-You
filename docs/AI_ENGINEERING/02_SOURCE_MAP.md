@@ -1,9 +1,9 @@
 # AShell 源码地图 / Source Map
 
-ADB当前源码4d3c446：localadb/AdbLayoutCapture与AdbLayoutNodes读取节点；AdbLayoutSnapshot为有界私有格式；LocalAdbLayout协调请求/几何，AdbLayoutRenderer在App绘JPEG。AdbPrivacyHint在App生成PNG，LocalAdbPrivacy传输，AdbPrivacyOverlay显示并绑定layerStack。PC状态展示在overlay.dart/remote_page.dart，Shell栏在remote_adb_sidebar.dart。2026-10-16 T001/Baseline21，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+当前实现基线0dbe202：ADB模块位于localadb；AdbVideoCapture/AdbVideoSurface负责独立GPU视频，AdbScreenshotCapture/LocalAdbScreenshotSession负责常驻截图，AdbLayoutNodes/Snapshot/Renderer区分节点与绘图，AdbPrivacyHint/Overlay区分字图生成与显示。LocalAdbKeyboard/LocalAdbTouch负责输入，LocalAdbKeepAlive负责豁免；KeepScreenOnState负责默认静默常亮。 2026-10-19文档复核，仅V0，构建/ROM实测待证；[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
 
-基线：2026-07-12，`HEAD 77062b4`
+历史接管基线：2026-07-12，`77062b4`；当前实现见本页顶部
 
 ## 1. 状态标签
 
@@ -23,7 +23,7 @@ ADB当前源码4d3c446：localadb/AdbLayoutCapture与AdbLayoutNodes读取节点�
 | `build.sh`, `env.sh` | PRIMARY/Android | Linux Android 环境与构建编排 |
 | `build.cmd` | PRIMARY/Windows | 当前 `C:\DevEnv` + `C:\DevTool` PC 构建 |
 | `build.py` | PRIMARY/Windows + COMPAT/other platforms | 当前PC入口调用的主编译包装，同时保留跨平台分支 |
-| `.github/workflows/build-clients.yml` | PRIMARY/CI | 独立手动 Android/Windows 构建，Actions artifacts only；V0，runner V2 pending |
+| `.github/workflows/Build-Clients.yml` / `Build-Clients-New.yml` | PRIMARY/CI | 手动Android aarch64/Windows；新入口常规/原始编译；Actions artifacts，实际构建待证 |
 | `res/`, `appimage/`, `flatpak/`, `fastlane/` | PLATFORM | installer、driver、icons、store metadata |
 | `.info` | PRIMARY config | 跟踪的基础设施 endpoint 文件；高变更/泄露面 |
 

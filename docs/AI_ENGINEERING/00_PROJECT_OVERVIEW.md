@@ -1,9 +1,9 @@
 # AShell 项目总览 / Project Overview
 
-ADB当前源码4d3c446：配对/UID验证、状态推送、独立命令与媒体/触摸保持；穿透节点由Shell读取、App绘图，黑屏白字由App预渲染。PC状态分组、Shell栏无悬浮小字；已回退菜单不在当前功能内。2026-10-16 T001/Baseline21，V0，构建/真机待证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+当前实现基线0dbe202：产品显示“一个壳子”；ADB独立配对/命令/媒体、全局优先输入、文本剪贴板、辅助保活与静默常亮已落源码。PC双源接收和分组状态保持。 2026-10-19文档复核，仅V0，构建/ROM实测待证；[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
-接管基线：2026-07-12  
-源码基线：`HEAD 77062b4`  
+初始接管记录：2026-07-12（历史）
+历史源码基线：`77062b4`；当前实现见本页顶部
 接管角色：AShell Principal Engineer
 
 2026-10-12 后续复核：[接管认知与证据](TAKEOVER_REVIEW_2026-10-12.md)、[新观察基线](../BASELINE/05_OBSERVED_BASELINE_2026-10-12.md)。本页7月基线保留；当前本地Git状态、历史源内容映射、ADB资产缺失、terminal生命周期及安全结论的证据边界以新复核和当前源码核对，不将旧环境描述冒充当前事实。
@@ -27,13 +27,13 @@ AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一�
 | Android native library | `libashell.so` | `build.sh`, `pkg2230.kt`, `native_model.dart` |
 | Windows native library | `ashell.dll` | `flutter/windows/CMakeLists.txt`, `native_model.dart` |
 
-2026-10-12 [身份迁移](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)将 `ORG` 改为 `me`。RustDesk内部类型名、第三方仓库URL、驱动名及外部兼容字段按用途保留，不做无差别替换。Flutter内部package明确保留flutter_hbb；当前身份基线为 `AS-BL-2026-10-12-a036f31-worktree`，只完成V0。
+2026-10-12 [身份迁移](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)将 `ORG` 改为 `me`。RustDesk内部类型名、第三方仓库URL、驱动名及外部兼容字段按用途保留，不做无差别替换。Flutter内部package明确保留flutter_hbb；该迁移的历史身份基线为 `AS-BL-2026-10-12-a036f31-worktree`；当前实现以Baseline22为准。
 
 2026-10-18 [T010显示名调整](../tasks/T-2026-10-18-010-display-name.md)：跨平台可见产品名统一为“一个壳子”；内部身份保持，旧Windows快捷方式文件名、2FA issuer及作者/版权仍为原值。D-032，仅V0，构建与运行待证。
 
 ## 2. 来源与可追溯性
 
-- 当前 Git 不是多年完整历史。仓库只有 59 个提交、无 tag、无 merge commit；根提交 `96a9c7c` 于 2026-04-13 以 `DaXianDesk` 为题一次性导入完整源码。
+- 2026-07-12接管时曾统计59个提交、无tag/merge；该计数不代表当前仓库。历史根提交 `96a9c7c` 于 2026-04-13 以 `DaXianDesk` 为题一次性导入完整源码。
 - 代码布局、协议、依赖和 README 明确来自 RustDesk；但当前仓库无法证明导入前的精确 upstream commit、补丁序列和 DaXian 阶段作者历史。
 - 远端 `历史源仓` 当前由 GitHub 元数据标记为 public。远端没有 PR 或 Issue 记录；开发历史主要表现为直接提交到 `main`。
 - 在没有上游基线 commit 前，只能称为“RustDesk 深度分支”，不能声称与某个官方版本存在可重放的 fork ancestry。

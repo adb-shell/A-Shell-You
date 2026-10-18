@@ -8,6 +8,13 @@ Last Updated：2026-10-19（ADB优化合并main）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261019-T006-01：以0dbe202重整当前文档与记忆
+
+- 用户明确授权文档同步及test→main交付，“文档更新”；源码回退已在本任务前完成。本次不再reset或强推，不执行CI。
+- 当前恢复快照只指向0dbe202及其文档后继；工程事实由源码核对，历史聊天中的已撤回内容不进入当前合同。旧任务/基线保留历史含义。
+- 仅Markdown，源/协议/构建/资产树保持；V0核对，未编译、真机、集成或生产执行。构建/性能/ROM结论仍待正式证据。
+- STATE/WORK-20261019-006、D-033、Baseline22；[详细任务](../docs/tasks/T-2026-10-19-006-restored-docs-sync.md)。Git最终SHA/一致性以实际交付查询为准。
+
 ## CE-20261019-T004-01：ADB优化合并main
 
 - 用户明确授权合并、提交、推送main并执行编排；本地/远端test=f28055c、main=e3b4454，初始clean。采用--no-ff合并保留五项提交，说明“完整优化adb投屏”；补记录前暂存树与test一致，diff检查通过。

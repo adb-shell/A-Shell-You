@@ -1,11 +1,8 @@
 # AShell 构建系统 / Build System
 
-2026-10-17 T001：以main/130f748为起点，将独立新工作流 `.github/workflows/Build-Clients-New.yml` 的 `BuildMode` 选项“完整编译”及全部九处条件统一改为“原始编译”，默认“常规编译”保持。构建命令、缓存策略、工具链与签名行为不变；旧工作流未改。V0精确替换检查通过，本次仅本地提交，不push、不dispatch、不执行构建。见[任务](../tasks/T-2026-10-17-001-build-mode-label.md)。下方为各历史时点记录。
+当前实现基线0dbe202，2026-10-19文档复核。构建配置保持源码原样；当前手动CI与本地入口见下文和[Actions说明](../BUILD_CLIENTS_ACTIONS.md)。本次只同步文档，不执行构建、编排、签名或版本变更；V0不代表产品编译通过。
 
-2026-10-16 T001：当前源码4d3c446；构建入口、依赖及工具链未变。此前1c46e74修正AdbStreamCompat访问package-private AdbProtocol的Java编译错误，不能把pub过期或字体优化提示当根因。既有dispatch204仅为接受证据，当前构建/真机结果未知。本轮文档提交推送后按授权单次Build AShell clients（both/aarch64），不监控、不本地构建。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
-
-
-接管基线：2026-07-12  
+历史接管基线：2026-07-12；当前实现基线见页首
 状态：`verified` + `verification-required`
 
 > 本轮只完成静态接管，没有运行任何 Rust、Flutter、Gradle、Android、Windows 或 Docker 构建/测试命令。下列命令是正式环境入口和待验证说明，不代表已通过。
@@ -153,17 +150,13 @@ cargo build --release --features flutter
 
 ## 7. CI/CD 现状
 
-2026-10-13 T001 用唯一 `.github/workflows/build-clients.yml` 替换 12 个旧上游 workflow，并删除空 submodule 对应、目标仍为 master 的 Dependabot 编排。仅 `workflow_dispatch`，选择 android/windows/both；Android 选择 aarch64/universal，默认 both + aarch64。Android native matrix 与 Windows x64 独立运行，APK 等待所选 ABI 完整。
+当前保留两个手动入口：[Build-Clients.yml](../../.github/workflows/Build-Clients.yml)与[Build-Clients-New.yml](../../.github/workflows/Build-Clients-New.yml)。Platform均为Both/Android/Windows；新入口另有BuildMode“常规编译”（默认）/“原始编译”。两者Android固定aarch64，不再提供android_arch或universal参数。新工作流区分编译缓存和下载缓存，不改变产品协议。
 
-CI 在 GitHub-hosted Ubuntu 22.04 / Windows 2022 上独立配置工具链，不运行本地 build.sh/env.sh/build.cmd 或 Android helper shell scripts。Android 直接调用 vcpkg/cargo-ndk/Flutter；Windows 调用 build.py 与 portable generate.py，只打包本次 Release。全部直接 Action 固定 SHA、contents: read、checkout 不保存凭据，没有自动 Git 写入、Release/tag/store 或生产签名 secret。
+CI在GitHub-hosted Ubuntu22.04/Windows2022独立配置工具链，不调用本地build.sh/env.sh/build.cmd。Android使用vcpkg/cargo-ndk/Flutter，Windows使用build.py与portable generate.py，只打包本次Release。Actions固定SHA、contents: read、checkout不保存凭据，不自动写仓库或创建Release/tag。
 
-Android Release APK 使用每次运行生成的临时测试 key，不能覆盖不同证书的安装。Windows 输出 unsigned EXE + ZIP；最终 artifacts 与 hash/provenance 保留 14 天，中间 JNI artifacts 1 天。tracked bridge 直接使用；不因删除 bridge workflow 而丢失 clean checkout 必需文件。旧 libadb.so 排除继续生效，8662f23 新增 local ADB 依赖保留。
+Android为临时测试key签名的Release APK；Windows为临时自签名Authenticode测试EXE/ZIP，不能等同生产可信签名。成品和hash/provenance保留14天，Android中间native artifact保留1天。tracked bridge直接使用，退役libadb.so排除，新localadb依赖及固定scrcpy资产保留。
 
-为解除旧 workflow 文件读取，build.sh 的 FRB 版本保持自身默认，vcpkg 读取 manifest baseline；历史 flutter/build_fdroid.sh 保留自身冻结版本。二者未在本轮运行，现有 Linux/Windows 本地构建入口继续保留。
-
-T002：用户反馈初版 sdkmanager 不在 PATH，native job 在 NDK 安装前失败。native/APK 两 job 现在均先运行固定 SHA 的 setup-android v3.2.2 / CLI 12266719（16.0），统一 SDK 根变量和 PATH、接受 licenses；显式仅安装 platform-tools，避免旧 tools 默认包。后续 sdkmanager 显式指定 SDK 根，路径/版本进入日志，CLI 版本进入产物元数据。
-
-操作、完整版本表、签名/依赖限制见 [Actions 使用说明](../BUILD_CLIENTS_ACTIONS.md) 和 [SDK 修复基线](../BASELINE/10_ANDROID_SDK_SETUP_BASELINE_2026-10-13.md)。修复后只有 V0，runner V2 尚未验证；依然没有 push/PR 自动质量 gate、bridge drift 检测或正式发布证据。
+本地build.sh的FRB/vcpkg版本解析独立于CI文件；build.cmd仍是正式Windows入口。完整参数、缓存边界、工具链、签名与下载方式见[Actions说明](../BUILD_CLIENTS_ACTIONS.md)。无push/PR自动质量门；本次没有新的runner、构建或真机通过证据。
 
 ## 8. 依赖与供应链
 

@@ -1,120 +1,39 @@
 # AShell Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261019-004`
+State Revision：`STATE-20261019-006`
 Last Updated / Observed At：2026-10-19（Asia/Tokyo）
-Evidence Scope：`repository-observed / V0 / formal build and runtime pending`
+Evidence Scope：`repository-observed / V0`
 
-T004：用户授权将test/f28055c合并main，提交说明“完整优化adb投屏”，推送后单次Build-Clients-New/main/Both/常规编译，不监控。fetch确认本地/远端main均e3b4454且为test祖先；无冲突合并，补记录前暂存树与test一致。无新增业务修改；准确SHA/dispatch见交付，构建/设备结果待证。CE-20261019-T004-01；[任务](../docs/tasks/T-2026-10-19-004-merge-adb-to-main.md)。下方为历史。
+## 当前源码基线
 
-T003 r2交付：用户授权提交推送test并单次Build-Clients-New/Both/常规编译，沿用不监控要求。执行前本地/远端2bbdf50、10路径范围与diff检查通过；准确Git/dispatch回执见交付，构建/设备结果待证。CE-20261019-T003-02；下方为实现阶段记录。
+- 用户指定的实现基线：`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`（完整优化adb投屏）。
+- 本次开始时：当前分支 test；本地 main/test、远端 main/test 均为上述提交；工作区 clean。
+- 本次只更新 Markdown 文档与工程记忆。后续文档提交不改变上述业务源码基线。
+- 当前基线：[Baseline22](../docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。历史基线、任务、编排授权只代表各自时点。
+- 回退后撤回的实现、实验方案和诊断结论不属于当前实现。后续会话先核对 HEAD/status，再由代码重新建立证据；不能沿用历史聊天中的“已修改”判断。
 
-T003：test/2bbdf50初始clean；按用户要求移除无障碍栏开共享/无视/穿透启动小字和专用提示逻辑，InputModel与添加提示前实现一致。连接等帧提示、ADB自身提示及T002恢复保持；V0完成，无Git/CI/产品执行。[任务](../docs/tasks/T-2026-10-19-003-remove-feature-start-hints.md)，CE-20261019-T003-01；无新Decision/ADR/资产。下方为历史。
+## 当前能力摘要
 
-T002 r2交付：用户授权T001/T002提交推送test后单次Build-Clients-New/Both/常规编译，不监控。执行前本地/远端8e26f0b，15路径范围与diff检查通过；实际SHA/dispatch见交付，不预写构建/真机通过。CE-20261019-T002-02；下方为实现阶段记录。
+| 领域 | 当前实现与限制 |
+|---|---|
+| 产品身份 | 显示“一个壳子”；内部 AShell/ashell、me.ashell、flutter_hbb 保持；Rust 5.2.1 / Flutter 5.2.1+59 |
+| Android 原链 | core连接服务、MediaProjection、无障碍输入/无视/穿透/黑屏保持各自原入口；服务运行不等于屏幕共享或首帧 |
+| ADB身份 | Android进程持有配对身份；双NSD发现，pairConnect后以真实 id -u 验证；配对记录不代表Shell已可用 |
+| ADB执行 | 2路独立命令、设备共享状态变化推送、有限意外断链恢复；PC无三秒远程status |
+| ADB画面 | scrcpy ScreenCapture + 独立GPU/H.264；常驻截图JPEG及raw/PNG兼容回退；Shell取节点、App绘穿透 |
+| ADB参数 | width/350整数缩放；4096边长/4Mi像素界限；只读普通VideoQoS，运行时更新；无视至少300ms，节点至少80ms |
+| ADB输入 | Shell可用时全局优先触摸，独立control-only连接；普通键盘、远程输入、Ctrl+V及PC→Android纯文本剪贴板同步 |
+| 黑屏 | 独立黑色buffer层及App预渲染白字PNG，排除自身采集；OEM表现待真机证据 |
+| PC界面 | 普通左/ADB右、单源居中；Shell栏无悬浮提示；状态分组；无障碍栏无视频/特殊/防触状态文字 |
+| 常亮与保活 | 默认连接服务运行期间静默常亮，无新增设置入口；ADB连接验证后尝试本应用电池优化豁免，不保证进程免杀 |
 
-T002：test/8e26f0b + T001 dirty；关闭ADB后普通单栏重新挂载Flutter Texture层并重获一次真实帧通知，native纹理/解码器/Android采集/传输保持。三份Dart局部修改、V0完成；这是显示恢复修复，用户设备冻结根因与效果仍需复测。未Git/CI/构建/设备操作；[任务](../docs/tasks/T-2026-10-19-002-ordinary-surface-resume.md)，CE-20261019-T002-01。下方为历史。
+详见 [12本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[Android原链](../docs/AI_ENGINEERING/04_ANDROID_PIPELINE.md)。
 
-T001：test/8e26f0b clean起点；PC Android等待弹窗改为普通画面区域小字，显式开共享/无视/穿透等下一张真实RGBA/Texture即清提示，无强制停留/清空画面。原命令与Android/Rust/协议/编排保持；复用本地Texture通知，不阻塞发送。V0完成，未构建/真机/提交/推送/编排。[任务](../docs/tasks/T-2026-10-19-001-inline-frame-wait.md)，CE-20261019-T001-01；无Decision/ADR/资产增量。下方为历史。
+## 本轮工作与验证
 
-T010 r2交付续接：用户授权提交推送名称变更到test，单次Build-Clients-New/Both/常规编译，不监控；已核对本地/远端起点4b729dd和33路径范围。准确Git与dispatch回执见交付，未本地构建，构建/运行结果待证。CE-20261019-T010-02；下方为实现阶段记录。
-
-T010：test/4b729dd，保留既有Android app_name修改；跨平台显示名统一“一个壳子”，保留内部身份、翻译键、2FA、署名和旧快捷方式名，Windows查找兼容旧标题。V0格式/身份/快捷方式检查通过，构建/运行待证；未提交/推送/编排。[任务](../docs/tasks/T-2026-10-18-010-display-name.md)，D-032 / CE-20261018-T010-01。下方为历史观察。
-
-T009：test/66d0657 clean起点；ADB对齐普通整数缩放、QoS实时fps/ratio和码率预算；独立GPU/MediaCodec复用固定scrcpy采集接口，参数运行中生效，无视/穿透同步节奏。原媒体/无障碍实现不改。V0源码/DEX接口/hash/资源复检，未本地构建或真机。授权test提交推送后单次Both/常规编译、不监控；准确回执见交付。[任务](../docs/tasks/T-2026-10-18-009-adb-media-alignment.md)，CE-20261018-T009-01。下方为历史。
-
-T008：main/e3b4454 clean后test快进至该基线；独立ADB截图常驻压缩、穿透80ms/缓存、视频30fps上限、黑屏buffer/创建排除、命令直接OPEN/分包及诊断、PC弹窗位移和重绘优化。原媒体/无障碍/输入实现未改。V0完成，未本地构建/操作设备；255设备根因与黑屏/流畅度仍待实测。用户授权test提交推送后单次Both/常规编译、不监控，准确SHA/dispatch见交付。CE-20261018-T008-01；[任务](../docs/tasks/T-2026-10-18-008-adb-runtime-performance.md)。下方为历史。
-
-T007：用户授权 test/82e0f7f 合并 main，提交说明“ADB功能问题完善”，推送后单次 Build-Clients-New/main/Both/常规编译，不监控。fetch 确认本地/远端 main 均为 test 祖先；无冲突合并，写记录前树与 test 一致。无新增业务修改；准确 SHA/远端一致性/dispatch 回执见交付，构建与设备仍待证。CE-20261018-T007-01；[任务](../docs/tasks/T-2026-10-18-007-merge-adb-to-main.md)。下方为历史。
-
-T006 r4：用户授权将 r3 的 Windows E0616 修复提交推送 test，单次 Build-Clients-New Windows/常规编译，不监控。执行前 test/de12290，七路径范围与 diff 检查通过；准确 Git/dispatch 回执见交付，构建/真机待证。CE-20261018-T006-04。
-
-T006 r3：test/de12290 初始 clean；用户日志确认 Windows Rust E0616，ADB 初始剪贴板同步跨模块读取 FlutterHandler 私有字段。已改读公开 Session.lc.peer_info，其他链路不改；V0 检查通过，修复后构建/设备待证，未提交或重新编排。日志中的同提交 Android APK 已产出，不代表运行验证。CE-20261018-T006-03，详情见 T006。
-
-T006 r2：用户授权将 T004/T005/T006 提交并推送 test，随后单次触发 Build-Clients-New（Both/常规编译），不监控。执行前 test/738a3fe、diff 检查通过；准确 SHA、远端一致性及 dispatch 接受回执见 Git/会话交付，构建与真机仍待证。CE-20261018-T006-02。下列未提交状态为各实现阶段历史。
-
-最新 test 增量：[T006](../docs/tasks/T-2026-10-18-006-adb-clipboard-sync.md)，test/738a3fe + T004/T005 dirty。仅 ADB 时复用原PC监听，经字段40 clipboard/text 更新手机剪贴板；paste=false，不自动输入，显式Ctrl+V队列保持。capability/状态/会话/权限检查及自动最新待发/取消清理；原无障碍剪贴板和模拟输入不改。V0完成，构建/真机待证，未提交/推送/编排。STATE/WORK-20261018-006 / CE-20261018-T006-01，无 Decision/ADR/资产增量。以下为历史。
-
-最新 test 增量：[T005](../docs/tasks/T-2026-10-18-005-adb-keyboard.md)，test/738a3fe + T004 dirty。原 KeyEvent 在 Android 分流到 ADB 常驻输入 socket，新增独立键盘队列与各 PC 修饰键状态，完整按键/释放清理；Ctrl+V/粘贴链保持，Flutter ADB 键盘放行。无媒体/无障碍实现/生成桥变更。V0 完成，构建/真机待证，未提交/推送/编排。STATE/WORK-20261018-005 / CE-20261018-T005-01，无 Decision/ADR/资产增量。以下为历史。
-
-最新 test 增量：[T004](../docs/tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，test/738a3fe clean 起点。Shell 文案“点亮屏”；普通画面光标与实际输入共用会话权限；Ctrl+V 无 ADB 时从 PC 直接经现有 Seq 文本链提交无障碍焦点输入，ADB 路径继续优先。五份源码局部修改，无手势/采集/普通剪贴板/协议变更；V0 完成，编译/真机待证。WORK-20261018-004 / CE-20261018-T004-01；未提交/推送/编排，无 Decision/ADR/资产增量。以下为历史。
-
-最新 test 增量：[T003](../docs/tasks/T-2026-10-18-003-keep-screen-on-settings.md)，test/9e28a90 clean 起点；r2 取消新增齿轮与设置页，主页不展示常亮控件。未配置默认 service-on 静默生效，已有有效选项保留，Kotlin 与 Dart 同步。HomePage 恢复 HEAD，原媒体/无障碍/ADB 不改；V0 完成，构建/真机待证。r3 用户授权提交推送 test 后单次 Build-Clients-New Both/常规编译，不监控，准确 Git/dispatch 回执见交付。WORK-20261018-003-r3 / CE-20261018-T003-03；无 Decision/ADR/资产增量。以下为历史。
-
-最新 test 增量：[T002](../docs/tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)，test/0b5ad99 clean 起点。ADB 验证连接后单次为当前包设置电池优化豁免，复用独立有界命令通道，PowerManager 回读及既有状态推送；Shell 栏新增 keycode224 点亮屏幕，原媒体/无障碍/传输保持。仅 V0，构建/真机待证；授权提交推送 test 后单次 Both/常规编译、不监控。WORK-20261018-002 / CE-20261018-T002-01，无 Decision/ADR/资产增量，实际 Git/dispatch 回执见交付。以下为历史。
-
-最新 test 增量：[T001](../docs/tasks/T-2026-10-18-001-keep-screen-on-and-adb-input.md)，test/00193fa clean 起点。主页开放三档常亮，移除强制 service-on，前后台共用真实授权 CM 连接判定（多 PC/ADB-only）；后台需悬浮权限，不依赖屏幕共享。已有 ADB 输入弹窗支持回车/确定、Shift+Enter、自动焦点，Ctrl+V 链保持。V0，未本地编译/真机验证；授权提交推送 test 后单次 Both/常规编译，不监控。WORK-20261018-001 / CE-20261018-T001-01，无 Decision/ADR/资产增量。Git/dispatch 回执见交付；以下为历史观察。
-
-最新test增量：[T003](../docs/tasks/T-2026-10-17-003-adb-paste-shortcut.md)，test/8ef006e clean起点。ADB直接Ctrl+V（native/Flutter键盘共用入口、会话/释放/权限检查及取消）、ADB视口焦点；移除960媒体限制、恢复统一1280 profile，JPEG对齐普通300ms采集节奏并限制4帧在途，不再额外按视频码率等待。V0源码/diff复检；无产品构建/真机通过证据。授权提交推送test、单次test Both/常规编译、不监控；实际Git/dispatch回执见最终交付。WORK-20261017-003 / CE-20261017-T003-01。以下T002及main为历史。
-
-最新test增量：[T-2026-10-17-002](../docs/tasks/T-2026-10-17-002-adb-input-performance.md)，从main/af1c72d（clean）创建test，保留既有未推送CI文案提交。新增显式ADB Unicode粘贴；ADB媒体二进制本地交接、24帧/8MiB回执窗口、960媒体上限、原始截图/PNG兼容回退。普通采集/无障碍/输入链零修改。V0检查完成；用户授权提交推送test并单次Build-Clients-New（Both/常规编译），不监控。实际SHA/dispatch接受结果见交付；产品构建及流畅度实测待证。WORK-20261017-002 / CE-20261017-T002-01，无Decision/ADR/资产增量。下方为main历史观察。
-
-最新局部观察：[T-2026-10-17-001](../docs/tasks/T-2026-10-17-001-build-mode-label.md)，起点main/130f748，初始clean。仅将新工作流的“完整编译”统一改名为“原始编译”，默认“常规编译”和运行逻辑保持；十处精确替换V0通过。用户授权本地提交，本次不push、不dispatch、不构建。当前Task/Event：T-2026-10-17-001 / CE-20261017-T001-01，WORK-20261017-001；提交结果以Git和会话交付为准。无Decision/ADR增量，产品与发布验证状态未提升。下方源码/基线表保留2026-10-16观察，未对期间其他提交作全仓复核。
-
-当前[T001](../docs/tasks/T-2026-10-16-001-adb-docs-sync.md)同步截至4d3c446的ADB文档，初始工作区clean、本地/远端一致。节点/字体绘制已迁移到App，PC状态与提示已更新；两次回退后，当前没有无障碍权限控制或开发者选项菜单。本快照写于文档提交前，最终文档SHA、推送及dispatch接受回执见Git/会话交付。
-
-## 1. Source and Product Snapshot
-
-| Field | Last Observed State | Evidence |
-|---|---|---|
-| Product/runtime | A Shell You / AShell；me.ashell；Flutter内部flutter_hbb | 当前manifest，产品身份未改 |
-| Rust / Flutter version | 5.2.1 / 5.2.1+59 | manifests |
-| Branch / implementation HEAD | main / 4d3c44640c4b001b9af2c3106e809564f8b615cf | 本任务文档提交前只读观察 |
-| Baseline | AS-BL-2026-10-16-4d3c446-adb-render-ui | Baseline21；旧基线冻结 |
-| Worktree | 初始clean；本轮仅ADB相关Markdown同步 | T001 / CE-20261016-T001-01 |
-| ADB current | 既有身份/UID/命令/推送及独立触摸/媒体保持；Shell读节点、App绘图/预渲染黑屏PNG；PC分组状态、精简文字 | 12_LOCAL_ADB / 13_REMOTE_ADB / 14_ADB_MIRROR |
-| Verification | V0源码、合同、引用与diff检查；无当前V2—V4通过结论 | TEST_MATRIX |
-| Build evidence | 1c46e74修正既有编译错误；此前4d3c446 both/aarch64 dispatch204未监控，当前构建结果仍未知 | 08_BUILD_SYSTEM / T001 |
-| Current actions | 用户授权文档commit/push后单次both/aarch64编排，不监控；未本地build/test/analyze/codegen或真机操作 | 当前用户指令 |
-| Release readiness | BLOCKED，既有安全/资产/正式验证缺口保持 | 下表；文档推送不是发布 |
-
-## 2. Governance and Knowledge Readiness
-
-| Area | State | Canonical Reference |
-|---|---|---|
-| Repository archaeology | 核心链V0已复核，逐文件覆盖/外部系统/运行验证未完成 | `TAKEOVER_REVIEW_2026-10-12.md` |
-| AI task governance | T0—T8、C0—C3、ADR、Baseline、Task Template、Test Matrix active | `PROJECT_START_HERE.md` + task protocol |
-| Global session memory | 本轮证据已保存并接入恢复入口；V0引用/范围检查完成，未实际启动新聊天验证 | `SESSION_START_PROTOCOL.md` + memory files |
-| Rust/Flutter/Android/Windows source understanding | V0 documented | domain architecture documents |
-| External infrastructure | incomplete / external | `EXTERNAL_ASSET_REGISTRY.md` |
-| Formal build/device/integration validation | not executed | `TEST_MATRIX.md` |
-| Commercial release gate | not satisfied | Security Model + External Registry |
-
-## 3. Current Blocking Areas
-
-| Category | Representative IDs / Gap | Current State | Owner / Next Gate |
-|---|---|---|---|
-| Credential/security evidence | `SEC-001` and related credential-type exposure | 字面量路径已确认；当前有效性/生产用途未测试，不能复制值 | project owner + Security / G0 |
-| Transport/auth/privacy | `SEC-002`—`SEC-016` applicable items | source-reviewed；dynamic proof pending | domain + Security / G1—G2 |
-| Backend and data | `EXT-SVC-001`—`003`, `EXT-DATA-001` | server/source/schema/owner missing | backend/infra owner |
-| ZEGO service | `EXT-SVC-004`, `EXT-SVC-005` | partial/external；incident and lock drift | API/Security owner |
-| Retired Android ADB assets | `EXT-BIN-ADB-001`；`EXT-REF-ADB-002/003` | RETIRED，不再是当前发布 blocker；历史来源记录保留 | Release 验证 APK 无 libadb.so |
-| New local ADB dependencies | `EXT-LIB-ADB-004`—`007` | 固定版本/许可来源已记录，hash/NOTICE/SBOM/Release JNI/R8/ROM验证未闭环 | Android/Security/Release，OWNER-REQUIRED；AND-09—13 |
-| New scrcpy server asset | `EXT-BIN-SCRCPY-001` | v5.0.1固定来源/大小/hash/Apache-2.0已记录并离线打包；未验证签名或重建上游产物 | Android/Release；ADB-M01—M08 |
-| Windows native assets | `EXT-WIN-001`—`009` applicable items | external/generated/unverified | Windows/Release/Security owner |
-| Build/sign/release | `EXT-SIGN-*`, `EXT-BUILD-*`, `EXT-CI-001`, `EXT-REL-001` | formal environments and custody incomplete | Release owner / G2—G3 |
-| Upstream/compliance | `EXT-HIST-001`, `EXT-COMP-001` | exact fork lineage、SBOM/NOTICE/source-offer incomplete | source/legal/release owner |
-
-## 4. Current Memory Pointers
-
-- Task：T-2026-10-16-001；活动状态以CURRENT_WORK为准。
-- Event：CE-20261016-T001-01；STATE-20261016-001 / WORK-20261016-001。
-- Decision：D-031 / ADR-0026（已有App绘图边界补录）；D-030及此前媒体/输入/遮罩隔离继续有效。
-- Current contract：docs/AI_ENGINEERING/12_LOCAL_ADB.md、13_REMOTE_ADB.md、14_ADB_MIRROR.md。
-- History：TASK_HISTORY、CHANGELOG_AI、CHANGE_EVENT_LOG、旧Task/ADR/Baseline；不把历史dispatch接受当构建成功。
-
-## 5. Standing Authority State
-
-本次明确授权文档更新、提交推送以及Build AShell clients单次dispatch（both/aarch64），不监控。没有产品代码、依赖/版本/签名、设备/生产或Release变更；本记录不授予下一任务权限，也不预写外部动作成功。
-
-## 6. Freshness and Update Contract
-
-At every new session:
-
-1. Compare branch、HEAD、dirty state and Baseline against a new read-only observation.
-2. Read `CURRENT_WORK.md` and detect concurrent、stale or conflicting tasks.
-3. If source or canonical engineering documents disagree with this file, mark this state stale and return to T0/T2.
-4. Baseline drift creates a new Baseline ID through the approved process；never rewrite the old snapshot.
-5. Do not store secret values、production addresses、peer/device identifiers、PII、absolute user paths or full command output here.
-
-For an authorized persisted-change task, update this file at T7/T8 after canonical sources and event records are synchronized. A C0 read-only task reports `reviewed-no-change` or `not-authorized` instead of editing this file.
+- 当前任务：[T-2026-10-19-006](../docs/tasks/T-2026-10-19-006-restored-docs-sync.md)，文档与V0同步完成；Git交付的准确SHA和分支一致性见实际引用及会话回执。
+- Registry：WORK-20261019-006；Event：CE-20261019-T006-01；Decision：D-033。
+- 授权：文档同步，以“文档更新”提交推送test，再合并推送main；本次不运行或触发构建。
+- 验证：源码对照、24份Markdown/249个本地引用和git diff --check通过，非文档树与0dbe202一致；本轮无编译、分析器、真机或集成测试。历史dispatch接受不等于当前构建通过。
+- 后续修复必须以此源码和新的复现证据为准。现有风险与验证缺口见 TEST_MATRIX、10_SECURITY_MODEL、EXTERNAL_ASSET_REGISTRY，不在本轮修改业务代码。

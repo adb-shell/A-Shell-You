@@ -1,6 +1,6 @@
 # AShell Commercial Test Matrix
 
-2026-10-16 T001：按4d3c446同步当前ADB合同。以下为待执行验收，不是已运行测试；当前没有V2/V3/V4通过证据。本次文档推送后按授权单次dispatch both/aarch64，不监控；接受回执不能将下表改为PASS。
+2026-10-19：按0dbe202 / [Baseline22](docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)同步当前ADB验收参数。以下均为待执行用例；本轮仅V0文档核对，不执行编排或产品测试，历史dispatch不等于PASS。下方注明日期的段落记录用例来源，不覆盖当前基线。
 
 | Case | 验证目标 | Level | Result |
 |---|---|---|---|
@@ -9,6 +9,16 @@
 | ADB-M28 | 黑屏白字在App生成有界PNG，helper只显示像素；默认显示layerStack、Android11/12+截图排除、触摸穿过、旋转、租约/断流/快速重开回收；修改系统字体的ROM分别验证，不宣称全ROM保证 | V2/V3/V4 | NOT_RUN |
 | ADB-M29 | PC状态区顺序/分界/144宽度与6内距；普通共享/无视保留，仅桌面隐藏视频/特殊/防触；加密字段可用/不可用；ADB模式/黑屏/命令状态及过渡“—”符合源phase，多PC不增加三秒轮询 | V3/V4 | NOT_RUN |
 | ADB-M30 | Shell栏鼠标悬浮无说明，语义名称/回调/启用条件保持；穿透仅中心进度、无底部重复；ADB菜单仅现有五项，无已回退的开发者/无障碍权限控制；移动端状态显示保持 | V3 | NOT_RUN |
+
+## 当前基线补充验收（0dbe202）
+
+| Case | 验证目标 | Level | Result |
+|---|---|---|---|
+| ADB-R23 | 远程输入回车/Shift+Enter/输入法组合、Ctrl+V；ADB优先、无ADB走无障碍；只读/剪贴板禁用/断线取消；文本不串PC、不重放 | V3/V4 | NOT_RUN |
+| ADB-R24 | ADB普通键盘映射、各PC修饰键与owner释放；自动clipboard paste=false、显式paste=true；保留原模拟输入/同步，不强制焦点粘贴 | V3/V4 | NOT_RUN |
+| ADB-R25 | UID验证后仅本应用电池豁免，已有豁免跳过、失败不撤Shell；点亮屏仅唤醒；默认core服务常亮、无新增入口，后台需现有悬浮权限 | V3 | NOT_RUN |
+| ADB-M31 | width/350缩放、4096/4Mi界限、真实source几何与硬件对齐；普通QoS变化后ADB视频动态码率/编码前帧率、截图/节点逐帧更新；同设备记录清晰度/时延/带宽 | V2/V3 | NOT_RUN |
+| ADB-M32 | 普通共享与ADB各模式按两种启动顺序组合，关ADB后普通单栏Texture重挂/下一真实帧恢复；原native指针与采集不重启；常驻截图失败回退、旋转、停止资源回收 | V3/V4 | NOT_RUN |
 
 以下ADB-R20—R22、M21—M25为T005建立的持续回归用例，保持待验状态：
 
@@ -19,8 +29,8 @@
 | ADB-R22 | 两PC同时Shell、总计8项满队列、超时/取消requestId/关弹窗；只取消对应请求，其他命令/媒体/触摸保持；输出不串PC，断开/撤销全局清理，不自动重放 | V3/V4 | NOT_RUN |
 | ADB-M21 | 连续开关投屏/无视/穿透/黑屏；模式化stop只影响目标，迟到序号与旧Run不覆盖新意图，关后再开/最后订阅退出释放；普通normal/ignore/SKL不被刷新、卡住或改状态 | V3/V4 | NOT_RUN |
 | ADB-M22 | 从未开启普通共享，仅配对连接后开ADB画面即可触摸；之后双源/关任一源、撤销/重连、只读切换；Shell可用与touchReady区分，两PC过期事件不松开另一PC手势 | V3/V4 | NOT_RUN |
-| ADB-M23 | 同generation重复starting与早到codec配置、反复切换/断线/页面移窗；保留有效配置、丢弃旧帧；每PC在途不超8帧或8MiB，慢端不拖停其他PC | V3/V4 | NOT_RUN |
-| ADB-M24 | H.264本机RGBA颜色/透明度/尺寸正确；16/100ms轮询不堆叠；截图1—8fps自适应、节点约2fps、静态去重；记录CPU/内存/带宽/实际帧率，不把上限当实测性能 | V3 | NOT_RUN |
+| ADB-M23 | 同generation重复starting与早到codec配置、反复切换/断线/页面移窗；保留有效配置、丢弃旧帧；每PC H.264在途≤24帧、JPEG/layout≤4帧、总量≤8MiB，慢端不拖停其他PC | V3/V4 | NOT_RUN |
+| ADB-M24 | H.264二进制本机RGBA桥颜色/透明度/尺寸及缓冲释放正确；16/100ms轮询不堆叠；截图间隔≥300ms、节点间隔≥80ms且随实时QoS更新、静态去重；记录CPU/内存/带宽/实际帧率，不把上限当实测性能 | V3 | NOT_RUN |
 | ADB-M25 | Android11/12+/目标OEM：黑屏三行白字16.5sp与左下位置、旋转、手机触摸穿过；PC普通/ADB源不出现遮罩或文字，关后资源释放；“正在启动无视…”正确；Release/R8及Java OPEN编译修复 | V2/V3/V4 | NOT_RUN |
 
 2026-10-14 T004新增（仅V0，均待正式环境）：
@@ -56,7 +66,7 @@
 |---|---|---|---|
 | ADB-M01 | Android aarch64/universal + Windows正式构建；APK含固定server/hash/LICENSE，新JNI经R8保留；Windows H.264独立解码可用 | V2 | NOT_RUN |
 | ADB-M02 | A/B两PC订阅同一Android；A开投屏B自动接收，任一关投屏两者关闭；只退出A时B继续；最后退出释放视频 | V3/V4 | NOT_RUN |
-| ADB-M03 | 慢PC、解码慢、帧窗口耗尽：在途<=8且总字节<=8MiB、等待关键帧后恢复，另一PC继续；新PC在静止画面加入也收到首帧 | V3/V4 | NOT_RUN |
+| ADB-M03 | 慢PC、解码慢、帧窗口耗尽：H.264在途<=24、JPEG/layout<=4且总字节<=8MiB、等待关键帧后恢复，另一PC继续；新PC在静止画面加入也收到首帧 | V3/V4 | NOT_RUN |
 | ADB-M04 | 旋转/缩放/黑边/横竖屏、关闭重开、页面移窗/断线重连；旧帧不复活，图像释放、旧owner不能取消新订阅 | V3 | NOT_RUN |
 | ADB-M05 | 原共享+无无障碍+ADB：可点击拖动；原共享+无障碍+ADB：只注入ADB；无ADB+无障碍：恢复原触摸；无ADB无无障碍不可触摸 | V3 | NOT_RUN |
 | ADB-M06 | 拖动期间切ADB/撤销/断线/只读/旋转/队列溢出；正确抬指；两PC争用不能互相抬起手势；关投屏仍可在原共享上ADB触摸 | V3/V4 | NOT_RUN |

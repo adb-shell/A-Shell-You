@@ -1,35 +1,10 @@
 # AShell Project Start Here
 
-2026-10-16 T001当前：源码main/4d3c446，初始clean；ADB节点采集与App绘图分离、黑屏白字App预渲染、PC状态分组与两处文字精简见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-16-001-adb-docs-sync.md)、ADR0026/D031/Baseline21。当前无已回退的无障碍权限控制或开发者菜单。仅V0，构建/真机待证；本轮文档提交推送后单次Build AShell clients both/aarch64，不监控。
+当前实现基线：`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`。2026-10-19核对时本地/远端test、main一致、工作区clean。本次只同步文档和工程记忆，以“文档更新”提交推送test，再合并推送main，不执行构建。见[Baseline22](docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)、[当前任务](docs/tasks/T-2026-10-19-006-restored-docs-sync.md)、[当前状态](.codex/PROJECT_STATE.md)。
 
-下方各时点快照保留历史含义，不覆盖4d3c446及本次授权。
+撤回的后续实现和诊断不属于当前事实，不得从旧聊天自动恢复。后续文档提交可以更新HEAD，业务树仍以该基线为准；新会话先核对HEAD/status。历史任务/基线仅保留追溯含义，不继承旧授权或构建结论。
 
-2026-10-14 T005当前：源码main/7607349，初始clean；ADB独立投屏/无视/节点穿透、白字黑屏、全局优先触摸、2路独立命令和Android状态推送均已落源码。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-14-005-adb-docs-sync.md)、ADR0025/D030/Baseline20。V0，当前构建/真机待证；本次仅文档提交推送，不执行编排。
-
-以下开头各段为历史任务快照；未提交、无push、投屏待设计等旧状态不代表7607349。
-
-2026-10-14 T003当前：main/941b215上调整全窗口状态浮层/双图间隔、修复ADB停止和请求超时路径、增加不进入采集的独立黑色遮罩（用户明确不采用熄屏）。原Android采集/Accessibility/输入实现保持；见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、ADR0023/Baseline18。V0未提交、未编译/真机。前轮941b215已推送且Build AShell clients获204、未监控；下方旧状态为历史快照。
-
-2026-10-14 T002：main/a0e46b1上实现主界面单源居中/双源左普通右ADB、Shell栏同款按钮、ADB独立连续系统截图。原Android采集/无障碍/触摸优先级保持，PC仅适配视口和ADB等待提示。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、ADR-0022/D-027/Baseline17；本轮未提交，仅V0。前轮a0e46b1已推送、Build AShell clients both/aarch64获204且未监控；没有本轮Git/CI或构建/真机结果。以下旧段为各任务历史快照。
-
-2026-10-13 T001历史：[独立客户端 Actions](docs/BUILD_CLIENTS_ACTIONS.md) 替换旧 GitHub 编排，仅手动 Android/Windows、测试签名和 Actions 下载；当时观察main/8662f23，V0。下文旧任务为各自历史快照；新会话先核对HEAD/status。
-
-当前ADB（2026-10-13 T008）：观察main/aca7446，初始clean；980f254固化无QR/两端模式/PC显式刷新，aca7446追加“移动端操作”左侧的ADB开关、可拖动Shell栏及ADB返回/主页/多任务，原侧栏仅加“无障碍栏”标题和布局空间。ADB确认可用时自动显示，持续可用时保留手动关闭；无PC周期status，各PC按事件查询Android共享状态。见[远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[Baseline15](docs/BASELINE/15_ADB_SIDEBAR_BASELINE_2026-10-13.md)、[T008](docs/tasks/T-2026-10-13-008-adb-sidebar-docs-sync.md)。仅V0，构建/真机待证。本轮仅同步文档；下一阶段[ADB投屏传输](docs/AI_ENGINEERING/11_ROADMAP.md)待设计，未选型/集成，不改原视频/输入/Accessibility链。
-
-最后更新：2026-10-14（T008跨日文档交付；下方历史观察日期保持）
-
-适用对象：所有 AI、sub-agent、人工开发者、审查者和发布负责人  
-定位：进入 AShell 仓库后的唯一第一入口
-
-> 本文件只负责启动、分流和权限提醒，不复制完整架构。当前源码始终是实现真相；AI 的强制行为规则以 `.codex/AI_RULES.md` 为准。
-
-最新接管复核：[2026-10-12 接管认知](docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)，对应观察基线 `CS-BL-2026-10-12-6fb0aa6`。先完成下列恢复顺序，再按任务读取该报告及源码。7月状态是历史快照；新对话应从 `.codex/PROJECT_STATE.md` 与 `.codex/PROJECT_MEMORY.md` 取得当前指针，不要求取得旧聊天记录。此机制是本工作区文件持久化，不表示 Git/云端已经同步。
-
-当前身份更新：[AShell迁移报告](docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md)，身份基线已由f423335固化，[T004服务器配置](docs/tasks/T-2026-10-12-004-server-configuration.md) 已由c0951b5固化。[T005 PC入口](docs/tasks/T-2026-10-12-005-pc-build-entry.md) 统一为build.cmd、只打包本次Release产物，现已由c9b7cd1固化。[T006产品图标](docs/tasks/T-2026-10-12-006-product-icons.md) 统一主图后，[T007覆盖复核](docs/tasks/T-2026-10-12-007-icon-coverage.md) 补齐Android通知/主题/悬浮图、Windows旧UI/自解压窗口和卸载快捷方式；两轮51文件已由fb5c393提交。Flutter内部package保留flutter_hbb；后台/PC显示A Shell You，Android桌面一个壳子。静态核验不等于构建或设备显示成功。
-
-T003补齐所有文档品牌字段/路径/文件名及两处ashell.分类匹配；历史名称按用户要求规范化，原文字/真实源仓地址留在Git a036f31；不更改Git历史或凭空改写源仓URL。
-
-最新状态补充：[T008 Android构建诊断](docs/tasks/T-2026-10-12-008-android-resource-build.md)。上述T006/T007图标已由fb5c393（修改图标）提交到test并快进合并/推送main；当前main。本轮仅修正build.sh捕获日志为APK路径及失败传播，改动未提交；用户旧目录增量资源合并异常仍需构建机清理生成目录后验证，未升级工具链或执行编译。
+当前ADB包含远程配对/独立Shell、投屏/无视/节点穿透、独立白字黑屏、全局优先触摸、键盘/远程输入/剪贴板同步和本应用电池优化豁免。Android默认连接服务运行期间静默常亮。详细实现、参数和待验边界见[12本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 
 ## 1. 五分钟启动顺序
 
@@ -77,7 +52,7 @@ T003补齐所有文档品牌字段/路径/文件名及两处ashell.分类匹配�
 
 ## 2. 项目身份速记
 
-- 产品/runtime：`AShell`。
+- 产品显示名：`一个壳子`；内部runtime：`AShell`。
 - Android 显示名：`一个壳子`。
 - 来源：RustDesk 深度二次开发；当前 Git 不能证明 2026-04-13 之前的完整 fork history。
 - Rust crate/library：`ashell`。

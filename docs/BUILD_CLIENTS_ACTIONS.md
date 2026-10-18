@@ -1,50 +1,40 @@
 # GitHub Actions 客户端编译
 
-入口：[`Build AShell clients`](../.github/workflows/build-clients.yml)。仅手动编译，产物保存在 Actions，不创建 GitHub Release、tag 或商店发布。
+当前源码基线0dbe202，2026-10-19按实际workflow核对。两个入口均仅手动运行，产物保存在Actions；不创建GitHub Release、tag或商店发布。本次文档同步不运行工作流。
 
-## 使用
+## 入口与参数
 
-1. 工作流提交并推送到仓库默认分支后，打开 **Actions → Build AShell clients → Run workflow**。
-2. 选择要编译的分支与参数：
-
-| 参数 | 可选值 | 默认 |
+| 入口 | 文件 | 参数 |
 |---|---|---|
-| `platform` | `android`、`windows`、`both` | `both` |
-| `android_arch` | `aarch64`、`universal`；仅编译 Windows 时忽略 | `aarch64` |
+| Build AShell Clients-New | [Build-Clients-New.yml](../.github/workflows/Build-Clients-New.yml) | Platform：Both / Android / Windows，默认Both；BuildMode：常规编译 / 原始编译，默认常规编译 |
+| Build AShell Clients | [Build-Clients.yml](../.github/workflows/Build-Clients.yml) | Platform：Both / Android / Windows，默认Both |
 
-3. 完成后从运行页 **Artifacts** 或各 job 的下载链接取得产物。最终 artifacts 保留 14 天；内部 `android-native-*` 中间文件保留 1 天。仓库策略可限制保留期限。
+在Actions选对应工作流、Run workflow，再选择实际已推送的分支。参数区分大小写；旧说明中的platform、android_arch及universal选择不适用于当前CI。两个工作流的Android目标均固定aarch64/arm64-v8a；需要universal时使用正式Linux本地入口build.sh 2，并另行验证。
 
-| 选择 | 成品 |
+新工作流“常规编译”复用受key约束的依赖/native构建缓存；“原始编译”跳过构建产物缓存恢复并清理相应输出，仍可复用工具和源码下载缓存，不等于断网或绝对无缓存编译。两种模式以实际workflow条件为准，不改变产品功能开关。
+
+## 产物
+
+| 平台 | 文件 |
 |---|---|
-| Android / aarch64 | `ashell-android-aarch64-test-signed.apk`，仅 arm64-v8a |
-| Android / universal | `ashell-android-universal-test-signed.apk`，arm64-v8a + armeabi-v7a + x86_64 |
-| Windows | `ashell-windows-x64.exe` 自解压程序、`ashell-windows-x64.zip` 完整 Release bundle |
+| Android | ashell-android-aarch64.apk（Release编译、临时测试签名） |
+| Windows | ashell-windows-x64.exe自解压程序；ashell-windows-x64.zip完整Release bundle |
 
-两平台 job 独立运行；一边失败不取消另一边。Android native matrix 中所有所选 ABI 成功后才打包 APK。下载包附带 `SHA256SUMS.txt`、源 commit/工具链信息和实际解析的 lockfile；Android 另附签名证书信息与 APK 文件清单。只上传成功检查的成品目录，不上传签名密钥、工作区或日志全集。中间文件过期后重新运行 Android 全部 jobs。
+成品从Actions运行页Artifacts/下载链接获取，保留14天；Android内部native中间产物保留1天，过期后需重新执行完整相关job。另有build-info、SHA256SUMS、解析依赖/锁文件和签名证据，准确清单以产物为准。Android APK等待native完成；Windows独立job，新工作流分别上传ZIP与EXE。
 
-## 签名与安装
+Android每次运行生成临时测试keystore并执行apksigner verify，证书不同的包不能直接覆盖安装；卸载会清除应用数据，保留数据需另行设计稳定签名。当前Windows也使用临时自签名Authenticode测试证书，签名只在runner临时信任环境验证，不代表用户设备信任或生产发布签名。私钥不随artifact上传。ZIP应完整解压运行，不能只取其中主EXE。
 
-- Android 是 **Release 编译 + 测试签名**，无需设置 GitHub Secrets。每次运行在 runner 临时目录生成测试 keystore，通过临时 `flutter/android/key.properties` 接入现有 Gradle 配置，并执行 `apksigner verify`。
-- **每次运行的测试证书不同**，也不能覆盖生产证书签名的安装。需要卸载已有应用后再安装，卸载会清除应用数据；需要保留数据时应另行配置稳定的测试签名身份。本工作流不提供生产签名模式。
-- Windows 成品没有 Authenticode 签名，系统可能显示未知发布者提示。ZIP 解压后从完整目录启动 `ashell.exe`，不能只取 ZIP 内的单个 EXE。
+## 工具链和边界
 
-## 工具链和构建边界
+源码固定Rust 1.75.0、Flutter 3.24.5、cargo-ndk 3.1.2、NDK 27.2.12479018、Android API21/Build Tools34、JDK17、command-line tools12266719；vcpkg baseline为6f29f12e82a8293156836ad81cc9bf5af41fe836。Hosted runner为Ubuntu22.04/Windows2022，Windows LLVM15.0.6；宿主patch/下载源仍可能变化，不能由版本固定推定完全可复现。
 
-全部 CI 配置位于 workflow：Ubuntu 22.04 / Windows 2022 hosted runner、Rust 1.75.0、Flutter 3.24.5、cargo-ndk 3.1.2、NDK 27.2.12479018（API 21）、JDK 17、Android SDK/Build Tools 34、Windows LLVM 15.0.6 / Python 3.11.9 / CMake 3.28.3 / Brotli 1.1.0、vcpkg `6f29f12e82a8293156836ad81cc9bf5af41fe836`。宿主 image、MSVC/JDK patch 和包源仍可能变动；完整 reproducibility 尚未验证。
+- CI独立配置SDK/NDK/vcpkg并直接调用cargo-ndk、Flutter，Windows调用build.py和portable/generate.py，不运行本地build.sh/env.sh/build.cmd。
+- Android检查目标ABI、核心native库与scrcpy资产；退役libadb.so继续排除，新LocalAdb及SPAKE2/Conscrypt依赖保留。
+- Windows只打包本次Release及其插件/库；原有外部驱动功能的可用性仍需正式验收。
+- 沿用tracked FRB桥，不以本任务自动生成或修改协议/桥文件。
+- contents: read、checkout不保存凭据、直接Actions引用固定SHA；没有push/PR自动构建触发器，没有生产签名Secrets依赖。
+- 本地构建机继续使用[build.sh](../build.sh) / [build.cmd](../build.cmd)，流程与CI相互独立。
 
-- native Android 直接执行 vcpkg 和 cargo-ndk，ARM 两 ABI 使用 `flutter,hwcodec`，x86_64 使用 `flutter`；合并相应的 `libashell.so` 与 NDK `libc++_shared.so` 后执行 Flutter APK 构建。APK 检查全部预期 ABI 和四种核心库，并排除退役 `libadb.so`。HEAD 中新的 local ADB 模块和 Maven dependencies 保留。
-- native 和 APK job 各自在 JDK setup 后运行固定 SHA 的 `android-actions/setup-android` v3.2.2，固定 command-line tools 12266719 / 16.0，安装 platform-tools、接受 licenses 并配置 PATH 和两个 SDK 根变量。后续 SDK/NDK 安装显式使用 `--sdk_root="$ANDROID_HOME"`；不依赖 runner 预装 sdkmanager。CLI 版本同时记录到 Android build-info。
-- Windows 调用 `python build.py --portable --hwcodec --flutter --vram --skip-portable-pack`，再调用 `libs/portable/generate.py`。仅打包本次 Release，包括本仓编译的 `dylib_virtual_display.dll` 和 Flutter 插件；不附加外部驱动、`WindowInjection.dll` 或上游自定义 engine。相关功能仍需单独验证。
-- 使用 tracked FRB bridge，不运行旧 bridge workflow 或自动重生成。两平台应用现有 Flutter dropdown patch，产品版本/包名/协议不改。
-- 不调用本地 `build.sh`、`env.sh`、`build.cmd`、`flutter/ndk_*.sh` 或 `flutter/build_android_deps.sh`。本地构建机仍使用原入口；为删除旧工作流解除的元数据依赖不改变入口。
-- 唯一 trigger 是 `workflow_dispatch`，`contents: read`，checkout 不保留凭据，直接 Action 引用固定 commit SHA；vcpkg cache 只含编译依赖，不含密钥。
+## 验证记录
 
-## 验证状态
-
-2026-10-13：初版完成 V0 后已由 c521601 提交。用户随后提供 runner 的 `sdkmanager: command not found` / 127 日志，失败发生在 NDK 安装前；T002 为两个 Android job 补齐上述 SDK 初始化。修复后仅完成 V0，**尚无修复后 runner 成功证据**。当前 `flutter/pubspec.yaml` 的 ZEGO 声明尚未进入 tracked lock，`flutter pub get` 会解析并把实际 lock 保存到 artifact；本轮不自动更新源 lock。后续仍需确认 JitPack/ZEGO/vcpkg/Cargo 下载与工具链兼容。
-
-验证修复时，在修复推送后用 **Run workflow → main** 创建新运行，先选 `android + aarch64`。旧运行的 **Re-run jobs** 仍使用原来的 commit，无法验证新工作流；见 [GitHub 重运行规则](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs)。SDK 初始化应显示 sdkmanager 路径和 16.0 版本，随后安装 NDK。详情见 [T002 修复记录](tasks/T-2026-10-13-002-android-sdk-setup.md)。
-
-《编译验证需求》：在 GitHub Actions 按 `android+aarch64`、`android+universal`、`windows`、`both` 四组运行，从 checkout 根目录执行工作流定义的步骤；确认 job 选择、APK 签名与 ABI、EXE/ZIP 完整性、失败不交付和下载。参考 [任务记录](tasks/T-2026-10-13-001-client-actions.md)、[CI 基线](BASELINE/09_CLIENT_ACTIONS_BASELINE_2026-10-13.md) 和 [TEST_MATRIX](../TEST_MATRIX.md)。
-
-GitHub 行为参考：[手动运行工作流](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)、[下载 workflow artifacts](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts)、[upload-artifact](https://github.com/actions/upload-artifact)。
+此页仅反映0dbe202的workflow配置，V0。历史sdkmanager、Java或Windows失败记录留在各任务中；不以旧失败证明当前失败，也不以dispatch接受证明当前构建通过。正式结果必须记录源SHA、分支/参数、run/job、artifact/hash、签名和实际结论；本轮未触发编排或本地构建。

@@ -1,22 +1,6 @@
-# AShell ADB 投屏、无视、穿透、黑屏与触摸
+# AShell ADB 投屏、无视、穿透、黑屏与输入
 
-test T002（2026-10-19，[任务](../tasks/T-2026-10-19-002-ordinary-surface-resume.md)）：针对关闭ADB后普通画面冻结，PC双栏退回普通单栏时在布局完成后校准视口，并用会话内revision重新挂载普通Flutter Texture层；native texture ID/指针、解码器和普通采集保持。现有本地通知桥重置notify_render_type，让下一张真实Texture事件再刷新一次，随后回到原通知频率；软件RGBA保持原帧更新。mounted/布局代次/peer校验使旧回调失效，不触发远程sessionRefreshVideo、重新授权或采集模式切换。T001等待提示保留。此为显示恢复路径的针对性修复，仅V0；用户尚未尝试重开ADB观察恢复，冻结根因与修复效果仍需设备复测。
-
-test T009（2026-10-18，[任务](../tasks/T-2026-10-18-009-adb-media-alignment.md)）覆盖下方旧参数策略：ADB采用与普通画面相同的width/350整数缩放，取消额外1280缩放；两端尺寸校验统一为单边4096、总4Mi像素。读取VideoQoS当前fps/ratio与画质档位，复用scrap基础码率/当前普通编码器类型对应预算，并用ADB source scale校正，普通共享未启动也可计算。视频通过新AdbVideoCapture复用固定scrcpy 5.0.1的ScreenCapture，在独立MediaCodec/GPU输入表面编码；App每秒经本机私有socket发送12字节SHPF参数，码率动态setParameters、帧率在编码前控制，避免锁死启动帧率或丢弃编码参考帧。普通QoS策略和状态不由ADB写入。无视至少300ms、穿透至少80ms，受当前fps节奏约束并逐帧重读；JPEG质量按实时ratio调整，不按JPEG大小推导长等待。多PC窗口、字段41、独立PC解码保持；旧PC仍仅接受1280内尺寸，较长画面需更新两端。视频helper只接受shell/root本机连接，关闭/EOF/10秒心跳丢失回收；App取消关闭自己的transport。编码器硬件对齐/码率范围、JPEG与H.264差异仍存在，“参数对齐”不等于像素、字节码率或实测帧率一致。仅V0，GPU/编码器/旋转/双源/多PC需真机验证。
-
-test T008（2026-10-18，[任务](../tasks/T-2026-10-18-008-adb-runtime-performance.md)）取代下方旧采集参数描述：无视优先常驻 `AdbScreenshotCapture`，Shell 缩放/JPEG后传输；以 `FLAG_DONT_USE_ACCESSIBILITY | FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES` 连接，不接管原无障碍。不支持时本次运行回退既有 screencap raw/PNG。一次一帧，请求/心跳串行，旧writer关闭后才回退重连。视频独立30fps上限，不再锁定普通视频拥塞后的瞬时fps；无视300ms、穿透80ms目标节奏，节点缓存由系统事件失效。PC串行取帧扣除调用耗时，画面重绘隔离；弹窗只更新位移。黑屏改为单个黑像素的buffer层缩放覆盖屏幕，白字为独立顶层；两层创建时设排除采集标记、事务再次设置，保持无输入通道、无Shell字体初始化、无FLAG_SECURE。原媒体/无障碍链路未改。仅V0：帧率是目标，黑屏ROM兼容及实际流畅度待实测，不能声称所有设备均通过。
-
-test T005（2026-10-18）：既有 LocalAdbTouch control-only 连接的单 writer 增加 LocalAdbKeyboard，键盘与触摸各自排队，不增加连接/线程或依赖媒体开启。owner 释放与 run 停止同时清键盘队列/修饰键；Flutter 旧 inputKey 入口允许非只读 Android ADB priority。普通/ADB 媒体与无障碍执行保持，Ctrl+V 沿用既有专用通道。详见[输入合同](13_REMOTE_ADB.md)，仅 V0。
-
-test T004（2026-10-18）：Shell 栏唤醒按钮显示“点亮屏”，仍执行 keycode224；普通画面光标改读当前 FfiModel 会话权限，与实际触摸同源，移除 ImagePaint 对设备 ID 共享权限副本的依赖。ADB 优先、只读显示与原手势/媒体链保持。无 ADB 的 Ctrl+V 文本输入见[远程输入合同](13_REMOTE_ADB.md)与[T004](../tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，仅 V0，设备待证。
-
-test 增量（2026-10-18，[T002](../tasks/T-2026-10-18-002-adb-keep-alive-and-wakeup.md)）：Shell 栏新增“点亮屏幕”，复用独立 shell 命令执行 `KEYCODE_WAKEUP`（224），已亮屏时不会反向息屏；无需启动任何媒体源，不自动移除 ADB/无障碍黑屏遮罩或解锁。ADB 辅助保活只设置本应用电池优化豁免，详见[本机 ADB](12_LOCAL_ADB.md)。本轮媒体、触摸及普通传输实现不改；V0，构建/设备待证。
-
-T003画质补充：H.264去掉固定1Mbps截断，沿用ADB的缩放像素量与选中quality ratio计算码率（尺寸/ratio有界、最低200kbps）。大画面Best不会再被同一上限压成Balanced码率；高画质需要相应网络带宽，不代表与普通编码器的码率/实测画质完全等同。
-
-test 分支增量（2026-10-17，[T002](../tasks/T-2026-10-17-002-adb-input-performance.md)、[T003](../tasks/T-2026-10-17-003-adb-paste-shortcut.md)）：PC ADB帧通过独立C ABI交接二进制，状态JSON不携带base64；按session/owner/generation取最新帧，Dart复制后释放Rust缓冲。H.264每PC在途/解码窗口24帧，独立JPEG/layout在途窗口4帧，均保留8 MiB上限。T003移除T002的额外960限制，统一width/350比例、最长边1280安全边界，H.264尺寸按8对齐；普通尺寸范围内与普通共享采用同一缩放策略。画质/FPS读取普通QoS的当前选择但不写入它，编码格式及实际效果不保证相同。截图优先原始像素、复用有界缓冲/Bitmap，不兼容时回退PNG，网络传缩放JPEG。无视截图目标间隔对齐普通无障碍300ms，低QoS FPS可延长；扣除采集耗时，不再按H.264码率预算额外等待最多2秒。原无障碍截图走视频编码，与独立JPEG的带宽/帧率不同，需同设备同网络实测。普通视频/截图/无障碍与协议不改；仅V0。下方main的8帧和base64描述由本段test实现取代。
-
-当前源码核对：2026-10-16，main/`4d3c446`，初始工作区 clean。本文为当前合同；历史任务和基线按各自提交解释。最新 [T001](../tasks/T-2026-10-16-001-adb-docs-sync.md)、[Baseline21](../BASELINE/21_ADB_RENDER_UI_BASELINE_2026-10-16.md)、[ADR-0026](../ADR/0026-adb-app-side-rendering.md) 补录节点采集与App绘制分离、遮罩文字及PC状态UI；[ADR-0025](../ADR/0025-adb-lanes-and-state-sync.md) 的通道隔离与同步继续有效。仅 V0，当前构建和真机兼容性尚未取得通过证据。
+当前实现基线：`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`，2026-10-19源码复核；见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)及[文档任务T006](../tasks/T-2026-10-19-006-restored-docs-sync.md)。本文合并此前已经进入该提交的功能，历史任务仅用于追溯，不覆盖当前参数。只完成V0文档/源码核对，不宣称构建、流畅度或全ROM兼容通过。
 
 ## 使用与界面
 
@@ -25,6 +9,7 @@ test 分支增量（2026-10-17，[T002](../tasks/T-2026-10-17-002-adb-input-perf
 | Shell栏入口 | 当前行为 |
 |---|---|
 | 返回 / 主页 / 多任务 | 独立 Shell 命令 `input keyevent 4/3/187` |
+| 点亮屏 | 独立 Shell 命令 `input keyevent 224`；只唤醒，不解锁、不关闭遮罩 |
 | 开投屏 / 关投屏 | 开启或关闭 scrcpy H.264 视频 |
 | 开无视 / 关无视 | 开启或关闭连续系统截图；启动提示为“正在启动无视…” |
 | 开穿透 / 关穿透 | 开启或关闭 Shell UiAutomation 节点边框、文字绘制 |
@@ -56,21 +41,29 @@ ADB 画面在主界面内显示：单源居中；双源左侧普通共享/无障
 
 `LocalAdbMirror`、`LocalAdbPrivacy`、`LocalAdbTouch` 和 `LocalAdbCommands` 各自管理连接和执行资源。关闭 ADB 画面只停止相应私有连接，不关闭共享 Shell、ADB 触摸或普通采集；关闭黑屏也不停止画面。ADB 关闭路径不调用普通 `sessionRefreshVideo`，避免普通编码器与解码器状态被连带重置。普通源与 ADB 源各自保持接收组件，ADB 帧不进入原 `VideoFrame/VIDEO_RAW`。
 
+双栏回普通单栏时，PC在布局完成后校准视口，并以会话revision重挂普通Flutter Texture层；native纹理指针、解码器和普通采集保持。本地notify_render_type使下一张真实Texture事件再刷新一次，随后回到原通知频率。连接等帧提示保留，无障碍功能启动小字已移除。该显示恢复路径已在基线中，实际设备效果仍需验证；不能把源码存在当作所有冻结问题已解决。
+
 单 PC 离开仅解除自己的订阅；最后订阅离开停止 ADB 画面和遮罩，共享 Shell/触摸生命周期仍由 Android manager 管理。ADB 断开、撤销或实际更换连接时释放所属视频、遮罩、触摸和命令资源。后台连接恢复不会自动重新开启已停止的画面或黑屏。
 
 ## 画质、尺寸与流畅度
 
-`AdbCaptureProfile` 参考原采集当前宽度整数除以350的缩放规则，下限1；最长边再限制为1280。例如1080×2400映射为360×800。H.264编码尺寸需8像素对齐，显示与点击使用额外传输的真实 `source_width/source_height`，不把编码对齐尺寸当作手机物理比例。旋转时重新匹配几何并释放旧手势。
+`AdbCaptureProfile`采用与普通采集相同的width/350整数缩放：divisor=max(1, sourceWidth/350)，宽高均除以divisor。例如1080×2400得到360×800。没有额外1280限缩；缩放结果单边不超过4096、总像素不超过4Mi，超限报错。H.264还需遵循实际编码器的尺寸能力/对齐；显示和输入另传真实source_width/source_height，旋转时重新匹配几何，不能拿编码尺寸冒充源尺寸。
 
-| 模式 | 源与压缩 | 当前限制 |
+`src/remote_adb_video.rs::Java_me_ashell_localadb_AdbCaptureProfile_quality`只读取普通VideoQoS当前fps、ratio及选中画质。码率复用scrap基础公式/当前编码器预算，并用ADB源的缩放修正；普通共享未开始也可计算。ADB不写普通QoS状态，但会读取其变化，因此两路的自适应参数并非互不相关。
+
+| 模式 | 采集/编码实现 | 当前参数与节奏 |
 |---|---|---|
-| 投屏 | 官方 scrcpy-server 5.0.1，H.264，video-only，无音频/控制；请求1秒关键帧间隔 | 只读普通画面 QoS 画质/FPS；FPS上限30、码率200kbps—1Mbps；设备编码器决定实际效果 |
-| 无视 | 固定 `screencap -p`，有界PNG解码后缩放并编码JPEG | 参考同一画质档位，JPEG低/均衡/最佳60/75/85，自定义50—90；节奏按FPS和JPEG字节预算调整，上限8fps，主动等待最长2秒 |
-| 穿透 | Shell UiAutomation 读取节点，App软件Canvas绘制JPEG | 500ms目标间隔（上限约2fps），读取/绘制耗时会降低实际帧率；每帧从App读取当前几何与画质档位 |
+| 投屏 | AdbVideoCapture复用固定scrcpy 5.0.1 ScreenCapture，经独立AdbVideoSurface GPU桥输入MediaCodec H.264；无音频 | App每秒经本机私有socket发送12字节SHPF参数；码率动态setParameters、帧率在编码前控制；30fps初始化hint不等于有效帧率固定上限；实际受QoS/设备/编码器限制 |
+| 无视 | 优先常驻AdbScreenshotCapture，UiAutomation.takeScreenshot后在Shell缩放/JPEG；不支持时本次Run回退screencap raw/PNG，由App处理 | 目标间隔max(300ms, ceil(1000/QoS fps))，逐帧重读并扣除采集耗时；不按JPEG字节预算额外长等待 |
+| 穿透 | Shell读取UiAutomation节点，App软件Canvas绘制JPEG | 目标间隔max(80ms, ceil(1000/QoS fps))；系统事件使节点缓存失效，读取/绘制耗时可降低实际频率 |
 
-视频与 JPEG 编码机制不同，不能说压缩质量或带宽完全一致。截图8fps是节奏上限，不是性能保证；截图仍有系统取图、PNG解码、JPEG压缩开销。相同截图/节点图去重，静态内容约每秒补一张供新PC加入。网络仍与普通画面共享会话及实际带宽，模块隔离不等于网络带宽隔离。
+JPEG选中档位Low/Balanced/Best为60/75/85，自定义50—90，再按实时ratio相对选中ratio下调，最终30—90。没有固定1Mbps视频上限，也不能将JPEG质量数字换算成H.264码率。视频helper仅接受shell/root本机连接，EOF或10秒心跳失联释放自身资源。
 
-PC H.264 使用独立解码器，输出 RGBA，经 base64 本机桥直接交给 Flutter `decodeImageFromPixels`，已移除中间JPEG重编码；网络仍传 H.264。截图/节点JPEG直接经本机桥交给Flutter，不重复视频解码。最新显示槽只保存一帧，替换时释放旧 `ui.Image`；streaming时本机取帧间隔16ms、空闲100ms，串行读取且不堆叠，不是远程status定时请求。仍有RGBA复制/base64成本，尚未接入专用texture管线。
+常驻截图以FLAG_DONT_USE_ACCESSIBILITY | FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES连接，不接管产品无障碍服务。请求与心跳串行，一次一帧；截图、节点和编码数据驻内存，不在手机相册保存截图。兼容回退保留更多解码开销。相同截图/节点图去重，静态内容约每秒补帧供新PC加入。
+
+PC H.264使用独立解码器输出RGBA，经独立C ABI二进制本机桥交给Flutter；状态JSON不承载base64，不做中间JPEG重编码。截图/节点JPEG直接通过帧桥。按session/owner/generation取最新帧，Dart复制后释放Rust缓冲，替换ui.Image时释放旧图像；仍有RGBA复制开销，未改成专用Texture管线。streaming时本机串行取帧间隔16ms、空闲100ms并扣除调用耗时；这是本地桥读取，不是远程status轮询。
+
+参数对齐只指缩放规则、QoS来源、码率计算及截图节奏对齐。普通无障碍截图最终走普通视频编码，ADB无视传独立JPEG；两者画质、带宽、实际帧率不会因此自动相同。两路仍共享设备GPU/CPU与网络带宽，需要同设备同网络对照实测。旧PC仍可能按1280尺寸校验，应更新两端。
 
 ## 节点穿透
 
@@ -112,7 +105,7 @@ ADB Shell可用时触摸优先走ADB；接管只结束旧无障碍远程手势�
 
 ADB画面DOWN/MOVE/UP经独立几何换算；原画面指针走原入口的ADB优先分流。PC队列32项、Android队列64项，合并相邻MOVE并保留DOWN/UP顺序；溢出释放手势。多PC可同时连接，但同一次拖动仅一个owner；其他PC的迟到/过期事件不能抬起当前owner的手势。10秒无事件自动抬起，断线/只读释放对应owner。旋转几何不匹配、旧epoch和迟到本机sequence会丢弃旧输入。
 
-触摸启动15秒、写入5秒守卫，有界停止与1—5秒退避重建；重复stop不延长首次清理期限，旧writer不取走新Run队列。完整键盘、文本/中文输入、剪贴板和ADB视图多指输入尚未实现，不能把任意Shell命令接口描述为完整桌面ADB客户端。
+触摸启动15秒、写入5秒守卫，有界停止与1—5秒退避重建；重复stop不延长首次清理期限，旧writer不取走新Run队列。LocalAdbKeyboard与触摸共用control-only连接的单writer、各自排队，支持常用普通键盘；Ctrl+V/远程输入与剪贴板同步已有独立文本语义，见[输入合同](13_REMOTE_ADB.md)。ADB视图多指、UHID及游戏长按未作完整支持承诺。
 
 ## 协议、所有权与资源
 
@@ -124,7 +117,7 @@ flowchart LR
   PC -->|remote_adb_video 41| HUB[Android订阅 / 流控]
   HUB --> MIRROR[LocalAdbMirror 私有画面连接]
   HUB --> PRIVACY[LocalAdbPrivacy 私有遮罩连接]
-  MIRROR --> SRC[H264 / screencap JPEG / 节点JPEG]
+  MIRROR --> SRC[H264 / 常驻截图JPEG / 节点JPEG]
   SRC --> HUB
   HUB --> DEC[PC独立解码 / RGBA或JPEG本机桥]
   DEC --> VIEW[主界面右侧ADB画面]
@@ -134,8 +127,8 @@ flowchart LR
 - `Misc.remote_adb=40`：配对/连接/命令/回执及共享状态；`Misc.remote_adb_video=41`：订阅、帧、触摸、模式与黑屏控制。原VideoFrame和其他字段编号不变。
 - 41字段15/16为格式与截图能力，17—19为黑屏能力/状态/错误，20为节点能力，21/22为真实几何。旧端空format按H.264解释，不把JPEG送入旧H.264解码器；不支持的模式提示更新。
 - 普通已认证会话可订阅；只有可控会话可触摸、开关画面和黑屏，文件/terminal/camera会话排除。ADB不依赖手机Accessibility键盘权限；不新增公网明文监听或关闭原会话传输策略。
-- Android最多32订阅者，每PC最多8帧且合计8MiB在途；ACK按sequence释放，慢PC等待关键帧恢复，不阻塞其他PC。PC解码队列8项，generation变化清旧缓存；同一generation的重复starting状态保留已收到的H.264配置。
-- H.264帧正文上限2MiB，codec配置上限64KiB，合并后的协议帧上限2MiB+64KiB；源边长<=16384、编码边长<=1280。系统PNG上限16MiB，解码前校验每边<=8192、总像素<=32Mi；JPEG上限2MiB、错误文本/节点解析均有界。
+- Android最多32订阅者；H.264每PC最多24帧、独立JPEG/layout最多4帧，均有合计8MiB在途上限。ACK按sequence释放，慢PC等待关键帧恢复，不阻塞其他PC。PC解码队列24项，generation变化清旧缓存；同一generation的重复starting状态保留已收到的H.264配置。
+- H.264帧正文上限2MiB，codec配置上限64KiB，合并后的协议帧上限2MiB+64KiB；源边长<=16384、编码/显示单边<=4096且总像素<=4Mi。系统PNG上限16MiB，解码前校验每边<=8192、总像素<=32Mi；JPEG上限2MiB、错误文本/节点解析均有界。
 - 私有连接有界close，画面20秒启动/无帧守卫、停止3秒守卫。Run、generation、订阅token和PCepoch隔离迟到结果；退出解码时释放资源，不执行killall或关闭adbd。守卫数值不等于所有平台上已验证的硬实时保证。
 
 ## 构建、资产与验证
@@ -144,6 +137,6 @@ flowchart LR
 
 沿用libadb3.1.1、Java8、Android11+无线调试；未升级工具链或增加PC adb.exe/旧libadb.so。`AdbStreamCompat`用于修复固定依赖的早到OKAY等待竞态。此前直接导入package-private的AdbProtocol导致Android编译错误，`1c46e74`已改为本地编码标准OPEN包，并保留所需反射成员的R8规则；修复后的构建结果仍待验证。
 
-[TEST_MATRIX](../../TEST_MATRIX.md) ADB-M01—M30、ADB-R01—R22及AND-09—13记录当前验收，除明确退役用例外均未取得通过证据。重点覆盖不启动普通共享时ADB触摸、双源独立关停、连点切换、双PC命令取消/争用、配对后连接验证、App绘图/字体回退、遮罩图层绑定/排除采集、节点读取及Release反射兼容。
+[TEST_MATRIX](../../TEST_MATRIX.md) ADB-M01—M32、ADB-R01—R25及AND-09—13记录当前验收，除明确退役用例外均未取得通过证据。重点覆盖不启动普通共享时ADB触摸、双源独立关停、连点切换、双PC命令取消/争用、配对后连接验证、App绘图/字体回退、遮罩图层绑定/排除采集、节点读取及Release反射兼容。
 
-《编译验证需求》：正式Linux仓库根 `./build.sh 1` / `./build.sh 2`、Windows `build.cmd` 用于验证JNI/R8/协议生成及安装包，再做目标Android版本与至少两PC实测。本次用户授权文档提交推送后单次执行 `Build AShell clients`（both/aarch64）；不监控编排，不执行本地产品验证。dispatch接受与构建通过分开记录，最终回执见本轮会话交付。
+后续正式验证入口为Linux仓库根 `./build.sh 1` / `./build.sh 2`、Windows `build.cmd`，以及[当前手动工作流](../BUILD_CLIENTS_ACTIONS.md)。需验证JNI/R8/安装包、Android目标版本和至少两PC实测。本次仅文档同步及Git交付，不执行或触发构建；dispatch接受与构建通过分别记录。

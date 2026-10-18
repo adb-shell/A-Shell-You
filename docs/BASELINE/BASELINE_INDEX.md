@@ -1,41 +1,33 @@
 # AShell Engineering Baseline Index
 
-当前：[AS-BL-2026-10-16-4d3c446-adb-render-ui](21_ADB_RENDER_UI_BASELINE_2026-10-16.md)。T001文档对齐App绘图、黑屏提示及PC展示，包含两次回退后的功能边界；V0，初始clean。本轮文档推送后单次both/aarch64编排、不监控；以下为历史快照，旧授权与验证结论不覆盖本次。
+当前：[AS-BL-2026-10-19-0dbe202-restored](22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。源码0dbe202，本轮仅文档与工程记忆同步；V0，无新增构建/设备通过证据。当前任务T-2026-10-19-006，提交推送test后合并推送main，不执行编排。
 
-当前：[AS-BL-2026-10-14-7607349-adb-current](20_ADB_CURRENT_BASELINE_2026-10-14.md)。T005补齐ADB当前实现与修复文档，初始clean，V0。本次仅文档提交推送，不执行编排；当前代码构建/真机证据待补。
+## 快照索引
 
-以下为此前快照索引，按各自日期解释；Baseline19由282b748固化，旧Baseline文件冻结不改。
+以下01—21均为冻结的历史快照，不代表当前HEAD或可继承授权。当前源码与12/13/14领域合同优先。
 
-当前：[AS-BL-2026-10-14-404b199-adb-layout-worktree](19_ADB_LAYOUT_INPUT_BASELINE_2026-10-14.md)，T004 Shell栏/画面压缩/输入恢复/独立节点穿透；未提交，V0。Baseline18由404b199固化并推送，前轮编排204且未监控。
-
-当前：[AS-BL-2026-10-14-941b215-adb-overlay-worktree](18_ADB_OVERLAY_BASELINE_2026-10-14.md)，T003布局/ADB恢复/独立遮罩，V0未提交。Baseline17已由941b215提交推送并触发编排（204，不监控）；下方旧状态保持历史含义。
-
-当前工作树快照：[AS-BL-2026-10-14-a0e46b1-adb-inline-worktree](17_ADB_INLINE_SCREENSHOT_BASELINE_2026-10-14.md)：主界面单双画面、Shell栏样式与独立ADB连续截图；本轮未提交，仅V0。
-
-前轮快照：[AS-BL-2026-10-14-a1486ee-adb-mirror-worktree](16_ADB_MIRROR_BASELINE_2026-10-14.md)已由a0e46b1提交推送，编排204接受但未监控；快照保持冻结，不代表构建通过。
-
-当前源码快照：[AS-BL-2026-10-13-aca7446-adb-sidebar](15_ADB_SIDEBAR_BASELINE_2026-10-13.md)。980f254已固化配对UI/显式刷新，aca7446增加独立Shell栏与开关，初始工作区clean。T008仅文档/V0，无当前构建/真机结果；ADB投屏仍待设计，无新依赖。下列“最新”保留各历史时点含义。
-
-T007交付前历史：[AS-BL-2026-10-13-efb2599-adb-ui-worktree](14_ADB_CODE_PAIRING_BASELINE_2026-10-13.md)，当时三份Dart dirty、历史CI仅dispatch接受；该快照继续冻结，不覆盖当前Baseline15。
-
-T006历史快照：[AS-BL-2026-10-13-504adea-adb-usability](13_ADB_USABILITY_BASELINE_2026-10-13.md)，独立ADB权限/双端口发现/一键连接/扫码；保持冻结。当前功能由Baseline14补充，不改写旧快照。
-
-最新ADB工作树快照：[AS-BL-2026-10-13-917e661-remote-adb-worktree](12_REMOTE_ADB_BASELINE_2026-10-13.md)。T004新增PC请求与Android共享状态，仅V0，V2—V4待验证，未提交。此前 [Baseline11](11_LOCAL_ADB_BASELINE_2026-10-13.md) 与以下旧基线继续冻结。
-
-最新 CI 工作树快照：[AS-BL-2026-10-13-c521601-android-sdk-setup-worktree](10_ANDROID_SDK_SETUP_BASELINE_2026-10-13.md)。T002 修复初版 sdkmanager 缺失；固定两 Android job 的 SDK setup 和 CLI 版本；修复后 V0，runner 构建待验证。原 [独立客户端 Actions 快照](09_CLIENT_ACTIONS_BASELINE_2026-10-13.md) 与以下旧快照保留冻结含义，不代表当前 HEAD。
-
-最新 repository-observed 快照：[AS-BL-2026-10-12-13f792d-adb-retired-worktree](08_ADB_RETIREMENT_BASELINE_2026-10-12.md)。T009 删除旧 ADB 功能链/权限并排除旧 native binary，V0；构建和运行未验证。下文所称最新 PC 构建快照为此前历史状态，旧基线不重写。
-
-> 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
-
-最新 repository-observed 快照：[`AS-BL-2026-10-12-c0951b5-pc-build-worktree`](07_PC_BUILD_BASELINE_2026-10-12.md)，T005统一PC入口与纯Release打包，V0，修改后build/runtime未验证。之前的 [`AS-BL-2026-10-12-a036f31-worktree`](06_ASHELL_IDENTITY_BASELINE_2026-10-12.md) 已经f423335固化；[`CS-BL-2026-10-12-6fb0aa6`](05_OBSERVED_BASELINE_2026-10-12.md) 与下列 `CS-BL-2026-07-12-77062b4` / 01—04文件保留历史冻结含义。
-
-基线日期：2026-07-12  
-Baseline ID：`CS-BL-2026-07-12-77062b4`  
-Source HEAD：`77062b4d8b63eae9a31afe288e3ac00a4f89e009`  
-状态：repository-side baseline accepted；formal build/runtime baseline `verification-required`
-
-> 本目录冻结可追溯的来源、产品版本、关键依赖和正式构建环境。它不保存 credential、生产地址或本机私有配置，也不证明未执行的 build/test 已通过。
+- [Baseline22：回退后的源码与文档基线](22_RESTORED_SOURCE_BASELINE_2026-10-19.md)
+- [Baseline21 — ADB绘图与PC展示文档同步](21_ADB_RENDER_UI_BASELINE_2026-10-16.md)
+- [Baseline20 — 当前ADB模块文档同步](20_ADB_CURRENT_BASELINE_2026-10-14.md)
+- [Baseline19 — ADB layout, geometry and input](19_ADB_LAYOUT_INPUT_BASELINE_2026-10-14.md)
+- [AS-BL-2026-10-14-941b215-adb-overlay-worktree](18_ADB_OVERLAY_BASELINE_2026-10-14.md)
+- [AShell inline ADB and screenshot baseline](17_ADB_INLINE_SCREENSHOT_BASELINE_2026-10-14.md)
+- [AShell ADB mirror baseline](16_ADB_MIRROR_BASELINE_2026-10-14.md)
+- [AShell ADB Shell栏 Baseline — 2026-10-13](15_ADB_SIDEBAR_BASELINE_2026-10-13.md)
+- [AS-BL-2026-10-13-efb2599-adb-ui-worktree](14_ADB_CODE_PAIRING_BASELINE_2026-10-13.md)
+- [AS-BL-2026-10-13-504adea-adb-usability](13_ADB_USABILITY_BASELINE_2026-10-13.md)
+- [Remote ADB Worktree Baseline — 2026-10-13](12_REMOTE_ADB_BASELINE_2026-10-13.md)
+- [AShell Local ADB Observed Baseline — 2026-10-13](11_LOCAL_ADB_BASELINE_2026-10-13.md)
+- [Android SDK Setup Fix Baseline](10_ANDROID_SDK_SETUP_BASELINE_2026-10-13.md)
+- [AShell Client Actions Baseline](09_CLIENT_ACTIONS_BASELINE_2026-10-13.md)
+- [AShell Legacy ADB Retirement Baseline](08_ADB_RETIREMENT_BASELINE_2026-10-12.md)
+- [PC Build Baseline — 2026-10-12](07_PC_BUILD_BASELINE_2026-10-12.md)
+- [AShell identity observed baseline](06_ASHELL_IDENTITY_BASELINE_2026-10-12.md)
+- [AShell 源码观察基线 2026-10-12](05_OBSERVED_BASELINE_2026-10-12.md)
+- [AShell Formal Build Environment Baseline](04_BUILD_ENVIRONMENT.md)
+- [AShell Dependency Baseline](03_DEPENDENCY_BASELINE.md)
+- [AShell Version Matrix](02_VERSION_MATRIX.md)
+- [RustDesk / DaXianDesk Upstream Baseline](01_UPSTREAM_BASELINE.md)
 
 ## 1. 文件职责
 
@@ -75,4 +67,3 @@ Source HEAD：`77062b4d8b63eae9a31afe288e3ac00a4f89e009`
 - 当前 source HEAD 固定，但工作树包含未提交的 AI 工程文档/Skill 资产；本目录没有把它们冒充 commit 内容。
 - 本次只做 V0 静态核验，没有执行项目编译、测试、codegen、设备、服务或发布验证。
 - `CS-BL-2026-07-12-77062b4` 可用于源码/文档任务；正式 release baseline 必须补齐 G2 证据、artifact hashes、signatures、SBOM 和 external asset owners。
-

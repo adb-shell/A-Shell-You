@@ -2,9 +2,16 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-19（ADB优化合并main）
+Last Updated：2026-10-19（回退基线文档同步）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-19-006：回退基线后的文档与记忆同步
+
+- 用户指定0dbe202为当前实现；开始时本地/远端test、main一致且clean。整理当前合同与恢复指针，历史任务只作追溯；撤回的后续实现/诊断不作为当前事实。
+- 纠正ADB视频/截图参数、二进制帧桥、键盘/剪贴板、静默常亮、保活、PC显示恢复及现有CI入口说明；仅Markdown，无业务/依赖/工作流或资产变更。
+- V0：源码对照、引用/格式及差异范围；不运行产品验证或编排。用户授权提交“文档更新”、push test、fast-forward main并push；准确SHA与最终引用见Git交付记录。
+- STATE/WORK-20261019-006 / CE-20261019-T006-01 / D-033 / Baseline22；[任务](../docs/tasks/T-2026-10-19-006-restored-docs-sync.md)。
 
 ## T-2026-10-19-004：ADB优化合并main
 

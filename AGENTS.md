@@ -1,33 +1,10 @@
-# AGENTS.md — A Shell You / AShell v5.2.1
+# AGENTS.md — 一个壳子 / AShell v5.2.1
 
-2026-10-16 T001当前：源码main/4d3c446，初始clean；Shell只采集布局节点，App绘制穿透文字与黑屏提示PNG。PC分组展示ADB状态，已移除桌面视频/特殊状态文字和Shell栏悬浮提示；已回退的无障碍权限控制/开发者菜单不在当前主线。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-16-001-adb-docs-sync.md)、ADR0026/D031/Baseline21。V0，构建与真机待证。本轮仅文档，按用户授权提交推送后单次Build AShell clients both/aarch64，不监控。后续会话先核对HEAD/status。
+当前实现基线：`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`。2026-10-19核对时本地/远端test、main一致、工作区clean。本次只同步文档和工程记忆，以“文档更新”提交推送test，再合并推送main，不执行构建。见[Baseline22](docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)、[当前任务](docs/tasks/T-2026-10-19-006-restored-docs-sync.md)、[当前状态](.codex/PROJECT_STATE.md)。
 
-以下为历史快照，旧“本次不执行编排”等授权只适用于各自任务。
+撤回的后续实现和诊断不属于当前事实，不得从旧聊天自动恢复。后续文档提交可以更新HEAD，业务树仍以该基线为准；新会话先核对HEAD/status。历史任务/基线仅保留追溯含义，不继承旧授权或构建结论。
 
-2026-10-14 T005当前：源码main/7607349；文档同步任务开始时clean。ADB已具备独立投屏/无视/节点穿透、白字黑屏、全局优先触摸、2路独立命令及Android状态变化推送；无PC三秒status。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[任务](docs/tasks/T-2026-10-14-005-adb-docs-sync.md)、ADR0025/D030/Baseline20。V0；当前构建/真机结果待证。本次仅文档提交推送，不执行或监控编排。
-
-以下段落为历史任务快照，不覆盖上述当前合同。
-
-2026-10-14 T002：main/a0e46b1上实现主界面单源居中/双源左普通右ADB、Shell栏同款按钮、ADB独立连续系统截图。原Android采集/无障碍/触摸优先级保持，PC仅适配视口和ADB等待提示。见[当前合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)、ADR-0022/D-027/Baseline17；本轮未提交，仅V0。前轮a0e46b1已推送、Build AShell clients both/aarch64获204且未监控；没有本轮Git/CI或构建/真机结果。以下旧段为各任务历史快照。
-
-2026-10-13 T008：当前观察main/aca7446，初始clean。980f254固化配对模式/无QR/PC显式刷新；aca7446新增PC Shell栏（三键经独立ADB shell）、“移动端操作”左侧开关与无障碍栏标题。RemotePage持有会话显示状态，确认ADB可用时自动显示，持续可用时保留手动关闭；无PC周期status，也无Android状态push。见13_REMOTE_ADB、D-025、Baseline15、T008；仅V0，当前构建/真机待证。本轮仅同步文档，无Git/构建操作。下一阶段ADB投屏传输待设计，未接入视频，不触碰原无障碍/采集/输入链。
-
-2026-10-13 T007历史：当时efb2599 + 三份Dart dirty的文档快照现已由980f254固化；Baseline14与T007保留原历史。两端自动/手动模式分离，Android本机3秒查询保持；历史CI dispatch接受不代表当前构建通过。
-
-2026-10-13 T006历史：main/504adea上实现独立ADB gate、双NSD、一键连接、PC二维码及可拖动弹窗，随后由feac956固化。二维码、PC周期刷新和相关时限已由T007记录的后续变更取代，其他隔离边界保持。此前T004由de8bc76固化、T005由504adea修复；下文“无PC ADB”为T003历史时点。
-
-2026-10-13 T004：main/917e661工作树新增PC顶栏远程ADB，专用Misc.remote_adb(40)与独立JNI接入Android共享manager，支持配对/连接/shell/撤销/刷新与多PC状态。见 `docs/AI_ENGINEERING/13_REMOTE_ADB.md` / ADR-0018；仅V0，编译/真机待验证，未提交。无ADB投屏，原无障碍/视频/输入处理保持。
-
-2026-10-13 T001：GitHub CI 仅保留 build-clients.yml，独立配置 Android/Windows 手动编译、Android aarch64/universal、临时测试签名、Actions-only artifacts。见 docs/BUILD_CLIENTS_ACTIONS.md；本地 build.sh/build.cmd 仍独立。历史源码验证为 V0，runner 成功证据待补。
-
-2026-10-12 T009：按用户要求剔除旧 ADB 页面/组件/专用权限和构建依赖；Windows 未发现旧运行组件。仅 V0，无编译/设备验证。当前状态先核对 HEAD/status；ADR-0015 取代 ADR-0007。
-
-2026-10-12产品身份迁移：见 `docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md`、ADR-0014、D-016。迁移已由f423335固化，T004服务器配置由c0951b5固化。T005在其上统一PC入口为build.cmd、仅打包编译后的Release产物，未提交，见 `docs/tasks/T-2026-10-12-005-pc-build-entry.md`；仅V0。Flutter内部包名flutter_hbb必须保留。T003按用户要求统一两处ashell.匹配和全部文档品牌字段/路径/文件名，历史原文可从Git恢复；新会话先核对HEAD/status。
-
-最后一次与全仓源码对齐：2026-07-12
-最近一次文档分层整理：2026-07-12
-
-最近一次接管复核与跨会话记忆落盘：2026-10-12（静态分析，未运行产品）。新对话先按下列入口恢复，再读取 `.codex/PROJECT_STATE.md` 和 `.codex/PROJECT_MEMORY.md`；本轮详细证据在 `docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md`。旧 `main/77062b4` 与本机 ADB 资产记录不是当前工作区状态；先核对 HEAD/status，不继承旧任务授权。
+当前ADB包含远程配对/独立Shell、投屏/无视/节点穿透、独立白字黑屏、全局优先触摸、键盘/远程输入/剪贴板同步和本应用电池优化豁免。Android默认连接服务运行期间静默常亮。详细实现、参数和待验边界见[12本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 
 > 本文件是 **Codex** 的项目入口说明。
 > 它是补充导航，不是最终真相层。
@@ -48,8 +25,8 @@
 
 ## 1. 项目身份（Project Identity）
 
-- 产品显示名：`A Shell You`；runtime 标识：`AShell`
-- Android application/后台名称：`A Shell You`；launcher 名称：`一个壳子`
+- 产品显示名：`一个壳子`；runtime 标识：`AShell`
+- Android application/后台/launcher 名称：`一个壳子`
 - 基础：RustDesk 深度二次开发
 - Rust crate：`ashell`
 - Rust library：`ashell`
@@ -74,7 +51,7 @@
 6. Legacy desktop UI：`src/ui/`
 7. Account / HTTP / sync / upload：`src/hbbs_http/`
 8. Windows privacy mode / virtual display：`src/privacy_mode.rs` + `src/virtual_display_manager.rs`
-9. 旧Android本地ADB/LADB仍退役；新LocalAdbManager归Android进程，字段40承担请求/回执/状态推送，字段41承担独立媒体与触摸。PC Shell栏包含导航、投屏/无视/穿透/黑屏、网址；主界面普通左/ADB右，单源居中。命令、媒体、触摸、遮罩各自连接，详见12_LOCAL_ADB、13_REMOTE_ADB和14_ADB_MIRROR。
+9. 旧Android本地ADB/LADB仍退役；新LocalAdbManager归Android进程，字段40承担请求/回执/状态推送，字段41承担独立媒体与触摸。PC Shell栏包含导航、投屏/无视/穿透/黑屏、网址和点亮屏；键盘、Ctrl+V及单向文本剪贴板同步已实现；主界面普通左/ADB右，单源居中。命令、媒体、触摸、遮罩各自连接，详见12_LOCAL_ADB、13_REMOTE_ADB和14_ADB_MIRROR。
 10. ZEGO voice call：Flutter RTC side path + Rust control-channel invitation state
 
 不要把项目误读成：

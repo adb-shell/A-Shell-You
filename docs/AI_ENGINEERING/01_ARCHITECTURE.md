@@ -1,9 +1,9 @@
 # AShell 完整架构 / Architecture
 
-ADB当前源码4d3c446：主界面单源居中、双源普通左/ADB右；三种ADB源互斥，普通源独立。Android拥有身份/状态；命令、媒体、黑屏、触摸各自连接。新增App绘图边界：shell helper只读取节点或显示已生成的黑屏文字PNG，不初始化系统context/字体。2026-10-16 T001/Baseline21/ADR0026，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+当前实现基线0dbe202：Android持有ADB身份及设备状态；命令、媒体、黑屏、输入各有资源。视频复用scrcpy ScreenCapture，经独立GPU/H.264编码；截图优先常驻UiAutomation；节点由Shell读取、App绘制。普通采集/接收独立，QoS参数只读共享。 2026-10-19文档复核，仅V0，构建/ROM实测待证；[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
 
-基线：2026-07-12，`HEAD 77062b4`
+历史接管基线：2026-07-12，`77062b4`；当前实现见本页顶部
 
 ## 1. 运行体与信任边界
 

@@ -1,34 +1,26 @@
 # AShell Project Memory
 
-最后更新：2026-10-18（产品显示名；下方ADB快照保留原时点）
+最后更新：2026-10-19。用途：当前会话恢复入口，不替代源码。
 
-用途：AI 会话的稳定入口，不替代源码和完整工程文档。
+## 0. 当前恢复基线
 
-## 0. Latest Recovery Snapshot
+唯一实现基线为用户指定的 `0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`。此次只同步文档；文档提交的HEAD可更新，但业务树保持此提交。撤回的后续修改及其诊断不作为当前事实或修复前提，也不自动恢复。历史聊天无法由仓库文档删除；工程判断只使用当前源码及重新取得的证据。
 
-2026-10-18 T010：test/4b729dd + 既有Android名称dirty；产品显示名统一“一个壳子”，内部身份、旧快捷方式名、2FA issuer及署名保持。STATE/WORK-20261018-010 / CE-20261018-T010-01 / D-032；[任务](../docs/tasks/T-2026-10-18-010-display-name.md)。仅V0，未Git/CI/产品构建；ADB等其他增量见PROJECT_STATE/CURRENT_WORK，以下为历史快照。
+先读 [PROJECT_STATE](PROJECT_STATE.md)、[CURRENT_WORK](CURRENT_WORK.md) 和 [Baseline22](../docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，核对实际 HEAD/status。任务 T-2026-10-19-006、STATE/WORK-20261019-006、CE-20261019-T006-01、D-033对应本轮；当前授权仅文档提交推送test后合并推送main，不含构建。
 
-2026-10-16 T001：源码main/4d3c446、初始clean，本地/远端一致；本次仅文档，按用户要求提交推送后单次Build AShell clients both/aarch64，不监控。当前指针STATE-20261016-001 / WORK-20261016-001 / CE-20261016-T001-01 / D031 / ADR0026 / Baseline21；[任务](../docs/tasks/T-2026-10-16-001-adb-docs-sync.md)记录验证与授权边界。
+当前ADB能力：
 
-ADB当前：双NSD配对和id -u验证，独立2路Shell命令、Android真实状态变化推送及最多3次意外断链恢复。PC无三秒远程status；apiVersion3支持requestId取消，mirrorVersion2按模式停止。主界面单源居中/双源普通左ADB右；投屏、无视、节点穿透三选一，独立白字黑屏、全局ADB优先触摸。PC视频解码后使用RGBA本机桥，截图最多8fps动态节奏、节点约2fps。详见[当前合同](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
+- 身份、配对、连接和Shell验证归Android进程；多PC共享真实状态，PC无三秒远程status刷新。
+- 命令、媒体、黑屏、触摸各有独立资源；投屏/无视/穿透是同一ADB源的三种互斥模式，普通采集与接收另走原链。
+- 视频由固定scrcpy 5.0.1 ScreenCapture进入独立GPU/MediaCodec；无视优先常驻UiAutomation截图，兼容raw/PNG；节点只由Shell读取，App绘图与文字，数字标红。
+- 尺寸沿用width/350整数缩放，校验4096/4Mi像素；实时读取普通VideoQoS fps/ratio与码率公式，不写普通QoS。无视至少300ms、穿透至少80ms；参数对齐不等于实测帧率/带宽相同。
+- PC独立解码与二进制本机帧桥；普通左/ADB右、单源居中；双栏回普通单栏只重挂本地Texture和校准视口，不重启远程采集。
+- ADB可用时全局优先触摸；普通键盘、Ctrl+V、远程输入和单向文本剪贴板同步均已实现，原无障碍/模拟输入链保持。
+- 黑屏为独立黑像素buffer层加App预绘白字PNG，排除自身采集；不能把静态代码当作所有ROM已验证。
+- 默认core连接服务运行期间静默常亮，无新增主页/齿轮/设置入口。ADB连接验证后尝试本应用电池优化豁免；Shell按钮“点亮屏”仅发送唤醒键。
+- PC没有无障碍权限控制或“进入开发者选项”菜单；Android本机ADB页原“打开开发者选项”入口仍在。不根据历史要求擅自补回PC菜单。
 
-227bbe0/a2fc3c3/e5c80ad补齐节点读取和App绘图分工、字体回退、有界快照、红色数字、黑屏App预渲染PNG与layerStack；helper不再初始化系统context或文字字体。393acaa新增PC分组状态；4d3c446仅移除桌面视频/特殊状态文字和Shell栏悬浮小字。当前没有无障碍暂停/恢复/授予/关闭或开发者选项菜单，这些先前尝试已随两次回退至393acaa撤回。不能从历史会话恢复这些功能。
-
-此前1c46e74修正AdbProtocol访问级别编译错误；当前构建/真机仍无通过结果。4d3c446推送后的both/aarch64 dispatch204未监控，仅证明请求接受，不构成运行验证。
-
-本次文档不修改原无障碍/画面/输入、产品身份或构建链。此前无障碍栏仅移除防触按钮，原实现保留；桌面隐藏的状态行没有删除底层字段或移动端展示。旧任务/基线保留时点含义。本文写于文档提交前，最终Git结果与本次dispatch回执见提交/会话交付。
-
-### 迁移前接管证据（历史）
-
-最新复核：[2026-10-12 接管认知](../docs/AI_ENGINEERING/TAKEOVER_REVIEW_2026-10-12.md)。Baseline：`CS-BL-2026-10-12-6fb0aa6`；本地 `test / 6fb0aa6e147901243d4cb14a5dc68ae75a13b890`，非 shallow，仅一次初始化提交。原审查工作树 clean；随后 `T-2026-10-12-001` 只保存记忆文档，未提交/推送。新对话必须重新核对 HEAD/status，不能假定工作树永远 clean。
-
-- **来源**：本地 HEAD 的975个 tracked blob 路径/hash与历史源 `历史源仓@cbce0ba36c5c` 一致。源仓60提交、最早2026-04-13无父导入；准确 RustDesk fork point 未知。RustDesk1.4.0对照有615同路径同blob文件，仅证明部分继承。
-- **四个关键边界**：Android core/share/frame/waiting 分离；controller relay-only 不删除 endpoint direct/NAT兼容；产品账号不是 endpoint密码认证；ZEGO邀请/Token/录音同意分离，媒体走SDK。
-- **容易遗漏的当前行为**：永久密码 getter固定常量、setter不更新；Android已认证输入分支缺desktop对应keyboard gate；terminal有进程内persistent但重连回放TODO；record_upload dormant；旧本地 ADB 子系统已在 T009 移除。
-- **风险解释**：JNI正常帧保存Image buffer裸地址后延迟读取；握手有non-secure fallback；双向nonce无方向标识；Android来电3秒自动接受；默认API/token HTTP与本地token保护有边界缺口。均为源码事实/静态风险，未证明已利用漏洞或凭据当前有效。
-- **当前资产**：jniLibs目录不存在，不能沿用7月本机libadb.so存在记录；ZEGO声明未进入pubspec.lock；broker有脚本内嵌Go实现，但独立工程/实际部署未知。`.info`是Windows构建输入，不是已证明的运行时配置入口。
-- **验证**：仅V0；未build/test/analyze/codegen、未运行服务/设备/生产验证，未审相邻API/WEB/SERVER仓。55处Rust测试标记不等于通过；Flutter cm_test是手动harness。
-- **恢复方式**：入口→状态/活动任务→本摘要→相关报告章节/源码。保持中文解释与English anchor；后续用户请求决定权限，不从已关闭任务恢复授权。文件在同一检出中可读；新worktree/机器必须实际包含这些文件才能恢复。
+完整合同：[本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。本轮仅V0，不继承历史构建/真机成功结论。旧任务细节保留在TASK_HISTORY和docs/tasks，不再混写到当前恢复快照。
 
 ## 1. Entry and Source of Truth
 
@@ -53,7 +45,7 @@ ADB当前：双NSD配对和id -u验证，独立2路Shell命令、Android真实�
 
 - 产品显示名：`一个壳子`；内部runtime：`AShell`；ORG：`me`。
 - Android application/后台/launcher：`一个壳子`。Windows旧快捷方式文件名、2FA issuer及作者/版权保留 `A Shell You`，不作全局替换。
-- 来源：RustDesk 深度二次开发；本地初始化与后续记忆提交，2026-04-13一次性导入来自上节映射的历史源仓；准确 upstream fork commit 未确认。
+- 来源：RustDesk 深度二次开发；本地初始化与后续记忆提交，2026-04-13一次性导入来自历史源仓（证据见接管复核文档）；准确 upstream fork commit 未确认。
 - Rust crate/library：`ashell`。
 - Flutter package：`flutter_hbb`。用户明确要求保留此内部包名及 `package:flutter_hbb/` 导入，与产品品牌无绑定关系。
 - Android applicationId：`me.ashell`。
@@ -83,7 +75,7 @@ ADB当前：双NSD配对和id -u验证，独立2路Shell命令、Android真实�
 - Android 真实 RGBA/Texture frame 必须清 PC waiting。
 - controller 当前强制 relay；受控端仍保留 rendezvous/direct/NAT compatibility code。
 - Windows 当前 virtual display implementation 是 Amyuni；RustDesk IDD 分支是 dormant。
-- 旧Android本地ADB/LADB已在T009移除；8662f23本机模块由T004扩展PC专用请求与Android共享状态，详见12_LOCAL_ADB.md/13_REMOTE_ADB.md。无ADB投屏，不能恢复旧入口/自动化。
+- 旧Android本地ADB/LADB已退役；当前LocalAdbManager为独立实现，支持远程配对/Shell、媒体、触摸与文本输入。当前合同见12_LOCAL_ADB、13_REMOTE_ADB和14_ADB_MIRROR；不能恢复旧入口/自动化。
 - ZEGO 媒体不走原 RustDesk audio service；peer protocol 只传 invitation/control state。
 - `verify_login()` 的 legacy UI bypass 不等于产品 API、hbbs 或 endpoint authentication bypass。
 

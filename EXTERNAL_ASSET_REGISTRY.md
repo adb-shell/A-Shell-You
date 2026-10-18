@@ -1,6 +1,6 @@
 # AShell External Asset Registry
 
-2026-10-16 T001：源码4d3c446文档同步；无新增、下载或替换外部资产。EXT-LIB-ADB-004—007与EXT-BIN-SCRCPY-001保持；AdbLayoutRenderer/AdbPrivacyHint在App用公开SANS_SERIF及Android字体回退，不读取厂商字体文件、不打包外部字体，黑屏PNG运行时生成并经私有流传送。Release/R8和Android11—17/OEM兼容待验；以下登记保留各时点证据。
+2026-10-19 T006：按0dbe202同步文档，无新增、下载或替换外部资产。EXT-LIB-ADB-004—007及EXT-BIN-SCRCPY-001保持；视频helper复用固定scrcpy 5.0.1，常驻截图/节点/遮罩helper来自APK。字体使用App内公开SANS_SERIF与系统回退，无外部字体文件。新旧CI入口以[当前构建说明](docs/BUILD_CLIENTS_ACTIONS.md)为准；以下登记保留各时点证据，当前构建/设备结果仍待验证。
 
 2026-10-14 T004：新增APK自编`AdbLayoutCapture`，使用设备UiAutomation/SurfaceControl隐藏接口；未下载/新增第三方库或binary，EXT-BIN-SCRCPY-001保持。平台来源、权限/生命周期/兼容边界见[ADR0024](docs/ADR/0024-adb-layout-and-geometry.md)，V0；OEM兼容和正式产物仍待验证。
 
