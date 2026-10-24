@@ -1,5 +1,5 @@
-name: Build AShell Clients-New
-run-name: Build ${{ inputs.Platform }} / ${{ inputs.BuildMode || '常规编译' }} -New
+name: Build AShell Clients-BT
+run-name: Build ${{ inputs.Platform }} / ${{ inputs.BuildMode || '常规编译' }} -BT
 
 on:
   workflow_dispatch:
@@ -162,7 +162,7 @@ jobs:
         uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
         with:
           prefix-key: ashell-rust-v1
-          key: android-arm64-flutter-hwcodec-${{ hashFiles('vcpkg.json', 'res/vcpkg/**', '.github/workflows/Build-Clients-New.yml') }}
+          key: android-arm64-flutter-hwcodec-${{ hashFiles('vcpkg.json', 'res/vcpkg/**', '.github/workflows/Build-Clients-BT.yml') }}
           env-vars: NDK_VERSION ANDROID_API VCPKG_COMMIT_ID LIBCLANG_PATH ImageVersion
           cache-bin: false
           cache-workspace-crates: false
@@ -584,7 +584,7 @@ jobs:
         uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
         with:
           prefix-key: ashell-rust-v1
-          key: windows-x64-flutter-hwcodec-vram-${{ steps.vcpkg.outputs.msys2-hash }}-${{ hashFiles('vcpkg.json', 'res/vcpkg/**', '.github/workflows/Build-Clients-New.yml') }}
+          key: windows-x64-flutter-hwcodec-vram-${{ steps.vcpkg.outputs.msys2-hash }}-${{ hashFiles('vcpkg.json', 'res/vcpkg/**', '.github/workflows/Build-Clients-BT.yml') }}
           env-vars: VCPKG_COMMIT_ID LLVM_VERSION VCToolsVersion WindowsSDKVersion ImageVersion
           cache-bin: false
           cache-workspace-crates: false
