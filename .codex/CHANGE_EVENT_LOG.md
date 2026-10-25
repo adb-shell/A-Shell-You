@@ -4,9 +4,43 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-19（ADB优化合并main）
+Last Updated：2026-10-25（PC开发者密码入口）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261025-T002-01：密码文档同步与main合并准备
+
+- 当前用户授权文档更新、test合并main、以“开发者密码增加”提交推送及main双端编排；test/48226fb、main/fd233fa与远端一致、clean，无并发活动任务。
+- no-ff merge test已准备且无冲突；文档同步纳入同一merge commit，不新增产品实现。更新AGENTS/PROJECT_START_HERE、00/01/02/03/08领域文档、BUILD_CLIENTS_ACTIONS、Baseline23/index、新任务与六份.codex记忆；冻结旧基线保持。
+- 修正当前唯一Build-Clients-BT入口，Both/常规编译；密码维护只记录UTF-8 SHA-256摘要步骤，不记录明文。无Decision/ADR/外部资产/版本增量。
+- V0通过：20份Markdown/222本地引用、diff、产品/工作流树与test一致性；Git/CI实际回执待回填。STATE/WORK-20261025-002，无本机产品验证、生产发布或强推。
+
+## CE-20261025-T001-04：双密码test交付与编排回执
+
+- 源码356f53b8a1999b96bf3d8d821bf6fa1a22495f64已提交推送test，API核对一致；BT/test/Windows/常规编译HTTP204，run40203581056、head356f53b，首次核对in_progress。r3仅一次dispatch，不把运行中当作编译PASS。
+- 只补原任务r3、PROJECT_STATE/PROJECT_MEMORY/CURRENT_WORK/CHANGELOG_AI/TASK_HISTORY/本日志七份Markdown；无产品或工作流增量，不再次编排。STATE/WORK-20261025-001-r3，T8关闭；FLT-08仍需正式双密码独立进程验收。
+
+## CE-20261025-T001-03：同一功能追加第二个可接受密码
+
+- 当前用户明确要求新增第二个密码并保留原密码；test/4694e78初始clean、远端一致。作为同一会话功能续接，交付继续使用已确认的test推送与Windows常规编排；不继承其他会话/任务授权。
+- `flutter/lib/models/developer_login_bypass_model.dart` 从单摘要比较改为两个摘要const集合包含检查，原摘要原样保留；其余失败/成功状态、页面/连接/工具栏密码逻辑不变，不新增明文口令副本。
+- 同步03_MODULE_DESIGN、10_SECURITY_MODEL、TEST_MATRIX、原任务r3节及PROJECT_STATE/PROJECT_MEMORY/CURRENT_WORK/CHANGELOG_AI/TASK_HISTORY/本日志；无新ADR/Decision/依赖/资产。
+- V0 PASS：两个摘要/原摘要保留、唯一启用调用、diff和10份Markdown/111本地引用；Git/编排回执待回填。无本机产品build/test/analyze/设备/生产操作。STATE/WORK-20261025-001-r3。
+
+## CE-20261025-T001-02：test推送与Windows编排回执
+
+- 用户续接授权已执行：test快进fd233fa后提交fe3c7d445a531a11ebbe5c30c9e3b047e2874ba3，push/远端核对成功；main保持fd233fa，无main推送。
+- Build AShell Clients-BT / workflow394791509，test / Windows / 常规编译，HTTP204；run40200073517、head fe3c7d4，首次核对in_progress。一次dispatch，未声称编译/交互PASS。
+- 此记录只同步 `docs/tasks/T-2026-10-25-001-developer-login-password.md`、`.codex/PROJECT_STATE.md`、`PROJECT_MEMORY.md`、`CHANGELOG_AI.md`、`TASK_HISTORY.md`、`CURRENT_WORK.md`及本日志；无产品/工作流增量，不再次编排。
+- STATE/WORK-20261025-001，T8关闭；本次无新Decision/ADR/外部资产，运行验收仍待证。
+
+## CE-20261025-T001-01：PC开发者免登录入口密码确认
+
+- 当前用户授权两份Dart实现与文档同步，续接授权提交推送test和一次Windows常规编排；main/fd233fa初始clean，test已从7e45842快进到当前main，原提交完整保留。
+- `flutter/lib/desktop/pages/connection_page.dart`新增单实例隐藏密码框、统一确认/回车/取消和销毁清理；`flutter/lib/models/developer_login_bypass_model.dart`改为精确摘要校验后启用内存开关。
+- 同步 `docs/AI_ENGINEERING/03_MODULE_DESIGN.md`、`10_SECURITY_MODEL.md`、`TEST_MATRIX.md`、本任务和PROJECT_STATE/PROJECT_MEMORY/CURRENT_WORK/TASK_HISTORY/CHANGELOG_AI及本日志；无新ADR/Decision/依赖/资产/版本/生成桥。
+- V0调用与diff核对；本机build/test/analyze、设备/生产执行none；Git提交推送和dispatch结果待回填。固定本地校验不关闭SEC-016。
+- STATE/WORK-20261025-001；[任务](../docs/tasks/T-2026-10-25-001-developer-login-password.md)。
 
 ## CE-20261019-T006-01：以0dbe202重整当前文档与记忆
 

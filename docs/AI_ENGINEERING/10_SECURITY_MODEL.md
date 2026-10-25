@@ -82,6 +82,8 @@ AShell 至少存在六个身份域：
 
 `src/common.rs::verify_login()` 当前直接成功，且 Flutter 存在 developer login bypass，但二者不等于自动绕过 endpoint password authentication。准确风险是：任何把这两个 gate 当作产品授权边界的功能都不安全。
 
+2026-10-25 T001 / r3：PC Ctrl+Shift+H改为先输入开发者密码，由 `developer_login_bypass_model.dart` 摘要比较成功后启用内存开关；r3按用户明确要求保留原密码并新增第二个摘要，两个密码任一匹配即可，错误/取消不启用。口令不写日志、配置或网络，源码仅保存摘要集合。此改动降低快捷键误操作的风险，固定客户端校验仍可由修改版绕过，不构成服务端授权，SEC-016保持开放。工具栏独立开发者选项未变；V0，两个密码须在独立未解锁进程完成FLT-08正式验证。
+
 ### 已确认的认证风险
 
 - 构建内置共享远控密码可由公开源码获知，设置 permanent password 的实现没有真正更新该值。

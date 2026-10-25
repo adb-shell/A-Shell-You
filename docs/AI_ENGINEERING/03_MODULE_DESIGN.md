@@ -1,6 +1,6 @@
 # AShell 模块设计 / Module Design
 
-当前实现基线0dbe202：连接、2路Shell、媒体、遮罩和输入资源分别管理；instance/revision按真实状态变化推送。键盘与触摸共用control-only单writer并各自排队，显式粘贴与被动剪贴板同步区分paste标志。PC帧桥为独立二进制C ABI，不以base64装入状态JSON。 2026-10-19文档复核，仅V0，构建/ROM实测待证；[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
+当前整体源码快照为Baseline23 / test48226fb，PC开发者双密码设计与维护见本页第11节。ADB部分沿用2026-10-19复核的0dbe202快照：连接、2路Shell、媒体、遮罩和输入资源分别管理，instance/revision按真实状态变化推送；键盘与触摸共用control-only单writer并各自排队，显式粘贴与被动剪贴板同步区分paste标志。PC帧桥为独立二进制C ABI，不以base64装入状态JSON。V0，构建/ROM实测待证；历史快照见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
 
 历史接管基线：2026-07-12，`77062b4`；当前实现见本页顶部
@@ -103,6 +103,14 @@ Privacy abstraction 支持 exclude/topmost、Magnifier、virtual display。当�
 地址簿/设备组由 Flutter models 直接调用 API；sync/heartbeat 在 Rust endpoint；backend/database 均在仓外。
 
 `src/common.rs::verify_login()` 的 unconditional `true` 不等于 endpoint password authentication 被删除，但说明 legacy/custom-client 产品准入不能作为安全边界。
+
+### PC开发者免登录入口（2026-10-25 / T001）
+
+`flutter/lib/desktop/pages/connection_page.dart` 的 Ctrl+Shift+H 仅在desktop main处理KeyDownEvent，先显示开发者密码框。`developer_login_bypass_model.dart::enableDeveloperLoginBypass(String password)` 精确校验UTF-8输入摘要，匹配 `_developerLoginPasswordHashes` 集合中任一摘要才设置内存开关；T001-r3保留原密码并新增第二个可接受密码。确认按钮、Enter/小键盘Enter共用提交逻辑，空值/错误输入保留弹窗并提示。
+
+输入隐藏且禁用纠错/建议/个性化学习，不trim、不保存或发送。重复快捷键不叠窗；取消/Esc不启用；页面dispose只按自身tag关闭弹窗，关闭后丢弃输入引用。已解锁不再次弹窗，进程重启恢复默认false。主连接按钮和peer card继续消费原开关；不改工具栏另一个开发者选项、产品API或endpoint认证。V0，运行验收见TEST_MATRIX FLT-08与[任务](../tasks/T-2026-10-25-001-developer-login-password.md)。
+
+维护密码时，在本地把新口令按UTF-8计算SHA-256，并将小写64位十六进制摘要加入 `_developerLoginPasswordHashes`；替换某一个密码时仅替换对应摘要，其他项保留。不要把明文直接填入摘要集合，也不要把口令抄入文档/日志；重新编译PC端才影响已安装程序。两个有效密码须分别在新启动、尚未解锁的进程验证。文档与main交付见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)。
 
 ## 12. ZEGO voice 模块
 

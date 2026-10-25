@@ -1,17 +1,16 @@
 # GitHub Actions 客户端编译
 
-当前源码基线0dbe202，2026-10-19按实际workflow核对。两个入口均仅手动运行，产物保存在Actions；不创建GitHub Release、tag或商店发布。本次文档同步不运行工作流。
+2026-10-25按当前test/48226fb源码核对，唯一工作流为Build AShell Clients-BT，仅手动运行，产物保存在Actions；不创建GitHub Release、tag或商店发布。本轮文档同步不改workflow，用户授权的main双端执行见[T002](tasks/T-2026-10-25-002-developer-password-main.md)。
 
 ## 入口与参数
 
 | 入口 | 文件 | 参数 |
 |---|---|---|
-| Build AShell Clients-New | [Build-Clients-New.yml](../.github/workflows/Build-Clients-New.yml) | Platform：Both / Android / Windows，默认Both；BuildMode：常规编译 / 原始编译，默认常规编译 |
-| Build AShell Clients | [Build-Clients.yml](../.github/workflows/Build-Clients.yml) | Platform：Both / Android / Windows，默认Both |
+| Build AShell Clients-BT | [Build-Clients-BT.yml](../.github/workflows/Build-Clients-BT.yml) | Platform：Both / Android / Windows，默认Both；BuildMode：常规编译 / 原始编译，默认常规编译 |
 
-在Actions选对应工作流、Run workflow，再选择实际已推送的分支。参数区分大小写；旧说明中的platform、android_arch及universal选择不适用于当前CI。两个工作流的Android目标均固定aarch64/arm64-v8a；需要universal时使用正式Linux本地入口build.sh 2，并另行验证。
+在Actions选择Build AShell Clients-BT、Run workflow，再选择实际已推送的分支。双端编译选Platform=Both；仅PC选Windows；通常使用BuildMode=常规编译。参数区分大小写，旧Build-Clients/Build-Clients-New入口及platform/android_arch参数不适用。Android固定aarch64/arm64-v8a；需要universal时使用正式Linux本地入口build.sh 2，并另行授权/验证。
 
-新工作流“常规编译”复用受key约束的依赖/native构建缓存；“原始编译”跳过构建产物缓存恢复并清理相应输出，仍可复用工具和源码下载缓存，不等于断网或绝对无缓存编译。两种模式以实际workflow条件为准，不改变产品功能开关。
+“常规编译”复用受key约束的依赖/native构建缓存；“原始编译”跳过构建产物缓存恢复并清理相应输出，仍可复用工具和源码下载缓存，不等于断网或绝对无缓存编译。两种模式以实际workflow条件为准，不改变产品功能开关。
 
 ## 产物
 
@@ -20,7 +19,7 @@
 | Android | ashell-android-aarch64.apk（Release编译、临时测试签名） |
 | Windows | ashell-windows-x64.exe自解压程序；ashell-windows-x64.zip完整Release bundle |
 
-成品从Actions运行页Artifacts/下载链接获取，保留14天；Android内部native中间产物保留1天，过期后需重新执行完整相关job。另有build-info、SHA256SUMS、解析依赖/锁文件和签名证据，准确清单以产物为准。Android APK等待native完成；Windows独立job，新工作流分别上传ZIP与EXE。
+成品从Actions运行页Artifacts/下载链接获取，保留14天；Android内部native中间产物保留1天，过期后需重新执行完整相关job。另有build-info、SHA256SUMS、解析依赖/锁文件和签名证据，准确清单以产物为准。Android APK等待native完成；Windows独立job，分别上传ZIP与EXE。
 
 Android每次运行生成临时测试keystore并执行apksigner verify，证书不同的包不能直接覆盖安装；卸载会清除应用数据，保留数据需另行设计稳定签名。当前Windows也使用临时自签名Authenticode测试证书，签名只在runner临时信任环境验证，不代表用户设备信任或生产发布签名。私钥不随artifact上传。ZIP应完整解压运行，不能只取其中主EXE。
 
@@ -37,4 +36,4 @@ Android每次运行生成临时测试keystore并执行apksigner verify，证书�
 
 ## 验证记录
 
-此页仅反映0dbe202的workflow配置，V0。历史sdkmanager、Java或Windows失败记录留在各任务中；不以旧失败证明当前失败，也不以dispatch接受证明当前构建通过。正式结果必须记录源SHA、分支/参数、run/job、artifact/hash、签名和实际结论；本轮未触发编排或本地构建。
+此页反映48226fb的BT workflow配置，V0。历史sdkmanager、Java或Windows失败记录留在各任务中；不以旧失败证明当前失败，也不以dispatch接受证明当前构建通过。正式结果必须记录源SHA、分支/参数、run/job、artifact/hash、签名和实际结论；T001的test Windows运行不替代T002的main双端运行，当前回执见各任务。

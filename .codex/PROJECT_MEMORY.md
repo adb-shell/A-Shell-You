@@ -1,12 +1,14 @@
 # AShell Project Memory
 
-最后更新：2026-10-19。用途：当前会话恢复入口，不替代源码。
+最后更新：2026-10-25。用途：当前会话恢复入口，不替代源码。
 
 ## 0. 当前恢复基线
 
-唯一实现基线为用户指定的 `0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`。此次只同步文档；文档提交的HEAD可更新，但业务树保持此提交。撤回的后续修改及其诊断不作为当前事实或修复前提，也不自动恢复。历史聊天无法由仓库文档删除；工程判断只使用当前源码及重新取得的证据。
+当前冻结源码快照为 [Baseline23](../docs/BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC主窗口Ctrl+Shift+H先弹密码框，`_developerLoginPasswordHashes`保存两个摘要，任一精确匹配后确认/回车开启进程内免登录；错误可重试，取消/Esc关闭后可重开，重启复位。维护见03_MODULE_DESIGN / FLT-08，文档不保存口令明文。
 
-先读 [PROJECT_STATE](PROJECT_STATE.md)、[CURRENT_WORK](CURRENT_WORK.md) 和 [Baseline22](../docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，核对实际 HEAD/status。任务 T-2026-10-19-006、STATE/WORK-20261019-006、CE-20261019-T006-01、D-033对应本轮；当前授权仅文档提交推送test后合并推送main，不含构建。
+当前T-2026-10-25-002 / STATE/WORK-20261025-002 / CE-20261025-T002-01：用户明确要求同步文档、以“开发者密码增加”合并提交推送main并执行Both/常规编译；当前准备no-ff merge，实际交付以任务回执为准。唯一工作流Build-Clients-BT，旧入口不再作为当前导航。本轮不新增产品实现、依赖或生产发布。
+
+先读 [PROJECT_STATE](PROJECT_STATE.md) 和 [CURRENT_WORK](CURRENT_WORK.md)，核对HEAD/status。T001的源码356f53b、test交付48226fb与run40203581056只代表前轮证据；新main双端结果单独记录，V1/V3仍未验。旧基线/撤回实现不自动恢复，不把历史授权或dispatch当作当前构建PASS。
 
 当前ADB能力：
 

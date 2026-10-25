@@ -1,11 +1,11 @@
 # AShell 构建系统 / Build System
 
-当前实现基线0dbe202，2026-10-19文档复核。构建配置保持源码原样；当前手动CI与本地入口见下文和[Actions说明](../BUILD_CLIENTS_ACTIONS.md)。本次只同步文档，不执行构建、编排、签名或版本变更；V0不代表产品编译通过。
+当前源码快照为[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb，2026-10-25复核。当前唯一手动CI为Build-Clients-BT，本地入口不变；本轮按用户授权在main合并后执行Both/常规编译，实际回执见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)与[Actions说明](../BUILD_CLIENTS_ACTIONS.md)。文档同步不改构建配置或版本，V0/dispatch不等于编译通过。
 
 历史接管基线：2026-07-12；当前实现基线见页首
 状态：`verified` + `verification-required`
 
-> 本轮只完成静态接管，没有运行任何 Rust、Flutter、Gradle、Android、Windows 或 Docker 构建/测试命令。下列命令是正式环境入口和待验证说明，不代表已通过。
+> 本机未执行产品构建/测试。下列命令是正式环境入口，CI执行证据必须绑定具体run/head SHA，不能从命令存在推断已通过。
 
 版本、依赖、lock hashes 与正式 host contract 的当前冻结值见 `docs/BASELINE/`；正式验证 case 和 evidence schema 见根目录 `TEST_MATRIX.md`。本文解释构建链路，不替代 baseline snapshot。
 
@@ -150,7 +150,7 @@ cargo build --release --features flutter
 
 ## 7. CI/CD 现状
 
-当前保留两个手动入口：[Build-Clients.yml](../../.github/workflows/Build-Clients.yml)与[Build-Clients-New.yml](../../.github/workflows/Build-Clients-New.yml)。Platform均为Both/Android/Windows；新入口另有BuildMode“常规编译”（默认）/“原始编译”。两者Android固定aarch64，不再提供android_arch或universal参数。新工作流区分编译缓存和下载缓存，不改变产品协议。
+当前唯一手动入口：[Build-Clients-BT.yml](../../.github/workflows/Build-Clients-BT.yml)，名称Build AShell Clients-BT。Platform为Both/Android/Windows，BuildMode为“常规编译”（默认）/“原始编译”；Android固定aarch64，不提供android_arch或universal参数。工作流区分编译缓存和下载缓存，不改变产品协议；旧Build-Clients/Build-Clients-New入口已不在当前源码中。
 
 CI在GitHub-hosted Ubuntu22.04/Windows2022独立配置工具链，不调用本地build.sh/env.sh/build.cmd。Android使用vcpkg/cargo-ndk/Flutter，Windows使用build.py与portable generate.py，只打包本次Release。Actions固定SHA、contents: read、checkout不保存凭据，不自动写仓库或创建Release/tag。
 

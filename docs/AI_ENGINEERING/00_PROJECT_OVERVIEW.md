@@ -1,6 +1,8 @@
 # AShell 项目总览 / Project Overview
 
-当前实现基线0dbe202：产品显示“一个壳子”；ADB独立配对/命令/媒体、全局优先输入、文本剪贴板、辅助保活与静默常亮已落源码。PC双源接收和分组状态保持。 2026-10-19文档复核，仅V0，构建/ROM实测待证；[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
+当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb，2026-10-25。PC开发者入口已改为Ctrl+Shift+H密码确认，支持两个密码，任一精确匹配后开启进程内免登录；维护与边界见[模块设计](03_MODULE_DESIGN.md)。当前CI唯一入口Build-Clients-BT；main合并及双端编排见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)，V0不等于运行通过。
+
+2026-10-19 ADB实现快照0dbe202：产品显示“一个壳子”；ADB独立配对/命令/媒体、全局优先输入、文本剪贴板、辅助保活与静默常亮已落源码。PC双源接收和分组状态保持；本次密码任务不修改该实现。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)，构建/ROM实测仍待证。
 
 初始接管记录：2026-07-12（历史）
 历史源码基线：`77062b4`；当前实现见本页顶部

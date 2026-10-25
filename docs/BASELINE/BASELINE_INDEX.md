@@ -1,11 +1,12 @@
 # AShell Engineering Baseline Index
 
-当前：[AS-BL-2026-10-19-0dbe202-restored](22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。源码0dbe202，本轮仅文档与工程记忆同步；V0，无新增构建/设备通过证据。当前任务T-2026-10-19-006，提交推送test后合并推送main，不执行编排。
+当前：[AS-BL-2026-10-25-48226fb-developer-password](23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)。观察源码test/48226fb，包含PC开发者双密码入口；T-2026-10-25-002同步文档并合并推送main，执行Both/常规编译。静态证据V0，准确main SHA和run见任务，不把dispatch当作构建PASS。
 
 ## 快照索引
 
-以下01—21均为冻结的历史快照，不代表当前HEAD或可继承授权。当前源码与12/13/14领域合同优先。
+以下01—22均为冻结的历史快照，不代表当前HEAD或可继承授权。当前源码与对应领域合同优先。
 
+- [Baseline23：PC开发者双密码与当前编排源码快照](23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)
 - [Baseline22：回退后的源码与文档基线](22_RESTORED_SOURCE_BASELINE_2026-10-19.md)
 - [Baseline21 — ADB绘图与PC展示文档同步](21_ADB_RENDER_UI_BASELINE_2026-10-16.md)
 - [Baseline20 — 当前ADB模块文档同步](20_ADB_CURRENT_BASELINE_2026-10-14.md)

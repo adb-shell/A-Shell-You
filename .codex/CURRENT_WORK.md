@@ -1,15 +1,15 @@
 # AShell Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261019-006`
-Last Updated：2026-10-19
-Active Task Count：0
+Registry Revision：`WORK-20261025-002`
+Last Updated：2026-10-25
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none。T-2026-10-19-006文档与V0完成；提交“文档更新”承载本轮记录，test→main Git交付结果以实际引用及会话最终回执为准。未执行编排。
+T-2026-10-25-002 / active / T7：文档同步与V0完成，20份Markdown/222本地引用有效，产品/工作流树保持test48226fb；main已准备无冲突no-ff merge。用户明确授权以“开发者密码增加”提交推送main及Both/常规编译，当前待Git/CI回执。Owner：Codex/master，Release与Security自审；CE-20261025-T002-01，[任务](../docs/tasks/T-2026-10-25-002-developer-password-main.md)。
 
 ## 2. Concurrent Session Rules
 
@@ -25,6 +25,6 @@ none。T-2026-10-19-006文档与V0完成；提交“文档更新”承载本轮�
 
 ## 4. Last Closed Task
 
-T-2026-10-19-006 / complete / T8（文档与V0）。实现基线0dbe202，当前合同/入口/记忆、Baseline22/D-033及事件索引同步；24份Markdown、249个本地引用已核对，非文档树与基线一致。Git范围为提交推送test、fast-forward main并推送；实际提交及远端一致性以Git交付记录为准，本次无CI/产品验证。
+T-2026-10-25-001 / r3 / complete / T8（源码、V0与触发交付）。保留原密码并新增第二个可接受密码，model摘要集合任一精确匹配即可。源码356f53b已推送test；Build-Clients-BT Windows/常规编译HTTP204，run40203581056、head356f53b，首次核对in_progress。后续仅补交付文档，无r3二次dispatch；main未推送，无本机产品或生产发布执行。
 
-[详细任务](../docs/tasks/T-2026-10-19-006-restored-docs-sync.md) / STATE-20261019-006 / CE-20261019-T006-01。历史任务保留在TASK_HISTORY和CHANGELOG_AI；不得恢复已撤回的后续实现或继承历史授权。
+[详细任务](../docs/tasks/T-2026-10-25-001-developer-login-password.md) / STATE-20261025-001-r3 / CE-20261025-T001-03/04。历史任务保留在TASK_HISTORY和CHANGELOG_AI；不得恢复已撤回的后续实现或从其他会话/任务继承授权。

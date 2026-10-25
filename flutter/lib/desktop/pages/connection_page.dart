@@ -349,6 +349,9 @@ class _ConnectionPageState extends State<ConnectionPage>
 
   final _menuOpen = false.obs;
 
+  final _developerLoginDialogTag = 'developer-login-bypass-${UniqueKey()}';
+  bool _developerLoginDialogOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -385,6 +388,9 @@ class _ConnectionPageState extends State<ConnectionPage>
       Get.delete<TextEditingController>();
     }
     HardwareKeyboard.instance.removeHandler(_handleDeveloperLoginBypassShortcut);
+    if (_developerLoginDialogOpen) {
+      gFFI.dialogManager.dismissByTag(_developerLoginDialogTag);
+    }
     super.dispose();
   }
 
@@ -399,9 +405,87 @@ class _ConnectionPageState extends State<ConnectionPage>
         HardwareKeyboard.instance.isMetaPressed) {
       return false;
     }
-    enableDeveloperLoginBypass();
-    showToast('Developer login bypass enabled');
+    unawaited(_showDeveloperLoginPasswordDialog());
     return true;
+  }
+
+  Future<void> _showDeveloperLoginPasswordDialog() async {
+    if (!mounted ||
+        _developerLoginDialogOpen ||
+        developerLoginBypassEnabled.isTrue) {
+      return;
+    }
+    _developerLoginDialogOpen = true;
+    var password = '';
+    String? errorText;
+    var finished = false;
+
+    try {
+      final unlocked = await gFFI.dialogManager.show<bool>(
+        (setDialogState, close, context) {
+          void cancel() {
+            if (finished) return;
+            finished = true;
+            close(false);
+          }
+
+          void submit() {
+            if (!mounted || finished) return;
+            if (enableDeveloperLoginBypass(password)) {
+              finished = true;
+              close(true);
+            } else {
+              setDialogState(() {
+                errorText = password.isEmpty ? '请输入开发者密码' : '开发者密码错误，请重试';
+              });
+            }
+          }
+
+          return CustomAlertDialog(
+            title: const Text('开发者模式'),
+            content: SizedBox(
+              width: 320,
+              child: TextField(
+                autofocus: true,
+                obscureText: true,
+                autocorrect: false,
+                enableSuggestions: false,
+                enableIMEPersonalizedLearning: false,
+                keyboardType: TextInputType.visiblePassword,
+                textInputAction: TextInputAction.done,
+                decoration: InputDecoration(
+                  labelText: '开发者密码',
+                  errorText: errorText,
+                ),
+                onChanged: (value) {
+                  password = value;
+                  if (errorText != null) {
+                    setDialogState(() => errorText = null);
+                  }
+                },
+                onSubmitted: (_) => submit(),
+              ),
+            ),
+            actions: [
+              dialogButton('Cancel', onPressed: cancel, isOutline: true),
+              dialogButton('OK', onPressed: submit),
+            ],
+            onSubmit: submit,
+            onCancel: cancel,
+          );
+        },
+        tag: _developerLoginDialogTag,
+      );
+      if (mounted && unlocked == true) {
+        showToast('已进入开发者模式');
+      }
+    } catch (_) {
+      if (mounted) showToast('无法打开开发者密码框，请重试');
+    } finally {
+      finished = true;
+      password = '';
+      _developerLoginDialogOpen = false;
+    }
   }
 
   bool _canConnectWithProductLoginState() {

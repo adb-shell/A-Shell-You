@@ -1,6 +1,8 @@
 # AShell 完整架构 / Architecture
 
-当前实现基线0dbe202：Android持有ADB身份及设备状态；命令、媒体、黑屏、输入各有资源。视频复用scrcpy ScreenCapture，经独立GPU/H.264编码；截图优先常驻UiAutomation；节点由Shell读取、App绘制。普通采集/接收独立，QoS参数只读共享。 2026-10-19文档复核，仅V0，构建/ROM实测待证；[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
+当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC开发者密码由Flutter主窗口本地校验两个摘要，任一匹配只改变进程内免登录状态；没有新增API、协议、持久化或endpoint授权边界。main合并与双端编排见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)，运行验收待证。
+
+ADB架构沿用既有实现：Android持有身份与设备状态，命令/媒体/黑屏/输入资源独立；视频复用scrcpy ScreenCapture，经独立GPU/H.264编码，截图优先常驻UiAutomation，节点由Shell读取/App绘制。普通采集/接收独立，QoS参数只读共享。本次密码任务不修改这些路径；详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
 
 历史接管基线：2026-07-12，`77062b4`；当前实现见本页顶部

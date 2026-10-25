@@ -1,8 +1,8 @@
 # AGENTS.md — 一个壳子 / AShell v5.2.1
 
-当前实现基线：`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`。2026-10-19核对时本地/远端test、main一致、工作区clean。本次只同步文档和工程记忆，以“文档更新”提交推送test，再合并推送main，不执行构建。见[Baseline22](docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)、[当前任务](docs/tasks/T-2026-10-19-006-restored-docs-sync.md)、[当前状态](.codex/PROJECT_STATE.md)。
+当前源码观察基线：`48226fbcdc08719b6e2a5c2e245dc9c10cc77ae9`。PC主窗口Ctrl+Shift+H先弹密码框，两个可接受密码任一精确匹配后确认/回车开启进程内免登录；错误可重试，取消/Esc关闭，重启复位。文档不保存口令明文。见[Baseline23](docs/BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)、[当前任务](docs/tasks/T-2026-10-25-002-developer-password-main.md)、[当前状态](.codex/PROJECT_STATE.md)。
 
-撤回的后续实现和诊断不属于当前事实，不得从旧聊天自动恢复。后续文档提交可以更新HEAD，业务树仍以该基线为准；新会话先核对HEAD/status。历史任务/基线仅保留追溯含义，不继承旧授权或构建结论。
+本轮按用户要求以“开发者密码增加”合并提交推送main，并执行现有Build-Clients-BT / Both / 常规编译；准确SHA、run与结果以任务回执为准，不能从文档计划推断成功。新会话先核对HEAD/status；历史任务/基线只作追溯，撤回的实现不从旧聊天恢复，旧授权与构建结论不自动继承。
 
 当前ADB包含远程配对/独立Shell、投屏/无视/节点穿透、独立白字黑屏、全局优先触摸、键盘/远程输入/剪贴板同步和本应用电池优化豁免。Android默认连接服务运行期间静默常亮。详细实现、参数和待验边界见[12本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 

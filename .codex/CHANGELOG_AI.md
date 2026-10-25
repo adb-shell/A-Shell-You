@@ -2,9 +2,25 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-19（回退基线文档同步）
+Last Updated：2026-10-25（PC开发者密码入口）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-25-002：开发者密码文档同步与main双端交付
+
+- 用户明确要求同步文档、合并main、提交说明“开发者密码增加”并推送，然后main双端编排。起点test/48226fb、main/fd233fa与远端一致、clean；no-ff merge已无冲突准备，保留test四项提交。
+- 更新密码维护说明、入口/总览/架构/源码地图、当前BT构建文档，新增Baseline23和任务薄记忆；无新产品/协议/版本/依赖/资产变更，no decision delta。
+- V0通过：20份Markdown/222个本地引用、diff及产品树与test一致性；提交/dispatch待回执。Both/常规编译使用现有临时测试签名与Actions产物，FLT-08交互仍NOT_RUN，无生产发布。
+- STATE/WORK-20261025-002 / CE-20261025-T002-01；[任务](../docs/tasks/T-2026-10-25-002-developer-password-main.md)。
+
+## T-2026-10-25-001：PC开发者免登录入口密码确认
+
+- r3交付完成：保留原密码，新增第二个可接受密码；一个model改为摘要集合，页面/连接边界保持。test/4694e78 clean起点，V0与文档同步完成；源码356f53b已推送test，BT Windows/常规编译HTTP204、run40203581056/head356f53b，首次核对in_progress。后续仅补交付文档，不二次编排。STATE/WORK-20261025-001-r3 / CE-20261025-T001-03/04；no decision delta；V1/V3未验。
+
+- 实现与V0、test推送及编排触发完成：Ctrl+Shift+H先弹密码框，确认/回车精确校验；错误/取消不启用，重复不叠窗、关闭不保留输入、进程重启复位。
+- 两份Dart及领域/安全/矩阵/记忆同步，保留原产品/endpoint认证与工具栏入口；固定本地gate不是服务端授权。
+- test快进至main/fd233fa后，源码提交fe3c7d4推送成功；BT Windows/常规编译HTTP204，run40200073517、head fe3c7d4，首次核对in_progress；后续仅补交付文档，无二次dispatch。main未推送，无本机产品验证或生产发布。
+- N/A — no decision delta；Baseline22作参考，实际HEAD漂移已记录。STATE/WORK-20261025-001 / CE-20261025-T001-01/02；[任务](../docs/tasks/T-2026-10-25-001-developer-login-password.md)。
 
 ## T-2026-10-19-006：回退基线后的文档与记忆同步
 
