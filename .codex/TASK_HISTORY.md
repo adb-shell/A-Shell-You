@@ -10,8 +10,8 @@
 
 - 当前用户明确授权文档同步、合并提交推送main（说明“开发者密码增加”）及Both/常规编译。起点test/48226fb、main/fd233fa，clean且远端一致；保留test四项提交，以no-ff merge加入文档。
 - 新增Baseline23，更新密码维护、当前入口/架构/源码地图/唯一BT构建文档与记忆；无业务实现增量/新依赖/外部资产/版本或Decision/ADR变化。
-- V0通过：20份Markdown/222本地引用、diff、产品/工作流树与test一致；实际SHA与dispatch待回填。FLT-08运行仍NOT_RUN，前轮test构建不替代main双端证据。回滚需维护者单独指定revert，无自动reset/强推/生产发布。
-- STATE/WORK-20261025-002 / CE-20261025-T002-01；[任务](../docs/tasks/T-2026-10-25-002-developer-password-main.md)。
+- V0通过：20份Markdown/222本地引用、diff、产品/工作流树与test一致；main合并42ba32c以“开发者密码增加”提交推送成功，test保持48226fb。main Both/常规编译HTTP204/run40204268722，首次核对Windows EXE/Android Native均in_progress；后续仅补文档，不再次编排。
+- T8文档/Git/触发交付完成，FLT-08运行仍NOT_RUN，无构建PASS。回滚需维护者单独指定revert，无自动reset/强推/生产发布。STATE/WORK-20261025-002 / CE-20261025-T002-01/02；[任务](../docs/tasks/T-2026-10-25-002-developer-password-main.md)。
 
 ## T-2026-10-25-001：PC开发者免登录入口密码确认
 

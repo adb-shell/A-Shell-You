@@ -10,8 +10,8 @@ Mode：`append-only task-level index`
 
 - 用户明确要求同步文档、合并main、提交说明“开发者密码增加”并推送，然后main双端编排。起点test/48226fb、main/fd233fa与远端一致、clean；no-ff merge已无冲突准备，保留test四项提交。
 - 更新密码维护说明、入口/总览/架构/源码地图、当前BT构建文档，新增Baseline23和任务薄记忆；无新产品/协议/版本/依赖/资产变更，no decision delta。
-- V0通过：20份Markdown/222个本地引用、diff及产品树与test一致性；提交/dispatch待回执。Both/常规编译使用现有临时测试签名与Actions产物，FLT-08交互仍NOT_RUN，无生产发布。
-- STATE/WORK-20261025-002 / CE-20261025-T002-01；[任务](../docs/tasks/T-2026-10-25-002-developer-password-main.md)。
+- V0通过：20份Markdown/222个本地引用、diff及产品树与test一致性；main合并42ba32c已推送，说明“开发者密码增加”。Both/常规编译HTTP204，run40204268722/head42ba32c；首次核对Windows EXE/Android Native均in_progress。后续仅补交付文档，FLT-08交互仍NOT_RUN，无构建PASS或生产发布。
+- T8文档/Git/触发交付完成；STATE/WORK-20261025-002 / CE-20261025-T002-01/02；[任务](../docs/tasks/T-2026-10-25-002-developer-password-main.md)。
 
 ## T-2026-10-25-001：PC开发者免登录入口密码确认
 

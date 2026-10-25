@@ -9,7 +9,7 @@ Evidence Scope：`repository-observed / V0`
 
 - 当前冻结源码快照：[Baseline23](../docs/BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，`48226fbcdc08719b6e2a5c2e245dc9c10cc77ae9`；含T001双密码实现与交付记录，Baseline22保持历史含义。
 - T002起点：test/48226fb，main/fd233fa，工作区clean，两分支与远端一致；main为test祖先，差异四项提交均属密码功能/记录。
-- 已在main准备no-ff merge test，无冲突；同步文档加入同一提交，待以“开发者密码增加”提交推送和Both/常规编译。产品/工作流实现保持test原样。
+- main已no-ff merge test并推送合并提交42ba32cc7fcb3cf3cb05959a139d181e870a5691，说明“开发者密码增加”，parents为fd233fa/48226fb；test保持48226fb。后续仅补交付文档，产品/工作流树保持该合并提交。
 - 回退后撤回的实现、实验方案和诊断结论不属于当前实现。后续会话先核对 HEAD/status，再由代码重新建立证据；不能沿用历史聊天中的“已修改”判断。
 
 ## 当前能力摘要
@@ -32,9 +32,9 @@ Evidence Scope：`repository-observed / V0`
 
 ## 本轮工作与验证
 
-- 当前任务：[T-2026-10-25-002](../docs/tasks/T-2026-10-25-002-developer-password-main.md)，文档同步、test合并main与双端编排；无新业务代码修改。
-- Registry：WORK-20261025-002；Event：CE-20261025-T002-01；Decision评估：N/A — no decision delta。
+- 当前任务：[T-2026-10-25-002](../docs/tasks/T-2026-10-25-002-developer-password-main.md)，文档同步、test合并推送main与双端编排触发完成；无新业务代码修改。
+- Registry：WORK-20261025-002；Events：CE-20261025-T002-01/02；Decision评估：N/A — no decision delta。
 - 当前用户授权：以“开发者密码增加”提交推送main，Build AShell Clients-BT / Both / 常规编译，沿用临时测试签名/Actions产物；无生产发布或本机产品验证。
 - V0：文档/基线/入口与当前源码核对，产品/工作流树与test一致；20份Markdown/222个本地引用、diff检查通过。FLT-08运行仍未验，dispatch接受不等于编译通过。
-- 前轮test run40203581056/head356f53b在T002起点仍in_progress；main双端run待触发，不能用前轮结果代替。
+- main双端回执：HTTP204，run40204268722/head42ba32c，Both/常规编译；首次核对workflow、Windows EXE和Android Native均in_progress，构建未获PASS。前轮test运行不替代本次结果。
 - 当前唯一workflow为Build-Clients-BT.yml，当前构建文档已纠正旧入口。SEC-016与既有正式验证/外部资产缺口保持。

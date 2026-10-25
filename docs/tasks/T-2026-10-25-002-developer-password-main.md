@@ -2,7 +2,7 @@
 
 ## 0. Task Metadata / Session Recovery
 
-- 模板：`TASK_TEMPLATE.md`；2026-10-25（Asia/Tokyo）；Status：verifying / T7（文档/V0完成，待Git/CI回执）；Risk：medium（Git/CI交付）。
+- 模板：`TASK_TEMPLATE.md`；2026-10-25（Asia/Tokyo）；Status：complete / T8（文档、main合并推送与双端触发完成，构建/运行验收仍待证）；Risk：medium（Git/CI交付）。
 - Requester/Product Owner：当前用户；执行/协调：Codex / ashell-master；文档与CI：ashell-release-engineer；Flutter/Security按本会话已读Skill自审；生产Release owner：N/A，本任务不发布。
 - 起点：test/48226fbcdc08719b6e2a5c2e245dc9c10cc77ae9，clean；main/fd233fa5178fd47dec5965b6c59d053d7e2db0fb；两者均与远端一致。main是test祖先，四项差异提交均为T001密码入口/双密码/交付记录。
 - 恢复STATE/WORK-20261025-001-r3、CE-20261025-T001-04，无并发活动任务，state-consistent。新指针STATE/WORK-20261025-002，CE-20261025-T002-01。
@@ -33,9 +33,9 @@
 
 ## T6. Verification / 编译验证需求
 
-- V0：PASS，20份Markdown/222个本地引用有效，工作区和暂存差异检查通过；相对test无非Markdown差异，merge无冲突。提交说明/parents与远端ref在提交推送时继续核对。
+- V0：PASS，20份Markdown/222个本地引用有效，工作区和暂存差异检查通过；相对test无非Markdown差异，merge无冲突。已核对提交说明、双parent与远端main同SHA。
 - V1/V3：NOT_RUN，FLT-08须两个独立未解锁进程验证两密码，再覆盖错误/取消/Enter/重复快捷键/关闭重开/重启；本机分析/运行需独立授权。
-- V2：用户授权GitHub Actions在main执行BT/Both/常规编译，记录head SHA、HTTP回执及run；触发成功不计构建PASS。
+- V2：main的BT/Both/常规编译已触发，HTTP204，[run40204268722](https://github.com/adb-shell/A-Shell-You/actions/runs/40204268722)，head42ba32c。首次核对workflow、Windows EXE和Android Native均in_progress；Android APK依赖native完成。无构建PASS结论。
 - 前轮test run40203581056/head356f53b在本次起点只读核对仍in_progress，无构建成功结论；不能替代main双端结果。
 - V4/V5：N/A，无集成/生产操作。
 
@@ -47,4 +47,8 @@
 
 已同步domain/build、Baseline23与index、入口及六项薄记忆；Decision/ADR/External Registry与测试用例语义无增量，已评估并保留；TEST_MATRIX已有FLT-08覆盖两密码。
 
-Git/编排回执与final worktree待回填。用户要求的提交说明“开发者密码增加”用于main交付；后续若补回执，仅文档变化，不再次触发编排。无本机产品执行或生产发布。
+Git交付：main合并提交 `42ba32cc7fcb3cf3cb05959a139d181e870a5691`，提交说明精确为“开发者密码增加”；parents为fd233fa与48226fb，保留全部test历史。push main成功，远端main同SHA，test保持48226fb；该次推送后工作区clean。
+
+编排：workflow394791509 / Build AShell Clients-BT，main / Both / 常规编译，HTTP204；run40204268722，head42ba32c，首次核对in_progress，Windows EXE/Android Native均在运行。只触发一次，未完成构建/设备验收，无本机产品执行、版本变更或生产发布。
+
+CE-20261025-T002-02补齐上述回执，仅本任务与六份.codex记录；回执文档后继提交同样使用用户指定说明“开发者密码增加”，不改变编排的产品/工作流树，也不再次编排。Global memory全部完成同步评估，CURRENT_WORK最后关闭。后续额外运行验收、发布或回滚仍需对应范围授权。

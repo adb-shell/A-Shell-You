@@ -6,7 +6,7 @@
 
 当前冻结源码快照为 [Baseline23](../docs/BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC主窗口Ctrl+Shift+H先弹密码框，`_developerLoginPasswordHashes`保存两个摘要，任一精确匹配后确认/回车开启进程内免登录；错误可重试，取消/Esc关闭后可重开，重启复位。维护见03_MODULE_DESIGN / FLT-08，文档不保存口令明文。
 
-当前T-2026-10-25-002 / STATE/WORK-20261025-002 / CE-20261025-T002-01：用户明确要求同步文档、以“开发者密码增加”合并提交推送main并执行Both/常规编译；当前准备no-ff merge，实际交付以任务回执为准。唯一工作流Build-Clients-BT，旧入口不再作为当前导航。本轮不新增产品实现、依赖或生产发布。
+当前T-2026-10-25-002 / STATE/WORK-20261025-002 / CE-20261025-T002-01/02：文档已同步，main合并提交42ba32c已推送，说明“开发者密码增加”；main双端BT/Both/常规编译run40204268722/head42ba32c已触发，首次核对Windows EXE/Android Native均in_progress。后续只补交付文档，不改变产品/工作流树。唯一工作流Build-Clients-BT，旧入口不再作为当前导航；无生产发布或新依赖。
 
 先读 [PROJECT_STATE](PROJECT_STATE.md) 和 [CURRENT_WORK](CURRENT_WORK.md)，核对HEAD/status。T001的源码356f53b、test交付48226fb与run40203581056只代表前轮证据；新main双端结果单独记录，V1/V3仍未验。旧基线/撤回实现不自动恢复，不把历史授权或dispatch当作当前构建PASS。
 
