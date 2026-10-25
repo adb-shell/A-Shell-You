@@ -1,15 +1,15 @@
 # AShell Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261025-001`
+Registry Revision：`WORK-20261025-001-r3`
 Last Updated：2026-10-25
-Active Task Count：0
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none。T-2026-10-25-001源码/V0、test推送及单次编排触发完成；实际交互与编译结果仍待验证。历史授权不继承。
+T-2026-10-25-001 / active / T7（r3）：两个可接受密码的model实现与V0完成，10份Markdown/111个本地引用有效；test/4694e78起点。沿用当前会话已确认的test推送与Windows常规编排交付，准备提交本次11路径；不从其他会话或历史任务继承授权。CE-20261025-T001-03；[任务](../docs/tasks/T-2026-10-25-001-developer-login-password.md)。
 
 ## 2. Concurrent Session Rules
 

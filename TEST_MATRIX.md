@@ -199,9 +199,9 @@ ADB 详细步骤、限制和取证项见 [本机 ADB](docs/AI_ENGINEERING/12_LOC
 | FLT-05 | P0 | Bridge contract | FRB/handwritten FFI/MethodChannel；generated drift；bad ABI/error | signatures match all sides；generated diff reviewed；errors bounded | V1+V2 / E-F+E-R | Flutter+Rust+Android / QA |
 | FLT-06 | P1 | Product flows | account/file/terminal/ZEGO success、deny、timeout、back navigation | state/error/consent remains domain-correct；no sensitive logging | V1+V3+V4 / E-F+E-A+E-P | Flutter+API+Security / QA |
 | FLT-07 | P2 | UX/accessibility | narrow/wide、localization、keyboard/focus、window close/restore | no inaccessible controls、layout loss or stale dialog overlay | V1+V3 / E-F | Flutter / QA |
-| FLT-08 | P1 | PC developer login password | Ctrl+Shift+H长按/重复；空/错/正确口令、大小写/标点/前后空格；按钮/Enter/小键盘Enter；取消/Esc/页面销毁/关闭重开；解锁连接/重启 | 只弹一个隐藏输入框；仅精确正确口令启用进程内免登录；错误/取消不启用；输入不保留；重启复位；非main无入口 | V1+V3 / E-F | Flutter+Security / QA |
+| FLT-08 | P1 | PC developer login password | Ctrl+Shift+H长按/重复；两个正确口令分别在独立未解锁进程验证；空/错/大小写/标点/前后空格；按钮/Enter/小键盘Enter；取消/Esc/页面销毁/关闭重开；解锁连接/重启 | 只弹一个隐藏输入框；任一正确口令精确匹配才启用进程内免登录；错误/取消不启用；输入不保留；重启复位；非main无入口 | V1+V3 / E-F | Flutter+Security / QA |
 
-2026-10-25 T001：FLT-08仅完成V0源码路径检查，V1/V3为NOT_RUN；Windows Actions编排授权与实际回执见[任务](docs/tasks/T-2026-10-25-001-developer-login-password.md)，dispatch不计编译或交互PASS。
+2026-10-25 T001 / r3：FLT-08仅完成V0源码路径检查，V1/V3为NOT_RUN；r3增加第二个密码的独立进程验证，避免原进程已解锁掩盖校验错误。Windows Actions编排授权与实际回执见[任务](docs/tasks/T-2026-10-25-001-developer-login-password.md)，dispatch不计编译或交互PASS。
 
 ## 8. Rust Suite
 

@@ -8,6 +8,13 @@ Last Updated：2026-10-25（PC开发者密码入口）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261025-T001-03：同一功能追加第二个可接受密码
+
+- 当前用户明确要求新增第二个密码并保留原密码；test/4694e78初始clean、远端一致。作为同一会话功能续接，交付继续使用已确认的test推送与Windows常规编排；不继承其他会话/任务授权。
+- `flutter/lib/models/developer_login_bypass_model.dart` 从单摘要比较改为两个摘要const集合包含检查，原摘要原样保留；其余失败/成功状态、页面/连接/工具栏密码逻辑不变，不新增明文口令副本。
+- 同步03_MODULE_DESIGN、10_SECURITY_MODEL、TEST_MATRIX、原任务r3节及PROJECT_STATE/PROJECT_MEMORY/CURRENT_WORK/CHANGELOG_AI/TASK_HISTORY/本日志；无新ADR/Decision/依赖/资产。
+- V0 PASS：两个摘要/原摘要保留、唯一启用调用、diff和10份Markdown/111本地引用；Git/编排回执待回填。无本机产品build/test/analyze/设备/生产操作。STATE/WORK-20261025-001-r3。
+
 ## CE-20261025-T001-02：test推送与Windows编排回执
 
 - 用户续接授权已执行：test快进fd233fa后提交fe3c7d445a531a11ebbe5c30c9e3b047e2874ba3，push/远端核对成功；main保持fd233fa，无main推送。

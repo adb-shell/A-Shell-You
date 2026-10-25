@@ -2,7 +2,7 @@
 
 ## 0. Task Metadata / Session Recovery
 
-- 模板：`TASK_TEMPLATE.md`；日期：2026-10-25（Asia/Tokyo）；Status：complete / T8（源码、推送与编排触发完成；运行验收未完成）；Risk：medium。
+- 模板：`TASK_TEMPLATE.md`；日期：2026-10-25（Asia/Tokyo）；Status：verifying / T7（r3实现与V0完成，待Git/编排交付）；Risk：medium。
 - Requester/Product Owner：当前用户；执行：Codex；协调 `ashell-master`，实现 `ashell-flutter-engineer`，Security/Release由同一执行者按对应Skill自审。
 - 初始main / `fd233fa5178fd47dec5965b6c59d053d7e2db0fb`，clean，无并行活动任务。中断续接后再次确认clean，上轮patch未落盘。
 - 参考基线：[AS-BL-2026-10-19-0dbe202-restored](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，通过 [BASELINE_INDEX](../BASELINE/BASELINE_INDEX.md) 定位。实际HEAD已有后续源码/配置/工作流提交，记录state-drift，不声称业务树仍等于0dbe202。
@@ -70,3 +70,12 @@ Git已执行：切换test、从7e45842快进至fd233fa，保留main五项后续�
 编排：workflow 394791509 / Build AShell Clients-BT，2026-10-25 22:58:45（Asia/Tokyo）在test按Windows/常规编译启动；run 40200073517，源码SHA为fe3c7d4，首次核对in_progress。只触发一次，不把请求接受或运行中当作构建PASS。
 
 CE-20261025-T001-02补记上述实际回执，仅修改本任务及六份.codex记录；后续文档提交不改变编排使用的产品源码/工作流树。无本机产品执行、删除、版本或生产发布。后续确认门为额外验证/修复或发布；FLT-08交互仍NOT_RUN，不继承历史任务授权。
+
+## r3：同一会话追加第二个密码（2026-10-25）
+
+- T0/T1：test/4694e78739dc8493786d366eacf5a6e07d7163b8初始clean，远端test一致，无活动任务。用户明确要求新增第二个指定口令且原口令继续有效；文档不保存两者明文。
+- T2/T3：仅 `developer_login_bypass_model.dart` 将单摘要改为两个SHA-256摘要的const集合，计算输入摘要后检查集合包含关系；保留大小写/标点/空格精确匹配，失败不启用。页面、生命周期、持久化、协议、依赖和工具栏独立密码均不变。回滚为移除此新增摘要和对应集合变更；无新ADR/Decision/外部资产。
+- T4：本次追加请求明确授权C2；作为同一功能续接，沿用当前会话用户已确认的提交推送test及Windows常规编排交付范围，不来自历史文件授权；无main推送、生产发布、本机产品测试或其他目标。
+- T5：事件CE-20261025-T001-03，STATE/WORK-20261025-001-r3；实际修改一个Dart model及10份Markdown，页面/其他产品代码无差异。
+- T6：V0 PASS，核对两摘要与原摘要原样保留、唯一model调用、`git diff --check`和10份Markdown/111个本地引用。V1/V3为NOT_RUN。FLT-08须在独立未解锁进程分别验证两密码，并覆盖错误/大小写/句号/空格；首次成功后再次提交不能证明第二密码有效。正式分析命令/环境沿用T6，CI仍使用BT/test/Windows/常规编译。
+- T7/T8：更新领域/安全/矩阵与任务薄记忆，Decision/ADR/Baseline/External Registry无增量；Git/编排回执待回填。
