@@ -9,7 +9,7 @@ Evidence Scope：`repository-observed / V0`
 
 - 参考冻结基线：[Baseline22](../docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`；实际源码已有后续提交，不能把旧快照当作当前HEAD。
 - 本次r3续接起点：test / `4694e78739dc8493786d366eacf5a6e07d7163b8`，clean，远端test同SHA；main仍fd233fa。
-- 前轮PC开发者密码入口源码fe3c7d4与交付记录4694e78已推送test；当前r3按同一会话追加请求支持两个密码，model与文档待提交，不改变main。
+- 前轮PC开发者密码入口源码fe3c7d4与交付记录4694e78已推送test；r3双密码源码356f53b已提交推送test，后续仅补交付文档，不改变main。
 - 回退后撤回的实现、实验方案和诊断结论不属于当前实现。后续会话先核对 HEAD/status，再由代码重新建立证据；不能沿用历史聊天中的“已修改”判断。
 
 ## 当前能力摘要
@@ -32,9 +32,10 @@ Evidence Scope：`repository-observed / V0`
 
 ## 本轮工作与验证
 
-- 当前任务：[T-2026-10-25-001 / r3](../docs/tasks/T-2026-10-25-001-developer-login-password.md)，一个model与领域/安全/测试矩阵/记忆同步；本次test提交推送和Windows编排待交付。
-- Registry：WORK-20261025-001-r3；最新Event：CE-20261025-T001-03；Decision评估：N/A — no decision delta（D-033保留历史）。
+- 当前任务：[T-2026-10-25-001 / r3](../docs/tasks/T-2026-10-25-001-developer-login-password.md)，一个model与领域/安全/测试矩阵/记忆同步；test提交推送和Windows编排触发完成。
+- Registry：WORK-20261025-001-r3；最新Event：CE-20261025-T001-04；Decision评估：N/A — no decision delta（D-033保留历史）。
 - 授权：实现、提交推送test、单次Build AShell Clients-BT / Windows / 常规编译，临时测试签名及Actions产物；无main推送或生产发布。
 - V0：源码调用/失败与取消/重入/销毁路径、diff检查；无本地编译/分析器/交互测试。FLT-08运行验收待证，dispatch接受不等于编译通过。
 - 前轮编排回执：HTTP204，run40200073517 / head fe3c7d4，首次核对in_progress；该run不包含r3新增密码，不能用它证明本次实现。
+- r3编排回执：HTTP204，run40203581056 / head356f53b，2026-10-25 23:43:34 Asia/Tokyo启动，首次核对in_progress；r3仅一次dispatch，运行验证仍待证。
 - 当前workflow源码仅Build-Clients-BT.yml，旧构建文档入口为历史快照；不据此执行已删除工作流。SEC-016和既有正式验证/外部资产缺口保持。

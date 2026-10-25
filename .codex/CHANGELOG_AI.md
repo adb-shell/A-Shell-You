@@ -8,7 +8,7 @@ Mode：`append-only task-level index`
 
 ## T-2026-10-25-001：PC开发者免登录入口密码确认
 
-- r3续接：保留原密码，新增第二个可接受密码；一个model改为摘要集合，页面/连接边界保持。test/4694e78 clean起点，V0与文档同步完成；沿用当前会话已确认的test/Windows常规编排交付，实际回执待补。STATE/WORK-20261025-001-r3 / CE-20261025-T001-03；no decision delta。
+- r3交付完成：保留原密码，新增第二个可接受密码；一个model改为摘要集合，页面/连接边界保持。test/4694e78 clean起点，V0与文档同步完成；源码356f53b已推送test，BT Windows/常规编译HTTP204、run40203581056/head356f53b，首次核对in_progress。后续仅补交付文档，不二次编排。STATE/WORK-20261025-001-r3 / CE-20261025-T001-03/04；no decision delta；V1/V3未验。
 
 - 实现与V0、test推送及编排触发完成：Ctrl+Shift+H先弹密码框，确认/回车精确校验；错误/取消不启用，重复不叠窗、关闭不保留输入、进程重启复位。
 - 两份Dart及领域/安全/矩阵/记忆同步，保留原产品/endpoint认证与工具栏入口；固定本地gate不是服务端授权。

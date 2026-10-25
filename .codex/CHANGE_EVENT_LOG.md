@@ -8,6 +8,11 @@ Last Updated：2026-10-25（PC开发者密码入口）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261025-T001-04：双密码test交付与编排回执
+
+- 源码356f53b8a1999b96bf3d8d821bf6fa1a22495f64已提交推送test，API核对一致；BT/test/Windows/常规编译HTTP204，run40203581056、head356f53b，首次核对in_progress。r3仅一次dispatch，不把运行中当作编译PASS。
+- 只补原任务r3、PROJECT_STATE/PROJECT_MEMORY/CURRENT_WORK/CHANGELOG_AI/TASK_HISTORY/本日志七份Markdown；无产品或工作流增量，不再次编排。STATE/WORK-20261025-001-r3，T8关闭；FLT-08仍需正式双密码独立进程验收。
+
 ## CE-20261025-T001-03：同一功能追加第二个可接受密码
 
 - 当前用户明确要求新增第二个密码并保留原密码；test/4694e78初始clean、远端一致。作为同一会话功能续接，交付继续使用已确认的test推送与Windows常规编排；不继承其他会话/任务授权。

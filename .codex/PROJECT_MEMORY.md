@@ -6,7 +6,7 @@
 
 参考冻结基线为 `0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`。2026-10-25实际起点main/fd233fa已有后续源码/配置/工作流提交；T001将test快进至此并增加PC开发者密码入口。撤回的历史修改及其诊断不自动恢复，工程判断以当前源码与新证据为准。
 
-T001-r3当前续接：test/4694e78初始clean，用户在同一会话要求保留原密码并增加第二个可接受密码；model使用两个摘要的const集合，任一精确匹配即可。STATE/WORK-20261025-001-r3、CE-20261025-T001-03；按本会话已确认方式交付test/Windows编排，当前回执待补。后续密码维护搜索 `_developerLoginPasswordHashes`；文档不保存明文。以下T001原交付为历史回执。
+T001-r3当前交付：test/4694e78初始clean，用户在同一会话要求保留原密码并增加第二个可接受密码；model使用两个摘要的const集合，任一精确匹配即可。STATE/WORK-20261025-001-r3、CE-20261025-T001-03/04；源码356f53b已推送test，Windows常规编排run40203581056/head356f53b已触发，首次核对in_progress，后续仅补文档。后续密码维护搜索 `_developerLoginPasswordHashes`；文档不保存明文，V1/V3仍未验。以下T001原交付为历史回执。
 
 先读 [PROJECT_STATE](PROJECT_STATE.md)、[CURRENT_WORK](CURRENT_WORK.md) 和 [Baseline22](../docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，核对HEAD/status。当前任务T-2026-10-25-001、STATE/WORK-20261025-001、CE-20261025-T001-01/02；源码fe3c7d4已推送test，Windows常规编排run40200073517已触发，首次核对in_progress，后续仅补交付文档；不继承授权或冒充构建PASS。Ctrl+Shift+H仅在密码校验成功后启用内存免登录，口令不保存在文档；见03_MODULE_DESIGN / FLT-08。
 

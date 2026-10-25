@@ -2,7 +2,7 @@
 
 ## 0. Task Metadata / Session Recovery
 
-- 模板：`TASK_TEMPLATE.md`；日期：2026-10-25（Asia/Tokyo）；Status：verifying / T7（r3实现与V0完成，待Git/编排交付）；Risk：medium。
+- 模板：`TASK_TEMPLATE.md`；日期：2026-10-25（Asia/Tokyo）；Status：complete / T8（r3源码、推送与编排触发完成，运行验收未完成）；Risk：medium。
 - Requester/Product Owner：当前用户；执行：Codex；协调 `ashell-master`，实现 `ashell-flutter-engineer`，Security/Release由同一执行者按对应Skill自审。
 - 初始main / `fd233fa5178fd47dec5965b6c59d053d7e2db0fb`，clean，无并行活动任务。中断续接后再次确认clean，上轮patch未落盘。
 - 参考基线：[AS-BL-2026-10-19-0dbe202-restored](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，通过 [BASELINE_INDEX](../BASELINE/BASELINE_INDEX.md) 定位。实际HEAD已有后续源码/配置/工作流提交，记录state-drift，不声称业务树仍等于0dbe202。
@@ -78,4 +78,6 @@ CE-20261025-T001-02补记上述实际回执，仅修改本任务及六份.codex�
 - T4：本次追加请求明确授权C2；作为同一功能续接，沿用当前会话用户已确认的提交推送test及Windows常规编排交付范围，不来自历史文件授权；无main推送、生产发布、本机产品测试或其他目标。
 - T5：事件CE-20261025-T001-03，STATE/WORK-20261025-001-r3；实际修改一个Dart model及10份Markdown，页面/其他产品代码无差异。
 - T6：V0 PASS，核对两摘要与原摘要原样保留、唯一model调用、`git diff --check`和10份Markdown/111个本地引用。V1/V3为NOT_RUN。FLT-08须在独立未解锁进程分别验证两密码，并覆盖错误/大小写/句号/空格；首次成功后再次提交不能证明第二密码有效。正式分析命令/环境沿用T6，CI仍使用BT/test/Windows/常规编译。
-- T7/T8：更新领域/安全/矩阵与任务薄记忆，Decision/ADR/Baseline/External Registry无增量；Git/编排回执待回填。
+- T7/T8：已同步领域/安全/矩阵与任务薄记忆，Decision/ADR/Baseline/External Registry无增量。源码提交 `356f53b8a1999b96bf3d8d821bf6fa1a22495f64`（开发者模式支持两个密码）已推送test，API核对远端同SHA。
+- r3编排：BT/test/Windows/常规编译HTTP204；[run40203581056](https://github.com/adb-shell/A-Shell-You/actions/runs/40203581056)，head356f53b，2026-10-25 23:43:34 Asia/Tokyo启动，首次核对in_progress。本次仅一次dispatch，V2尚无PASS，V1/V3仍NOT_RUN。
+- CE-20261025-T001-04补记实际交付，仅本任务与六份.codex记录；后续文档提交与运行中的产品/工作流树一致，不再次编排。CURRENT_WORK最后关闭；未执行main推送、生产发布或本机产品验证。
