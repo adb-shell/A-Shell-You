@@ -4,9 +4,17 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-19（ADB优化合并main）
+Last Updated：2026-10-25（PC开发者密码入口）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261025-T001-01：PC开发者免登录入口密码确认
+
+- 当前用户授权两份Dart实现与文档同步，续接授权提交推送test和一次Windows常规编排；main/fd233fa初始clean，test已从7e45842快进到当前main，原提交完整保留。
+- `flutter/lib/desktop/pages/connection_page.dart`新增单实例隐藏密码框、统一确认/回车/取消和销毁清理；`flutter/lib/models/developer_login_bypass_model.dart`改为精确摘要校验后启用内存开关。
+- 同步 `docs/AI_ENGINEERING/03_MODULE_DESIGN.md`、`10_SECURITY_MODEL.md`、`TEST_MATRIX.md`、本任务和PROJECT_STATE/PROJECT_MEMORY/CURRENT_WORK/TASK_HISTORY/CHANGELOG_AI及本日志；无新ADR/Decision/依赖/资产/版本/生成桥。
+- V0调用与diff核对；本机build/test/analyze、设备/生产执行none；Git提交推送和dispatch结果待回填。固定本地校验不关闭SEC-016。
+- STATE/WORK-20261025-001；[任务](../docs/tasks/T-2026-10-25-001-developer-login-password.md)。
 
 ## CE-20261019-T006-01：以0dbe202重整当前文档与记忆
 

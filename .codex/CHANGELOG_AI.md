@@ -2,9 +2,16 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-19（回退基线文档同步）
+Last Updated：2026-10-25（PC开发者密码入口）
 
 Mode：`append-only task-level index`
+
+## T-2026-10-25-001：PC开发者免登录入口密码确认
+
+- 实现与V0完成，Git/编排交付待回填：Ctrl+Shift+H先弹密码框，确认/回车精确校验；错误/取消不启用，重复不叠窗、关闭不保留输入、进程重启复位。
+- 两份Dart及领域/安全/矩阵/记忆同步，保留原产品/endpoint认证与工具栏入口；固定本地gate不是服务端授权。
+- 用户续接授权推送test并编排；test快进至当前main/fd233fa，随后提交本任务并执行现有BT Windows/常规编译。无本机产品验证或生产发布。
+- N/A — no decision delta；Baseline22作参考，实际HEAD漂移已记录。STATE/WORK-20261025-001 / CE-20261025-T001-01；[任务](../docs/tasks/T-2026-10-25-001-developer-login-password.md)。
 
 ## T-2026-10-19-006：回退基线后的文档与记忆同步
 

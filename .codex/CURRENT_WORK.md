@@ -1,15 +1,15 @@
 # AShell Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261019-006`
-Last Updated：2026-10-19
-Active Task Count：0
+Registry Revision：`WORK-20261025-001`
+Last Updated：2026-10-25
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none。T-2026-10-19-006文档与V0完成；提交“文档更新”承载本轮记录，test→main Git交付结果以实际引用及会话最终回执为准。未执行编排。
+T-2026-10-25-001 / active / T7：PC开发者密码入口实现和V0完成；两份Dart与10份Markdown，111个本地引用有效。当前test已快进至main/fd233fa；准备按用户授权提交推送test及单次BT Windows/常规编译。Owner：Codex，Flutter实现，Security/Release自审。CE-20261025-T001-01；[任务](../docs/tasks/T-2026-10-25-001-developer-login-password.md)。历史授权不继承。
 
 ## 2. Concurrent Session Rules
 

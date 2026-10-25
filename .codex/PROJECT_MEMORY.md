@@ -1,12 +1,12 @@
 # AShell Project Memory
 
-最后更新：2026-10-19。用途：当前会话恢复入口，不替代源码。
+最后更新：2026-10-25。用途：当前会话恢复入口，不替代源码。
 
 ## 0. 当前恢复基线
 
-唯一实现基线为用户指定的 `0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`。此次只同步文档；文档提交的HEAD可更新，但业务树保持此提交。撤回的后续修改及其诊断不作为当前事实或修复前提，也不自动恢复。历史聊天无法由仓库文档删除；工程判断只使用当前源码及重新取得的证据。
+参考冻结基线为 `0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`。2026-10-25实际起点main/fd233fa已有后续源码/配置/工作流提交；T001将test快进至此并增加PC开发者密码入口。撤回的历史修改及其诊断不自动恢复，工程判断以当前源码与新证据为准。
 
-先读 [PROJECT_STATE](PROJECT_STATE.md)、[CURRENT_WORK](CURRENT_WORK.md) 和 [Baseline22](../docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，核对实际 HEAD/status。任务 T-2026-10-19-006、STATE/WORK-20261019-006、CE-20261019-T006-01、D-033对应本轮；当前授权仅文档提交推送test后合并推送main，不含构建。
+先读 [PROJECT_STATE](PROJECT_STATE.md)、[CURRENT_WORK](CURRENT_WORK.md) 和 [Baseline22](../docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，核对HEAD/status。当前任务T-2026-10-25-001、STATE/WORK-20261025-001、CE-20261025-T001-01；C2实现及test提交推送/Windows常规编排来自本次用户请求，后续会话不继承授权。Ctrl+Shift+H仅在密码校验成功后启用内存免登录，口令不保存在文档；见03_MODULE_DESIGN / FLT-08。
 
 当前ADB能力：
 

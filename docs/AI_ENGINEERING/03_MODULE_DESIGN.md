@@ -104,6 +104,12 @@ Privacy abstraction 支持 exclude/topmost、Magnifier、virtual display。当�
 
 `src/common.rs::verify_login()` 的 unconditional `true` 不等于 endpoint password authentication 被删除，但说明 legacy/custom-client 产品准入不能作为安全边界。
 
+### PC开发者免登录入口（2026-10-25 / T001）
+
+`flutter/lib/desktop/pages/connection_page.dart` 的 Ctrl+Shift+H 仅在desktop main处理KeyDownEvent，先显示开发者密码框。`developer_login_bypass_model.dart::enableDeveloperLoginBypass(String password)` 精确校验UTF-8输入摘要，成功才设置内存开关；确认按钮、Enter/小键盘Enter共用提交逻辑，空值/错误输入保留弹窗并提示。
+
+输入隐藏且禁用纠错/建议/个性化学习，不trim、不保存或发送。重复快捷键不叠窗；取消/Esc不启用；页面dispose只按自身tag关闭弹窗，关闭后丢弃输入引用。已解锁不再次弹窗，进程重启恢复默认false。主连接按钮和peer card继续消费原开关；不改工具栏另一个开发者选项、产品API或endpoint认证。V0，运行验收见TEST_MATRIX FLT-08与[任务](../tasks/T-2026-10-25-001-developer-login-password.md)。
+
 ## 12. ZEGO voice 模块
 
 - Rust：创建 metadata、邀请、pending/active timestamp、accept/close/timeout。
