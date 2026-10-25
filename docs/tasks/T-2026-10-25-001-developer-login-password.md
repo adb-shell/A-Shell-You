@@ -2,11 +2,11 @@
 
 ## 0. Task Metadata / Session Recovery
 
-- 模板：`TASK_TEMPLATE.md`；日期：2026-10-25（Asia/Tokyo）；Status：verifying / T7（实现与V0完成，Git/编排待交付）；Risk：medium。
+- 模板：`TASK_TEMPLATE.md`；日期：2026-10-25（Asia/Tokyo）；Status：complete / T8（源码、推送与编排触发完成；运行验收未完成）；Risk：medium。
 - Requester/Product Owner：当前用户；执行：Codex；协调 `ashell-master`，实现 `ashell-flutter-engineer`，Security/Release由同一执行者按对应Skill自审。
 - 初始main / `fd233fa5178fd47dec5965b6c59d053d7e2db0fb`，clean，无并行活动任务。中断续接后再次确认clean，上轮patch未落盘。
 - 参考基线：[AS-BL-2026-10-19-0dbe202-restored](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，通过 [BASELINE_INDEX](../BASELINE/BASELINE_INDEX.md) 定位。实际HEAD已有后续源码/配置/工作流提交，记录state-drift，不声称业务树仍等于0dbe202。
-- 恢复指针STATE/WORK-20261019-006、CE-20261019-T006-01；本任务STATE/WORK-20261025-001、CE-20261025-T001-01。历史授权继承none。
+- 恢复指针STATE/WORK-20261019-006、CE-20261019-T006-01；本任务STATE/WORK-20261025-001、CE-20261025-T001-01/02。历史授权继承none。
 - ADR/Decision：N/A — no decision delta；D-033保留历史含义，不新增长期架构决定或改写冻结Baseline。
 - TEST_MATRIX：FLT-01/02/04/06/07，新FLT-08；源码交付V0，正式验收V1/V2/V3。External Asset IDs：N/A，无新依赖、服务或二进制。
 
@@ -52,7 +52,7 @@
 
 - V0：PASS，人工核对唯一启用调用、成功/失败/取消路径、键盘/重入/销毁生命周期；`git diff --check`通过，10份Markdown/111个本地引用有效；仅两份Dart和任务同步文档。不把此记录等同实际交互PASS。
 - V1：NOT_RUN，本机分析器/测试未授权。正式Flutter环境可在flutter/运行 `flutter analyze lib/models/developer_login_bypass_model.dart lib/desktop/pages/connection_page.dart`，需另行授权。
-- V2：用户授权GitHub Actions `Build-Clients-BT.yml`，test、Platform=Windows、BuildMode=常规编译；dispatch与编译成功分开记录。
+- V2：已触发GitHub Actions `Build-Clients-BT.yml`，test、Platform=Windows、BuildMode=常规编译；HTTP204，[run 40200073517](https://github.com/adb-shell/A-Shell-You/actions/runs/40200073517)，首次核对in_progress，尚无编译成功结论。
 - V3：NOT_RUN；FLT-08覆盖正确/空/错误/空格/大小写/标点、按钮/Enter/小键盘Enter、取消/Esc、重复快捷键、窗口销毁、解锁连接与重启；FLT-02/04/06/07补多窗口/生命周期/连接/焦点回归。
 - V4/V5：N/A，无服务端授权/生产行为调整。
 
@@ -62,7 +62,11 @@
 
 ## T7 / T8. Documentation / Handoff
 
-已同步domain/security、TEST_MATRIX、TASK_HISTORY、CHANGE_EVENT_LOG、CHANGELOG_AI、PROJECT_STATE、PROJECT_MEMORY；CURRENT_WORK在Git/编排回执后最后关闭。
+已同步domain/security、TEST_MATRIX、TASK_HISTORY、CHANGE_EVENT_LOG、CHANGELOG_AI、PROJECT_STATE、PROJECT_MEMORY；Git/编排回执已取得，CURRENT_WORK最后关闭。
 N/A：ADR、DECISION_LOG（no decision delta）、Baseline冻结快照、EXTERNAL_ASSET_REGISTRY、build/debug/roadmap和入口规则/Skills；未产生对应增量。
 
-Git已执行：远端分支只读核对、切换test、从7e45842快进至fd233fa，保留main五项后续提交；接着提交本任务12路径并推送test。远端workflow 394791509 / Build AShell Clients-BT为active，计划单次Windows/常规编译。提交/push/dispatch实际SHA和结果待回填，不预写成功。无本机产品执行、删除、版本或生产发布。后续确认门为额外验证/修复或发布，不继承历史任务授权。
+Git已执行：切换test、从7e45842快进至fd233fa，保留main五项后续提交；12路径提交为 `fe3c7d445a531a11ebbe5c30c9e3b047e2874ba3`（PC开发者模式增加密码验证），push成功且远端test同SHA，main仍fd233fa。工作区在该提交推送后clean。
+
+编排：workflow 394791509 / Build AShell Clients-BT，2026-10-25 22:58:45（Asia/Tokyo）在test按Windows/常规编译启动；run 40200073517，源码SHA为fe3c7d4，首次核对in_progress。只触发一次，不把请求接受或运行中当作构建PASS。
+
+CE-20261025-T001-02补记上述实际回执，仅修改本任务及六份.codex记录；后续文档提交不改变编排使用的产品源码/工作流树。无本机产品执行、删除、版本或生产发布。后续确认门为额外验证/修复或发布；FLT-08交互仍NOT_RUN，不继承历史任务授权。

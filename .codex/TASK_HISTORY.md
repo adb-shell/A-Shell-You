@@ -11,8 +11,8 @@
 - main/fd233fa初始clean，当前用户明确授权指定密码弹窗、确认/回车进入，并续接授权推送test/执行编排；上轮中断未写入文件。
 - 两份Dart实现先校验后启用内存开关；空值/错误/取消、重入、页面销毁路径已静态检查，口令不写文档/日志/磁盘/网络。依赖、协议、native、工具栏独立开发者选项不改。
 - 领域/安全/测试矩阵与五项记忆评估同步；V0，FLT-08运行NOT_RUN；无新增ADR/Decision/外部资产。回滚为维护者人工撤销本任务差异，无自动reset/强推。
-- test从7e45842快进至fd233fa，提交推送与Build-Clients-BT Windows/常规编译的实际结果待回填；无本机编译或生产发布。
-- STATE/WORK-20261025-001 / CE-20261025-T001-01；[任务](../docs/tasks/T-2026-10-25-001-developer-login-password.md)。
+- test从7e45842快进至fd233fa，fe3c7d4源码提交推送成功；Build-Clients-BT Windows/常规编译HTTP204，run40200073517 / head fe3c7d4，首次核对in_progress。后续仅补交付文档，不再次编排；main未推送，无本机编译或生产发布。
+- T8源码/Git/触发交付完成，V1/V3未验；STATE/WORK-20261025-001 / CE-20261025-T001-01/02；[任务](../docs/tasks/T-2026-10-25-001-developer-login-password.md)。
 
 ## T-2026-10-19-006：回退基线后的文档与记忆同步
 

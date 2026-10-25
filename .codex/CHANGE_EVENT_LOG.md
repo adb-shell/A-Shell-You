@@ -8,6 +8,13 @@ Last Updated：2026-10-25（PC开发者密码入口）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261025-T001-02：test推送与Windows编排回执
+
+- 用户续接授权已执行：test快进fd233fa后提交fe3c7d445a531a11ebbe5c30c9e3b047e2874ba3，push/远端核对成功；main保持fd233fa，无main推送。
+- Build AShell Clients-BT / workflow394791509，test / Windows / 常规编译，HTTP204；run40200073517、head fe3c7d4，首次核对in_progress。一次dispatch，未声称编译/交互PASS。
+- 此记录只同步 `docs/tasks/T-2026-10-25-001-developer-login-password.md`、`.codex/PROJECT_STATE.md`、`PROJECT_MEMORY.md`、`CHANGELOG_AI.md`、`TASK_HISTORY.md`、`CURRENT_WORK.md`及本日志；无产品/工作流增量，不再次编排。
+- STATE/WORK-20261025-001，T8关闭；本次无新Decision/ADR/外部资产，运行验收仍待证。
+
 ## CE-20261025-T001-01：PC开发者免登录入口密码确认
 
 - 当前用户授权两份Dart实现与文档同步，续接授权提交推送test和一次Windows常规编排；main/fd233fa初始clean，test已从7e45842快进到当前main，原提交完整保留。
