@@ -1,5 +1,24 @@
 # OpenWorld Commercial Test Matrix
 
+## 2026-11-07 开发者画面优先 / T004
+
+实现快照：[Baseline26](docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)；[任务与命令](docs/tasks/T-2026-11-07-004-developer-screen-priority.md)。V0不能代替双端编译或通话验收。
+
+| Case | 验证目标 | Level | Result |
+|---|---|---|---|
+| DSP-01 | 既有协议字段保持、新字段唯一、C ABI两侧对应、口令摘要及生成文件/依赖不变；既有身份合同122项 | V0 | PASS |
+| DSP-02 | screen_policy四项单测：A先/B先及普通重连、多开发者最后退出、重复注册不能升级、重复清理幂等及revision前进 | V1 | NOT_RUN；本机无rustc |
+| DSP-03 | Windows x64 + Android aarch64正式构建；Rust1.75/Flutter3.24.5；protobuf生成、原生符号加载、Release/R8 | V2 | NOT_RUN |
+| DSP-04 | A普通先连接并双向通话，B开发者加入；A画面停止且显示暂停，B正常画面/控制；双方声音连续，无自动挂断/重邀 | V3/V4 | NOT_RUN |
+| DSP-05 | B先连接，A新建/重连无首帧也可发起/接听语音；已有通话忙规则保持；错误密码/2FA未通过不暂停A | V3/V4 | NOT_RUN |
+| DSP-06 | 两个开发者/同进程多窗口，关一个不恢复、全退出恢复；崩溃/断网按存活检测释放；快切与旧revision不回显旧图 | V3/V4 | NOT_RUN |
+| DSP-07 | 普通共享/无视/穿透与ADB H.264/JPEG/layout、截图请求逐项验证；暂停无帧/无盲输入，B可操作；不重启采集/重弹权限 | V3/V4 | NOT_RUN |
+| DSP-08 | 静态画面恢复关键帧、Texture/RGBA、移窗、ADB独立/双源；旧队列/迟到解码不回显；手动录屏选择保持；持续暂停不触发无操作断连 | V3/V4 | NOT_RUN |
+| DSP-09 | 无开发者时原多PC接收/输入/采集、普通远控/ADB/剪贴板/文件/语音回归；慢普通PC暂停后不拖慢B ACK/QoS | V3/V4 | NOT_RUN |
+| DSP-10 | 新PC/旧Android明确不支持；旧PC/新Android缺省普通并受过滤；篡改角色仅验证已说明协作信任边界，不视为抗伪造授权 | V3/V4 | NOT_RUN |
+
+同时回归FLT-08两种密码/取消/错误/重启，NET-01/04/05/07、E2E-05及ADB-M21—M32。语音验证须记录持续双向音频和呼叫接听/拒绝/取消，不能仅以UI显示“通话中”判PASS。
+
 ## 2026-11-07 产品身份迁移
 
 | Case | 范围 | 级别 | 结果 |

@@ -1,15 +1,15 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261107-001`
+State Revision：`STATE-20261107-004-r2`
 Last Updated / Observed At：2026-11-07（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0`
 
 ## 当前源码基线
 
-- 本次起点 main / `7361d39d34ad0bb147827e30fa61419a00b84038`，初始clean；用户指定test交付后，身份迁移源码已提交推送`ad88665e74ef48e251a1faefda6461e3c0e8112b`，说明“更新开放世界产品信息及指纹”；main保持。
-- 当前工作区快照：[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)，`OW-BL-2026-11-07-7361d39-identity-worktree`；实现与验证范围见[身份迁移](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。Baseline23与历史Git/编排回执只作追溯。
-- 用户续接确认改用test提交推送及Both/常规编译；起点test/48226fb与main产品树一致，17份文档恢复切换前快照。dispatch HTTP204，run42350649478/head ad88665；用户随后要求“不监控”，已停止本地轮询，未取消云编译；真机及生产未操作。
+- 本次起点main/9040c53d37e3542c7ab8948b64beec1f0df0cd93 clean；按用户要求切换已有test/d9f111944da644b427f7fbfc5970de6f14604ef4 clean，在test保留本任务未提交增量；main无写入。
+- 当前工作区快照：[Baseline26](../docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)，`OW-BL-2026-11-07-d9f1119-screen-priority-worktree`。test版本仍5.2.1/5.2.1+59，未合入main的2.0.26版本更改。
+- 本次仅test切换、源码及必要文档修改；无stage/commit/push/merge/编排/部署/设备操作。身份迁移与历史run结果见历史任务，不自动恢复监控或沿用验证结论。
 - 回退后撤回的实现、实验方案和诊断结论不属于当前实现。后续会话先核对 HEAD/status，再由代码重新建立证据；不能沿用历史聊天中的“已修改”判断。
 
 ## 当前能力摘要
@@ -26,16 +26,15 @@ Evidence Scope：`repository-observed / V0`
 | 黑屏 | 独立黑色buffer层及App预渲染白字PNG，排除自身采集；OEM表现待真机证据 |
 | PC界面 | 普通左/ADB右、单源居中；Shell栏无悬浮提示；状态分组；无障碍栏无视频/特殊/防触状态文字 |
 | PC开发者入口 | Ctrl+Shift+H先弹密码框；两个可接受密码任一精确匹配后确认/回车启用内存免登录，取消/错误不启用，重启复位；V0/FLT-08待运行 |
+| 开发者画面优先 | 进程模式供新建/重连使用；Android认证后暂停普通画面/盲输入/采集控制，保留会话与ZEGO；多开发者可接收，最后退出恢复；协作角色可由修改版伪造，正式验证待证 |
 | 常亮与保活 | 默认连接服务运行期间静默常亮，无新增设置入口；ADB连接验证后尝试本应用电池优化豁免，不保证进程免杀 |
 
 详见 [12本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[Android原链](../docs/AI_ENGINEERING/04_ANDROID_PIPELINE.md)。
 
 ## 本轮工作与验证
 
-- 当前交付：[T-2026-11-07-001](../docs/tasks/T-2026-11-07-001-openworld-identity.md)，T8源码/文档/Git/触发交付完成；按用户要求不监控，正式编译与运行验收仍待证。
-- Registry：WORK-20261107-001；Events：CE-20261107-T001-01/02/03；Decision：D-034 / ADR-0027。
-- 当前交付授权覆盖产品身份与文档、test切换/stage/commit/push origin/test及Build-Clients-BT / Both / 常规编译，沿用工作流临时测试签名和Actions产物；用户最新要求停止监控，无main写入/部署/凭据轮换。
-- V0：135项静态身份合同通过；四份Shell、工作流14段Bash/14段PowerShell语法、嵌入Python AST、TOML/XML/plist及diff检查。已有iOS exportOptions.plist非法引号单列，未混入本次修复。
-- 变更范围：156个原路径文件修改、71个必要文件改名及5个新文件；旧路径均有新文件对应，58份Markdown/324个本地链接通过。
-- 新包是独立安装身份，旧数据/系统权限/ADB配对不自动迁移；设备UUID/硬件指纹算法、凭据和版本保持。外部ZEGO请求键、签名环境变量和旧域名分类保留显式兼容。
-- 唯一workflow为Build-Clients-BT.yml / Build OpenWorld Clients-BT / Both / 常规编译；run42350649478最后观察为Windows EXE与Android Native均在原生依赖构建，停止监控后不再查询，最终结果未知。ID-03未取得PASS，ID-04真机仍NOT_RUN。SEC-016与既有外部资产缺口保持。
+- 当前任务：[T-2026-11-07-004](../docs/tasks/T-2026-11-07-004-developer-screen-priority.md)，T6 handoff；源码和T7文档就绪，T8未关闭。
+- Registry：WORK-20261107-004-r2；Events：CE-20261107-T004-01/02/03；Decision：D-035 / ADR-0028。用户已明确确认同时暂停普通操作、保留语音，源码与验证状态不变；本次答复不涉及提交推送/编排授权。
+- V0：122项身份合同、旧协议字段保持/新字段唯一、C ABI两侧匹配、密码摘要/generated/依赖边界及diff通过；无修改generated、版本、构建工作流或Kotlin/JNI原采集代码。
+- 四项纯策略单测已加入未执行；本机无rustc/cargo/dart/flutter。DSP-02—10正式单测/双端编译/真机通话/新旧端矩阵NOT_RUN，不能声称零编译错误或完美运行。
+- 待用户确认本轮提交推送test及Both/常规编译后取得真实CI证据；保留现有工作流，不增加发布动作。角色声明不是可信凭证，SEC-016及既有外部资产风险不在本任务关闭。

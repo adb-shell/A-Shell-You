@@ -4,11 +4,11 @@
 
 ## 0. 当前恢复基线
 
-身份迁移源码ad88665e74ef48e251a1faefda6461e3c0e8112b已提交推送test，main保持7361d39；[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)记录实施快照。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me。T-2026-11-07-001 / STATE/WORK-20261107-001 / CE-20261107-T001-01/02 / D-034。
+当前test/d9f111944da644b427f7fbfc5970de6f14604ef4上有开发者画面优先未提交增量，起点main/9040c53已按用户要求切换，未合入main版本变化。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me，test版本5.2.1/5.2.1+59。T-2026-11-07-004 / STATE、WORK-20261107-004 / CE-20261107-T004-01/02 / D-035 / [Baseline26](../docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)。
 
 客户端、ADB JNI/帧桥/包路径、安装资源、本地及云编译同步；版本、依赖和原功能控制流保持。旧ZEGO wire key、构建环境变量及服务分类前缀受控兼容，见[迁移记录](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
 
-V0通过；用户已确认test提交推送与Both/常规编译，run42350649478/head ad88665已启动，随后要求“不监控”。本地helper已停止，未取消云编译，最终结果未知，真机仍未验证。仅源码/Git/触发交付T8关闭，不自动恢复轮询。PC开发者双密码入口保持；旧Task/run不能证明新产品构建通过。先读[PROJECT_STATE](PROJECT_STATE.md)和[CURRENT_WORK](CURRENT_WORK.md)。
+当前V0身份122项及协议/ABI/diff检查通过，四项策略单测未跑，本机无Rust/Flutter工具链。源码和文档就绪，T6 handoff，正式双端编译与真机通话待证；本次未提交推送/编排，历史run不继承。PC双密码摘要保持，解锁同时设置进程native模式，已有会话需重连；Android有开发者时普通PC暂停画面/盲输入/采集操作，连接与ZEGO保留，最后开发者退出恢复。见[ADR-0028](../docs/ADR/0028-developer-screen-priority.md)。先读[PROJECT_STATE](PROJECT_STATE.md)和[CURRENT_WORK](CURRENT_WORK.md)。
 
 当前ADB能力：
 

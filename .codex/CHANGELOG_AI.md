@@ -2,9 +2,18 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-11-07（开放世界产品身份）
+Last Updated：2026-11-07（开发者画面优先）
 
 Mode：`append-only task-level index`
+
+## T-2026-11-07-004：开发者画面优先（正式验证待证）
+
+- 续接：用户明确选择同时暂停操作、保留语音，与现有源码一致；仅确认记录同步，CE-20261107-T004-03 / STATE、WORK-20261107-004-r2。提交推送及编排仍待确认，验证等级未提升。
+
+- 用户指定切换现有test并实现。起点main/9040c53 clean，切换test/d9f1119 clean；保留test版本，未合main版本提交。
+- 实现Android认证后连接策略、普通/截图/ADB帧过滤、ACK/QoS、暂停输入/采集操作；PC进程模式、状态通知、旧帧清理、Texture恢复与多窗缓存。连接与ZEGO生命周期保持。
+- V0：身份合同122项、协议编号/类型兼容、C ABI、既有口令摘要/依赖/generated边界、diff通过。四项纯策略单测存在但未跑，本机无Rust/Flutter工具链；双端编译和真机/语音矩阵NOT_RUN。
+- T6 handoff，源码和T7文档就绪；test未提交，无push/merge/编排/部署。STATE/WORK-20261107-004，CE-20261107-T004-01/02，D-035 / ADR-0028 / Baseline26；[任务](../docs/tasks/T-2026-11-07-004-developer-screen-priority.md)。
 
 ## T-2026-11-07-001：开放世界产品身份迁移
 

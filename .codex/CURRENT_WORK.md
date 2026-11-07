@@ -1,15 +1,19 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261107-001`
+Registry Revision：`WORK-20261107-004-r3`
 Last Updated：2026-11-07
-Active Task Count：0
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none。用户要求不监控；构建继续运行，最终结果未查询，不自动恢复轮询。
+最新续接：用户明确“提交test，并执行双端编译，不监控”；T7交付执行中，授权stage/commit/push origin/test与单次Build-Clients-BT / Both / 常规编译。触发后不监控结果，历史“待确认”已由本次指令解除。CE-20261107-T004-04。
+
+续接确认：用户已明确选择同时暂停普通操作、保留语音，与现有实现一致；CE-20261107-T004-03 / STATE-20261107-004-r2。仅记录确认，提交推送/编排及正式验证状态不变。
+
+T-2026-11-07-004 / handoff / T6：test/d9f1119上的源码与T7文档就绪，开发者画面优先/普通连接语音保留；V0身份122项及协议/ABI/diff通过，四项策略单测未跑，本机无Rust/Flutter，正式双端编译与真机语音待证。Owner Codex/openworld-master，Flutter/Rust/Network/Security自审。test未提交，本次提交推送/云编排待确认；T8未关闭，历史编排不监控。STATE-20261107-004 / CE-20261107-T004-01/02 / D-035；[任务](../docs/tasks/T-2026-11-07-004-developer-screen-priority.md)。
 
 ## 2. Concurrent Session Rules
 

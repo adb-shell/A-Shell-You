@@ -1,5 +1,7 @@
 # OpenWorld 源码地图 / Source Map
 
+2026-11-07 T004新增PRIMARY：`src/developer_mode.rs`（进程模式与Android注册）、`src/screen_policy.rs`（纯策略/单测）；入口链为developer_login_bypass_model→native_model→LoginRequest17→server/connection→screen_access42→client/io_loop→FlutterHandler/FfiModel。普通视频分发/ACK/QoS及`remote_adb_video.rs`共同执行暂停，remote_page/remote_adb_mirror负责显示。`message.proto`是协议源；FRB不改签名、不手改generated。详见[Baseline26](../BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)，当前仅V0；下方旧基线只作追溯。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC开发者快捷键/弹窗在 `flutter/lib/desktop/pages/connection_page.dart`，两个密码摘要与校验在 `flutter/lib/models/developer_login_bypass_model.dart`；两者均PRIMARY手写源码，维护不涉及generated bridge。

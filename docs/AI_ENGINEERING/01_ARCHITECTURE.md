@@ -1,5 +1,7 @@
 # OpenWorld 完整架构 / Architecture
 
+2026-11-07 T004当前：在test/d9f1119工作区增加开发者画面优先。PC本地模式通过进程native标志进入LoginRequest；Android在原端点认证后统一裁定各普通远控会话的画面资格。暂停媒体分发而保留会话与ZEGO，最后开发者离开恢复。普通VideoFrame和独立ADB媒体共用策略，不合并两条采集链。角色声明不是抗伪造授权，原认证不变。见[ADR-0028](../ADR/0028-developer-screen-priority.md)、[协议](06_NETWORK_PROTOCOL.md)；V0，正式编译/运行待证。以下密码任务描述仅代表当时快照。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC开发者密码由Flutter主窗口本地校验两个摘要，任一匹配只改变进程内免登录状态；没有新增API、协议、持久化或endpoint授权边界。main合并与双端编排见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)，运行验收待证。

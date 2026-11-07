@@ -1,5 +1,7 @@
 # OpenWorld 安全模型 / Security Model
 
+2026-11-07 T004安全边界：新增客户端`developer_mode`声明用于已认证Android普通会话之间的画面协作策略，密码不入协议/日志。注册在原端点认证后、视频订阅前；未认证请求不能暂停其他连接，普通角色无法通过重复登录升级。画面在Android生产/出队及PC发布多处过滤；语音授权/忙状态保持。固定本地密码和bool角色无法防止修改版已授权客户端伪造，SEC-016继续开放，不把本功能称为服务端特权认证。可抵抗伪造的能力凭证需另立签发/撤销合同。见[ADR-0028](../ADR/0028-developer-screen-priority.md)，V0，攻击/兼容与真机测试未执行。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 2026-10-16 T001：当前4d3c446，ADB原认证/只读gate保持。节点helper DONT_SUPPRESS、密码遮盖、节点/文本/帧有界且仅内存；App排版与黑屏PNG不引入外部字体。白字/黑层排除自身采集、12+trusted，无输入窗口，不关闭全局触摸保护。没有已回退的无障碍权限管理菜单；任意Shell命令仍可影响系统。V0，隐藏API/OEM需真机验证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。

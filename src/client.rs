@@ -2578,6 +2578,7 @@ impl LoginConfigHandler {
             Bytes::new()
         };
         let mut lr = LoginRequest {
+            developer_mode: self.conn_type == ConnType::DEFAULT_CONN && crate::developer_mode::enabled(),
             username: pure_id,
             password: password.into(),
             my_id,

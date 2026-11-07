@@ -176,6 +176,15 @@ pub mod android {
         if stop { invoke("stop_all"); }
     }
 
+    pub fn reset_screen_access(owner: i32) {
+        if let Ok(mut hub) = HUB.lock() {
+            if let Some(viewer) = hub.viewers.get_mut(&owner) {
+                viewer.pending.clear();
+                viewer.need_key = true;
+            }
+        }
+    }
+
     fn publish(generation: u64, state: String, error: String, format: String) {
         if let Ok(mut hub) = HUB.lock() {
             let new_generation = generation != hub.state.generation;
@@ -332,7 +341,12 @@ pub mod android {
         let packet = RemoteAdbVideo { action: "frame".into(), generation: generation as u64, sequence,
             width: width as u32, height: height as u32, keyframe, data: payload.into(),
             format: hub.state.format.clone(), source_width: source_width as u32, source_height: source_height as u32, ..Default::default() };
-        for viewer in hub.viewers.values_mut() {
+        for (owner, viewer) in hub.viewers.iter_mut() {
+            if !crate::developer_mode::video_allowed(*owner) {
+                viewer.pending.clear();
+                viewer.need_key = true;
+                continue;
+            }
             // Allow normal relay RTT without dropping every fourth frame and
             // waiting for another keyframe. Bound bytes as well as frame count.
             let pending_bytes: usize = viewer.pending.iter().map(|(_, size)| *size).sum();
@@ -362,16 +376,31 @@ pub mod pc {
     use std::{collections::HashMap, sync::{Arc, Mutex, mpsc::{sync_channel, SyncSender}, atomic::{AtomicBool, Ordering}}, time::{Duration, Instant}};
     use uuid::Uuid;
 
-    struct View { generation: u64, revision: u64, adb_state: Option<Value>, state: String, error: String, image: Option<Vec<u8>>, supported: bool,
+    struct View { generation: u64, revision: u64, screen_epoch: u64, screen_paused: bool, adb_state: Option<Value>, state: String, error: String, image: Option<Vec<u8>>, supported: bool,
         adb_priority: bool, touch_ready: bool, input_error: String, format: String, screenshot_supported: bool,
         privacy_supported: bool, privacy_state: String, privacy_error: String, paste_requests: u8, accessibility_paste_requests: u8, paste_key_down: bool,
         layout_supported: bool, source_width: u32, source_height: u32, rgba_width: u32, rgba_height: u32 }
     type SessionSender = Arc<std::sync::RwLock<Option<hbb_common::tokio::sync::mpsc::UnboundedSender<Data>>>>;
-    struct Entry { peer: String, token: String, queue: SyncSender<RemoteAdbVideo>, view: Arc<Mutex<View>>,
+    struct Entry { peer: String, token: String, queue: SyncSender<(u64, RemoteAdbVideo)>, view: Arc<Mutex<View>>,
         sender: SessionSender, clipboard_ready: bool,
         resync: Arc<AtomicBool>, live: Arc<AtomicBool>, since: Instant, last_receive: Instant, last_watch: Instant,
         touch_sequence: u64, command_sequence: u64, privacy_sequence: u64 }
     lazy_static::lazy_static! { static ref ENTRIES: Mutex<HashMap<Uuid, Entry>> = Mutex::new(HashMap::new()); }
+
+    pub fn set_screen_paused<T: crate::ui_session_interface::InvokeUiSession>(
+        session: &crate::ui_session_interface::Session<T>, paused: bool,
+    ) {
+        if let Ok(entries) = ENTRIES.lock() {
+            for entry in entries.values().filter(|e| Arc::ptr_eq(&e.sender, &session.sender)) {
+                if let Ok(mut view) = entry.view.lock() {
+                    view.screen_epoch = view.screen_epoch.wrapping_add(1);
+                    view.screen_paused = paused;
+                    view.image = None;
+                    entry.resync.store(true, Ordering::Release);
+                }
+            }
+        }
+    }
 
     /// Fallback only: leave the existing Accessibility clipboard permission and delivery intact.
     pub fn clipboard_required<T: crate::ui_session_interface::InvokeUiSession>(
@@ -493,7 +522,7 @@ pub mod pc {
         if entry.token != owner || !entry.live.load(Ordering::Acquire) { return None; }
         let mut view = entry.view.lock().ok()?;
         // A state transition between the JSON poll and this call cannot mix old/new media.
-        if view.generation != generation || view.state != "streaming" { return None; }
+        if view.screen_paused || view.generation != generation || view.state != "streaming" { return None; }
         view.image.take()
     }
 
@@ -540,8 +569,8 @@ pub mod pc {
             if entries.len() >= 32 { return None; }
             let session = sessions::get_session_by_session_id(&session_id)?;
             let token = owner.to_owned();
-            let (tx, rx) = sync_channel::<RemoteAdbVideo>(MAX_PENDING_FRAMES);
-            let view = Arc::new(Mutex::new(View { generation: 0, revision: 0, adb_state: None, state: "waiting".into(), error: String::new(), image: None, supported: false,
+            let (tx, rx) = sync_channel::<(u64, RemoteAdbVideo)>(MAX_PENDING_FRAMES);
+            let view = Arc::new(Mutex::new(View { generation: 0, revision: 0, screen_epoch: 0, screen_paused: false, adb_state: None, state: "waiting".into(), error: String::new(), image: None, supported: false,
                 adb_priority: false, touch_ready: false, input_error: String::new(), format: String::new(), screenshot_supported: false,
                 privacy_supported: false, privacy_state: String::new(), privacy_error: String::new(), paste_requests: 0, accessibility_paste_requests: 0, paste_key_down: false,
                 layout_supported: false, source_width: 0, source_height: 0, rgba_width: 0, rgba_height: 0 }));
@@ -558,7 +587,7 @@ pub mod pc {
                 let mut dimensions = (0, 0);
                 let mut rgb = ImageRgb::new(ImageFormat::ABGR, 1);
                 loop {
-                    let packet = match rx.recv_timeout(Duration::from_millis(250)) {
+                    let (screen_epoch, packet) = match rx.recv_timeout(Duration::from_millis(250)) {
                         Ok(packet) => packet,
                         Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
                         Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
@@ -575,7 +604,7 @@ pub mod pc {
                     if !live.load(Ordering::Acquire) { break; }
                     let result = (|| -> Result<(), String> {
                         if let Ok(view) = view.lock() {
-                            if view.generation != packet.generation || view.state != "streaming" || view.format != packet.format { return Err(String::new()); }
+                            if view.screen_paused || view.screen_epoch != screen_epoch || view.generation != packet.generation || view.state != "streaming" || view.format != packet.format { return Err(String::new()); }
                         }
                         if matches!(packet.format.as_str(), "jpeg" | "layout") {
                             decoder = None;
@@ -584,7 +613,7 @@ pub mod pc {
                                 .map_err(|_| "ADB 截图格式无效。".to_string())?;
                             if jpeg.dimensions() != (packet.width, packet.height) { return Err("ADB 截图尺寸无效。".into()); }
                             if let Ok(mut view) = view.lock() {
-                                if view.generation == packet.generation && view.state == "streaming" && live.load(Ordering::Acquire) {
+                                if !view.screen_paused && view.screen_epoch == screen_epoch && view.generation == packet.generation && view.state == "streaming" && live.load(Ordering::Acquire) {
                                     view.image = Some(binary_frame(&packet.data, 0, 0, packet.source_width, packet.source_height));
                                     view.rgba_width = 0; view.rgba_height = 0;
                                     view.source_width = packet.source_width;
@@ -620,7 +649,7 @@ pub mod pc {
                             // The network stream remains compressed H.264.
                             let image = binary_frame(&rgb.raw, rgb.w as u32, rgb.h as u32, packet.source_width, packet.source_height);
                             if let Ok(mut view) = view.lock() {
-                                if view.generation == generation && view.state == "streaming" && live.load(Ordering::Acquire) {
+                                if !view.screen_paused && view.screen_epoch == screen_epoch && view.generation == generation && view.state == "streaming" && live.load(Ordering::Acquire) {
                                     view.image = Some(image);
                                     view.rgba_width = rgb.w as u32; view.rgba_height = rgb.h as u32;
                                     view.source_width = packet.source_width;
@@ -800,9 +829,13 @@ pub mod pc {
             }
         } else if packet.action == "frame" {
             if !valid_dimensions(packet.width, packet.height) || packet.data.is_empty() { return; }
-            if let Err(error) = entry.queue.try_send(packet) {
+            let screen_epoch = match entry.view.lock() {
+                Ok(view) if !view.screen_paused => view.screen_epoch,
+                _ => return,
+            };
+            if let Err(error) = entry.queue.try_send((screen_epoch, packet)) {
                 entry.resync.store(true, Ordering::Release);
-                let packet = match error { std::sync::mpsc::TrySendError::Full(p) | std::sync::mpsc::TrySendError::Disconnected(p) => p };
+                let (_, packet) = match error { std::sync::mpsc::TrySendError::Full(p) | std::sync::mpsc::TrySendError::Disconnected(p) => p };
                 send(*session_id, RemoteAdbVideo { token: entry.token.clone(), action: "nack".into(), sequence: packet.sequence, ..Default::default() });
             }
         }

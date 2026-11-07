@@ -1,5 +1,7 @@
 # OpenWorld ADB 投屏、无视、穿透、黑屏与输入
 
+2026-11-07 T004当前规则补充：有开发者普通远控连接时，Android仅向开发者分发H.264/JPEG/layout；普通PC保持watch/状态/ACK及语音，清待显示旧图并显示暂停。暂停连接不能触摸、键盘/粘贴、操作Shell或切换采集/黑屏；设备本机操作保持。暂停只释放对应owner触摸/待剪贴板同步，不停止ADB源或其他PC资源。最后开发者离开后普通PC等待新关键帧/独立截图恢复。此前“所有PC接收/任意PC停止”的共享规则只在没有开发者优先限制时成立；来源与边界见[ADR-0028](../ADR/0028-developer-screen-priority.md)。V0，正式编译与设备矩阵未验。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前实现基线：`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`，2026-10-19源码复核；见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)及[文档任务T006](../tasks/T-2026-10-19-006-restored-docs-sync.md)。本文合并此前已经进入该提交的功能，历史任务仅用于追溯，不覆盖当前参数。只完成V0文档/源码核对，不宣称构建、流畅度或全ROM兼容通过。

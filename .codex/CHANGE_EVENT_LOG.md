@@ -4,9 +4,36 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-11-07（开放世界产品身份）
+Last Updated：2026-11-07（开发者画面优先）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261107-T004-04：test提交推送及双端编排授权
+
+- 用户明确“提交test，并执行双端编译，不监控”；授权本任务stage/commit/push origin/test及Build-Clients-BT / Both / 常规编译，沿用工作流临时测试签名和Actions产物。无main合并/推送或生产发布。
+- 本地HEAD和远端test均d9f111944da644b427f7fbfc5970de6f14604ef4；远端main9040c53保持。43个变更路径均为本任务；差异格式检查通过。workflow394791509处于active，参数与权限保持。
+- 更新本任务记录、CURRENT_WORK及本日志；随后提交源码并触发，准确SHA与HTTP接受结果另记，不启动监控helper、不轮询jobs/logs/artifacts。
+
+## CE-20261107-T004-03：用户确认暂停操作、保留语音
+
+- 异步问题答复明确选择“同时暂停操作，保留语音（推荐）”；与已实现策略一致，无源码增量，不扩展为提交推送/编排授权。
+- 更新`docs/tasks/T-2026-11-07-004-developer-screen-priority.md`、`docs/ADR/0028-developer-screen-priority.md`以及`.codex/DECISION_LOG.md`、`TASK_HISTORY.md`、`CHANGELOG_AI.md`、`PROJECT_STATE.md`、`CURRENT_WORK.md`和本日志；PROJECT_MEMORY行为摘要已一致，reviewed-no-change。
+- STATE、WORK-20261107-004-r2，T6 handoff不变；仅文档差异静态检查，无构建/测试/外部动作。
+
+## CE-20261107-T004-02：架构、验证与工程记忆同步
+
+- 授权来自当前实现任务的必要文档同步。新增`docs/ADR/0028-developer-screen-priority.md`、`docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md`，更新两目录索引、`TEST_MATRIX.md`和`docs/tasks/T-2026-11-07-004-developer-screen-priority.md`。
+- 同步`docs/AI_ENGINEERING/01_ARCHITECTURE.md`、`02_SOURCE_MAP.md`、`03_MODULE_DESIGN.md`、`04_ANDROID_PIPELINE.md`、`06_NETWORK_PROTOCOL.md`、`09_DEBUG_SYSTEM.md`、`10_SECURITY_MODEL.md`、`14_ADB_MIRROR.md`及入口`AGENTS.md`、`PROJECT_START_HERE.md`；历史基线不覆盖。
+- `.codex/PROJECT_STATE.md`、`PROJECT_MEMORY.md`、`CURRENT_WORK.md`、`DECISION_LOG.md`、`TASK_HISTORY.md`、`CHANGELOG_AI.md`与本日志同事务同步，D-035 / STATE、WORK-20261107-004；External Asset Registry reviewed-no-change。
+- T6 handoff，V0与正式验证分开；未进行提交推送/云编排/构建/部署，没有把旧任务构建回执用作本轮结果。
+
+## CE-20261107-T004-01：test工作区实现开发者画面优先
+
+- 当前用户明确要求切换test并开始修改；main/9040c53 clean→test/d9f1119 clean，未合并main的版本改动，无其他Git写操作。
+- 新增`src/developer_mode.rs`、`src/screen_policy.rs`，改`src/lib.rs`、`src/client.rs`、`src/client/io_loop.rs`、`src/flutter.rs`、`src/ui_session_interface.rs`、`src/remote_adb_video.rs`、`src/server/connection.rs`、`src/server/service.rs`、`src/server/video_qos.rs`、`src/server/video_service.rs`及`libs/hbb_common/protos/message.proto`。
+- Flutter修改`flutter/lib/models/developer_login_bypass_model.dart`、`native_model.dart`、`web_model.dart`、`model.dart`、`flutter/lib/desktop/pages/connection_page.dart`、`remote_page.dart`、`flutter/lib/desktop/adb/remote_adb_mirror.dart`；任务与CURRENT_WORK同时建档。
+- 增加进程角色、认证后成员策略、帧入队/出队过滤、暂停输入/ADB变更、ACK/QoS、客户端旧帧与Texture恢复；保留连接与ZEGO。无权限弹窗/服务重启，无口令值、依赖/版本/工作流变化。
+- V0：122项身份合同、协议既有字段不变/新字段唯一、C ABI、摘要及generated/锁文件边界、diff通过；四项策略单测未执行，本机无Rust/Flutter。正式编译与设备验收NOT_RUN。
 
 ## CE-20261107-T001-03：停止监控与交付回执同步
 

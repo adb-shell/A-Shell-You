@@ -1,8 +1,8 @@
 # OpenWorld Project Start Here
 
-当前产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”，实施起点为main/7361d39，已按用户要求交付test，版本保持5.2.1 / 5.2.1+59。见[Baseline24](docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-001-openworld-identity.md)和[当前状态](.codex/PROJECT_STATE.md)。本次同步客户端、ADB、构建编排与当前文档；准确源码SHA、双端编译run及结果见任务回执；V0不等于编译或真机通过。
+当前test/d9f1119工作区实现开发者画面优先，未提交。产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”，test版本5.2.1 / 5.2.1+59保持；未合入main的版本变化。见[Baseline26](docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-004-developer-screen-priority.md)和[当前状态](.codex/PROJECT_STATE.md)。当前仅V0，四项策略单测、双端编译和真机通话待证，无本轮push或编排。
 
-PC主窗口Ctrl+Shift+H双密码入口、ADB及原链行为保持。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
+PC主窗口Ctrl+Shift+H双密码验证保持；成功后增加进程native模式，新建/重连携带角色。Android有已认证开发者连接时，普通连接暂停普通/截图/ADB画面及盲输入/采集控制，保留会话与ZEGO；最后开发者离开恢复。角色是协作声明而非抗伪造凭证，见ADR-0028。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 
 当前ADB包含远程配对/独立Shell、投屏/无视/节点穿透、独立白字黑屏、全局优先触摸、键盘/远程输入/剪贴板同步和本应用电池优化豁免。Android默认连接服务运行期间静默常亮。详细实现、参数和待验边界见[12本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 
