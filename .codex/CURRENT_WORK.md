@@ -1,19 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261107-004-r3`
+Registry Revision：`WORK-20261107-004-r4`
 Last Updated：2026-11-07
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-最新续接：用户明确“提交test，并执行双端编译，不监控”；T7交付执行中，授权stage/commit/push origin/test与单次Build-Clients-BT / Both / 常规编译。触发后不监控结果，历史“待确认”已由本次指令解除。CE-20261107-T004-04。
-
-续接确认：用户已明确选择同时暂停普通操作、保留语音，与现有实现一致；CE-20261107-T004-03 / STATE-20261107-004-r2。仅记录确认，提交推送/编排及正式验证状态不变。
-
-T-2026-11-07-004 / handoff / T6：test/d9f1119上的源码与T7文档就绪，开发者画面优先/普通连接语音保留；V0身份122项及协议/ABI/diff通过，四项策略单测未跑，本机无Rust/Flutter，正式双端编译与真机语音待证。Owner Codex/openworld-master，Flutter/Rust/Network/Security自审。test未提交，本次提交推送/云编排待确认；T8未关闭，历史编排不监控。STATE-20261107-004 / CE-20261107-T004-01/02 / D-035；[任务](../docs/tasks/T-2026-11-07-004-developer-screen-priority.md)。
+无活动任务。用户指定的test提交推送、双端编排触发已完成；按要求不监控，不自动查询构建结果或再次dispatch。
 
 ## 2. Concurrent Session Rules
 
@@ -29,6 +25,6 @@ T-2026-11-07-004 / handoff / T6：test/d9f1119上的源码与T7文档就绪，�
 
 ## 4. Last Closed Task
 
-T-2026-11-07-001 / complete / T8（源码、文档、test提交推送及编排触发交付）。源码ad88665已推送origin/test，main保持7361d39；Both/常规编译HTTP204/run42350649478/head ad88665。用户续接要求“不监控”，已停止本地监控helper，未取消云编译；最后观察为双端原生依赖构建中，无编译PASS结论。后续仅补回执文档，不二次编排，真机与生产未操作。
+T-2026-11-07-004 / complete / T8（源码、文档、test提交推送及编排触发交付）。源码25bc2ce已推送origin/test，说明“开发者模式画面优先”；main保持9040c53。Both/常规编译HTTP204，单次定位尚无run；用户要求不监控，最终编译结果未知。仅补回执文档不二次编排，真机与生产未操作。
 
-[详细任务](../docs/tasks/T-2026-11-07-001-openworld-identity.md) / STATE-20261107-001 / CE-20261107-T001-01/02/03。T8仅关闭本次交付范围，不表示V2/V3通过；历史任务保留在TASK_HISTORY和CHANGELOG_AI，不继承旧授权或构建结论。
+[详细任务](../docs/tasks/T-2026-11-07-004-developer-screen-priority.md) / STATE-20261107-004-r4 / CE-20261107-T004-01—05 / D-035。T8仅关闭本次指定交付范围，不表示V1/V2/V3/V4通过；历史任务保留在TASK_HISTORY和CHANGELOG_AI，不继承旧授权或构建结论。

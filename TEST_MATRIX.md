@@ -8,7 +8,7 @@
 |---|---|---|---|
 | DSP-01 | 既有协议字段保持、新字段唯一、C ABI两侧对应、口令摘要及生成文件/依赖不变；既有身份合同122项 | V0 | PASS |
 | DSP-02 | screen_policy四项单测：A先/B先及普通重连、多开发者最后退出、重复注册不能升级、重复清理幂等及revision前进 | V1 | NOT_RUN；本机无rustc |
-| DSP-03 | Windows x64 + Android aarch64正式构建；Rust1.75/Flutter3.24.5；protobuf生成、原生符号加载、Release/R8 | V2 | NOT_RUN |
+| DSP-03 | Windows x64 + Android aarch64正式构建；Rust1.75/Flutter3.24.5；protobuf生成、原生符号加载、Release/R8 | V2 | test/25bc2ce Both/常规编译HTTP204；用户要求不监控，最终结果未知，未计PASS |
 | DSP-04 | A普通先连接并双向通话，B开发者加入；A画面停止且显示暂停，B正常画面/控制；双方声音连续，无自动挂断/重邀 | V3/V4 | NOT_RUN |
 | DSP-05 | B先连接，A新建/重连无首帧也可发起/接听语音；已有通话忙规则保持；错误密码/2FA未通过不暂停A | V3/V4 | NOT_RUN |
 | DSP-06 | 两个开发者/同进程多窗口，关一个不恢复、全退出恢复；崩溃/断网按存活检测释放；快切与旧revision不回显旧图 | V3/V4 | NOT_RUN |

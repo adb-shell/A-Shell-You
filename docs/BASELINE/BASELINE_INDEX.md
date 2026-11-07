@@ -1,5 +1,7 @@
 # OpenWorld Engineering Baseline Index
 
+最新交付：Baseline26对应源码25bc2ce已推送test，Both/常规编译HTTP204；用户要求不监控，最终结果未知。准确回执见[T004](../tasks/T-2026-11-07-004-developer-screen-priority.md)。下方工作区描述及Baseline26正文保留冻结时点事实，不等于当前未提交。
+
 当前工作区：[Baseline26：开发者画面优先](26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)，OW-BL-2026-11-07-d9f1119-screen-priority-worktree；test/d9f1119上未提交增量，V0，正式验证待证。以下“当前”均保留为当时快照说明；Baseline25编号已在main使用。
 
 当前工作区：[Baseline24：开放世界产品身份](24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)，OW-BL-2026-11-07-7361d39-identity-worktree；V0，未提交/未编译。以下Baseline23及更早内容为冻结历史记录。

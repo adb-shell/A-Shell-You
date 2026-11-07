@@ -1,15 +1,15 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261107-004-r2`
+State Revision：`STATE-20261107-004-r4`
 Last Updated / Observed At：2026-11-07（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0`
 
 ## 当前源码基线
 
-- 本次起点main/9040c53d37e3542c7ab8948b64beec1f0df0cd93 clean；按用户要求切换已有test/d9f111944da644b427f7fbfc5970de6f14604ef4 clean，在test保留本任务未提交增量；main无写入。
+- 本次起点main/9040c53d37e3542c7ab8948b64beec1f0df0cd93 clean；按用户要求切换已有test/d9f111944da644b427f7fbfc5970de6f14604ef4 clean，源码已以“开发者模式画面优先”提交推送test/25bc2ce04484c6d40f8c06325008d78a347432f7；main无写入。
 - 当前工作区快照：[Baseline26](../docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)，`OW-BL-2026-11-07-d9f1119-screen-priority-worktree`。test版本仍5.2.1/5.2.1+59，未合入main的2.0.26版本更改。
-- 本次仅test切换、源码及必要文档修改；无stage/commit/push/merge/编排/部署/设备操作。身份迁移与历史run结果见历史任务，不自动恢复监控或沿用验证结论。
+- 用户续接授权test提交推送和双端编译、不监控；Both/常规编译HTTP204接受，单次定位尚无run，不继续查询。无merge/部署/设备操作；回执文档另行提交，不二次编排。历史run不沿用。
 - 回退后撤回的实现、实验方案和诊断结论不属于当前实现。后续会话先核对 HEAD/status，再由代码重新建立证据；不能沿用历史聊天中的“已修改”判断。
 
 ## 当前能力摘要
@@ -33,8 +33,8 @@ Evidence Scope：`repository-observed / V0`
 
 ## 本轮工作与验证
 
-- 当前任务：[T-2026-11-07-004](../docs/tasks/T-2026-11-07-004-developer-screen-priority.md)，T6 handoff；源码和T7文档就绪，T8未关闭。
-- Registry：WORK-20261107-004-r2；Events：CE-20261107-T004-01/02/03；Decision：D-035 / ADR-0028。用户已明确确认同时暂停普通操作、保留语音，源码与验证状态不变；本次答复不涉及提交推送/编排授权。
+- 当前任务：[T-2026-11-07-004](../docs/tasks/T-2026-11-07-004-developer-screen-priority.md)，T8源码/文档/Git/触发交付完成；用户要求不监控，构建最终结果未知。
+- Registry：WORK-20261107-004-r4；Events：CE-20261107-T004-01—05；Decision：D-035 / ADR-0028。暂停操作保留语音、test提交推送、双端编排均已得到本轮明确授权。
 - V0：122项身份合同、旧协议字段保持/新字段唯一、C ABI两侧匹配、密码摘要/generated/依赖边界及diff通过；无修改generated、版本、构建工作流或Kotlin/JNI原采集代码。
-- 四项纯策略单测已加入未执行；本机无rustc/cargo/dart/flutter。DSP-02—10正式单测/双端编译/真机通话/新旧端矩阵NOT_RUN，不能声称零编译错误或完美运行。
-- 待用户确认本轮提交推送test及Both/常规编译后取得真实CI证据；保留现有工作流，不增加发布动作。角色声明不是可信凭证，SEC-016及既有外部资产风险不在本任务关闭。
+- 四项纯策略单测已加入未执行；本机无rustc/cargo/dart/flutter。DSP-03双端编排接受、最终结果未查；DSP-02及04—10单测/真机通话/兼容验收NOT_RUN，不能声称零编译错误或完美运行。
+- 唯一workflow394791509 / Build-Clients-BT / Both / 常规编译于2026-11-07 09:26:23 UTC请求，HTTP204，source25bc2ce。不监控、不重试dispatch、不发布。角色声明不是可信凭证，SEC-016及既有外部资产风险保持。

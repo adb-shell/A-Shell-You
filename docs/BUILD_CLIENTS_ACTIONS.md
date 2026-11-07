@@ -1,5 +1,7 @@
 # GitHub Actions 客户端编译
 
+2026-11-07 T004回执：开发者画面优先源码test/25bc2ce04484c6d40f8c06325008d78a347432f7已推送，Build-Clients-BT / Both / 常规编译POST HTTP204（09:26:23 UTC）。单次定位尚未列出run；用户要求不监控，未继续查询结果。仅补回执文档不再dispatch；具体边界见[任务](tasks/T-2026-11-07-004-developer-screen-priority.md)，不据HTTP204宣称编译成功。
+
 2026-11-07产品身份迁为开放世界/OpenWorld，唯一手动工作流Build OpenWorld Clients-BT。jobs/输入/工具链/actions pins/权限保持，native/缓存/签名展示/产物名同步。已按用户要求交付test并运行Both/常规编译；准确head/run与结果见本次迁移回执，旧run不能替代。见[身份迁移](AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
 
 ## 入口与参数

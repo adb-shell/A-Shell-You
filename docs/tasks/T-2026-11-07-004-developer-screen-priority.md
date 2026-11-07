@@ -2,7 +2,7 @@
 
 ## T0 / Authority and Baseline
 
-- Status：active / T7交付，源码及文档就绪，当前执行test提交推送与双端编排；用户要求不监控，正式结果待证。Owner：Codex / openworld-master，Network主导，Flutter/Rust/Security自审。
+- Status：complete / T8（源码、文档、test提交推送和双端编排触发交付）；按用户要求不监控，正式编译/真机结果待证。Owner：Codex / openworld-master，Network主导，Flutter/Rust/Security自审。
 - 用户要求在test实现已分析方案：开发者连接Android时普通PC暂停画面，连接和ZEGO语音保留；新连接/重连同样适用；最后开发者离开恢复。
 - 授权：切换现有test、业务源码及必要协议/文档修改；用户续接“提交test，并执行双端编译，不监控”，明确授权stage/commit/push origin/test及Build-Clients-BT / Both / 常规编译，沿用既有工作流测试签名与Actions产物；无main写入或生产发布。触发后仅记录接受回执，不监控run/jobs/logs。
 - 起点main/9040c53 clean；切换test/d9f111944da644b427f7fbfc5970de6f14604ef4 clean。test产品身份OpenWorld、版本5.2.1；main另有2.0.26版本提交，本任务不合并或改版本。
@@ -43,7 +43,14 @@
 - 已同步架构/源码地图/模块/Android/协议/ADB/安全/调试合同、ADR-0028、Baseline26、TEST_MATRIX及工程记忆。D-035 / CE-20261107-T004-01/02 / STATE、WORK-20261107-004。
 - 续接行为确认：CE-20261107-T004-03；STATE、WORK-20261107-004-r2。仅更新确认记录，源码与验证结果不变。
 - External Asset Registry：reviewed-no-change；没有新增服务、凭据、依赖、工具链或外部资产。原SEC-016边界保持，不冒充可信角色认证。
-- test工作区未提交；没有stage/commit/push/merge/编排/安装/部署；main无写入，版本及工作流无改动。回滚仅本任务增量，Git撤销另行授权。
+- 已按续接授权stage/commit/push origin/test，源码`25bc2ce04484c6d40f8c06325008d78a347432f7`，说明“开发者模式画面优先”。main无写入，无merge/安装/部署，版本及工作流无改动。回滚仅本任务增量，Git撤销另行授权。
+
+## T8 / Git与编排回执
+
+- 源码25bc2ce提交成功、push成功，dispatch前远端test已精确核对为该SHA。
+- 2026-11-07 09:26:23 UTC请求workflow394791509 / `Build-Clients-BT.yml` / ref=test / Platform=Both / BuildMode=常规编译，POST返回HTTP204。
+- 仅一次运行定位读取，当时列表尚未出现该SHA对应run；遵从“不监控”要求，没有等待/轮询run、jobs、logs或artifacts，无run ID和编译PASS结论。可从[工作流页面](https://github.com/adb-shell/A-Shell-You/actions/workflows/Build-Clients-BT.yml)查看后续结果。
+- 只补交付回执文档并提交推送，不因文档提交再次编排；业务/协议/工作流树与25bc2ce一致。CE-20261107-T004-05 / STATE、WORK-20261107-004-r4。T8仅关闭本次指定交付范围，V1策略单测和V3/V4运行验收仍待证。
 
 ## 《编译验证需求》
 
