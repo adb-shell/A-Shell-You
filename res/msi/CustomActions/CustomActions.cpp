@@ -58,7 +58,7 @@ UINT __stdcall RemoveInstallFolder(
     hr = WcaReadStringFromCaData(&pwz, &installFolder);
     ExitOnFailure(hr, "failed to read database key from custom action data: %ls", pwz);
 
-    StringCchPrintfW(runtimeBroker, sizeof(runtimeBroker) / sizeof(runtimeBroker[0]), L"%ls\\RuntimeBroker_ashell.exe", installFolder);
+    StringCchPrintfW(runtimeBroker, sizeof(runtimeBroker) / sizeof(runtimeBroker[0]), L"%ls\\RuntimeBroker_openworld.exe", installFolder);
 
     SHFILEOPSTRUCTW fileOp;
     ZeroMemory(&fileOp, sizeof(SHFILEOPSTRUCT));
@@ -396,7 +396,7 @@ UINT __stdcall CreateStartService(__in MSIHANDLE hInstall)
     svcBinary += 1;
 
     hr = StringCchPrintfW(szSvcDisplayName, cchSvcDisplayName, L"%ls Service",
-        lstrcmpW(svcName, L"AShell") == 0 ? L"\u4e00\u4e2a\u58f3\u5b50" : svcName);
+        lstrcmpW(svcName, L"OpenWorld") == 0 ? L"\u4e00\u4e2a\u58f3\u5b50" : svcName);
     ExitOnFailure(hr, "Failed to compose a resource identifier string");
     if (MyCreateServiceW(svcName, szSvcDisplayName, svcBinary)) {
         WcaLog(LOGMSG_STANDARD, "Service \"%ls\" is created.", svcName);

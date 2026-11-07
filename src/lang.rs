@@ -175,7 +175,7 @@ pub fn translate_locale(name: String, locale: &str) -> String {
     let (name, placeholder_value) = extract_placeholder(&name);
     let replace = |s: &&str| {
         // Keep translation keys stable; rename only the displayed product text.
-        let mut s = s.replace("A Shell You", &crate::common::get_display_app_name());
+        let mut s = s.replace("OpenWorld", &crate::common::get_display_app_name());
         if let Some(value) = placeholder_value.as_ref() {
             s = s.replace("{}", &value);
         }

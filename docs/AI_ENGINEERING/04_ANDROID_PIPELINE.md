@@ -1,4 +1,6 @@
-# AShell Android 完整链路 / Android Pipeline
+# OpenWorld Android 完整链路 / Android Pipeline
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 test T004（2026-10-18）：显式 `KeyEvent.seq` 文本在 AccessibilityService 主线程提交一次，33+ 有 AccessibilityInputConnection 时使用 commitText，否则对当前输入焦点的可编辑节点执行 ACTION_SET_TEXT/SET_SELECTION，按选区替换并将光标移到插入文本后；未知选区追加，不搜索其他字段，不依赖后台手机剪贴板或模拟 EditText。仅修改文本序列入口，其他按键、无障碍手势、采集及 MediaProjection 保持。PC Ctrl+V 无 ADB 时通过既有 sessionInputString 发送文本，ADB 可用时仍走独立 ADB 输入。见[T004](../tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，V0，设备兼容待证。
 
@@ -33,7 +35,7 @@ Android 不是“Flutter 应用加一个 Service”，而是四层共同组成�
 | Accessibility/Input | `nZW99cdXQ0COhB2o.kt` |
 | Bitmap/frame helper | `EqljohYazB0qrhnj.kt` |
 | Android JNI | `libs/scrap/src/android/pkg2230.rs` |
-| 独立本机 ADB | LocalAdbPage / me.ashell.localadb；8662f23 / ADR-0017；旧 LADB 仍退役 |
+| 独立本机 ADB | LocalAdbPage / com.openworld.me.localadb；8662f23 / ADR-0017；旧 LADB 仍退役 |
 | ZEGO | `flutter/lib/models/zego_voice_call_model.dart`，`flutter/lib/models/server_model.dart`，`src/client/helper.rs` |
 
 当前 Android 非 outgoing-only 主页直接装载 `ServerPage` 与右侧 `LocalAdbPage`，向左滑进入本机 ADB。Remote、file、terminal、camera、settings 等移动页面仍有源码，但不是当前主页的直接导航入口。
@@ -83,7 +85,7 @@ Android 端 core service、screen share、frame source 和 PC waiting 是四个�
 
 - `ServerModel._connectStatus` 直接来自 Rust `mainGetConnectStatus()`，代表真实 rendezvous 注册状态，不是 core service 存活证明。
 - `ServerModel._coreServiceStarted` 与 `ServerModel._isStart` 分别表示 core 和 screen share。
-- `AShellStatusModel` 显示 Android 状态快照；超过 8 秒无更新时字段清回 unknown，不伪造 ready/failure。
+- `OpenWorldStatusModel` 显示 Android 状态快照；超过 8 秒无更新时字段清回 unknown，不伪造 ready/failure。
 - 源码中 `_isReady // media permission ready status` 的注释已经过时；当前语义是 core ready。
 
 ### 3.1 必须保持的不变量
@@ -303,7 +305,7 @@ waiting/reconnect 不得自动开启这条链。
 
 ## 9. 状态包
 
-`MainService.DFm8Y8iMScvB2YDwGYN("ashell_status")` 返回真实快照：
+`MainService.DFm8Y8iMScvB2YDwGYN("openworld_status")` 返回真实快照：
 
 | 字段 | 源码含义 |
 |---|---|
@@ -318,7 +320,7 @@ waiting/reconnect 不得自动开启这条链。
 
 构建快照失败时返回空字符串，让 Rust 跳过推送，不能返回一组伪造 false。
 
-授权成功后应立即推一次真实状态，之后回到 2 秒节流推送。Flutter `AShellStatusModel` 保留 missing key 的旧/unknown 值，8 秒 stale 后清 unknown。
+授权成功后应立即推一次真实状态，之后回到 2 秒节流推送。Flutter `OpenWorldStatusModel` 保留 missing key 的旧/unknown 值，8 秒 stale 后清 unknown。
 
 ## 10. 命令与输入链
 
@@ -401,7 +403,7 @@ JNI 修改规则：
 
 当前新模块见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)：API30+配对/连接、id验证、单次shell-v2、20秒取消watchdog、64KiB输出。T004本机Plugin与PC独立JNI共用LocalAdbManager，原采集JNI/服务不参与。配对不等于连接，连接不等于screen share或PC首帧；仅已连接后的意外断链允许有限恢复；不自动开启调试或重放命令，新NSD只发现本机配对/连接端口。
 
-T009 删除的 AdbPage、AndroidAdbManager、11 个 ashell_adb_* 分支、四个 Kotlin 文件及 Accessibility 自动化仍不恢复。WRITE_SECURE_SETTINGS、CHANGE_WIFI_MULTICAST_STATE 仍不声明；旧 libadb.so 仍排除。远控输入、DevAutoSelectorController、正常/SKL/ignore、MediaProjection、ZEGO 和 terminal 未由本次 ADB 集成改动。旧配对/prefs/系统设置不自动清理，新身份不迁移旧 key；历史档案见 [旧集成记录](../ADB_LADB_INTEGRATION_MEMORY.md)。
+T009 删除的 AdbPage、AndroidAdbManager、11 个 openworld_adb_* 分支、四个 Kotlin 文件及 Accessibility 自动化仍不恢复。WRITE_SECURE_SETTINGS、CHANGE_WIFI_MULTICAST_STATE 仍不声明；旧 libadb.so 仍排除。远控输入、DevAutoSelectorController、正常/SKL/ignore、MediaProjection、ZEGO 和 terminal 未由本次 ADB 集成改动。旧配对/prefs/系统设置不自动清理，新身份不迁移旧 key；历史档案见 [旧集成记录](../ADB_LADB_INTEGRATION_MEMORY.md)。
 
 ## 13. ZEGO 语音旁路
 

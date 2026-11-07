@@ -1,8 +1,8 @@
-# AGENTS.md — 一个壳子 / AShell v5.2.1
+# AGENTS.md — 开放世界 / OpenWorld v5.2.1
 
-当前源码观察基线：`48226fbcdc08719b6e2a5c2e245dc9c10cc77ae9`。PC主窗口Ctrl+Shift+H先弹密码框，两个可接受密码任一精确匹配后确认/回车开启进程内免登录；错误可重试，取消/Esc关闭，重启复位。文档不保存口令明文。见[Baseline23](docs/BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)、[当前任务](docs/tasks/T-2026-10-25-002-developer-password-main.md)、[当前状态](.codex/PROJECT_STATE.md)。
+当前产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”，源自test/d9f1119，当前按用户要求合并main并推送，版本保持5.2.1 / 5.2.1+59。见[Baseline24](docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-002-openworld-main.md)和[当前状态](.codex/PROJECT_STATE.md)。客户端、ADB、构建编排与当前文档同步；准确合并SHA、push和Both/常规编译触发回执见任务。按要求不监控；触发接受及V0不等于编译或真机通过。
 
-本轮按用户要求以“开发者密码增加”合并提交推送main，并执行现有Build-Clients-BT / Both / 常规编译；准确SHA、run与结果以任务回执为准，不能从文档计划推断成功。新会话先核对HEAD/status；历史任务/基线只作追溯，撤回的实现不从旧聊天恢复，旧授权与构建结论不自动继承。
+PC主窗口Ctrl+Shift+H双密码入口、ADB及原链行为保持。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 
 当前ADB包含远程配对/独立Shell、投屏/无视/节点穿透、独立白字黑屏、全局优先触摸、键盘/远程输入/剪贴板同步和本应用电池优化豁免。Android默认连接服务运行期间静默常亮。详细实现、参数和待验边界见[12本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 
@@ -25,16 +25,16 @@
 
 ## 1. 项目身份（Project Identity）
 
-- 产品显示名：`一个壳子`；runtime 标识：`AShell`
-- Android application/后台/launcher 名称：`一个壳子`
+- 产品显示名：`开放世界`；runtime 标识：`OpenWorld`
+- Android application/后台/launcher 名称：`开放世界`
 - 基础：RustDesk 深度二次开发
-- Rust crate：`ashell`
-- Rust library：`ashell`
-- Flutter package：`flutter_hbb`（保留上游内部包名；产品身份使用 AShell/ashell）
-- Android package/applicationId：`me.ashell`
-- Android deep link scheme：`ashell`
-- Runtime `APP_NAME`：`AShell`（`libs/hbb_common/src/config.rs` / `hbb_common::config::APP_NAME`）
-- Runtime `ORG`：`me`；Android/macOS/iOS bundle 标识：`me.ashell`
+- Rust crate：`openworld`
+- Rust library：`openworld`
+- Flutter package：`flutter_hbb`（保留上游内部包名；产品身份使用 OpenWorld/openworld）
+- Android package/applicationId：`com.openworld.me`
+- Android deep link scheme：`openworld`
+- Runtime `APP_NAME`：`OpenWorld`（`libs/hbb_common/src/config.rs` / `hbb_common::config::APP_NAME`）
+- Runtime `ORG`：`com.openworld`（macOS配置）；Android/macOS/iOS bundle 标识：`com.openworld.me`
 - 当前版本：Rust `5.2.1`，Flutter `5.2.1+59`
 
 ---
@@ -47,7 +47,7 @@
 2. Shared protocol/config：`libs/hbb_common/`
 3. Android JNI / raw frame：`libs/scrap/src/android/`
 4. Flutter UI：`flutter/lib/`
-5. Android Kotlin runtime：`flutter/android/app/src/main/kotlin/me/ashell/`
+5. Android Kotlin runtime：`flutter/android/app/src/main/kotlin/com/openworld/me/`
 6. Legacy desktop UI：`src/ui/`
 7. Account / HTTP / sync / upload：`src/hbbs_http/`
 8. Windows privacy mode / virtual display：`src/privacy_mode.rs` + `src/virtual_display_manager.rs`
@@ -61,7 +61,7 @@
 - Android 只有 Kotlin，没有 Rust JNI 主链
 - 旧 ADB/LADB 仍在运行；它已退役，历史实现只作参考，不能恢复旧桥接/打包依赖
 - ZEGO 语音走 RustDesk 原 `audio_service`；当前媒体只走 ZEGO SDK
-- 品牌/运行名已经迁移到 AShell，但上游文档、翻译、兼容判断和第三方依赖中仍会有历史 RustDesk 字样
+- 品牌/运行名已经迁移到 OpenWorld，但上游文档、翻译、兼容判断和第三方依赖中仍会有历史 RustDesk 字样
 
 ---
 
@@ -78,7 +78,7 @@
 - `common.kt` = Android 全局状态
 - `KeyboardKeyEventMapper.kt` = 键盘映射
 - `VolumeController.kt` = 音量控制
-- 旧ADB四个Kotlin模块和自动化已移除；DevAutoSelectorController、输入/采集保持。新ADB位于 `flutter/android/app/src/main/java/me/ashell/localadb/`，本机 `me.ashell/local_adb/v1` 和远端独立 `RemoteAdbNative` JNI共用LocalAdbManager，不走产品采集JNI。详见12_LOCAL_ADB.md与13_REMOTE_ADB.md。
+- 旧ADB四个Kotlin模块和自动化已移除；DevAutoSelectorController、输入/采集保持。新ADB位于 `flutter/android/app/src/main/java/com/openworld/me/localadb/`，本机 `com.openworld.me/local_adb/v1` 和远端独立 `RemoteAdbNative` JNI共用LocalAdbManager，不走产品采集JNI。详见12_LOCAL_ADB.md与13_REMOTE_ADB.md。
 - `pkg2230.kt` = 主 JNI bridge
 - `ffi.kt` = 兼容 JNI bridge
 - `p50.java` + `q50.java` = XOR / 混淆辅助
@@ -226,7 +226,7 @@ build.cmd
 说明：
 
 - `build.cmd` 适配 `PC-Build.md` 中的 `C:\DevEnv` + `C:\DevTool` 环境。
-- 生成的自解压产物输出到：`PC-Bulid\ashell.exe`。
+- 生成的自解压产物输出到：`PC-Bulid\openworld.exe`。
 - 2026-10-12 T005：仅保留 `build.cmd`，沿用原新环境入口；自解压只包含本次编译的Release目录，不再附加外部DLL/驱动。
 
 ### Desktop / Flutter（通用）
@@ -250,17 +250,17 @@ cargo test
 
 ### Android
 
-- Rust 输出：`libashell.so`
-- `build.sh` 复制到：`flutter/android/app/src/main/jniLibs/<abi>/libashell.so`
-- Kotlin 加载：`System.loadLibrary("ashell")`
-- Dart Android 打开：`DynamicLibrary.open('libashell.so')`
-- Android 可见应用名：`一个壳子`
+- Rust 输出：`libopenworld.so`
+- `build.sh` 复制到：`flutter/android/app/src/main/jniLibs/<abi>/libopenworld.so`
+- Kotlin 加载：`System.loadLibrary("openworld")`
+- Dart Android 打开：`DynamicLibrary.open('libopenworld.so')`
+- Android 可见应用名：`开放世界`
 
 ### Windows
 
-- Runner 加载：`ashell.dll`
-- Dart Windows 打开：`DynamicLibrary.open('ashell.dll')`
-- `flutter/windows/CMakeLists.txt` 从 `target/<profile>/ashell.dll` 安装为 `ashell.dll`
+- Runner 加载：`openworld.dll`
+- Dart Windows 打开：`DynamicLibrary.open('openworld.dll')`
+- `flutter/windows/CMakeLists.txt` 从 `target/<profile>/openworld.dll` 安装为 `openworld.dll`
 
 ### Deep Link
 
@@ -268,8 +268,8 @@ cargo test
 
 当前要区分：
 
-- Android manifest scheme：`ashell`
-- Rust `get_uri_prefix()`：由 `APP_NAME = AShell` 推导，必须与 `ashell://` 保持一致
+- Android manifest scheme：`openworld`
+- Rust `get_uri_prefix()`：由 `APP_NAME = OpenWorld` 推导，必须与 `openworld://` 保持一致
 
 因此，任何 deep-link 任务都必须同时核对 manifest 与 Rust helper。
 

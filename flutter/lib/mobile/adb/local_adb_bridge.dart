@@ -59,7 +59,7 @@ class LocalAdbOutput {
 
 /// This bridge only addresses the phone-local plugin, never the product/remote channel.
 class LocalAdbBridge {
-  static const _channel = MethodChannel('me.ashell/local_adb/v1');
+  static const _channel = MethodChannel('com.openworld.me/local_adb/v1');
 
   Future<LocalAdbStatus> status() async {
     final value = await _channel.invokeMapMethod<dynamic, dynamic>('status');

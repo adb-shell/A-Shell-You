@@ -1,4 +1,6 @@
-# AShell 安全模型 / Security Model
+# OpenWorld 安全模型 / Security Model
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 2026-10-16 T001：当前4d3c446，ADB原认证/只读gate保持。节点helper DONT_SUPPRESS、密码遮盖、节点/文本/帧有界且仅内存；App排版与黑屏PNG不引入外部字体。白字/黑层排除自身采集、12+trusted，无输入窗口，不关闭全局触摸保护。没有已回退的无障碍权限管理菜单；任意Shell命令仍可影响系统。V0，隐藏API/OEM需真机验证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
@@ -8,7 +10,7 @@
 接管基线：2026-07-12  
 状态：`verified` + `inferred` + `external` + `verification-required`
 
-> 本文是源码与公开仓库资产的静态安全接管，不是渗透测试。未测试任何 credential，有关值均不复述。当前结论足以判定：在 P0 人工处置和正式验证完成前，AShell 不应进入新的正式发布。
+> 本文是源码与公开仓库资产的静态安全接管，不是渗透测试。未测试任何 credential，有关值均不复述。当前结论足以判定：在 P0 人工处置和正式验证完成前，OpenWorld 不应进入新的正式发布。
 
 ## 1. 总体判断
 
@@ -49,7 +51,7 @@
 ### 完整性与可用性
 
 - rendezvous/API/relay/key 配置。
-- AShell executable、SO/DLL、APK、driver、plugin、update。
+- OpenWorld executable、SO/DLL、APK、driver、plugin、update。
 - Android core service/screen-share state。
 - Windows privacy/display recovery。
 - hbbs/hbbr/API/ZEGO external services。
@@ -71,7 +73,7 @@
 
 ## 4. 身份与授权模型
 
-AShell 至少存在六个身份域：
+OpenWorld 至少存在六个身份域：
 
 1. Flutter 产品账号。
 2. Rust OIDC/account。
@@ -147,7 +149,7 @@ AShell 至少存在六个身份域：
 
 ### Deep link — Critical / E1
 
-Manifest 注册的 `ashell` custom scheme 缺少 host/path 限制。Flutter config URI path 可无确认导入并绕过 server validation，改写 rendezvous、relay、API 与信任 key；其他 URI 还可携带 connection password 并触发 remote/file/tunnel/terminal path，且完整 URI 可能进入日志。
+Manifest 注册的 `openworld` custom scheme 缺少 host/path 限制。Flutter config URI path 可无确认导入并绕过 server validation，改写 rendezvous、relay、API 与信任 key；其他 URI 还可携带 connection password 并触发 remote/file/tunnel/terminal path，且完整 URI 可能进入日志。
 
 要求：
 
@@ -229,7 +231,7 @@ Plugin ZIP 解压使用 archive-provided name 拼接 target path，未见 `enclo
 
 发布 gate：
 
-- AShell-only workflow，默认 `contents: read`。
+- OpenWorld-only workflow，默认 `contents: read`。
 - third-party Actions 固定 full commit SHA。
 - untrusted PR、build、sign、publish job 隔离。
 - GitHub Environment 人工审批和受保护 signing secret。
@@ -261,7 +263,7 @@ Severity reflects static path and impact; except SEC-001, exploit success was no
 
 ## 12. Positive Controls
 
-- AShell controller does enforce relay-only and rejects explicit direct entry.
+- OpenWorld controller does enforce relay-only and rejects explicit direct entry.
 - Endpoint still retains password/click/2FA/trusted-device authentication code.
 - HTTP client did not show an explicit disable-TLS-verification option.
 - Android AccessibilityService is not exported; MediaProjection permission remains system-mediated.
@@ -307,6 +309,6 @@ Formal isolated verification must cover:
 - ZEGO broker 缺独立、可审计工程。
 - upstream RustDesk fork point 未记录，影响 CVE/diff/license traceability。
 - AGPL-3.0 distribution、Corresponding Source、network-use 和 third-party notices 需专业法律意见；本文不是法律建议。
-- AShell 自有 security contact、incident SLA、disclosure policy、SBOM/NOTICE 尚未建立。
+- OpenWorld 自有 security contact、incident SLA、disclosure policy、SBOM/NOTICE 尚未建立。
 
 这些资产补齐前，安全接管只能覆盖本仓库端点源码，不能宣称全系统安全闭环。

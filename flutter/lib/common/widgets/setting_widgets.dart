@@ -225,7 +225,7 @@ List<(String, String)> otherDefaultSettings() {
     ('Follow remote window focus', kOptionFollowRemoteWindow),
     if ((isDesktop || isWebDesktop)) ('Zoom cursor', kOptionZoomCursor),
     ('Show quality monitor', kOptionShowQualityMonitor),
-    ('Show A Shell You status monitor', kOptionShowAShellStatusMonitor),
+    ('Show OpenWorld status monitor', kOptionShowOpenWorldStatusMonitor),
     ('Mute', kOptionDisableAudio),
     if (isDesktop) ('Enable file copy and paste', kOptionEnableFileCopyPaste),
     ('Disable clipboard', kOptionDisableClipboard),

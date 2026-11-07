@@ -61,7 +61,7 @@ pub mod android {
     }
 
     #[no_mangle]
-    pub extern "system" fn Java_me_ashell_localadb_LocalAdbMirror_register(env: JNIEnv, _class: JClass, manager: JObject) {
+    pub extern "system" fn Java_com_openworld_me_localadb_LocalAdbMirror_register(env: JNIEnv, _class: JClass, manager: JObject) {
         if let (Ok(vm), Ok(manager)) = (env.get_java_vm(), env.new_global_ref(manager)) {
             if let Ok(mut bridge) = BRIDGE.lock() { *bridge = Some(Bridge { vm, manager }); }
         }
@@ -233,7 +233,7 @@ pub mod android {
     }
 
     #[no_mangle]
-    pub extern "system" fn Java_me_ashell_localadb_LocalAdbTouch_status(mut env: JNIEnv, _class: JClass,
+    pub extern "system" fn Java_com_openworld_me_localadb_LocalAdbTouch_status(mut env: JNIEnv, _class: JClass,
         priority: jboolean, ready: jboolean, error: JString) {
         let Ok(error) = env.get_string(&error).map(|s| s.to_string_lossy().into_owned()) else { return; };
         if error.len() > 2048 { return; }
@@ -247,7 +247,7 @@ pub mod android {
     }
 
     #[no_mangle]
-    pub extern "system" fn Java_me_ashell_localadb_LocalAdbPrivacy_state(mut env: JNIEnv, _class: JClass,
+    pub extern "system" fn Java_com_openworld_me_localadb_LocalAdbPrivacy_state(mut env: JNIEnv, _class: JClass,
         state: JString, error: JString) {
         let Ok(state) = env.get_string(&state).map(|s| s.to_string_lossy().into_owned()) else { return; };
         let Ok(error) = env.get_string(&error).map(|s| s.to_string_lossy().into_owned()) else { return; };
@@ -261,7 +261,7 @@ pub mod android {
     }
 
     #[no_mangle]
-    pub extern "system" fn Java_me_ashell_localadb_AdbCaptureProfile_quality(env: JNIEnv, _class: JClass,
+    pub extern "system" fn Java_com_openworld_me_localadb_AdbCaptureProfile_quality(env: JNIEnv, _class: JClass,
         width: jint, height: jint, source_width: jint) -> jni::sys::jintArray {
         if !valid_dimensions(width as u32, height as u32) { return std::ptr::null_mut(); }
         if source_width <= 0 || source_width > 16384 { return std::ptr::null_mut(); }
@@ -296,7 +296,7 @@ pub mod android {
     }
 
     #[no_mangle]
-    pub extern "system" fn Java_me_ashell_localadb_LocalAdbMirror_state(mut env: JNIEnv, _class: JClass,
+    pub extern "system" fn Java_com_openworld_me_localadb_LocalAdbMirror_state(mut env: JNIEnv, _class: JClass,
         generation: jlong, state: JString, error: JString, format: JString) {
         let Ok(state) = env.get_string(&state).map(|s| s.to_string_lossy().into_owned()) else { return; };
         let Ok(error) = env.get_string(&error).map(|s| s.to_string_lossy().into_owned()) else { return; };
@@ -307,7 +307,7 @@ pub mod android {
     }
 
     #[no_mangle]
-    pub extern "system" fn Java_me_ashell_localadb_LocalAdbMirror_frame(env: JNIEnv, _class: JClass,
+    pub extern "system" fn Java_com_openworld_me_localadb_LocalAdbMirror_frame(env: JNIEnv, _class: JClass,
         generation: jlong, width: jint, height: jint, config: jboolean, key: jboolean, data: JByteArray, screenshot: jboolean,
         source_width: jint, source_height: jint) {
         if !valid_dimensions(width as u32, height as u32) { return; }
@@ -498,9 +498,9 @@ pub mod pc {
     }
 
     /// Caller provides valid UTF-8 C strings and a writable length. The returned allocation
-    /// belongs to the caller until ashell_free_adb_frame(ptr, length), exactly once.
+    /// belongs to the caller until openworld_free_adb_frame(ptr, length), exactly once.
     #[no_mangle]
-    pub unsafe extern "C" fn ashell_take_adb_frame(session: *const std::os::raw::c_char,
+    pub unsafe extern "C" fn openworld_take_adb_frame(session: *const std::os::raw::c_char,
         owner: *const std::os::raw::c_char, generation: u64, length: *mut u32) -> *mut u8 {
         if length.is_null() { return std::ptr::null_mut(); }
         *length = 0;
@@ -514,7 +514,7 @@ pub mod pc {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn ashell_free_adb_frame(data: *mut u8, length: u32) {
+    pub unsafe extern "C" fn openworld_free_adb_frame(data: *mut u8, length: u32) {
         if !data.is_null() { drop(Box::from_raw(std::ptr::slice_from_raw_parts_mut(data, length as usize))); }
     }
 

@@ -2890,7 +2890,7 @@ Future<void> onActiveWindowChanged() async {
     } catch (err) {
       debugPrintStack(label: "$err");
     } finally {
-      debugPrint("Start closing AShell...");
+      debugPrint("Start closing OpenWorld...");
       await windowManager.setPreventClose(false);
       await windowManager.close();
       if (isMacOS) {
@@ -3107,7 +3107,7 @@ Future<void> updateSystemWindowTheme() async {
 ///
 /// Note: not found a general solution for rust based AVFoundation bingding.
 /// [AVFoundation] crate has compile error.
-const kMacOSPermChannel = MethodChannel("me.ashell/macos");
+const kMacOSPermChannel = MethodChannel("com.openworld.me/macos");
 
 enum PermissionAuthorizeType {
   undetermined,
@@ -4125,7 +4125,7 @@ String _appName = '';
 String get appName {
   if (_appName.isEmpty) {
     _appName = bind.mainGetAppNameSync();
-    if (_appName == 'AShell') _appName = '一个壳子';
+    if (_appName == 'OpenWorld') _appName = '开放世界';
   }
   return _appName;
 }

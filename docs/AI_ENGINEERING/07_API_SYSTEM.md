@@ -1,4 +1,6 @@
-# AShell API 系统 / API System
+# OpenWorld API 系统 / API System
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 接管基线：2026-07-12  
 状态：`verified` + `external` + `verification-required`
@@ -7,7 +9,7 @@
 
 ## 1. 结论先行
 
-本仓库不是 AShell 后台仓库。它包含：
+本仓库不是 OpenWorld 后台仓库。它包含：
 
 - Flutter 产品账号与设备 API client。
 - Rust OIDC/account client。
@@ -159,13 +161,13 @@ login form
 客户端不应持有可签发任意 token 的高权限 secret。目标设计应是：
 
 ```text
-authenticated AShell session
+authenticated OpenWorld session
   -> HTTPS token broker
   -> short-lived, room/user-bound token
   -> ZEGO SDK
 ```
 
-broker 必须校验当前 AShell 用户、peer、room、用途、TTL 与 replay，不接受仅凭静态客户端 key 的无限制签发。
+broker 必须校验当前 OpenWorld 用户、peer、room、用途、TTL 与 replay，不接受仅凭静态客户端 key 的无限制签发。
 
 ## 10. Token 与本地存储
 

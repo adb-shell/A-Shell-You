@@ -127,17 +127,17 @@ class PlatformFFI {
   Future<void> init(String appType) async {
     _appType = appType;
     final dylib = isAndroid
-        ? DynamicLibrary.open('libashell.so')
+        ? DynamicLibrary.open('libopenworld.so')
         : isLinux
-            ? DynamicLibrary.open('libashell.so')
+            ? DynamicLibrary.open('libopenworld.so')
             : isWindows
-                ? DynamicLibrary.open('ashell.dll')
+                ? DynamicLibrary.open('openworld.dll')
                 :
                 // Use executable itself as the dynamic library for MacOS.
                 // Multiple dylib instances will cause some global instances to be invalid.
                 // eg. `lazy_static` objects in rust side, will be created more than once, which is not expected.
                 //
-                // isMacOS? DynamicLibrary.open("libashell.dylib") :
+                // isMacOS? DynamicLibrary.open("libopenworld.dylib") :
                 DynamicLibrary.process();
     debugPrint('initializing FFI $_appType');
     try {

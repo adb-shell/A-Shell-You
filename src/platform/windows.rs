@@ -1340,11 +1340,11 @@ fn get_after_install(
     ", create_service=get_create_service(&exe))
 }
 
-// Existing shortcut filenames and publisher attribution must survive UI renames.
+// Shortcut creation, startup and uninstall must use the same product display name.
 fn get_legacy_display_app_name() -> String {
     let name = crate::get_app_name();
-    if name == "AShell" {
-        "A Shell You".to_owned()
+    if name == "OpenWorld" {
+        "开放世界".to_owned()
     } else {
         name
     }

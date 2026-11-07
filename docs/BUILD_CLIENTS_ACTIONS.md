@@ -1,14 +1,16 @@
 # GitHub Actions 客户端编译
 
-2026-10-25按当前test/48226fb源码核对，唯一工作流为Build AShell Clients-BT，仅手动运行，产物保存在Actions；不创建GitHub Release、tag或商店发布。本轮文档同步不改workflow，用户授权的main双端执行见[T002](tasks/T-2026-10-25-002-developer-password-main.md)。
+当前T002交付将test/d9f1119合并main，版本保持5.2.1 / 5.2.1+59，只触发一次Both/常规编译，不监控；准确源码SHA与HTTP回执见[main交付任务](tasks/T-2026-11-07-002-openworld-main.md)。以下test运行属于迁移来源历史，不能替代本次main结果。
+
+2026-11-07产品身份迁为开放世界/OpenWorld，唯一手动工作流Build OpenWorld Clients-BT。jobs/输入/工具链/actions pins/权限保持，native/缓存/签名展示/产物名同步。已按用户要求交付test并运行Both/常规编译；准确head/run与结果见本次迁移回执，旧run不能替代。见[身份迁移](AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
 
 ## 入口与参数
 
 | 入口 | 文件 | 参数 |
 |---|---|---|
-| Build AShell Clients-BT | [Build-Clients-BT.yml](../.github/workflows/Build-Clients-BT.yml) | Platform：Both / Android / Windows，默认Both；BuildMode：常规编译 / 原始编译，默认常规编译 |
+| Build OpenWorld Clients-BT | [Build-Clients-BT.yml](../.github/workflows/Build-Clients-BT.yml) | Platform：Both / Android / Windows，默认Both；BuildMode：常规编译 / 原始编译，默认常规编译 |
 
-在Actions选择Build AShell Clients-BT、Run workflow，再选择实际已推送的分支。双端编译选Platform=Both；仅PC选Windows；通常使用BuildMode=常规编译。参数区分大小写，旧Build-Clients/Build-Clients-New入口及platform/android_arch参数不适用。Android固定aarch64/arm64-v8a；需要universal时使用正式Linux本地入口build.sh 2，并另行授权/验证。
+在Actions选择Build OpenWorld Clients-BT、Run workflow，再选择实际已推送的分支。双端编译选Platform=Both；仅PC选Windows；通常使用BuildMode=常规编译。参数区分大小写，旧Build-Clients/Build-Clients-New入口及platform/android_arch参数不适用。Android固定aarch64/arm64-v8a；需要universal时使用正式Linux本地入口build.sh 2，并另行授权/验证。
 
 “常规编译”复用受key约束的依赖/native构建缓存；“原始编译”跳过构建产物缓存恢复并清理相应输出，仍可复用工具和源码下载缓存，不等于断网或绝对无缓存编译。两种模式以实际workflow条件为准，不改变产品功能开关。
 
@@ -16,8 +18,8 @@
 
 | 平台 | 文件 |
 |---|---|
-| Android | ashell-android-aarch64.apk（Release编译、临时测试签名） |
-| Windows | ashell-windows-x64.exe自解压程序；ashell-windows-x64.zip完整Release bundle |
+| Android | openworld-android-aarch64.apk（Release编译、临时测试签名） |
+| Windows | openworld-windows-x64.exe自解压程序；openworld-windows-x64.zip完整Release bundle |
 
 成品从Actions运行页Artifacts/下载链接获取，保留14天；Android内部native中间产物保留1天，过期后需重新执行完整相关job。另有build-info、SHA256SUMS、解析依赖/锁文件和签名证据，准确清单以产物为准。Android APK等待native完成；Windows独立job，分别上传ZIP与EXE。
 

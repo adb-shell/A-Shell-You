@@ -92,7 +92,7 @@ static CLICK_TIME: AtomicI64 = AtomicI64::new(0);
 // escape this call, and no Android callback is made while holding the lock.
 #[cfg(target_os = "android")]
 #[no_mangle]
-pub extern "system" fn Java_me_ashell_KeepScreenOnState_hasRemoteConnection(
+pub extern "system" fn Java_com_openworld_me_KeepScreenOnState_hasRemoteConnection(
     _env: jni::JNIEnv,
     _object: jni::objects::JObject,
 ) -> jni::sys::jboolean {

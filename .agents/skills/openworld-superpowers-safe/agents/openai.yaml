@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenWorld Safe Superpowers"
+  short_description: "Safely brainstorm, plan, debug, verify, and review OpenWorld"
+  default_prompt: "Use $openworld-superpowers-safe to review this OpenWorld task read-only and stop before any edit, build, Git write, or release action."

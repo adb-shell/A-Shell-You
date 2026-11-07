@@ -18,8 +18,8 @@ const APP_METADATA: &[u8] = include_bytes!("../app_metadata.toml");
 const APP_METADATA: &[u8] = &[];
 const APP_METADATA_CONFIG: &str = "meta.toml";
 const META_LINE_PREFIX_TIMESTAMP: &str = "timestamp = ";
-const APP_PREFIX: &str = "AShell";
-const APPNAME_RUNTIME_ENV_KEY: &str = "ASHELL_APPNAME";
+const APP_PREFIX: &str = "OpenWorld";
+const APPNAME_RUNTIME_ENV_KEY: &str = "OPENWORLD_APPNAME";
 #[cfg(windows)]
 const SET_FOREGROUND_WINDOW_ENV_KEY: &str = "SET_FOREGROUND_WINDOW";
 
@@ -90,7 +90,7 @@ fn setup(
     for file in reader.files.iter() {
         file.write_to_file(&dir);
     }
-    let custom_appname = "ashell.exe";
+    let custom_appname = "openworld.exe";
     write_meta(&dir, ts);
     #[cfg(windows)]
     windows::copy_runtime_broker(&dir);
@@ -184,7 +184,7 @@ mod windows {
 
     // Used for privacy mode(magnifier impl).
     pub const RUNTIME_BROKER_EXE: &'static str = "C:\\Windows\\System32\\RuntimeBroker.exe";
-    pub const WIN_TOPMOST_INJECTED_PROCESS_EXE: &'static str = "RuntimeBroker_ashell.exe";
+    pub const WIN_TOPMOST_INJECTED_PROCESS_EXE: &'static str = "RuntimeBroker_openworld.exe";
 
     pub(super) fn copy_runtime_broker(dir: &Path) {
         let src = RUNTIME_BROKER_EXE;

@@ -1,8 +1,8 @@
-# AShell Project Start Here
+# OpenWorld Project Start Here
 
-当前源码观察基线：`48226fbcdc08719b6e2a5c2e245dc9c10cc77ae9`。PC主窗口Ctrl+Shift+H先弹密码框，两个可接受密码任一精确匹配后确认/回车开启进程内免登录；错误可重试，取消/Esc关闭，重启复位。文档不保存口令明文。见[Baseline23](docs/BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)、[当前任务](docs/tasks/T-2026-10-25-002-developer-password-main.md)、[当前状态](.codex/PROJECT_STATE.md)。
+当前产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”，源自test/d9f1119，当前按用户要求合并main并推送，版本保持5.2.1 / 5.2.1+59。见[Baseline24](docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-002-openworld-main.md)和[当前状态](.codex/PROJECT_STATE.md)。客户端、ADB、构建编排与当前文档同步；准确合并SHA、push和Both/常规编译触发回执见任务。按要求不监控；触发接受及V0不等于编译或真机通过。
 
-本轮按用户要求以“开发者密码增加”合并提交推送main，并执行现有Build-Clients-BT / Both / 常规编译；准确SHA、run与结果以任务回执为准，不能从文档计划推断成功。新会话先核对HEAD/status；历史任务/基线只作追溯，撤回的实现不从旧聊天恢复，旧授权与构建结论不自动继承。
+PC主窗口Ctrl+Shift+H双密码入口、ADB及原链行为保持。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 
 当前ADB包含远程配对/独立Shell、投屏/无视/节点穿透、独立白字黑屏、全局优先触摸、键盘/远程输入/剪贴板同步和本应用电池优化豁免。Android默认连接服务运行期间静默常亮。详细实现、参数和待验边界见[12本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 
@@ -17,7 +17,7 @@
 5. [`.codex/CHANGELOG_AI.md`](.codex/CHANGELOG_AI.md)：AI task-level 历史索引。
 6. [`.codex/DECISION_LOG.md`](.codex/DECISION_LOG.md)：重大决定流水。
 7. [`docs/ADR/README.md`](docs/ADR/README.md) 与当前任务相关 ADR。
-8. 当前任务相关的 [`.agents/skills/`](.agents/skills/) AShell Skill。
+8. 当前任务相关的 [`.agents/skills/`](.agents/skills/) OpenWorld Skill。
 
 完成记忆恢复后、开始任何任务动作前，继续按任务激活顺序读取：
 
@@ -52,15 +52,15 @@
 
 ## 2. 项目身份速记
 
-- 产品显示名：`一个壳子`；内部runtime：`AShell`。
-- Android 显示名：`一个壳子`。
+- 产品显示名：`开放世界`；内部runtime：`OpenWorld`。
+- Android 显示名：`开放世界`。
 - 来源：RustDesk 深度二次开发；当前 Git 不能证明 2026-04-13 之前的完整 fork history。
-- Rust crate/library：`ashell`。
+- Rust crate/library：`openworld`。
 - Flutter package：`flutter_hbb`（内部包名保留，不影响产品身份）。
-- Android applicationId：`me.ashell`。
+- Android applicationId：`com.openworld.me`。
 - Android active JNI：`libs/scrap/src/android/pkg2230.rs`。
 - Windows active virtual display：Amyuni；RustDesk IDD 分支是 dormant。
-- AShell controller 强制 relay；controlled endpoint 仍保留 direct/NAT compatibility code。
+- OpenWorld controller 强制 relay；controlled endpoint 仍保留 direct/NAT compatibility code。
 - 产品 backend、业务 database、hbbs/hbbr server 和完整 ZEGO token broker 不在本仓库。
 
 完整事实只从当前源码和 `docs/AI_ENGINEERING/` 获取。
@@ -73,7 +73,7 @@
 2. 运行只读 `git status --short --branch`，记录 branch、HEAD 和已有 dirty state，并判断 state 是 consistent、drift 还是 conflict。
 3. 识别请求类型：回答、审查、诊断、文档、代码、构建、发布、生产或安全事件。
 4. 写明授权范围、禁止动作、假设和非目标；历史会话授权一律记为不继承。
-5. 选择最窄的领域 Skill；跨两个以上领域时使用 `ashell-master` 协调。
+5. 选择最窄的领域 Skill；跨两个以上领域时使用 `openworld-master` 协调。
 6. 先完成需求与影响分析，再决定是否存在修改权限。
 7. 发现并行任务或用户已有修改时保留并绕开；不得 reset、checkout、clean 或覆盖。
 
@@ -133,19 +133,19 @@
 
 | 任务 | 首选 Skill |
 |---|---|
-| 跨域、架构、接管、迁移、复杂事故 | `ashell-master` |
-| Rust、unsafe、FFI、JNI、Windows runtime | `ashell-rust-engineer` |
-| Android service、MediaProjection、Accessibility | `ashell-android-engineer` |
-| Flutter UI、state、multi-window、bridge | `ashell-flutter-engineer` |
-| rendezvous、relay、protocol、auth、transport | `ashell-network-engineer` |
-| account、HTTP、sync、backend contract、database boundary | `ashell-api-engineer` |
-| threat、credential、permission、supply chain | `ashell-security-engineer` |
-| build/release planning、artifact、signing、rollback | `ashell-release-engineer` |
-| 只读 brainstorming、planning、debugging、verification、review | `ashell-superpowers-safe` |
+| 跨域、架构、接管、迁移、复杂事故 | `openworld-master` |
+| Rust、unsafe、FFI、JNI、Windows runtime | `openworld-rust-engineer` |
+| Android service、MediaProjection、Accessibility | `openworld-android-engineer` |
+| Flutter UI、state、multi-window、bridge | `openworld-flutter-engineer` |
+| rendezvous、relay、protocol、auth、transport | `openworld-network-engineer` |
+| account、HTTP、sync、backend contract、database boundary | `openworld-api-engineer` |
+| threat、credential、permission、supply chain | `openworld-security-engineer` |
+| build/release planning、artifact、signing、rollback | `openworld-release-engineer` |
+| 只读 brainstorming、planning、debugging、verification、review | `openworld-superpowers-safe` |
 
 领域 Skill 不增加权限。Security 和 release guardrail 高于实现便利。
 
-`ashell-superpowers-safe` 不是外部 Superpowers 安装证明；它只允许五项只读能力，并硬性禁止 commit、push、release。完整边界见 [`SAFE_SUPERPOWERS_PROFILE.md`](docs/AI_ENGINEERING/SAFE_SUPERPOWERS_PROFILE.md)。
+`openworld-superpowers-safe` 不是外部 Superpowers 安装证明；它只允许五项只读能力，并硬性禁止 commit、push、release。完整边界见 [`SAFE_SUPERPOWERS_PROFILE.md`](docs/AI_ENGINEERING/SAFE_SUPERPOWERS_PROFILE.md)。
 
 ## 8. 高价值不变量
 

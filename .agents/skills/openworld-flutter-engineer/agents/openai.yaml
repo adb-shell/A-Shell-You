@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenWorld Flutter Engineer"
+  short_description: "Maintain OpenWorld Flutter UI, state, and bridges"
+  default_prompt: "Use $openworld-flutter-engineer to handle this Flutter task."

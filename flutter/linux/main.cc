@@ -1,16 +1,16 @@
 #include <dlfcn.h>
 #include "my_application.h"
 
-#define ASHELL_LIB_PATH "libashell.so"
-typedef bool (*AShellCoreMain)();
+#define OPENWORLD_LIB_PATH "libopenworld.so"
+typedef bool (*OpenWorldCoreMain)();
 bool gIsConnectionManager = false;
 
 void print_help_install_pkg(const char* so);
 
-bool flutter_ashell_core_main() {
-   void* libashell = dlopen(ASHELL_LIB_PATH, RTLD_LAZY);
-   if (!libashell) {
-      fprintf(stderr,"Failed to load \"libashell.so\"\n");
+bool flutter_openworld_core_main() {
+   void* libopenworld = dlopen(OPENWORLD_LIB_PATH, RTLD_LAZY);
+   if (!libopenworld) {
+      fprintf(stderr,"Failed to load \"libopenworld.so\"\n");
       char* error;
       if ((error = dlerror()) != nullptr) {
         fprintf(stderr, "%s\n", error);
@@ -24,17 +24,17 @@ bool flutter_ashell_core_main() {
       }
      return false;
    }
-   auto core_main = (AShellCoreMain) dlsym(libashell,"ashell_core_main");
+   auto core_main = (OpenWorldCoreMain) dlsym(libopenworld,"openworld_core_main");
    char* error;
    if ((error = dlerror()) != nullptr) {
-       fprintf(stderr, "Program entry \"ashell_core_main\" is not found: %s\n", error);
+       fprintf(stderr, "Program entry \"openworld_core_main\" is not found: %s\n", error);
        return false;
    }
    return core_main();
 }
 
 int main(int argc, char** argv) {
-  if (!flutter_ashell_core_main()) {
+  if (!flutter_openworld_core_main()) {
       return 0;
   }
   for (int i = 0; i < argc; i++) {

@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenWorld API Engineer"
+  short_description: "Maintain OpenWorld account, HTTP, sync, and API contracts"
+  default_prompt: "Use $openworld-api-engineer to analyze this API or backend-contract task."

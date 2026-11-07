@@ -37,7 +37,7 @@ static PRIVILEGES_SCRIPTS_DIR: Dir =
     include_dir!("$CARGO_MANIFEST_DIR/src/platform/privileges_scripts");
 static mut LATEST_SEED: i32 = 0;
 
-const UPDATE_TEMP_DIR: &str = "/tmp/.rustdeskupdate";
+const UPDATE_TEMP_DIR: &str = "/tmp/.openworldupdate";
 
 extern "C" {
     fn CGSCurrentCursorSeed() -> i32;
@@ -293,6 +293,19 @@ fn update_daemon_agent(agent_plist_file: String, update_source_dir: String, sync
 }
 
 fn correct_app_name(s: &str) -> String {
+    // The inherited templates use upstream placeholders. Resolve config and
+    // launchd identities separately: the config folder need not equal bundle ID.
+    let full_name = crate::get_full_name();
+    let config_path = hbb_common::config::Config::path("");
+    let config_name = config_path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or(&full_name);
+    let s = s.replace(
+        "Library/Preferences/com.carriez.RustDesk",
+        &format!("Library/Preferences/{}", config_name),
+    );
+    let s = s.replace("com.carriez.RustDesk", &full_name);
     let s = s.replace("rustdesk", &crate::get_app_name().to_lowercase());
     let s = s.replace("RustDesk", &crate::get_app_name());
     s
@@ -752,7 +765,7 @@ pgrep -x 'RustDesk' | grep -v {} | xargs kill -9 && rm -rf /Applications/RustDes
         );
         match Command::new("osascript")
             .arg("-e")
-            .arg(update_body)
+            .arg(correct_app_name(&update_body))
             .status()
         {
             Ok(status) if !status.success() => {
@@ -781,7 +794,7 @@ pub fn update_to(file: &str) -> ResultType<()> {
 }
 
 fn extract_dmg(dmg_path: &str, target_dir: &str) -> ResultType<()> {
-    let mount_point = "/Volumes/RustDeskUpdate";
+    let mount_point = "/Volumes/OpenWorldUpdate";
     let target_path = Path::new(target_dir);
 
     if target_path.exists() {
@@ -803,7 +816,7 @@ fn extract_dmg(dmg_path: &str, target_dir: &str) -> ResultType<()> {
     }
     let _guard = DmgGuard(mount_point);
 
-    let app_name = "RustDesk.app";
+    let app_name = format!("{}.app", crate::get_app_name());
     let src_path = format!("{}/{}", mount_point, app_name);
     let dest_path = format!("{}/{}", target_dir, app_name);
 
@@ -826,7 +839,8 @@ fn extract_dmg(dmg_path: &str, target_dir: &str) -> ResultType<()> {
 }
 
 fn update_extracted(target_dir: &str) -> ResultType<()> {
-    let exe_path = format!("{}/RustDesk.app/Contents/MacOS/RustDesk", target_dir);
+    let app_name = crate::get_app_name();
+    let exe_path = format!("{}/{}.app/Contents/MacOS/{}", target_dir, app_name, app_name);
     let _child = unsafe {
         Command::new(&exe_path)
             .arg("--update")

@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenWorld Rust Engineer"
+  short_description: "Maintain OpenWorld Rust core, FFI, and unsafe code"
+  default_prompt: "Use $openworld-rust-engineer to analyze this Rust or FFI task."

@@ -1,11 +1,11 @@
-# AShell Architecture Memory
+# OpenWorld Architecture Memory
 
-最后更新：2026-10-13（T004独立远程ADB；V0，编译/多PC运行待验证）
+最后更新：2026-11-07（产品身份同步；编译回执见当前任务，多PC运行待验证）
 用途：跨会话架构速记；详细设计只在 `docs/AI_ENGINEERING/` 维护。
 
 ## 1. Runtime Topology
 
-当前产品显示A Shell You、内部AShell/ashell、Android me.ashell；Flutter内部package保留flutter_hbb。身份变更详见 `docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md`，V0 only。
+当前产品显示开放世界、内部OpenWorld/openworld、Android com.openworld.me；Flutter内部package保留flutter_hbb。身份变更详见 `docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md`；编译与真机证据分别记录。
 
 ```text
 Flutter UI / legacy UI
@@ -13,14 +13,14 @@ Flutter UI / legacy UI
   <-> Rust controller/server core
   <-> protobuf peer protocol
   <-> hbbs/hbbr external infrastructure
-  <-> remote AShell endpoint
+  <-> remote OpenWorld endpoint
 
 Android Rust core
   <-> pkg2230 JNI
   <-> MainService / Accessibility / MediaProjection
 
 Android LocalAdbPage（独立旁路）
-  <-> me.ashell/local_adb/v1
+  <-> com.openworld.me/local_adb/v1
   <-> LocalAdbPlugin / LocalAdbClient
   <-> loopback / 本机 adbd
 
@@ -110,7 +110,7 @@ peer invitation authorization != ZEGO token authorization != microphone user con
 Network:
 
 ```text
-AShell controller relay-only != controlled endpoint has no direct/NAT compatibility
+OpenWorld controller relay-only != controlled endpoint has no direct/NAT compatibility
 ```
 
 ## 5. Detailed References

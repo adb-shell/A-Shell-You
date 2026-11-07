@@ -51,7 +51,7 @@ pub enum GrabState {
 pub type NotifyMessageBox = fn(String, String, String, String) -> dyn Future<Output = ()>;
 
 // the executable name of the portable version
-pub const PORTABLE_APPNAME_RUNTIME_ENV_KEY: &str = "ASHELL_APPNAME";
+pub const PORTABLE_APPNAME_RUNTIME_ENV_KEY: &str = "OPENWORLD_APPNAME";
 
 pub const PLATFORM_WINDOWS: &str = "Windows";
 pub const PLATFORM_LINUX: &str = "Linux";
@@ -989,8 +989,8 @@ pub fn get_app_name() -> String {
 /// Presentation name; filesystem, service and URI identities stay space-free.
 pub fn get_display_app_name() -> String {
     let name = get_app_name();
-    if name == "AShell" {
-        "一个壳子".to_owned()
+    if name == "OpenWorld" {
+        "开放世界".to_owned()
     } else {
         name
     }
@@ -998,7 +998,7 @@ pub fn get_display_app_name() -> String {
 
 #[inline]
 pub fn is_rustdesk() -> bool {
-    hbb_common::config::APP_NAME.read().unwrap().eq("AShell")
+    hbb_common::config::APP_NAME.read().unwrap().eq("OpenWorld")
 }
 
 #[inline]
@@ -1008,8 +1008,8 @@ pub fn get_uri_prefix() -> String {
 
 #[cfg(target_os = "macos")]
 pub fn get_full_name() -> String {
-    if get_app_name() == "AShell" {
-        return "me.ashell".to_owned();
+    if get_app_name() == "OpenWorld" {
+        return "com.openworld.me".to_owned();
     }
     format!(
         "{}.{}",
@@ -1084,7 +1084,8 @@ fn get_api_server_(api: String, custom: String) -> String {
 
 #[inline]
 pub fn is_public(url: &str) -> bool {
-    url.contains("ashell.")
+    // Keep classification of existing deployments while accepting the new brand.
+    url.contains("openworld.") || url.contains("ashell.")
 }
 
 pub fn get_udp_punch_enabled() -> bool {

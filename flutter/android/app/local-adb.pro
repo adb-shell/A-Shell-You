@@ -2,10 +2,10 @@
 -keep class org.conscrypt.** { *; }
 -keep class io.github.muntashirakon.crypto.spake2.** { *; }
 # Independent JNI bridge and the pinned libadb TLS identity-cache reset.
--keep class me.ashell.localadb.RemoteAdbNative { *; }
--keep class me.ashell.localadb.LocalAdbMirror { native <methods>; }
--keep class me.ashell.localadb.LocalAdbTouch { native <methods>; }
--keepclassmembers class me.ashell.localadb.LocalAdbManager {
+-keep class com.openworld.me.localadb.RemoteAdbNative { *; }
+-keep class com.openworld.me.localadb.LocalAdbMirror { native <methods>; }
+-keep class com.openworld.me.localadb.LocalAdbTouch { native <methods>; }
+-keepclassmembers class com.openworld.me.localadb.LocalAdbManager {
     public void dispatchRemote(java.lang.String, java.lang.String, java.lang.String);
     public void disconnectRemote(java.lang.String);
     public void cancelClipboardSync(java.lang.String);

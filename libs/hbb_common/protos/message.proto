@@ -841,8 +841,8 @@ message Misc {
     DisplayResolution change_display_resolution = 36;
     MessageQuery message_query = 37;
     int32 follow_current_display = 38;
-    // AShell: Android controlled-end feature status JSON push.
-    string ashell_status = 39;
+    // OpenWorld: Android controlled-end feature status JSON push.
+    string openworld_status = 39;
     // Independent device-owned ADB request/reply JSON, versioned and bounded by endpoints.
     string remote_adb = 40;
     // Independent scrcpy media/control; never enters the original VideoFrame path.
@@ -879,7 +879,7 @@ message VoiceCallRequest {
   int64 req_timestamp = 1;
   // Indicates whether the request is a connect action or a disconnect action.
   bool is_connect = 2;
-  // AShell: third-party RTC voice call metadata. These fields are only used
+  // OpenWorld: third-party RTC voice call metadata. These fields are only used
   // by the ZEGO voice-call path and do not affect the existing remote-control
   // video/input/file channels.
   string rtc_provider = 3;

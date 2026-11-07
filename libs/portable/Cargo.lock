@@ -160,7 +160,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ashell-portable-packer"
+name = "openworld-portable-packer"
 version = "5.2.1"
 dependencies = [
  "brotli",

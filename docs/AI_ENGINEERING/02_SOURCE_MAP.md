@@ -1,4 +1,6 @@
-# AShell 源码地图 / Source Map
+# OpenWorld 源码地图 / Source Map
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC开发者快捷键/弹窗在 `flutter/lib/desktop/pages/connection_page.dart`，两个密码摘要与校验在 `flutter/lib/models/developer_login_bypass_model.dart`；两者均PRIMARY手写源码，维护不涉及generated bridge。
 
@@ -35,14 +37,14 @@ ADB模块仍位于localadb；AdbVideoCapture/AdbVideoSurface负责独立GPU视�
 
 | Crate | 关键目录 | 职责 |
 |---|---|---|
-| `ashell` | `src/` | controller、endpoint、FFI、平台与产品集成 |
+| `openworld` | `src/` | controller、endpoint、FFI、平台与产品集成 |
 | `hbb_common` | `libs/hbb_common/` | protobuf、config、crypto、socket、fs |
 | `scrap` | `libs/scrap/` | capture、codec、Android raw/JNI |
 | `enigo` | `libs/enigo/` | desktop input injection |
 | `clipboard` | `libs/clipboard/` | clipboard/CLIPRDR/file clipboard |
 | `virtual_display` | `libs/virtual_display/` | RustDesk IDD wrapper |
 | `dylib_virtual_display` | `libs/virtual_display/dylib/` | virtual display DLL ABI |
-| `ashell-portable-packer` | `libs/portable/` | Windows self-extracting package |
+| `openworld-portable-packer` | `libs/portable/` | Windows self-extracting package |
 | `remote_printer` | `libs/remote_printer/` | Windows printer/driver integration |
 
 `workspace.exclude` 指向的 `vdi/host`、`examples/custom_plugin` 当前不存在，是 manifest 历史残留。
@@ -143,7 +145,7 @@ ADB模块仍位于localadb；AdbVideoCapture/AdbVideoSurface负责独立GPU视�
 
 PC侧aca7446新增`remote_adb_sidebar.dart`与`remote_adb_session_state.dart`：前者持有拖动位置/导航controller，后者由RemotePage创建释放并通过Provider供顶栏共享。`remote_toolbar.dart::_AdbActionMenu`在“移动端操作”左侧；dialog controller向同一session state提交查询/操作状态。`common/widgets/overlay.dart::DraggableMobileActions`仅增加无障碍栏标题和布局空间，原回调不变。
 
-8662f23新增 `flutter/android/app/src/main/java/me/ashell/localadb/` 五类；T004追加LocalAdbManager、RemoteAdbNative、AdbPortDiscovery，本机Plugin转为adapter。me.ashell/local_adb/v1与新独立JNI均不使用产品mChannel/采集JNI。职责和合同见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
+8662f23新增 `flutter/android/app/src/main/java/com/openworld/me/localadb/` 五类；T004追加LocalAdbManager、RemoteAdbNative、AdbPortDiscovery，本机Plugin转为adapter。com.openworld.me/local_adb/v1与新独立JNI均不使用产品mChannel/采集JNI。职责和合同见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
 
 T009 已删除 AdbPage、Dart wrapper、11 个 MethodChannel 分支、adb/ 四个 Kotlin 文件及无线调试自动化。Gradle 排除旧 libadb.so；不再存在此运行模块。历史位置和回滚基准见 [T009](../tasks/T-2026-10-12-009-remove-legacy-adb.md)。
 
@@ -161,7 +163,7 @@ T009 已删除 AdbPage、Dart wrapper、11 个 MethodChannel 分支、adb/ 四�
 - privacy：`src/privacy_mode.rs`, `src/privacy_mode/win_*`。
 - virtual display：`src/virtual_display_manager.rs`；当前 Amyuni。
 - driver/package：`res/vcpkg/`, `res/msi/`, external `usbmmidd_v2`, printer driver。
-- runner/library：`flutter/windows/runner/`, `ashell.dll`。
+- runner/library：`flutter/windows/runner/`, `openworld.dll`。
 
 ## 8. Protocol 与 API 地图
 

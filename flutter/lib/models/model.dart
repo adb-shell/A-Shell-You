@@ -525,8 +525,8 @@ class FfiModel with ChangeNotifier {
         parent.target?.serverModel.onClientRemove(evt);
       } else if (name == 'update_quality_status') {
         parent.target?.qualityMonitorModel.updateQualityStatus(evt);
-      } else if (name == 'update_ashell_status') {
-        parent.target?.ashellStatusModel.updateFromEvent(evt);
+      } else if (name == 'update_openworld_status') {
+        parent.target?.openworldStatusModel.updateFromEvent(evt);
       } else if (name == 'update_block_input_state') {
         updateBlockInputState(evt, peerId);
       } else if (name == 'update_privacy_mode') {
@@ -1149,7 +1149,7 @@ class FfiModel with ChangeNotifier {
     bind.sessionReconnect(sessionId: sessionId, forceRelay: effectiveForceRelay);
     if (!isPeerAndroid) {
       clearPermissions();
-      parent.target?.ashellStatusModel.reset();
+      parent.target?.openworldStatusModel.reset();
     }
     _stopAndroidAutoReconnect();
     if (isPeerAndroid) {
@@ -1691,7 +1691,7 @@ class FfiModel with ChangeNotifier {
     }
 
     if (updateData.isEmpty) {
-      _pi.platformAdditions.remove(kPlatformAdditionsAShellVirtualDisplays);
+      _pi.platformAdditions.remove(kPlatformAdditionsOpenWorldVirtualDisplays);
       _pi.platformAdditions.remove(kPlatformAdditionsAmyuniVirtualDisplays);
     } else {
       try {
@@ -1700,9 +1700,9 @@ class FfiModel with ChangeNotifier {
           _pi.platformAdditions[key] = updateJson[key];
         }
         if (!updateJson
-            .containsKey(kPlatformAdditionsAShellVirtualDisplays)) {
+            .containsKey(kPlatformAdditionsOpenWorldVirtualDisplays)) {
           _pi.platformAdditions
-              .remove(kPlatformAdditionsAShellVirtualDisplays);
+              .remove(kPlatformAdditionsOpenWorldVirtualDisplays);
         }
         if (!updateJson.containsKey(kPlatformAdditionsAmyuniVirtualDisplays)) {
           _pi.platformAdditions.remove(kPlatformAdditionsAmyuniVirtualDisplays);
@@ -3150,7 +3150,7 @@ class QualityMonitorModel with ChangeNotifier {
   }
 }
 
-class AShellStatusData {
+class OpenWorldStatusData {
   bool? video;
   bool? screenshot;
   bool? share;
@@ -3161,18 +3161,18 @@ class AShellStatusData {
   bool? accessibility;
 }
 
-class AShellStatusModel with ChangeNotifier {
+class OpenWorldStatusModel with ChangeNotifier {
   WeakReference<FFI> parent;
-  AShellStatusModel(this.parent);
+  OpenWorldStatusModel(this.parent);
 
   var _show = true;
-  final _data = AShellStatusData();
+  final _data = OpenWorldStatusData();
   static const Duration _staleThreshold = Duration(seconds: 8);
   DateTime? _lastUpdateTime;
   Timer? _staleTimer;
 
   bool get show => _show;
-  AShellStatusData get data => _data;
+  OpenWorldStatusData get data => _data;
 
   Duration? get sinceLastUpdate {
     final t = _lastUpdateTime;
@@ -3185,17 +3185,17 @@ class AShellStatusModel with ChangeNotifier {
     return since != null && since > _staleThreshold;
   }
 
-  Future<void> checkShowAShellStatusMonitor(SessionID sessionId) async {
+  Future<void> checkShowOpenWorldStatusMonitor(SessionID sessionId) async {
     try {
       final raw = await bind.sessionGetToggleOption(
-          sessionId: sessionId, arg: 'show-ashell-status-monitor');
+          sessionId: sessionId, arg: 'show-openworld-status-monitor');
       final show = raw ?? true;
       if (_show != show) {
         _show = show;
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('checkShowAShellStatusMonitor failed: $e');
+      debugPrint('checkShowOpenWorldStatusMonitor failed: $e');
     }
   }
 
@@ -3256,7 +3256,7 @@ class AShellStatusModel with ChangeNotifier {
       _restartStaleTimer();
       if (changed) notifyListeners();
     } catch (e) {
-      debugPrint('updateAShellStatus parse failed: $e');
+      debugPrint('updateOpenWorldStatus parse failed: $e');
     }
   }
 
@@ -3266,7 +3266,7 @@ class AShellStatusModel with ChangeNotifier {
         Timer(_staleThreshold + const Duration(milliseconds: 500), () {
       if (isStale) {
         debugPrint(
-            'AShellStatusModel: stale (>${_staleThreshold.inSeconds}s no update), mark status waiting');
+            'OpenWorldStatusModel: stale (>${_staleThreshold.inSeconds}s no update), mark status waiting');
         _clearStatusFields();
         _lastUpdateTime = null;
         _staleTimer?.cancel();
@@ -3361,7 +3361,7 @@ class FFI {
   late final UserModel userModel; // global
   late final PeerTabModel peerTabModel; // global
   late final QualityMonitorModel qualityMonitorModel; // session
-  late final AShellStatusModel ashellStatusModel; // session
+  late final OpenWorldStatusModel openworldStatusModel; // session
   late final RecordingModel recordingModel; // session
   late final InputModel inputModel; // session
   late final ElevationModel elevationModel; // session
@@ -3392,7 +3392,7 @@ class FFI {
     abModel = AbModel(WeakReference(this));
     groupModel = GroupModel(WeakReference(this));
     qualityMonitorModel = QualityMonitorModel(WeakReference(this));
-    ashellStatusModel = AShellStatusModel(WeakReference(this));
+    openworldStatusModel = OpenWorldStatusModel(WeakReference(this));
     recordingModel = RecordingModel(WeakReference(this));
     inputModel = InputModel(WeakReference(this));
     elevationModel = ElevationModel(WeakReference(this));
@@ -3742,7 +3742,7 @@ class FFI {
     await imageModel.update(null);
     cursorModel.clear();
     ffiModel.clear();
-    ashellStatusModel.reset();
+    openworldStatusModel.reset();
     canvasModel.clear();
     inputModel.resetModifiers();
     if (closeSession) {
@@ -3868,8 +3868,8 @@ class PeerInfo with ChangeNotifier {
   bool get isInstalled =>
       platform != kPeerPlatformWindows ||
       platformAdditions[kPlatformAdditionsIsInstalled] == true;
-  List<int> get AShellVirtualDisplays => List<int>.from(
-      platformAdditions[kPlatformAdditionsAShellVirtualDisplays] ?? []);
+  List<int> get OpenWorldVirtualDisplays => List<int>.from(
+      platformAdditions[kPlatformAdditionsOpenWorldVirtualDisplays] ?? []);
   int get amyuniVirtualDisplayCount =>
       platformAdditions[kPlatformAdditionsAmyuniVirtualDisplays] ?? 0;
 
@@ -3898,7 +3898,7 @@ class PeerInfo with ChangeNotifier {
 
   bool get cursorEmbedded => tryGetDisplay()?.cursorEmbedded ?? false;
 
-  bool get isAShellIdd =>
+  bool get isOpenWorldIdd =>
       platformAdditions[kPlatformAdditionsIddImpl] == 'rustdesk_idd';
   bool get isAmyuniIdd =>
       platformAdditions[kPlatformAdditionsIddImpl] == 'amyuni_idd';

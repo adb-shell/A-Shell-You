@@ -4,10 +4,10 @@ project(runner LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "ashell")
+set(BINARY_NAME "openworld")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
-set(APPLICATION_ID "me.ashell")
+set(APPLICATION_ID "com.openworld.me")
 
 # Explicitly opt into modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -125,13 +125,13 @@ foreach(bundled_library ${PLUGIN_BUNDLED_LIBRARIES})
 endforeach(bundled_library)
 
 # flutter_rust_bridge
-set(ASHELL_LIB_BUILD_TYPE $<IF:$<CONFIG:Debug>,debug,release>)
-string(TOLOWER "${CMAKE_BUILD_TYPE}" ASHELL_LIB_BUILD_TYPE)
-message(STATUS "ashell lib build type: ${ASHELL_LIB_BUILD_TYPE}")
+set(OPENWORLD_LIB_BUILD_TYPE $<IF:$<CONFIG:Debug>,debug,release>)
+string(TOLOWER "${CMAKE_BUILD_TYPE}" OPENWORLD_LIB_BUILD_TYPE)
+message(STATUS "openworld lib build type: ${OPENWORLD_LIB_BUILD_TYPE}")
 
-set(ASHELL_LIB "../../target/${ASHELL_LIB_BUILD_TYPE}/libashell.so")
-install(FILES "${ASHELL_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-COMPONENT Runtime RENAME libashell.so)
+set(OPENWORLD_LIB "../../target/${OPENWORLD_LIB_BUILD_TYPE}/libopenworld.so")
+install(FILES "${OPENWORLD_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+COMPONENT Runtime RENAME libopenworld.so)
 
 # Fully re-copy the assets directory on each build to avoid having stale files
 # from a previous install.

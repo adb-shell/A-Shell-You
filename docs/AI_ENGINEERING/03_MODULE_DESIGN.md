@@ -1,4 +1,6 @@
-# AShell 模块设计 / Module Design
+# OpenWorld 模块设计 / Module Design
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前整体源码快照为Baseline23 / test48226fb，PC开发者双密码设计与维护见本页第11节。ADB部分沿用2026-10-19复核的0dbe202快照：连接、2路Shell、媒体、遮罩和输入资源分别管理，instance/revision按真实状态变化推送；键盘与触摸共用control-only单writer并各自排队，显式粘贴与被动剪贴板同步区分paste标志。PC帧桥为独立二进制C ABI，不以base64装入状态JSON。V0，构建/ROM实测待证；历史快照见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
@@ -7,7 +9,7 @@
 
 ## 1. 启动与进程模型
 
-`src/main.rs` 按 target/feature 分流；desktop 非 Flutter 走 `core_main()` + Sciter，Flutter 构建主要加载 `ashell` library。`src/core_main.rs` 继续处理 install、tray、server、CM、elevation、quick support 和 portable 参数。`flutter/lib/main.dart` 再按 window argument 启动 main/remote/file/terminal/port-forward/install/mobile。
+`src/main.rs` 按 target/feature 分流；desktop 非 Flutter 走 `core_main()` + Sciter，Flutter 构建主要加载 `openworld` library。`src/core_main.rs` 继续处理 install、tray、server、CM、elevation、quick support 和 portable 参数。`flutter/lib/main.dart` 再按 window argument 启动 main/remote/file/terminal/port-forward/install/mobile。
 
 设计含义：一次“启动问题”可能跨 Rust process args、native runner、Flutter engine 和 multi-window。不能只看 `main.dart`。
 
@@ -49,7 +51,7 @@ display_service/video_service
 
 Controller 由 `input_model.dart`、`flutter_ffi.rs`、`client::send_mouse` 编码；endpoint 在 `Connection::on_message()` 分发到 `input_service`；desktop 通过 enigo/portable service，Android 通过 JNI → Accessibility。
 
-AShell 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、browser、analysis、back、share、touch-block、Dev selector。它们是协议命令，不是纯 UI 操作。
+OpenWorld 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、browser、analysis、back、share、touch-block、Dev selector。它们是协议命令，不是纯 UI 操作。
 
 安全边界：UI 密码/按钮可见性不是协议授权；endpoint 必须独立检查 session permission。当前部分 Mouse/Touch/Key 和自定义 mask 未形成完整 server-side gate，列为 P0/P1。
 
@@ -81,7 +83,7 @@ AShell 自定义 Android 命令复用 mouse mask/url 通道，包括 blank、bro
 
 ## 9. Android local ADB — 独立新模块
 
-当前LocalAdbPage→LocalAdbBridge→me.ashell/local_adb/v1→LocalAdbPlugin→LocalAdbManager。T004的PC专用协议/独立JNI也进入该manager；它拥有进程共享状态和有限串行worker，由LocalAdbClient执行本机配对/连接。AdbIdentity管身份，AdbLocalSocket管loopback transport，AdbShell管shell-v2。见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
+当前LocalAdbPage→LocalAdbBridge→com.openworld.me/local_adb/v1→LocalAdbPlugin→LocalAdbManager。T004的PC专用协议/独立JNI也进入该manager；它拥有进程共享状态和有限串行worker，由LocalAdbClient执行本机配对/连接。AdbIdentity管身份，AdbLocalSocket管loopback transport，AdbShell管shell-v2。见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
 
 T009 / ADR-0015旧runner/bridge/mDNS/Accessibility自动化及libadb.so保持退役。新NSD发现本机配对和连接两类端口，媒体另走字段41；remote terminal等原链保持。ADR-0017记录本机集成，ADR-0018扩展多PC请求和共享状态，ADR-0019/0020记录独立权限、发现和显式刷新边界。
 

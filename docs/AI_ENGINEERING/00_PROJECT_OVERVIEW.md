@@ -1,12 +1,14 @@
-# AShell 项目总览 / Project Overview
+# OpenWorld 项目总览 / Project Overview
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb，2026-10-25。PC开发者入口已改为Ctrl+Shift+H密码确认，支持两个密码，任一精确匹配后开启进程内免登录；维护与边界见[模块设计](03_MODULE_DESIGN.md)。当前CI唯一入口Build-Clients-BT；main合并及双端编排见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)，V0不等于运行通过。
 
-2026-10-19 ADB实现快照0dbe202：产品显示“一个壳子”；ADB独立配对/命令/媒体、全局优先输入、文本剪贴板、辅助保活与静默常亮已落源码。PC双源接收和分组状态保持；本次密码任务不修改该实现。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)，构建/ROM实测仍待证。
+2026-10-19 ADB实现快照0dbe202：产品显示“开放世界”；ADB独立配对/命令/媒体、全局优先输入、文本剪贴板、辅助保活与静默常亮已落源码。PC双源接收和分组状态保持；本次密码任务不修改该实现。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)，构建/ROM实测仍待证。
 
 初始接管记录：2026-07-12（历史）
 历史源码基线：`77062b4`；当前实现见本页顶部
-接管角色：AShell Principal Engineer
+接管角色：OpenWorld Principal Engineer
 
 2026-10-12 后续复核：[接管认知与证据](TAKEOVER_REVIEW_2026-10-12.md)、[新观察基线](../BASELINE/05_OBSERVED_BASELINE_2026-10-12.md)。本页7月基线保留；当前本地Git状态、历史源内容映射、ADB资产缺失、terminal生命周期及安全结论的证据边界以新复核和当前源码核对，不将旧环境描述冒充当前事实。
 
@@ -14,24 +16,24 @@
 
 ## 1. 项目身份
 
-AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一个壳子`。当前身份锚点：
+OpenWorld 是 RustDesk 的深度二次开发产品，Android 可见名称为 `开放世界`。当前身份锚点：
 
 | 项目 | 当前值 | 源码锚点 |
 |---|---|---|
-| Rust package/library | `ashell` / `ashell` | `Cargo.toml` |
+| Rust package/library | `openworld` / `openworld` | `Cargo.toml` |
 | Rust version | `5.2.1` | `Cargo.toml` |
 | Flutter package/version | `flutter_hbb` / `5.2.1+59`；内部包名保留 | `flutter/pubspec.yaml` |
-| Runtime app name | `AShell` | `libs/hbb_common/src/config.rs::APP_NAME` |
-| Product display name | `一个壳子` | `src/common.rs::get_display_app_name`、Flutter `appName` |
-| Android package | `me.ashell` | `flutter/android/app/build.gradle` |
-| Android labels | application/后台/launcher `一个壳子` | strings.xml + manifest activity-alias |
-| Android scheme | `ashell` | `flutter/android/app/src/main/AndroidManifest.xml` |
-| Android native library | `libashell.so` | `build.sh`, `pkg2230.kt`, `native_model.dart` |
-| Windows native library | `ashell.dll` | `flutter/windows/CMakeLists.txt`, `native_model.dart` |
+| Runtime app name | `OpenWorld` | `libs/hbb_common/src/config.rs::APP_NAME` |
+| Product display name | `开放世界` | `src/common.rs::get_display_app_name`、Flutter `appName` |
+| Android package | `com.openworld.me` | `flutter/android/app/build.gradle` |
+| Android labels | application/后台/launcher `开放世界` | strings.xml + manifest activity-alias |
+| Android scheme | `openworld` | `flutter/android/app/src/main/AndroidManifest.xml` |
+| Android native library | `libopenworld.so` | `build.sh`, `pkg2230.kt`, `native_model.dart` |
+| Windows native library | `openworld.dll` | `flutter/windows/CMakeLists.txt`, `native_model.dart` |
 
 2026-10-12 [身份迁移](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)将 `ORG` 改为 `me`。RustDesk内部类型名、第三方仓库URL、驱动名及外部兼容字段按用途保留，不做无差别替换。Flutter内部package明确保留flutter_hbb；该迁移的历史身份基线为 `AS-BL-2026-10-12-a036f31-worktree`；当前实现以Baseline22为准。
 
-2026-10-18 [T010显示名调整](../tasks/T-2026-10-18-010-display-name.md)：跨平台可见产品名统一为“一个壳子”；内部身份保持，旧Windows快捷方式文件名、2FA issuer及作者/版权仍为原值。D-032，仅V0，构建与运行待证。
+2026-10-18 [T010显示名调整](../tasks/T-2026-10-18-010-display-name.md)：跨平台可见产品名统一为“开放世界”；内部身份保持，旧Windows快捷方式文件名、2FA issuer及作者/版权仍为原值。D-032，仅V0，构建与运行待证。
 
 ## 2. 来源与可追溯性
 
@@ -102,7 +104,7 @@ AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一�
 2. Flutter 负责主产品 UI、session/model 状态和多平台窗口。
 3. Android 由 Flutter MethodChannel + Rust FFI/JNI + Kotlin service 三层共同组成；任何运行时改动都可能跨层。
 4. Windows 继续使用 RustDesk 平台底座，并叠加 Amyuni driver、隐私窗体和注入辅助进程。
-5. AShell 控制端会话固定请求 relay；受控端仍保留上游 direct/punch/LAN/NAT 代码，不能称为全局移除直连。
+5. OpenWorld 控制端会话固定请求 relay；受控端仍保留上游 direct/punch/LAN/NAT 代码，不能称为全局移除直连。
 6. ZEGO 是独立 RTC 媒体旁路；旧 RustDesk `audio_service` 不承担当前语音媒体。
 7. 产品账号 API 与远控会话认证是两套边界，不能混为一个“登录”。
 
@@ -112,7 +114,7 @@ AShell 是 RustDesk 的深度二次开发产品，Android 可见名称为 `一�
 |---|---|
 | 2026-04-13 | DaXianDesk/RustDesk 快照导入 |
 | 04-14—04-22 | 工程文档初建；Android 黑屏、独立防触、状态监测、双通道与无障碍守卫 |
-| 05-05—05-18 | AShell 品牌/package/SO/DLL/构建迁移；文档清理和源码审计 |
+| 05-05—05-18 | OpenWorld 品牌/package/SO/DLL/构建迁移；文档清理和源码审计 |
 | 05-20—05-31 | Android 本地 ADB/LADB、mDNS、无线调试自动化 |
 | 05-31—06-07 | ZEGO 替换语音媒体；Token 服务和开发者登录旁路 |
 | 06-09—06-24 | relay 重连、core service/share 解耦、Android 首帧与投屏授权稳定性 |

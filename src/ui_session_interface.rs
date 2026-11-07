@@ -1588,7 +1588,7 @@ impl<T: InvokeUiSession> Session<T> {
 
     pub fn printer_response(&self, id: i32, path: String, printer_name: String) {
         self.printer_names.write().unwrap().insert(id, printer_name);
-        let to = std::env::temp_dir().join(format!("ashell_printer_{id}"));
+        let to = std::env::temp_dir().join(format!("openworld_printer_{id}"));
         self.send(Data::SendFiles((
             id,
             hbb_common::fs::JobType::Printer,
@@ -1615,7 +1615,7 @@ pub trait InvokeUiSession: Send + Sync + Clone + 'static + Sized + Default {
     fn set_permission(&self, name: &str, value: bool);
     fn close_success(&self);
     fn update_quality_status(&self, qs: QualityStatus);
-    fn update_ashell_status(&self, json: String);
+    fn update_openworld_status(&self, json: String);
     fn set_connection_type(&self, is_secured: bool, direct: bool);
     fn set_fingerprint(&self, fingerprint: String);
     fn job_error(&self, id: i32, err: String, file_num: i32);

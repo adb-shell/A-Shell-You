@@ -1,8 +1,10 @@
 # ZEGO Voice Call Architecture / ZEGO 语音通话工程方案
 
+2026-11-07命名兼容：产品/本地变量使用OpenWorld/openworld；客户端继续发送已部署的`ashellSessionId`，不要求外部服务先发布。仓内broker接受`openworldSessionId`和旧键，新键优先；地址/凭据/认证/媒体逻辑不变。
+
 最后同步源码：2026-06-07
 
-本文是 AShell PC -> Android 1v1 ZEGO 语音通话的工程级链路说明。ZEGO 只承载语音媒体，AShell 原远控连接只承载邀请、接听、挂断和房间参数分发。
+本文是 OpenWorld PC -> Android 1v1 ZEGO 语音通话的工程级链路说明。ZEGO 只承载语音媒体，OpenWorld 原远控连接只承载邀请、接听、挂断和房间参数分发。
 
 官方依据：
 
@@ -17,8 +19,8 @@
 ```mermaid
 sequenceDiagram
     participant PC as "PC Flutter + Rust session"
-    participant Token as "AShell ZEGO Token Service"
-    participant Conn as "Existing AShell control channel"
+    participant Token as "OpenWorld ZEGO Token Service"
+    participant Conn as "Existing OpenWorld control channel"
     participant AndroidRust as "Android Rust connection-manager"
     participant AndroidUI as "Android Flutter UI"
     participant ZegoPC as "ZEGO SDK on PC"
@@ -49,7 +51,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    subgraph Control["AShell existing control connection"]
+    subgraph Control["OpenWorld existing control connection"]
         A["PC voice button"] --> B["Rust Data::NewVoiceCall"]
         B --> C["VoiceCallRequest / VoiceCallResponse"]
         C --> D["Android auto-accept dialog"]
@@ -73,7 +75,7 @@ flowchart LR
     E -.hangup.-> M["stopPlayingStream + stopPublishingStream + logoutRoom"]
 ```
 
-AShell video, input, ADB/LADB, file transfer, clipboard, terminal, Android `MediaProjection`, `SKL`, `BIS`, `VIDEO_RAW`, and side-button command protocol are outside this media boundary.
+OpenWorld video, input, ADB/LADB, file transfer, clipboard, terminal, Android `MediaProjection`, `SKL`, `BIS`, `VIDEO_RAW`, and side-button command protocol are outside this media boundary.
 
 ## 3. State Truth
 
@@ -138,9 +140,9 @@ Runtime isolation:
 
 ## 6. Official Demo Alignment
 
-The official ZEGO Flutter quick-start flow was reviewed as an implementation reference. The demo zip is not a Git-tracked project source file; if a local `ZegoExpressDemo_flutter_dart.zip` is provided again, treat it as external reference material and verify against current ZEGO docs plus AShell source anchors.
+The official ZEGO Flutter quick-start flow was reviewed as an implementation reference. The demo zip is not a Git-tracked project source file; if a local `ZegoExpressDemo_flutter_dart.zip` is provided again, treat it as external reference material and verify against current ZEGO docs plus OpenWorld source anchors.
 
-| Official demo flow | Demo source | AShell source |
+| Official demo flow | Demo source | OpenWorld source |
 |---|---|---|
 | Create engine with `ZegoEngineProfile` | `lib/topics/QuickStart/quick_start/quick_start_page.dart::createEngine` | `flutter/lib/models/zego_voice_call_model.dart::_ensureEngine` |
 | Login room before publish/play | `quick_start_page.dart::loginRoom` | `ZegoVoiceCallModel.join` |
@@ -153,9 +155,9 @@ The official ZEGO Flutter quick-start flow was reviewed as an implementation ref
 | Track sent audio first frame | `publish_stream_publishing_page.dart::onPublisherSendAudioFirstFrame` | `ZegoVoiceCallModel._installCallbacks` |
 | Track publish/play quality | `publish_stream_publishing_page.dart::onPublisherQualityUpdate`, `play_stream_page.dart::onPlayerQualityUpdate` | `ZegoVoiceCallModel._installCallbacks`, PC panel, Android status card |
 
-Intentional AShell differences:
+Intentional OpenWorld differences:
 
-- AShell uses Token authentication from `docs/ZEGO_TOKEN_SERVICE_DEPLOYMENT.md`; `ZEGO_SERVER_SECRET` stays server-side.
-- AShell uses `ZegoScenario.StandardVoiceCall` for 1v1 audio instead of the demo's generic/high-quality video scenario.
-- AShell does not create video canvas views because the module is audio-only; `startPlayingStream(streamID)` is still used for the audio stream.
-- AShell uses the existing remote-control channel only for invite/accept/hangup and ZEGO room metadata; audio frames never travel through RustDesk `audio_service`.
+- OpenWorld uses Token authentication from `docs/ZEGO_TOKEN_SERVICE_DEPLOYMENT.md`; `ZEGO_SERVER_SECRET` stays server-side.
+- OpenWorld uses `ZegoScenario.StandardVoiceCall` for 1v1 audio instead of the demo's generic/high-quality video scenario.
+- OpenWorld does not create video canvas views because the module is audio-only; `startPlayingStream(streamID)` is still used for the audio stream.
+- OpenWorld uses the existing remote-control channel only for invite/accept/hangup and ZEGO room metadata; audio frames never travel through RustDesk `audio_service`.

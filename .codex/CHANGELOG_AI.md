@@ -1,10 +1,23 @@
-# AShell AI Changelog
+# OpenWorld AI Changelog
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-25（PC开发者密码入口）
+Last Updated：2026-11-07（开放世界产品身份）
 
 Mode：`append-only task-level index`
+
+## T-2026-11-07-002：保持版本合并main与双端编排
+
+- 用户明确版本先不改，test/d9f1119合并main/7361d39并推送，提交说明“更新产品信息及指纹”，Both/常规编译不监控；两分支初始clean且远端一致。
+- 15处文档冲突按test当前内容解决，合并树先核对与test一致，再只补交付文档/记忆；版本仍5.2.1 / 5.2.1+59，撤销的2.0.26/2026方案未恢复，无产品/工作流增量。
+- Git/dispatch准确回执待追加；N/A — no decision delta，沿用Baseline24，设备运行未验。STATE/WORK-20261107-002 / CE-20261107-T002-01/02；[任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。
+
+## T-2026-11-07-001：开放世界产品身份迁移
+
+- main/7361d39初始clean；当前源码、ADB、native/FFI/包路径、平台资源、构建编排与当前工程文档统一新品牌；71个必要文件路径重命名，PNG内容不变。
+- 135项V0合同及四份Shell、CI 14段Bash/14段PowerShell语法通过；锁文件版本/checksum、协议编号/类型、认证输入、依赖与工作流执行结构保持。外部ZEGO请求键/签名输入/域名分类兼容，历史记录保留原名。
+- 用户确认test交付后，源码ad88665已提交推送，Both/常规编译HTTP204/run42350649478/head ad88665；main保持7361d39。用户随后要求“不监控”，helper已停、云编译未取消；最终构建结果未知，真机NOT_RUN，不声称编译PASS。
+- T8源码/文档/Git/触发交付完成；仅补回执文档，不再次dispatch。STATE/WORK-20261107-001 / CE-20261107-T001-01/02/03 / D-034 / Baseline24；[任务](../docs/tasks/T-2026-11-07-001-openworld-identity.md)。
 
 ## T-2026-10-25-002：开发者密码文档同步与main双端交付
 

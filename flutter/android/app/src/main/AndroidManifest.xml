@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="me.ashell">
+    package="com.openworld.me">
 
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -69,7 +69,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="ashell" />
+                <data android:scheme="openworld" />
             </intent-filter>
         </activity>
 
@@ -98,7 +98,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <!--ACTION_BOOT_COMPLETED for debug test on no root device-->
-                <action android:name="me.ashell.DEBUG_BOOT_COMPLETED" />
+                <action android:name="com.openworld.me.DEBUG_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

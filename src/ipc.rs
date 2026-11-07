@@ -385,7 +385,7 @@ impl Drop for CheckIfRestart {
         if self.audio_input != Config::get_option("audio-input") {
             crate::audio_service::restart();
         }
-        // AShell voice calls use ZEGO only; legacy voice-call-input changes
+        // OpenWorld voice calls use ZEGO only; legacy voice-call-input changes
         // must not update RustDesk audio_service voice-call devices.
     }
 }

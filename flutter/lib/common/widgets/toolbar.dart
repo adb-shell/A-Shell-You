@@ -646,16 +646,16 @@ Future<List<TToggleMenu>> toolbarDisplayToggle(
       },
       child: Text(translate('Show quality monitor'))));
   // show Android controlled-end status monitor
-  final ashellOption = 'show-ashell-status-monitor';
+  final openworldOption = 'show-openworld-status-monitor';
   v.add(TToggleMenu(
       value: bind.sessionGetToggleOptionSync(
-          sessionId: sessionId, arg: ashellOption),
+          sessionId: sessionId, arg: openworldOption),
       onChanged: (value) async {
         if (value == null) return;
-        await bind.sessionToggleOption(sessionId: sessionId, value: ashellOption);
-        ffi.ashellStatusModel.checkShowAShellStatusMonitor(sessionId);
+        await bind.sessionToggleOption(sessionId: sessionId, value: openworldOption);
+        ffi.openworldStatusModel.checkShowOpenWorldStatusMonitor(sessionId);
       },
-      child: Text(translate('Show A Shell You status monitor'))));
+      child: Text(translate('Show OpenWorld status monitor'))));
   // mute
   if (isDefaultConn && perms['audio'] != false) {
     final option = 'disable-audio';
@@ -943,7 +943,7 @@ bool showVirtualDisplayMenu(FFI ffi) {
   if (!ffi.ffiModel.pi.isInstalled) {
     return false;
   }
-  if (ffi.ffiModel.pi.isAShellIdd || ffi.ffiModel.pi.isAmyuniIdd) {
+  if (ffi.ffiModel.pi.isOpenWorldIdd || ffi.ffiModel.pi.isAmyuniIdd) {
     return true;
   }
   return false;
@@ -956,8 +956,8 @@ List<Widget> getVirtualDisplayMenuChildren(
   }
   final pi = ffi.ffiModel.pi;
   final privacyModeState = PrivacyModeState.find(id);
-  if (pi.isAShellIdd) {
-    final virtualDisplays = ffi.ffiModel.pi.AShellVirtualDisplays;
+  if (pi.isOpenWorldIdd) {
+    final virtualDisplays = ffi.ffiModel.pi.OpenWorldVirtualDisplays;
     final children = <Widget>[];
     for (var i = 0; i < kMaxVirtualDisplayCount; i++) {
       children.add(Obx(() => CkbMenuButton(

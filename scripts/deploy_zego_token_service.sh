@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-SERVICE_NAME="${SERVICE_NAME:-ashell-zego-token}"
-INSTALL_DIR="${INSTALL_DIR:-/www/wwwroot/ashell-zego-token}"
+SERVICE_NAME="${SERVICE_NAME:-openworld-zego-token}"
+INSTALL_DIR="${INSTALL_DIR:-/www/wwwroot/openworld-zego-token}"
 INSTALL_DIR="${INSTALL_DIR%/}"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 
@@ -16,15 +16,15 @@ GOPROXY_VALUE="${GOPROXY_VALUE:-https://goproxy.cn,direct}"
 ACTION=""
 
 log() {
-  printf '\033[1;32m[ashell-zego]\033[0m %s\n' "$*"
+  printf '\033[1;32m[openworld-zego]\033[0m %s\n' "$*"
 }
 
 warn() {
-  printf '\033[1;33m[ashell-zego]\033[0m %s\n' "$*"
+  printf '\033[1;33m[openworld-zego]\033[0m %s\n' "$*"
 }
 
 fail() {
-  printf '\033[1;31m[ashell-zego]\033[0m %s\n' "$*" >&2
+  printf '\033[1;31m[openworld-zego]\033[0m %s\n' "$*" >&2
   exit 1
 }
 
@@ -117,7 +117,7 @@ EOF
   umask 022
 
   cat > go.mod <<'EOF'
-module ashell-zego-token
+module openworld-zego-token
 
 go 1.18
 
@@ -145,7 +145,8 @@ import (
 type createRequest struct {
 	PcPeerId           string `json:"pcPeerId"`
 	AndroidPeerId      string `json:"androidPeerId"`
-	AShellSessionId string `json:"ashellSessionId"`
+	OpenWorldSessionId string `json:"openworldSessionId"`
+	LegacySessionId    string `json:"ashellSessionId"`
 }
 
 type createResponse struct {
@@ -174,7 +175,7 @@ func main() {
 	http.HandleFunc("/api/v1/voice-call/create", handleCreate)
 
 	addr := host + ":" + port
-	log.Println("ashell zego token service listening on", addr)
+	log.Println("openworld zego token service listening on", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
@@ -211,7 +212,10 @@ func handleCreate(w http.ResponseWriter, r *http.Request) {
 
 	pcPeerId := clean(req.PcPeerId)
 	androidPeerId := clean(req.AndroidPeerId)
-	sessionId := clean(req.AShellSessionId)
+	sessionId := clean(req.OpenWorldSessionId)
+	if sessionId == "" {
+		sessionId = clean(req.LegacySessionId)
+	}
 
 	if pcPeerId == "" || androidPeerId == "" || sessionId == "" {
 		writeJSON(w, http.StatusBadRequest, errorResponse{"missing_required_id"})
@@ -341,7 +345,7 @@ install_systemd_service() {
   log "写入 systemd 服务：${SERVICE_FILE}"
   cat > "${SERVICE_FILE}" <<EOF
 [Unit]
-Description=AShell ZEGO Token Service
+Description=OpenWorld ZEGO Token Service
 After=network.target
 
 [Service]
@@ -370,19 +374,19 @@ verify_service() {
 
   local health_url="http://127.0.0.1:${PORT}/api/v1/health"
   log "测试健康接口：${health_url}"
-  curl -fsS "${health_url}" >/tmp/ashell-zego-health.json
-  grep -q '"ok":true' /tmp/ashell-zego-health.json || fail "健康检查返回异常：$(cat /tmp/ashell-zego-health.json)"
+  curl -fsS "${health_url}" >/tmp/openworld-zego-health.json
+  grep -q '"ok":true' /tmp/openworld-zego-health.json || fail "健康检查返回异常：$(cat /tmp/openworld-zego-health.json)"
 
   local token_url="http://127.0.0.1:${PORT}"
   log "测试 Token 创建接口：POST ${token_url}"
   curl -fsS -X POST "${token_url}" \
     -H "Authorization: Bearer ${VOICE_API_KEY}" \
     -H "Content-Type: application/json" \
-    -d '{"pcPeerId":"pc_test","androidPeerId":"android_test","ashellSessionId":"sess_test"}' \
-    >/tmp/ashell-zego-token-test.json
+    -d '{"pcPeerId":"pc_test","androidPeerId":"android_test","openworldSessionId":"sess_test"}' \
+    >/tmp/openworld-zego-token-test.json
 
-  grep -q '"callerToken"' /tmp/ashell-zego-token-test.json || fail "Token 测试返回异常：$(cat /tmp/ashell-zego-token-test.json)"
-  grep -q '"calleeToken"' /tmp/ashell-zego-token-test.json || fail "Token 测试缺少 calleeToken：$(cat /tmp/ashell-zego-token-test.json)"
+  grep -q '"callerToken"' /tmp/openworld-zego-token-test.json || fail "Token 测试返回异常：$(cat /tmp/openworld-zego-token-test.json)"
+  grep -q '"calleeToken"' /tmp/openworld-zego-token-test.json || fail "Token 测试缺少 calleeToken：$(cat /tmp/openworld-zego-token-test.json)"
 }
 
 print_summary() {
@@ -395,7 +399,7 @@ print_summary() {
   cat <<EOF
 
 ============================================================
-AShell ZEGO Token Service 部署完成
+OpenWorld ZEGO Token Service 部署完成
 ============================================================
 
 服务名：${SERVICE_NAME}
@@ -463,7 +467,7 @@ uninstall_token_service() {
     warn "未找到服务目录：${INSTALL_DIR}"
   fi
 
-  rm -f /tmp/ashell-zego-health.json /tmp/ashell-zego-token-test.json
+  rm -f /tmp/openworld-zego-health.json /tmp/openworld-zego-token-test.json
 
   systemctl daemon-reload
   if systemctl is-active --quiet "${SERVICE_NAME}" 2>/dev/null; then
@@ -479,7 +483,7 @@ uninstall_token_service() {
   cat <<EOF
 
 ============================================================
-AShell ZEGO Token Service 卸载完成
+OpenWorld ZEGO Token Service 卸载完成
 ============================================================
 
 已处理：
@@ -499,7 +503,7 @@ show_menu() {
   cat <<EOF
 
 ============================================================
-AShell ZEGO Token Service 部署脚本
+OpenWorld ZEGO Token Service 部署脚本
 ============================================================
 
 1.安装Token服务

@@ -14,7 +14,7 @@ class RdPlatformChannel {
   static RdPlatformChannel get instance => _windowUtil;
 
   final MethodChannel _osxMethodChannel =
-      MethodChannel("me.ashell/macos");
+      MethodChannel("com.openworld.me/macos");
 
   /// Change the theme of the system window
   Future<void> changeSystemWindowTheme(SystemWindowTheme theme) {

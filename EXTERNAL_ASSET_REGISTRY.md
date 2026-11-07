@@ -1,4 +1,6 @@
-# AShell External Asset Registry
+# OpenWorld External Asset Registry
+
+2026-11-07 / T-2026-11-07-001：当前产品包/bundle迁至com.openworld.me、native为openworld。现有外部服务地址/凭据和二进制资产保持；ZEGO旧wire key与构建机旧变量仅保留兼容。新Apple/Google bundle注册、正式证书/profile及客户端真实构建证据尚未取得；没有远端部署或密钥轮换。详见[身份迁移](docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
 
 2026-10-19 T006：按0dbe202同步文档，无新增、下载或替换外部资产。EXT-LIB-ADB-004—007及EXT-BIN-SCRCPY-001保持；视频helper复用固定scrcpy 5.0.1，常驻截图/节点/遮罩helper来自APK。字体使用App内公开SANS_SERIF与系统回退，无外部字体文件。新旧CI入口以[当前构建说明](docs/BUILD_CLIENTS_ACTIONS.md)为准；以下登记保留各时点证据，当前构建/设备结果仍待验证。
 
@@ -6,7 +8,7 @@
 
 2026-10-14 T002：主界面分栏/连续截图无新外部依赖或二进制；截图调用设备系统screencap并使用Android Bitmap及既有image crate，原EXT-BIN-SCRCPY-001未变。D-027 / Baseline17，V0，未构建。
 
-2026-10-14 / EXT-BIN-SCRCPY-001：官方 Genymobile scrcpy-server v5.0.1（Apache-2.0），733930字节；SHA256 `764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536`已与官方发布元数据比对。固定资产和LICENSE/NOTICE位于`flutter/android/app/src/main/assets/adb-mirror/`；仅在Android已授权ADB shell执行，宿主不执行。来源/链接见资产NOTICE与[投屏合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。上游owner Genymobile；集成owner AShell维护者；签名/可复现重建/真机证据未取得，不据此宣称release-ready。T-2026-10-14-001 / D-026 / Baseline16。
+2026-10-14 / EXT-BIN-SCRCPY-001：官方 Genymobile scrcpy-server v5.0.1（Apache-2.0），733930字节；SHA256 `764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536`已与官方发布元数据比对。固定资产和LICENSE/NOTICE位于`flutter/android/app/src/main/assets/adb-mirror/`；仅在Android已授权ADB shell执行，宿主不执行。来源/链接见资产NOTICE与[投屏合同](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。上游owner Genymobile；集成owner OpenWorld维护者；签名/可复现重建/真机证据未取得，不据此宣称release-ready。T-2026-10-14-001 / D-026 / Baseline16。
 
 2026-10-13 T008：main/aca7446的Shell栏复用既有ADB shell接口，仅增加Flutter侧入口/状态，无新增库、服务、binary或工具链。ADB远程投屏传输为下一阶段待设计方向，尚未选定或引入scrcpy/其他媒体组件；后续确定选型时再登记固定来源、许可、hash/NOTICE等，不将计划登记为已安装资产。详见[当前ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)与[路线图](docs/AI_ENGINEERING/11_ROADMAP.md)。
 
@@ -110,8 +112,8 @@ Owner 为空时统一写 `OWNER-REQUIRED`，不能由 AI 推断个人或组织�
 | `EXT-WIN-004` | Printer driver package | `EXTERNAL/UNVERIFIED` | `libs/remote_printer/`, `build.cmd` | `OWNER-REQUIRED` | driver source/version、INF/CAT/SYS hashes、signature/publisher、license、OS matrix | remote printer install/release `BLOCKING` |
 | `EXT-WIN-005` | `printer_driver_adapter.dll` | `EXTERNAL/UNVERIFIED` | `src/server/printer_service.rs`, `build.cmd` | `OWNER-REQUIRED` | source/ABI/version/hash/signature/license | runtime DLL loading and printer service `BLOCKING` |
 | `EXT-WIN-006` | `dylib_virtual_display.dll` | `GENERATED`：source tracked in `libs/virtual_display/`，artifact not tracked | Windows packaging and virtual display FFI | Release owner required | formal toolchain result、artifact hash、Authenticode、ABI test | source provenance较好；仍需正式 build/sign evidence |
-| `EXT-WIN-007` | `RuntimeBroker_ashell.exe` helper | `OS-DERIVED/UNVERIFIED`：运行时复制 Windows `RuntimeBroker.exe` 后改名；仓内不存在独立 helper source/binary 是预期状态 | `src/privacy_mode/win_topmost_window.rs`, Windows runtime copy path | Windows/Security owner required | supported Windows build matrix、源文件 Microsoft signature 校验、复制/注入/清理 contract、EDR compatibility | 行为随 OS build 漂移；privacy helper 路径必须按目标 OS 验证 |
-| `EXT-WIN-008` | Windows `XpsPrint.dll` OS prerequisite | `OS-DERIVED`：`PrintXPSRawData` implementation 已 tracked，仓外依赖仅为 Windows OS API/DLL | `src/platform/windows.cc`, `src/platform/windows.rs` | Windows owner required | supported OS/API matrix、resource/error contract | 不是缺失的 AShell function；仍需 Win10/11 print compatibility 验证 |
+| `EXT-WIN-007` | `RuntimeBroker_openworld.exe` helper | `OS-DERIVED/UNVERIFIED`：运行时复制 Windows `RuntimeBroker.exe` 后改名；仓内不存在独立 helper source/binary 是预期状态 | `src/privacy_mode/win_topmost_window.rs`, Windows runtime copy path | Windows/Security owner required | supported Windows build matrix、源文件 Microsoft signature 校验、复制/注入/清理 contract、EDR compatibility | 行为随 OS build 漂移；privacy helper 路径必须按目标 OS 验证 |
+| `EXT-WIN-008` | Windows `XpsPrint.dll` OS prerequisite | `OS-DERIVED`：`PrintXPSRawData` implementation 已 tracked，仓外依赖仅为 Windows OS API/DLL | `src/platform/windows.cc`, `src/platform/windows.rs` | Windows owner required | supported OS/API matrix、resource/error contract | 不是缺失的 OpenWorld function；仍需 Win10/11 print compatibility 验证 |
 | `EXT-WIN-009` | Dormant RustDesk IDD driver package | `DORMANT/MISSING`：user-mode dylib source tracked，driver INF/SYS/CAT 不在仓库；current active backend 为 Amyuni | `libs/virtual_display/dylib/src/win10/`, `src/virtual_display_manager.rs` | Architecture/Release owner required | 保留/淘汰决定；若启用则需 source/version/hash/signature/license/rollback | 不得误标为 active 或混入当前 release；启用前为 `BLOCKING` |
 
 ## 6. Signing, Build and Release Infrastructure

@@ -1,14 +1,16 @@
-# AShell Project Memory
+# OpenWorld Project Memory
 
-最后更新：2026-10-25。用途：当前会话恢复入口，不替代源码。
+最后更新：2026-11-07。用途：当前会话恢复入口，不替代源码。
 
 ## 0. 当前恢复基线
 
-当前冻结源码快照为 [Baseline23](../docs/BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC主窗口Ctrl+Shift+H先弹密码框，`_developerLoginPasswordHashes`保存两个摘要，任一精确匹配后确认/回车开启进程内免登录；错误可重试，取消/Esc关闭后可重开，重启复位。维护见03_MODULE_DESIGN / FLT-08，文档不保存口令明文。
+最新任务T-2026-11-07-002：保持Rust/portable5.2.1、Flutter5.2.1+59，将当前test/d9f1119合并main推送后一次Both/常规编译，不监控。先前2.0.26/2026修改已按用户要求完全撤销；不从旧聊天恢复。STATE/WORK-20261107-002 / CE-20261107-T002-01/02；准确main SHA与dispatch见[任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。以下T001为产品身份来源记录。
 
-当前T-2026-10-25-002 / STATE/WORK-20261025-002 / CE-20261025-T002-01/02：文档已同步，main合并提交42ba32c已推送，说明“开发者密码增加”；main双端BT/Both/常规编译run40204268722/head42ba32c已触发，首次核对Windows EXE/Android Native均in_progress。后续只补交付文档，不改变产品/工作流树。唯一工作流Build-Clients-BT，旧入口不再作为当前导航；无生产发布或新依赖。
+身份迁移源码ad88665e74ef48e251a1faefda6461e3c0e8112b已提交推送test，main保持7361d39；[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)记录实施快照。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me。T-2026-11-07-001 / STATE/WORK-20261107-001 / CE-20261107-T001-01/02 / D-034。
 
-先读 [PROJECT_STATE](PROJECT_STATE.md) 和 [CURRENT_WORK](CURRENT_WORK.md)，核对HEAD/status。T001的源码356f53b、test交付48226fb与run40203581056只代表前轮证据；新main双端结果单独记录，V1/V3仍未验。旧基线/撤回实现不自动恢复，不把历史授权或dispatch当作当前构建PASS。
+客户端、ADB JNI/帧桥/包路径、安装资源、本地及云编译同步；版本、依赖和原功能控制流保持。旧ZEGO wire key、构建环境变量及服务分类前缀受控兼容，见[迁移记录](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
+
+V0通过；用户已确认test提交推送与Both/常规编译，run42350649478/head ad88665已启动，随后要求“不监控”。本地helper已停止，未取消云编译，最终结果未知，真机仍未验证。仅源码/Git/触发交付T8关闭，不自动恢复轮询。PC开发者双密码入口保持；旧Task/run不能证明新产品构建通过。先读[PROJECT_STATE](PROJECT_STATE.md)和[CURRENT_WORK](CURRENT_WORK.md)。
 
 当前ADB能力：
 
@@ -22,7 +24,7 @@
 - 默认core连接服务运行期间静默常亮，无新增主页/齿轮/设置入口。ADB连接验证后尝试本应用电池优化豁免；Shell按钮“点亮屏”仅发送唤醒键。
 - PC没有无障碍权限控制或“进入开发者选项”菜单；Android本机ADB页原“打开开发者选项”入口仍在。不根据历史要求擅自补回PC菜单。
 
-完整合同：[本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。本轮仅V0，不继承历史构建/真机成功结论。旧任务细节保留在TASK_HISTORY和docs/tasks，不再混写到当前恢复快照。
+完整合同：[本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。本轮编译回执与真机证据分开，不继承历史成功结论。旧任务细节保留在TASK_HISTORY和docs/tasks，不再混写到当前恢复快照。
 
 ## 1. Entry and Source of Truth
 
@@ -41,17 +43,17 @@
 3. `docs/ENGINEERING_*` 与 `docs/TASK_ENTRYPOINTS.md`，作为旧主套件和历史细节。
 4. 本目录、`AGENTS.md`、`CLAUDE.md` 只作为规则、摘要和入口，不覆盖源码。
 
-开发任务执行 `DEVELOPMENT_WORKFLOW.md`；仓外服务、database、driver 或 binary 查询 `EXTERNAL_ASSET_REGISTRY.md`。安全 Superpowers 只通过 `ashell-superpowers-safe` 的五项只读 allowlist 使用，外部包未安装。冲突时以源码为准；构建/运行行为只有正式环境验证后才能从 `verification-required` 提升为已验证。
+开发任务执行 `DEVELOPMENT_WORKFLOW.md`；仓外服务、database、driver 或 binary 查询 `EXTERNAL_ASSET_REGISTRY.md`。安全 Superpowers 只通过 `openworld-superpowers-safe` 的五项只读 allowlist 使用，外部包未安装。冲突时以源码为准；构建/运行行为只有正式环境验证后才能从 `verification-required` 提升为已验证。
 
 ## 2. Stable Identity
 
-- 产品显示名：`一个壳子`；内部runtime：`AShell`；ORG：`me`。
-- Android application/后台/launcher：`一个壳子`。Windows旧快捷方式文件名、2FA issuer及作者/版权保留 `A Shell You`，不作全局替换。
+- 产品显示名：`开放世界`；内部runtime：`OpenWorld`；macOS ORG：`com.openworld`。
+- Android application/后台/launcher及Windows快捷方式：`开放世界`；2FA issuer及产品作者/版权信息：`OpenWorld`。第三方署名和许可保持。
 - 来源：RustDesk 深度二次开发；本地初始化与后续记忆提交，2026-04-13一次性导入来自历史源仓（证据见接管复核文档）；准确 upstream fork commit 未确认。
-- Rust crate/library：`ashell`。
+- Rust crate/library：`openworld`。
 - Flutter package：`flutter_hbb`。用户明确要求保留此内部包名及 `package:flutter_hbb/` 导入，与产品品牌无绑定关系。
-- Android applicationId：`me.ashell`。
-- Android deep link scheme：`ashell`。
+- Android applicationId：`com.openworld.me`。
+- Android deep link scheme：`openworld`。
 - 当前源码版本：Rust `5.2.1`，Flutter `5.2.1+59`；不得由 AI 自动修改。
 - 根 license：AGPL-3.0；第三方 license/provenance 尚需完整审计。
 
@@ -61,7 +63,7 @@
 - shared config/protocol：`libs/hbb_common/`。
 - capture：`libs/scrap/`。
 - Flutter：`flutter/lib/`。
-- Android runtime：`flutter/android/app/src/main/kotlin/me/ashell/`。
+- Android runtime：`flutter/android/app/src/main/kotlin/com/openworld/me/`。
 - Android active JNI：`libs/scrap/src/android/pkg2230.rs`；`ffi.rs` 是未导出的兼容层。
 - Windows privacy/display：`src/privacy_mode.rs`、`src/privacy_mode/`、`src/virtual_display_manager.rs`。
 - account/API/sync/download：`src/hbbs_http/` 与 Flutter models。

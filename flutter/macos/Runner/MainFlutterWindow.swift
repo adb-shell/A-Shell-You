@@ -21,7 +21,7 @@ import texture_rgba_renderer
 
 class MainFlutterWindow: NSWindow {
     override func awakeFromNib() {
-        ashell_core_main();
+        openworld_core_main();
         let flutterViewController = FlutterViewController.init()
         let windowFrame = self.frame
         self.contentViewController = flutterViewController
@@ -65,7 +65,7 @@ class MainFlutterWindow: NSWindow {
     }
     
     public func setMethodHandler(registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "me.ashell/macos", binaryMessenger: registrar.messenger)
+        let channel = FlutterMethodChannel(name: "com.openworld.me/macos", binaryMessenger: registrar.messenger)
         channel.setMethodCallHandler({
             (call, result) -> Void in
                 switch call.method {

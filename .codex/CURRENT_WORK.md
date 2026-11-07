@@ -1,15 +1,15 @@
-# AShell Current Work Registry
+# OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261025-002`
-Last Updated：2026-10-25
-Active Task Count：0
+Registry Revision：`WORK-20261107-002`
+Last Updated：2026-11-07
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none。T-2026-10-25-002文档/V0、main合并推送与双端编排触发完成；构建与双密码实际交互仍待验收。
+T-2026-11-07-002 / active / T6：保持5.2.1 / 5.2.1+59，将test/d9f1119合并main/7361d39，说明“更新产品信息及指纹”，推送后一次Both/常规编译，不监控。15处文档冲突已按test当前内容解决，暂存树与test一致后仅补交付文档；Git/dispatch准确回执待追加。见[任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。
 
 ## 2. Concurrent Session Rules
 
@@ -25,6 +25,6 @@ none。T-2026-10-25-002文档/V0、main合并推送与双端编排触发完成�
 
 ## 4. Last Closed Task
 
-T-2026-10-25-002 / complete / T8（文档、Git与触发交付）。文档/Baseline23与BT入口同步，main以“开发者密码增加”合并提交42ba32c并推送，保留test48226fb全部历史；main Both/常规编译HTTP204/run40204268722/head42ba32c，首次核对Windows EXE/Android Native均in_progress。后续仅补同说明回执文档，无二次编排，无本机产品验证或生产发布。
+T-2026-11-07-001 / complete / T8（源码、文档、test提交推送及编排触发交付）。源码ad88665已推送origin/test，main保持7361d39；Both/常规编译HTTP204/run42350649478/head ad88665。用户续接要求“不监控”，已停止本地监控helper，未取消云编译；最后观察为双端原生依赖构建中，无编译PASS结论。后续仅补回执文档，不二次编排，真机与生产未操作。
 
-[详细任务](../docs/tasks/T-2026-10-25-002-developer-password-main.md) / STATE-20261025-002 / CE-20261025-T002-01/02。历史任务保留在TASK_HISTORY和CHANGELOG_AI；不得恢复已撤回的后续实现或从其他会话/任务继承授权。
+[详细任务](../docs/tasks/T-2026-11-07-001-openworld-identity.md) / STATE-20261107-001 / CE-20261107-T001-01/02/03。T8仅关闭本次交付范围，不表示V2/V3通过；历史任务保留在TASK_HISTORY和CHANGELOG_AI，不继承旧授权或构建结论。

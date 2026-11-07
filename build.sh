@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# ===== AShell Android 本地构建脚本 =====
+# ===== OpenWorld Android 本地构建脚本 =====
 # 最终成品输出:
-# - flutter/build/app/outputs/flutter-apk/ashell-aarch64-release.apk
-# - flutter/build/app/outputs/flutter-apk/ashell-universal-release.apk
+# - flutter/build/app/outputs/flutter-apk/openworld-aarch64-release.apk
+# - flutter/build/app/outputs/flutter-apk/openworld-universal-release.apk
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR"
 cd "$REPO_ROOT"
 
 # ===== 全局工具链路径 =====
-: "${ASHELL_TOOLCHAIN_ROOT:=/opt/rustdesk-toolchain}"
-: "${FLUTTER_HOME:=$ASHELL_TOOLCHAIN_ROOT/flutter}"
-: "${ANDROID_SDK_ROOT:=$ASHELL_TOOLCHAIN_ROOT/android-sdk}"
+# Existing build hosts may still provide the previous product's environment.
+: "${OPENWORLD_TOOLCHAIN_ROOT:=${ASHELL_TOOLCHAIN_ROOT:-/opt/rustdesk-toolchain}}"
+: "${FLUTTER_HOME:=$OPENWORLD_TOOLCHAIN_ROOT/flutter}"
+: "${ANDROID_SDK_ROOT:=$OPENWORLD_TOOLCHAIN_ROOT/android-sdk}"
 : "${ANDROID_HOME:=$ANDROID_SDK_ROOT}"
 : "${ANDROID_NDK_HOME:=$ANDROID_SDK_ROOT/ndk/27.2.12479018}"
 : "${ANDROID_NDK_ROOT:=$ANDROID_NDK_HOME}"
-: "${VCPKG_ROOT:=$ASHELL_TOOLCHAIN_ROOT/vcpkg}"
-: "${VCPKG_DEFAULT_BINARY_CACHE:=$ASHELL_TOOLCHAIN_ROOT/cache/vcpkg}"
+: "${VCPKG_ROOT:=$OPENWORLD_TOOLCHAIN_ROOT/vcpkg}"
+: "${VCPKG_DEFAULT_BINARY_CACHE:=$OPENWORLD_TOOLCHAIN_ROOT/cache/vcpkg}"
 : "${JAVA_HOME:=/usr/lib/jvm/java-17-openjdk-amd64}"
 
 detect_android_build_tools_dir() {
@@ -42,8 +43,8 @@ export ANDROID_SDK_ROOT ANDROID_HOME ANDROID_NDK_HOME ANDROID_NDK_ROOT
 export VCPKG_ROOT VCPKG_DEFAULT_BINARY_CACHE JAVA_HOME
 
 # ===== 签名配置 =====
-SIGN_ENV_DEFAULT="$ASHELL_TOOLCHAIN_ROOT/signing/android/signing.env"
-SIGN_ENV="${ASHELL_SIGN_ENV:-$SIGN_ENV_DEFAULT}"
+SIGN_ENV_DEFAULT="$OPENWORLD_TOOLCHAIN_ROOT/signing/android/signing.env"
+SIGN_ENV="${OPENWORLD_SIGN_ENV:-${ASHELL_SIGN_ENV:-$SIGN_ENV_DEFAULT}}"
 
 # ===== 构建参数 =====
 RELTYPE="release"
@@ -299,19 +300,26 @@ check_signing() {
   # shellcheck disable=SC1090
   source "$SIGN_ENV"
 
-  [[ "${ASHELL_ANDROID_SIGN_ENABLED:-0}" == "1" ]] || die "签名未启用: ASHELL_ANDROID_SIGN_ENABLED != 1"
-  require_file "${ASHELL_ANDROID_KEYSTORE_PATH:-}"
-  [[ -n "${ASHELL_ANDROID_KEY_ALIAS:-}" ]] || die "ASHELL_ANDROID_KEY_ALIAS 未设置"
-  [[ -n "${ASHELL_ANDROID_STORE_PASSWORD:-}" ]] || die "ASHELL_ANDROID_STORE_PASSWORD 未设置"
-  [[ -n "${ASHELL_ANDROID_KEY_PASSWORD:-}" ]] || die "ASHELL_ANDROID_KEY_PASSWORD 未设置"
+  # Prefer new names; retain installed signing.env values without rotating keys.
+  : "${OPENWORLD_ANDROID_SIGN_ENABLED:=${ASHELL_ANDROID_SIGN_ENABLED:-0}}"
+  : "${OPENWORLD_ANDROID_KEYSTORE_PATH:=${ASHELL_ANDROID_KEYSTORE_PATH:-}}"
+  : "${OPENWORLD_ANDROID_KEY_ALIAS:=${ASHELL_ANDROID_KEY_ALIAS:-}}"
+  : "${OPENWORLD_ANDROID_STORE_PASSWORD:=${ASHELL_ANDROID_STORE_PASSWORD:-}}"
+  : "${OPENWORLD_ANDROID_KEY_PASSWORD:=${ASHELL_ANDROID_KEY_PASSWORD:-}}"
+
+  [[ "${OPENWORLD_ANDROID_SIGN_ENABLED:-0}" == "1" ]] || die "签名未启用: OPENWORLD_ANDROID_SIGN_ENABLED != 1"
+  require_file "${OPENWORLD_ANDROID_KEYSTORE_PATH:-}"
+  [[ -n "${OPENWORLD_ANDROID_KEY_ALIAS:-}" ]] || die "OPENWORLD_ANDROID_KEY_ALIAS 未设置"
+  [[ -n "${OPENWORLD_ANDROID_STORE_PASSWORD:-}" ]] || die "OPENWORLD_ANDROID_STORE_PASSWORD 未设置"
+  [[ -n "${OPENWORLD_ANDROID_KEY_PASSWORD:-}" ]] || die "OPENWORLD_ANDROID_KEY_PASSWORD 未设置"
 
   keytool -list \
-    -keystore "${ASHELL_ANDROID_KEYSTORE_PATH}" \
-    -alias "${ASHELL_ANDROID_KEY_ALIAS}" \
-    -storepass "${ASHELL_ANDROID_STORE_PASSWORD}" >/dev/null
+    -keystore "${OPENWORLD_ANDROID_KEYSTORE_PATH}" \
+    -alias "${OPENWORLD_ANDROID_KEY_ALIAS}" \
+    -storepass "${OPENWORLD_ANDROID_STORE_PASSWORD}" >/dev/null
 
-  export ASHELL_ANDROID_KEYSTORE_PATH ASHELL_ANDROID_KEY_ALIAS
-  export ASHELL_ANDROID_STORE_PASSWORD ASHELL_ANDROID_KEY_PASSWORD
+  export OPENWORLD_ANDROID_KEYSTORE_PATH OPENWORLD_ANDROID_KEY_ALIAS
+  export OPENWORLD_ANDROID_STORE_PASSWORD OPENWORLD_ANDROID_KEY_PASSWORD
 
   ok "签名配置有效"
 }
@@ -321,10 +329,10 @@ prepare_key_properties() {
   section "写入 key.properties"
 
   cat > "$key_props" <<EOF2
-storeFile=${ASHELL_ANDROID_KEYSTORE_PATH}
-storePassword=${ASHELL_ANDROID_STORE_PASSWORD}
-keyAlias=${ASHELL_ANDROID_KEY_ALIAS}
-keyPassword=${ASHELL_ANDROID_KEY_PASSWORD}
+storeFile=${OPENWORLD_ANDROID_KEYSTORE_PATH}
+storePassword=${OPENWORLD_ANDROID_STORE_PASSWORD}
+keyAlias=${OPENWORLD_ANDROID_KEY_ALIAS}
+keyPassword=${OPENWORLD_ANDROID_KEY_PASSWORD}
 EOF2
 
   chmod 600 "$key_props" || true
@@ -599,12 +607,12 @@ build_rust_lib_for_target() {
     return 1
   fi
 
-  src_so="$REPO_ROOT/target/$target/release/libashell.so"
+  src_so="$REPO_ROOT/target/$target/release/libopenworld.so"
   require_file "$src_so"
 
   dst_dir="$REPO_ROOT/flutter/android/app/src/main/jniLibs/$jni_dir"
   mkdir -p "$dst_dir"
-  cp "$src_so" "$dst_dir/libashell.so"
+  cp "$src_so" "$dst_dir/libopenworld.so"
   cp "$libcpp" "$dst_dir/libc++_shared.so"
 
   ok "JNI 库已放置: $dst_dir"
@@ -724,10 +732,10 @@ sign_apk_manual() {
 
   section "签名 APK"
   run apksigner sign \
-    --ks "$ASHELL_ANDROID_KEYSTORE_PATH" \
-    --ks-key-alias "$ASHELL_ANDROID_KEY_ALIAS" \
-    --ks-pass "pass:$ASHELL_ANDROID_STORE_PASSWORD" \
-    --key-pass "pass:$ASHELL_ANDROID_KEY_PASSWORD" \
+    --ks "$OPENWORLD_ANDROID_KEYSTORE_PATH" \
+    --ks-key-alias "$OPENWORLD_ANDROID_KEY_ALIAS" \
+    --ks-pass "pass:$OPENWORLD_ANDROID_STORE_PASSWORD" \
+    --key-pass "pass:$OPENWORLD_ANDROID_KEY_PASSWORD" \
     --out "$output_apk" \
     "$work_aligned"
 
@@ -763,25 +771,25 @@ finalize_named_apk_to_flutter_dir() {
 build_mode_aarch64() {
   local target="aarch64-linux-android"
   local apk_in
-  local signed_tmp_apk="$TMP_DIR/ashell-aarch64-release.signed.tmp.apk"
+  local signed_tmp_apk="$TMP_DIR/openworld-aarch64-release.signed.tmp.apk"
 
   section "开始构建: aarch64"
   install_android_deps_for_target "$target"
   build_rust_lib_for_target "$target"
   apk_in="$(flutter_build_split_abi_apk "$target")" || return $?
   sign_apk_manual "$apk_in" "$signed_tmp_apk"
-  finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "ashell-aarch64-release.apk"
+  finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "openworld-aarch64-release.apk"
 
   echo
   echo "${C_BOLD}${C_GREEN}✅ 构建完成 (aarch64)${C_RESET}"
-  echo "${C_BOLD}目标目录:${C_RESET} $FLUTTER_APK_DIR/ashell-aarch64-release.apk"
+  echo "${C_BOLD}目标目录:${C_RESET} $FLUTTER_APK_DIR/openworld-aarch64-release.apk"
 }
 
 build_mode_universal() {
   local targets=(aarch64-linux-android armv7-linux-androideabi x86_64-linux-android)
   local t
   local apk_in
-  local signed_tmp_apk="$TMP_DIR/ashell-universal-release.signed.tmp.apk"
+  local signed_tmp_apk="$TMP_DIR/openworld-universal-release.signed.tmp.apk"
 
   section "开始构建: universal"
   for t in "${targets[@]}"; do
@@ -791,11 +799,11 @@ build_mode_universal() {
 
   apk_in="$(flutter_build_universal_apk)" || return $?
   sign_apk_manual "$apk_in" "$signed_tmp_apk"
-  finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "ashell-universal-release.apk"
+  finalize_named_apk_to_flutter_dir "$signed_tmp_apk" "openworld-universal-release.apk"
 
   echo
   echo "${C_BOLD}${C_GREEN}✅ 构建完成 (universal)${C_RESET}"
-  echo "${C_BOLD}目标目录:${C_RESET} $FLUTTER_APK_DIR/ashell-universal-release.apk"
+  echo "${C_BOLD}目标目录:${C_RESET} $FLUTTER_APK_DIR/openworld-universal-release.apk"
 }
 
 main() {

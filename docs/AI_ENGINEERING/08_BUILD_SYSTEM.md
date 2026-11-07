@@ -1,4 +1,6 @@
-# AShell 构建系统 / Build System
+# OpenWorld 构建系统 / Build System
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前源码快照为[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb，2026-10-25复核。当前唯一手动CI为Build-Clients-BT，本地入口不变；本轮按用户授权在main合并后执行Both/常规编译，实际回执见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)与[Actions说明](../BUILD_CLIENTS_ACTIONS.md)。文档同步不改构建配置或版本，V0/dispatch不等于编译通过。
 
@@ -13,16 +15,16 @@
 
 | 项目 | 当前源码值 |
 |---|---|
-| Rust package/crate | `ashell` |
+| Rust package/crate | `openworld` |
 | Rust version | `5.2.1` |
 | Rust edition | `2021` |
 | Rust MSRV | `1.75` |
 | Flutter package | `flutter_hbb`（内部包名保留） |
 | Flutter version | `5.2.1+59` |
-| Android applicationId | `me.ashell` |
+| Android applicationId | `com.openworld.me` |
 | Android compile/target/min SDK | `34 / 33 / 21` |
-| Android native library | `libashell.so` |
-| Windows native library | `ashell.dll` |
+| Android native library | `libopenworld.so` |
+| Windows native library | `openworld.dll` |
 
 版本号是发布资产。本轮和后续 AI 工作都不得自动修改。
 
@@ -73,8 +75,8 @@ FRB 文件带 1.80.1 生成标记，且 Git 历史显示 Rust FFI 后续仍有�
 
 - Rust Android targets。
 - Android SDK/NDK、vcpkg 与 native dependencies。
-- 构建 `libashell.so`。
-- 复制到 `flutter/android/app/src/main/jniLibs/<abi>/libashell.so`。
+- 构建 `libopenworld.so`。
+- 复制到 `flutter/android/app/src/main/jniLibs/<abi>/libopenworld.so`。
 - Flutter/Gradle packaging、zipalign/signing 和产物命名。
 
 签名环境是发布机机密，不得复制到仓库或诊断输出。
@@ -117,7 +119,7 @@ build.cmd
 - `build.py --portable --hwcodec --flutter --vram --skip-portable-pack`。
 - portable self-extract packer。
 
-最终自解压产物固定为 `PC-Bulid\ashell.exe`。这个目录名当前拼写就是 `PC-Bulid`，不要在未迁移所有脚本前擅自更正。
+最终自解压产物固定为 `PC-Bulid\openworld.exe`。这个目录名当前拼写就是 `PC-Bulid`，不要在未迁移所有脚本前擅自更正。
 
 2026-10-12 T005：旧PC入口由原新环境脚本替换，仓库只保留 `build.cmd`。脚本先检查Python Brotli、工具链与manifest恢复状态；对固定的 `flutter/build/windows/x64/runner/Release` 路径和reparse point做检查后清除旧bundle，再编译。Rust/Flutter增量缓存保留，`CARGO_TARGET_DIR` 固定为仓库 `target`。
 
@@ -140,7 +142,7 @@ cd flutter && flutter build apk --release
 cargo build --release --features flutter
 ```
 
-但 `build.py` 的 macOS/Linux 分支仍有 `librustdesk` 等上游命名残留，未在本轮验证。iOS、Linux、macOS、Web 的源码存在不等于 AShell 当前发布矩阵已经覆盖这些平台。
+但 `build.py` 的 macOS/Linux 分支仍有 `librustdesk` 等上游命名残留，未在本轮验证。iOS、Linux、macOS、Web 的源码存在不等于 OpenWorld 当前发布矩阵已经覆盖这些平台。
 
 发布支持矩阵必须由产品 owner 明确：
 
@@ -150,7 +152,7 @@ cargo build --release --features flutter
 
 ## 7. CI/CD 现状
 
-当前唯一手动入口：[Build-Clients-BT.yml](../../.github/workflows/Build-Clients-BT.yml)，名称Build AShell Clients-BT。Platform为Both/Android/Windows，BuildMode为“常规编译”（默认）/“原始编译”；Android固定aarch64，不提供android_arch或universal参数。工作流区分编译缓存和下载缓存，不改变产品协议；旧Build-Clients/Build-Clients-New入口已不在当前源码中。
+当前唯一手动入口：[Build-Clients-BT.yml](../../.github/workflows/Build-Clients-BT.yml)，名称Build OpenWorld Clients-BT。Platform为Both/Android/Windows，BuildMode为“常规编译”（默认）/“原始编译”；Android固定aarch64，不提供android_arch或universal参数。工作流区分编译缓存和下载缓存，不改变产品协议；旧Build-Clients/Build-Clients-New入口已不在当前源码中。
 
 CI在GitHub-hosted Ubuntu22.04/Windows2022独立配置工具链，不调用本地build.sh/env.sh/build.cmd。Android使用vcpkg/cargo-ndk/Flutter，Windows使用build.py与portable generate.py，只打包本次Release。Actions固定SHA、contents: read、checkout不保存凭据，不自动写仓库或创建Release/tag。
 
@@ -219,12 +221,12 @@ Android为临时测试key签名的Release APK；Windows为临时自签名Authent
 ### 图标覆盖补充（T007 / 2026-10-12）
 
 - Android通知/前台服务的两处 `setSmallIcon(R.mipmap.ic_stat_logo)` 已替换五密度白色机器人alpha图（24/36/48/72/96）。两个adaptive XML的monochrome改用新 `ic_launcher_monochrome.png`（108/162/216/324/432），避免白底板变成唯一主题轮廓；彩色桌面图不变。
-- 默认悬浮球 `drawable/floating_window.xml` 改为引用 `drawable-nodpi/ashell_floating_icon.png`（320），原Kotlin消费资源名保持不变。已有用户 `customSvg` 仍优先，未清理用户配置。六个新增Android PNG均有精确ignore例外。
+- 默认悬浮球 `drawable/floating_window.xml` 改为引用 `drawable-nodpi/openworld_floating_icon.png`（320），原Kotlin消费资源名保持不变。已有用户 `customSvg` 仍优先，未清理用户配置。六个新增Android PNG均有精确ignore例外。
 - Windows旧Sciter `src/ui.rs::get_icon` 的Windows分支改为嵌入同源 `res/128x128.png`，覆盖其主窗/远程窗/CM/聊天窗消费链。portable `BasicApp.window_icon` 持有同一PNG生成的HICON，窗口builder绑定small，并通过WM_SETICON绑定big；不改变已有加载文字/动画。
 - Windows EXE安装路径的卸载快捷方式 `IconLocation` 改为主程序exe索引0。服务及portable-service复用主EXE，程序列表/文件关联/普通快捷方式使用主EXE图标；MSI的AppIcon由preprocess从 `res/icon.ico` 复制。当前没有实际生成MSI资源副本或EXE。
 - services.msc通用图标和OS派生RuntimeBroker辅助进程不属于项目品牌资源；未修改系统或第三方签名二进制。其他平台专用图标保留，通用 `res/128x128.png` 的既有bundle消费者也会看到新图。
 - 详见 [T007覆盖表与28文件清单](../tasks/T-2026-10-12-007-icon-coverage.md)。12PNG/16XML及引用V0检查通过，T006图片hash不变；本地NWG源码/portable lock缺失，API仅对照官方上游源码。无编译、产品测试、运行、打包或Git写入，Windows实际Shell与Android设备显示待验证。
 
-## 12. 2026-10-12 AShell身份迁移补充
+## 12. 2026-10-12身份迁移历史补充（名称已映射到当前产品）
 
-当前命名和静态证据见 [迁移报告](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。Rust crate/native artifact迁为ashell，Flutter内部package保留flutter_hbb。Android与Windows正式脚本、portable marker长度、加载端和C符号已同步；未执行任何脚本/编译。FRB generated_bridge.dart仅做C符号的机械同步，与手写导出对应，未改API类型；正式环境仍需重生成核对，不能把V0检查当成codegen或构建通过。jniLibs缺失、ZEGO lock drift、外部签名/驱动及Apple/Google注册仍待验证。
+当前命名和静态证据见 [迁移报告](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)。Rust crate/native artifact迁为openworld，Flutter内部package保留flutter_hbb。Android与Windows正式脚本、portable marker长度、加载端和C符号已同步；未执行任何脚本/编译。FRB generated_bridge.dart仅做C符号的机械同步，与手写导出对应，未改API类型；正式环境仍需重生成核对，不能把V0检查当成codegen或构建通过。jniLibs缺失、ZEGO lock drift、外部签名/驱动及Apple/Google注册仍待验证。

@@ -1,4 +1,6 @@
-# AShell Windows 完整链路 / Windows Pipeline
+# OpenWorld Windows 完整链路 / Windows Pipeline
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 基线：2026-07-12，`HEAD 77062b4`
 
@@ -33,7 +35,7 @@
 - `usbmmidd_v2` driver package
 - RustDesk printer driver package
 
-`RuntimeBroker_ashell.exe` 不是缺失的独立工程：`src/platform/windows.rs::check_update_broker_process()` 会复制目标 OS 的 `C:\Windows\System32\RuntimeBroker.exe` 并改名。`PrintXPSRawData` 也已在 `src/platform/windows.cc` 实现，运行时动态加载 OS `XpsPrint.dll`。前述 driver/DLL 标记为 `external / verification-required`；两个 OS-derived 路径标记为 `verification-required`，不能按缺失源码处理。
+`RuntimeBroker_openworld.exe` 不是缺失的独立工程：`src/platform/windows.rs::check_update_broker_process()` 会复制目标 OS 的 `C:\Windows\System32\RuntimeBroker.exe` 并改名。`PrintXPSRawData` 也已在 `src/platform/windows.cc` 实现，运行时动态加载 OS `XpsPrint.dll`。前述 driver/DLL 标记为 `external / verification-required`；两个 OS-derived 路径标记为 `verification-required`，不能按缺失源码处理。
 
 ## 2. 总体架构
 
@@ -174,7 +176,7 @@ Desktop server branches在执行普通 mouse/key/pointer 前检查 `peer_keyboar
 - key down/up/click
 - Unicode input
 
-注入事件设置 `ENIGO_INPUT_EXTRA_VALUE`。Privacy low-level hook 用该 marker 区分 AShell 注入与本机物理输入。
+注入事件设置 `ENIGO_INPUT_EXTRA_VALUE`。Privacy low-level hook 用该 marker 区分 OpenWorld 注入与本机物理输入。
 
 `input_service` 还负责：
 
@@ -260,7 +262,7 @@ Amyuni virtual-display privacy 被视为 async：
 仓内 Rust 实现能证明：
 
 1. 要求当前程序目录存在 `WindowInjection.dll`。
-2. 由安装/运行逻辑从目标 OS `RuntimeBroker.exe` 更新 `RuntimeBroker_ashell.exe`。
+2. 由安装/运行逻辑从目标 OS `RuntimeBroker.exe` 更新 `RuntimeBroker_openworld.exe`。
 3. 以 active console user token 创建 suspended process。
 4. 通过 `VirtualAllocEx`、`WriteProcessMemory`、`QueueUserAPC(LoadLibraryW)` 注入 DLL。
 5. 等待名为 `RustDeskPrivacyWindow` 的窗口。
@@ -344,7 +346,7 @@ enumerate active displays
 
 源码明确记录：
 
-- 只能用 `DeviceString` 识别 AShell 当前选定的 virtual display。
+- 只能用 `DeviceString` 识别 OpenWorld 当前选定的 virtual display。
 - 无法区分其他供应商 virtual display 与 physical display。
 - Windows 24H2 下，退出 privacy 后可能无法恢复其他 virtual display。
 - 快速 plug-out + plug-in Amyuni 可能使 server crash，因此 restore 中刻意不立即 replug。
@@ -376,7 +378,7 @@ const IDD_IMPL: &str = IDD_IMPL_AMYUNI;
 - Dormant compatibility：RustDesk IDD modules。
 - peer platform addition：`idd_impl = "amyuni_idd"`。
 - 当前数量字段：`amyuni_virtual_displays`。
-- `ashell_virtual_displays` 只属于未选用 RustDesk IDD 分支。
+- `openworld_virtual_displays` 只属于未选用 RustDesk IDD 分支。
 
 ### 9.2 支持与驱动
 
@@ -407,7 +409,7 @@ const IDD_IMPL: &str = IDD_IMPL_AMYUNI;
 `VIRTUAL_DISPLAY_COUNT` 只是本进程近似值。源码承认：
 
 - driver 可被其他 process 控制。
-- AShell crash/restart 后 virtual display 仍可能存在。
+- OpenWorld crash/restart 后 virtual display 仍可能存在。
 - 强制拔全部可能影响其他 process 管理的 Amyuni display。
 
 `force_all`、`force_one` 必须只在明确恢复流程使用。
@@ -426,7 +428,7 @@ const IDD_IMPL: &str = IDD_IMPL_AMYUNI;
 
 规则：
 
-- `dwExtraInfo == ENIGO_INPUT_EXTRA_VALUE`：允许 AShell 注入。
+- `dwExtraInfo == ENIGO_INPUT_EXTRA_VALUE`：允许 OpenWorld 注入。
 - 其他 mouse event：吞掉。
 - 其他 keyboard event：大部分吞掉。
 - 本机 `Ctrl+P`：允许触发强制关闭 privacy。
@@ -438,7 +440,7 @@ const IDD_IMPL: &str = IDD_IMPL_AMYUNI;
 
 - hook 线程依赖 Win32 message loop 和 `PostThreadMessage` 退出。
 - hook 安装失败时 privacy window/display 可能已部分改变，必须验证 rollback。
-- AShell marker 是固定 `dwExtraInfo`，其他本机 process 理论上可伪造；它不是强身份认证。
+- OpenWorld marker 是固定 `dwExtraInfo`，其他本机 process 理论上可伪造；它不是强身份认证。
 - Ctrl+P 是本机 emergency escape，不能无意删除或改成远端不可达组合。
 
 ## 11. Remote printing
@@ -456,7 +458,7 @@ const IDD_IMPL: &str = IDD_IMPL_AMYUNI;
 
 - driver INF path 含 `RustDeskPrinterDriver`。
 - driver name 为 `RustDesk v4 Printer Driver`。
-- visible printer/port 使用 runtime app name，即 `AShell Printer`。
+- visible printer/port 使用 runtime app name，即 `OpenWorld Printer`。
 
 安装是阻塞/高权限操作，Flutter FFI 会在后台线程执行并通过 global event 返回结果。
 
@@ -504,7 +506,7 @@ Controller Windows 收到 Printer job：
 
 - PRN/XPS 整体进入 memory；源码未见独立 printer payload size limit，存在内存压力风险。
 - 多个 compatible controller 时只选择第一个 connection。
-- adapter DLL 与 printer driver 为外部资产，clean clone 不可重建；`XpsPrint.dll` 是目标 Windows prerequisite，不是应复制进仓库的 AShell artifact。
+- adapter DLL 与 printer driver 为外部资产，clean clone 不可重建；`XpsPrint.dll` 是目标 Windows prerequisite，不是应复制进仓库的 OpenWorld artifact。
 - setup 中部分 driver install/uninstall 错误被 `allow_err!` 后继续，可能形成 partial state。
 - `add_printer()` 成功返回的 printer handle 当前未显式 `ClosePrinter`，存在 handle leak 风险。
 - 默认 printer name buffer 是否包含尾随 NUL、外部 FFI 是否接受，需要验证。
@@ -514,9 +516,9 @@ Controller Windows 收到 Printer job：
 
 当前 Windows 推荐入口为 `build.cmd`，面向 `C:\DevEnv` + `C:\DevTool`。
 
-2026-10-12 T005后，此CMD仅把本次Release目录（`ashell.dll`、runner、Flutter插件/运行库、`dylib_virtual_display.dll`、data资源）交给portable generator。它不再装配 `WindowInjection.dll`、`usbmmidd_v2`、printer adapter/driver，也不调用MSI打包流程。源码仍保留对应运行功能；没有配套文件时的隐私模式、虚拟显示和打印能力不能宣称可用。其他installer/历史workflow应按各自源码分析，不继承此CMD的资产策略。
+2026-10-12 T005后，此CMD仅把本次Release目录（`openworld.dll`、runner、Flutter插件/运行库、`dylib_virtual_display.dll`、data资源）交给portable generator。它不再装配 `WindowInjection.dll`、`usbmmidd_v2`、printer adapter/driver，也不调用MSI打包流程。源码仍保留对应运行功能；没有配套文件时的隐私模式、虚拟显示和打印能力不能宣称可用。其他installer/历史workflow应按各自源码分析，不继承此CMD的资产策略。
 
-安装/运行逻辑会从目标 OS 派生 `RuntimeBroker_ashell.exe`，正式包不应把未知来源的同名 binary 当作仓外依赖注入。仓库只包含部分下载/复制/安装逻辑，不包含所有原始工程或二进制。正式发布前必须维护：
+安装/运行逻辑会从目标 OS 派生 `RuntimeBroker_openworld.exe`，正式包不应把未知来源的同名 binary 当作仓外依赖注入。仓库只包含部分下载/复制/安装逻辑，不包含所有原始工程或二进制。正式发布前必须维护：
 
 - source/repository/revision
 - binary SHA-256

@@ -1729,10 +1729,10 @@ typedef AdbMonitorStatus = ({
   bool available,
 });
 
-class AShellStatusMonitor extends StatelessWidget {
-  final AShellStatusModel ashellStatusModel;
+class OpenWorldStatusMonitor extends StatelessWidget {
+  final OpenWorldStatusModel openworldStatusModel;
   final AdbMonitorStatus? adbStatus;
-  AShellStatusMonitor(this.ashellStatusModel, {this.adbStatus});
+  OpenWorldStatusMonitor(this.openworldStatusModel, {this.adbStatus});
 
   bool get _desktopStatus => isDesktop || isWebDesktop;
 
@@ -1779,8 +1779,8 @@ class AShellStatusMonitor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider.value(
-      value: ashellStatusModel,
-      child: Consumer<AShellStatusModel>(
+      value: openworldStatusModel,
+      child: Consumer<OpenWorldStatusModel>(
         builder: (context, m, child) => m.show
             ? Container(
                 constraints: BoxConstraints(maxWidth: _desktopStatus ? 144 : 200),
@@ -1819,23 +1819,23 @@ class AShellStatusMonitor extends StatelessWidget {
 
 class RemoteStatusMonitors extends StatelessWidget {
   final QualityMonitorModel qualityMonitorModel;
-  final AShellStatusModel ashellStatusModel;
+  final OpenWorldStatusModel openworldStatusModel;
   final AdbMonitorStatus? adbStatus;
-  RemoteStatusMonitors(this.qualityMonitorModel, this.ashellStatusModel,
+  RemoteStatusMonitors(this.qualityMonitorModel, this.openworldStatusModel,
       {this.adbStatus});
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: Listenable.merge([qualityMonitorModel, ashellStatusModel]),
+        animation: Listenable.merge([qualityMonitorModel, openworldStatusModel]),
         builder: (context, child) => Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: [
             if (qualityMonitorModel.show) QualityMonitor(qualityMonitorModel),
-            if (qualityMonitorModel.show && ashellStatusModel.show)
+            if (qualityMonitorModel.show && openworldStatusModel.show)
               const SizedBox(height: 6),
-            if (ashellStatusModel.show)
-              AShellStatusMonitor(ashellStatusModel, adbStatus: adbStatus),
+            if (openworldStatusModel.show)
+              OpenWorldStatusMonitor(openworldStatusModel, adbStatus: adbStatus),
           ],
         ),
       );

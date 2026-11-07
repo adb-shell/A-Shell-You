@@ -159,7 +159,7 @@ class _RemotePageState extends State<RemotePage>
     _ffi.ffiModel.updateEventListener(sessionId, widget.id);
     if (!isWeb) bind.pluginSyncUi(syncTo: kAppTypeDesktopRemote);
     _ffi.qualityMonitorModel.checkShowQualityMonitor(sessionId);
-    _ffi.ashellStatusModel.checkShowAShellStatusMonitor(sessionId);
+    _ffi.openworldStatusModel.checkShowOpenWorldStatusMonitor(sessionId);
     _ffi.dialogManager.loadMobileActionsOverlayVisible();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Session option should be set after models.dart/FFI.start
@@ -490,7 +490,7 @@ class _RemotePageState extends State<RemotePage>
           final bool? privacyState = !peerReady || _remoteAdbMirror.phase == 'waiting' ||
                   privacyPhase == 'starting' || privacyPhase == 'stopping'
               ? null : privacyPhase == 'on';
-          return RemoteStatusMonitors(_ffi.qualityMonitorModel, _ffi.ashellStatusModel,
+          return RemoteStatusMonitors(_ffi.qualityMonitorModel, _ffi.openworldStatusModel,
               adbStatus: showAdb ? (
                 video: mediaState('h264'),
                 ignore: mediaState('jpeg'),
