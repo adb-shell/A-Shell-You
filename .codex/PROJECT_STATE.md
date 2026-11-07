@@ -7,7 +7,7 @@ Evidence Scope：`repository-observed / V0`
 
 ## 当前源码基线
 
-- T002当前交付：按最新用户指令保持5.2.1 / 5.2.1+59，将test/d9f1119合并main/7361d39后推送，再触发Both/常规编译，不监控。原2.0.26/2026修改已撤销，不能恢复；合并、push和dispatch准确回执见[当前任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。下列T001记录为来源沿革。
+- T002当前交付完成：test/d9f1119已合并main并推送`482eda5cd1404617512009cd032cc87e202c8d16`，说明“更新产品信息及指纹”；版本保持5.2.1 / 5.2.1+59。2026-11-07 17:38:48 +09:00一次Both/常规编译获HTTP204，不监控、无run或结果查询；后续仅补交付文档，不二次dispatch。原2.0.26/2026修改已撤销，不能恢复。准确回执见[当前任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。下列T001记录为来源沿革。
 
 - 本次起点 main / `7361d39d34ad0bb147827e30fa61419a00b84038`，初始clean；用户指定test交付后，身份迁移源码已提交推送`ad88665e74ef48e251a1faefda6461e3c0e8112b`，说明“更新开放世界产品信息及指纹”；main保持。
 - 当前工作区快照：[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)，`OW-BL-2026-11-07-7361d39-identity-worktree`；实现与验证范围见[身份迁移](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。Baseline23与历史Git/编排回执只作追溯。
@@ -34,7 +34,7 @@ Evidence Scope：`repository-observed / V0`
 
 ## 本轮工作与验证
 
-- 当前Task T-2026-11-07-002 / STATE、WORK-20261107-002 / CE-20261107-T002-01/02；main no-ff merge test已准备，15处冲突仅文档且按test内容解决；补交付文档前合并树与test完全一致。当前授权main提交推送、双端常规编译只触发；版本、产品及工作流保持test，不监控，不代表正式验证通过。
+- 当前Task T-2026-11-07-002 / T8 / STATE、WORK-20261107-002 / CE-20261107-T002-01/02；main no-ff merge test已提交推送，15处冲突仅文档且按test内容解决，补交付文档前合并树与test完全一致。135项静态身份合同、版本与137个本地文档链接/差异检查通过；产品及工作流保持test。编排只记录HTTP204，不监控，不代表编译或运行通过。
 
 以下为T001静态验证与旧test触发回执，不能替代本次main交付结果：
 

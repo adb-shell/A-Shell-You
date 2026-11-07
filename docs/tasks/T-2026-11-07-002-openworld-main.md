@@ -2,7 +2,7 @@
 
 ## T0：任务、基线与授权
 
-- Status：implementing / T6；2026-11-07（Asia/Tokyo）；Owner：当前用户 / Codex；Primary：openworld-release-engineer，身份合同沿用openworld-master。
+- Status：complete / T8（合并、推送与触发交付）；2026-11-07（Asia/Tokyo）；Owner：当前用户 / Codex；Primary：openworld-release-engineer，身份合同沿用openworld-master。
 - 当前指令：版本号先不改，将当前test合并main并推送GitHub，提交说明“更新产品信息及指纹”，执行双端常规编译，不监控。
 - 起点：test/d9f111944da644b427f7fbfc5970de6f14604ef4，main/7361d39d34ad0bb147827e30fa61419a00b84038；本地/远端一致，工作区clean，无未完成merge。
 - 先前2.0.26/2026版本调整和未完成合并已按用户要求撤销，未提交、未推送、未触发编排；本任务不恢复该方案。
@@ -19,9 +19,15 @@
 
 ## T6–T8：验证与回执
 
-- V0：`python scripts/check_product_identity.py`退出0，135项静态身份合同通过；与test相比仅10份交付Markdown有差异，产品/工作流完全一致。137个本地文档链接有效，无未解决冲突，`git diff --check`与`git diff --cached --check`均退出0。版本5.2.1 / 5.2.1+59及已撤销版本任务/基线文件不存在均已核对；准确合并SHA、push、dispatch后续追加。
+- V0：`python scripts/check_product_identity.py`退出0，135项静态身份合同通过；与test相比仅10份交付Markdown有差异，产品/工作流完全一致。137个本地文档链接有效，无未解决冲突，`git diff --check`与`git diff --cached --check`均退出0。版本5.2.1 / 5.2.1+59及已撤销版本任务/基线文件不存在均已核对。
 - Git提交说明统一“更新产品信息及指纹”；test分支保持d9f1119，不改写历史。
 - main编排只记录HTTP触发回执，不查询运行进度、日志或产物；没有编译/运行PASS结论。
+
+### 精确交付回执
+
+- 合并提交：`482eda5cd1404617512009cd032cc87e202c8d16`，说明“更新产品信息及指纹”；parents为main/7361d39与test/d9f1119。`git push origin main`退出0，`git ls-remote`确认origin/main指向482eda5、origin/test保持d9f1119；提交后工作区clean。
+- 2026-11-07 17:38:48 +09:00，一次POST `Build-Clients-BT.yml/dispatches`获HTTP204，workflow394791509，ref=main，Platform=Both，BuildMode=常规编译。发起前再次核对远端main精确SHA为482eda5；未查询run/jobs/logs/artifacts，不记录run ID或构建结果。
+- 后续仅同步本回执及当前入口/记忆，以同一提交说明补文档提交并推送main；产品、版本和工作流保持482eda5，不再次dispatch。T8关闭本次Git及触发交付，不表示编译或运行通过；新会话不能自动恢复监控。
 
 《编译验证需求》
 - 命令：Build-Clients-BT.yml workflow_dispatch，ref=main，Platform=Both，BuildMode=常规编译。

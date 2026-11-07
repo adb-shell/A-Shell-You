@@ -4,7 +4,7 @@
 
 ## 0. 当前恢复基线
 
-最新任务T-2026-11-07-002：保持Rust/portable5.2.1、Flutter5.2.1+59，将当前test/d9f1119合并main推送后一次Both/常规编译，不监控。先前2.0.26/2026修改已按用户要求完全撤销；不从旧聊天恢复。STATE/WORK-20261107-002 / CE-20261107-T002-01/02；准确main SHA与dispatch见[任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。以下T001为产品身份来源记录。
+最新任务T-2026-11-07-002已T8交付：保持Rust/portable5.2.1、Flutter5.2.1+59，test/d9f1119合并main为482eda5cd1404617512009cd032cc87e202c8d16并推送，说明“更新产品信息及指纹”。2026-11-07 17:38:48 +09:00一次Both/常规编译获HTTP204；不监控，未查询run或结果，后续仅补文档回执不再次编排。先前2.0.26/2026修改已按用户要求完全撤销；不从旧聊天恢复。STATE/WORK-20261107-002 / CE-20261107-T002-01/02；准确回执见[任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。以下T001为产品身份来源记录。
 
 身份迁移源码ad88665e74ef48e251a1faefda6461e3c0e8112b已提交推送test，main保持7361d39；[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)记录实施快照。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me。T-2026-11-07-001 / STATE/WORK-20261107-001 / CE-20261107-T001-01/02 / D-034。
 

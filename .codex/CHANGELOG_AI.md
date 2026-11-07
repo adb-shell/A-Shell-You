@@ -10,7 +10,7 @@ Mode：`append-only task-level index`
 
 - 用户明确版本先不改，test/d9f1119合并main/7361d39并推送，提交说明“更新产品信息及指纹”，Both/常规编译不监控；两分支初始clean且远端一致。
 - 15处文档冲突按test当前内容解决，合并树先核对与test一致，再只补交付文档/记忆；版本仍5.2.1 / 5.2.1+59，撤销的2.0.26/2026方案未恢复，无产品/工作流增量。
-- Git/dispatch准确回执待追加；N/A — no decision delta，沿用Baseline24，设备运行未验。STATE/WORK-20261107-002 / CE-20261107-T002-01/02；[任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。
+- main合并482eda5已推送，说明“更新产品信息及指纹”；2026-11-07 17:38:48 +09:00一次Both/常规编译HTTP204，未监控或查询run/结果。135项静态身份合同通过，T8仅Git/触发交付；后续只补文档回执，不二次dispatch。N/A — no decision delta，沿用Baseline24，设备运行未验。STATE/WORK-20261107-002 / CE-20261107-T002-01/02；[任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。
 
 ## T-2026-11-07-001：开放世界产品身份迁移
 
