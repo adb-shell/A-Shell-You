@@ -6,7 +6,7 @@
 |---|---|---|---|
 | ID-01 | scripts/check_product_identity.py：产品清单、组件/JNI/R8/Shell/C ABI、protobuf39/40/41、portable、macOS、CI及依赖/认证输入不变 | V0 | PASS：135项静态合同 |
 | ID-02 | 四份Shell语法、云编排14段Bash/14段PowerShell、嵌入Python AST、TOML/XML/plist及diff | V0 | PASS；iOS导出模板基线既有XML缺陷单列 |
-| ID-03 | Android两ABI模式/Windows正式构建、包和产物名、native加载及Release R8 | V2 | NOT_RUN：本机无正式工具链 |
+| ID-03 | Android两ABI模式/Windows正式构建、包和产物名、native加载及Release R8 | V2 | CI/test/ad88665：Both/常规编译run42350649478已触发（Android aarch64/Windows x64）；用户要求不监控，最终结果未查询；universal及实际产物检查未执行 |
 | ID-04 | 新包独立安装、权限、普通远控与ADB Shell/媒体/触摸/剪贴板、ZEGO、新旧peer、安装卸载 | V3/V4 | NOT_RUN |
 
 本次映射和兼容边界见[身份迁移](docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。旧运行记录不能替代ID-03/04。

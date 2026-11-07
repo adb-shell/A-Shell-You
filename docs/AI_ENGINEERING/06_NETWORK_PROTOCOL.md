@@ -1,6 +1,6 @@
 # OpenWorld 网络与协议 / Network Protocol
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 ADB当前源码4d3c446：字段40请求/回执/instance与revision状态推送，apiVersion3；字段41独立媒体/触摸、mirrorVersion2模式化停止，每PC8帧/8MiB在途。App-helper的LAYN/LAYP/LAYE节点帧及黑屏PNG属于本机私有流，不增加peer协议字段。原认证/传输策略及VideoFrame不变。2026-10-16 T001/Baseline21，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 

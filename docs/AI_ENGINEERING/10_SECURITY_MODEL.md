@@ -1,6 +1,6 @@
 # OpenWorld 安全模型 / Security Model
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 2026-10-16 T001：当前4d3c446，ADB原认证/只读gate保持。节点helper DONT_SUPPRESS、密码遮盖、节点/文本/帧有界且仅内存；App排版与黑屏PNG不引入外部字体。白字/黑层排除自身采集、12+trusted，无输入窗口，不关闭全局触摸保护。没有已回退的无障碍权限管理菜单；任意Shell命令仍可影响系统。V0，隐藏API/OEM需真机验证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 

@@ -8,11 +8,17 @@ Last Updated：2026-11-07（开放世界产品身份）
 
 Mode：`append-only logical persisted-change events`
 
+## CE-20261107-T001-03：停止监控与交付回执同步
+
+- 用户明确要求“不监控”，本地openworld_watch_build.py helper已停止，未调用取消云编译或再次dispatch；此后不查询run/jobs/artifacts/logs。
+- 最后观察为run42350649478/head ad88665的Windows EXE、Android Native均在Build native dependencies；最终结果未知，不记录PASS。真机仍NOT_RUN。
+- 仅同步任务/当前入口/领域文档头部和记忆回执，产品及工作流树与源码ad88665一致；同一test提交推送授权内交付文档，不因文档提交再次编排。T8仅源码/Git/触发交付关闭，验证边界保留。
+
 ## CE-20261107-T001-02：test交付与双端编译授权续接
 
 - 用户对明确枚举的新分支提交推送、Both/常规编译/监控及临时测试签名/Actions产物确认单回复“切换到test分支，然后继续”；因此目标改为origin/test，main保持。
 - 核对远端main7361d39、test48226fb；两分支产品树相同，仅17份文档不同。保留工作区switch到test，文档冲突以切换前快照恢复，保留Git自动恢复stash；没有丢弃产品修改或历史文档。
-- stage/commit/push及准确workflow/head/run结果待回填；无部署、正式签名、生产发布或设备操作。STATE/WORK-20261107-001，任务继续T6。
+- 源码ad88665e74ef48e251a1faefda6461e3c0e8112b以“更新开放世界产品信息及指纹”提交推送origin/test并核对一致，main保持7361d39；单次dispatch HTTP204，workflow394791509 / run42350649478 / head ad88665 / Both / 常规编译。无部署、正式签名、生产发布或设备操作。后续用户停止监控见CE-20261107-T001-03。
 
 ## CE-20261107-T001-01：产品身份源码与文档同步
 

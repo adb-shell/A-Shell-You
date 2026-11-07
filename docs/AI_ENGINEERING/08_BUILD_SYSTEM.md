@@ -1,6 +1,6 @@
 # OpenWorld 构建系统 / Build System
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前源码快照为[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb，2026-10-25复核。当前唯一手动CI为Build-Clients-BT，本地入口不变；本轮按用户授权在main合并后执行Both/常规编译，实际回执见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)与[Actions说明](../BUILD_CLIENTS_ACTIONS.md)。文档同步不改构建配置或版本，V0/dispatch不等于编译通过。
 

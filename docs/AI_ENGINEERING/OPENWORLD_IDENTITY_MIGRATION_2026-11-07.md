@@ -1,6 +1,6 @@
 # 开放世界产品身份迁移
 
-2026-11-07；T-2026-11-07-001 / D-034 / ADR-0027。起点main/7361d39、clean；参考f423335e“更新产品信息及指纹”。当前修改尚未提交或编译。
+2026-11-07；T-2026-11-07-001 / D-034 / ADR-0027。起点main/7361d39、clean；参考f423335e“更新产品信息及指纹”。源码已按用户要求交付test/ad88665，Both/常规编译run42350649478已触发；随后按用户要求停止监控，最终结果未查询。见[任务回执](../tasks/T-2026-11-07-001-openworld-identity.md)。
 
 ## 当前名称与影响
 
@@ -46,4 +46,4 @@ macOS launchd/卸载模板分别使用com.openworld.me和实际配置目录；�
 | 正式Windows | build.cmd | DLL导出加载、portable包头、快捷方式/服务/安装卸载、PC-Bulid/openworld.exe |
 | GitHub Actions | Build-Clients-BT.yml / Both / 常规编译 | 包含本次改动的精确提交、双端构建、签名/产物/run证据 |
 
-本机未发现产品工具链；没有Git写入或workflow dispatch回执。V0不能证明编译或运行通过。正式验证覆盖AND-08、ADB-R07/M01/M16/M20、WIN-08、FLT-05、RST-03/06及新旧peer组合。
+本机未发现产品工具链；使用用户明确授权的test云编排，run42350649478/head ad88665。V0不能证明编译或运行通过，编译PASS也不能代替设备验收。正式运行验证覆盖AND-08、ADB-R07/M01/M16/M20、WIN-08、FLT-05、RST-03/06及新旧peer组合。

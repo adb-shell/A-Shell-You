@@ -13,3 +13,5 @@
 - Existing limits：Apple/Google注册和生产签名未核验；iOS exportOptions.plist有基线已存在的非法XML引号，不扩大为Apple发布修复。
 
 详见[迁移记录](../AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。Baseline23及更早快照冻结保留。
+
+交付补注：上述实施快照已作为源码ad88665e74ef48e251a1faefda6461e3c0e8112b提交推送test；main保持7361d39。Both/常规编译run42350649478/head ad88665已触发，用户随后要求不监控；最终编译/产物结果未查询，不能将此补注解释为V2/V3 PASS。

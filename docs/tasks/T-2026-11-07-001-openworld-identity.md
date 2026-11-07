@@ -2,14 +2,14 @@
 
 ## Metadata / T0
 
-- Status：active / T6；T5实现与V0审查完成，用户已确认test提交推送和双端云编译，正式结果待证；2026-11-07（Asia/Tokyo）。
+- Status：complete / T8（源码/文档/Git及编排触发交付）；用户最新要求“不监控”，最终编译结果未查询，运行仍待验；2026-11-07（Asia/Tokyo）。
 - 用户明确要求：显示名“开放世界”，AShell/ashell 产品身份迁为 OpenWorld/openworld，现有 me.ashell 迁为 com.openworld.me；包括后续 ADB、云编译编排及文档同步，仅修改产品信息。
 - Source：main / 7361d39d34ad0bb147827e30fa61419a00b84038；初始工作区 clean；参考迁移 f423335e90885975c101484977abbe8c7524b42e。
 - Baseline：Baseline23 / AS-BL-2026-10-25-48226fb-developer-password；本次追加 Baseline24。
 - Primary：Codex / openworld-master（本次由ashell-master更名）；Rust、Flutter、Android、Network/API、Release/Security 合同由主执行者逐项核对。
 - Authority：C2产品身份、必要路径及文档；用户对提交推送/双端编译确认单回复“切换到test分支，然后继续”，据此授权test切换、stage/commit/push origin/test、Both/常规编译及监控，沿用工作流临时测试签名/Actions产物；不含main写入、远端部署、凭据轮换或业务重构。
 - Validation：用户要求确保编译和链路；本机尚未发现 Rust/Flutter/Java/CMake 正式工具链，先完成 V0，再记录正式构建缺口。不能把静态检查当作 V2/V3 通过。
-- Registry：WORK-20261107-001；Event：CE-20261107-T001-01；Decision：D-034 / ADR-0027。
+- Registry：WORK-20261107-001；Events：CE-20261107-T001-01/02/03；Decision：D-034 / ADR-0027。
 
 ## T1–T4：范围、影响与方案
 
@@ -32,14 +32,29 @@ TEST_MATRIX：AND-08、AND-12/13、ADB-R07、ADB-M01/M16/M20、WIN-08、FLT-05�
 
 ## T5–T8：实施与验证
 
-源码、必要路径及当前文档同步完成，尚未提交。包括Android两棵包目录、九个Skill目录、Flatpak/Linux打包资源及PNG共71个文件路径重命名；PNG内容SHA-256相同。当前实现/兼容边界见[身份迁移](../AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)，决定为[ADR-0027](../ADR/0027-openworld-product-identity.md)。
+源码、必要路径及当前文档同步完成，交付源码为ad88665。包括Android两棵包目录、九个Skill目录、Flatpak/Linux打包资源及PNG共71个文件路径重命名；PNG内容SHA-256相同。当前实现/兼容边界见[身份迁移](../AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)，决定为[ADR-0027](../ADR/0027-openworld-product-identity.md)。
 
 - V0 PASS：`python scripts/check_product_identity.py`，135项产品、JNI/R8/Shell/C ABI、protobuf、portable、macOS launchd/update及依赖/认证输入合同；桥接仅三个C符号改名，protobuf只改字段名/注释而不改编号/类型。
 - V0 PASS：四份Shell `bash -n`；CI内14段Bash、14段PowerShell分别语法解析，嵌入Python AST、TOML、Android/XML和主Info.plist静态解析、`git diff --check`。工作流与原HEAD比较，除品牌映射外jobs/actions pins/permissions/工具链及参数结构一致。
 - 范围复核：156个原路径文件修改、71个文件改名和5个新增文件；全部旧路径均有对应新文件，无未映射删除。58份变更Markdown的324个本地链接全部可解析。
+- 补查Android 167处p50.a双byteArrayOf字面量XOR字符串，均可静态解码，未含旧产品品牌/包名；未输出解码内容，不改混淆、命令或认证输入。
 - macOS模板统一真实bundle与配置目录；安装/更新脚本、挂载目录和app名同步。没有Apple正式编译或运行证据。
 - 有意保留：已部署ZEGO的ashellSessionId请求键（仓内broker接受新旧键）；旧ASHELL_*构建机输入回退；旧域名分类；真实仓库/endpoint、第三方来源和冻结历史。不更改身份认证或设备UUID/硬件指纹算法。
 - 基线既有缺口：`flutter/ios/exportOptions.plist`含非法XML引号，原HEAD同样存在；未夹带修复，Apple/Google注册及签名资料属于外部未验证。
-- ID-03（V2构建）、ID-04（V3/V4运行）均NOT_RUN；本机缺正式Rust/Flutter/Java/CMake工具链。无Git索引/分支/提交/推送、workflow dispatch、签名上传或生产操作，旧run不作本轮证据。
+- 初次V0完成时ID-03（V2构建）、ID-04（V3/V4运行）均NOT_RUN，本机缺正式工具链；随后按用户确认完成Git/编排。最新ID-03已触发而最终结果未查询，ID-04仍NOT_RUN，旧run不作本轮证据。
 
 后续授权与执行：用户指定使用现有test分支，已核对origin/main=7361d39、origin/test=48226fb；两分支产品树一致，差异仅17份文档。使用保留工作区的switch迁移到test，文档冲突按切换前快照恢复，保留main已有Baseline23及任务回执。Git自动保留的恢复stash未删除。提交/push和Build-Clients-BT / Both / 常规编译结果将在本节追加，不包含main合并、正式发布、凭据修改或设备操作。Event CE-20261107-T001-02。
+
+## Git与编排回执（CE-20261107-T001-02）
+
+- 源码提交：`ad88665e74ef48e251a1faefda6461e3c0e8112b`，说明“更新开放世界产品信息及指纹”；origin/test已核对一致，main仍7361d39。提交含产品/文档迁移及从main保留的两份历史文档，Git默认相似度统计244项，不表示244个独立实现改动。
+- 一次dispatch：HTTP204；workflow394791509 / Build-Clients-BT / test / Both / 常规编译。
+- [run42350649478](https://github.com/adb-shell/A-Shell-You/actions/runs/42350649478)，精确head为ad88665；2026-11-07 07:17:21 UTC启动，Windows EXE与Android Native均in_progress，尚未获得编译PASS。
+- 临时测试签名、Actions构建产物及持续监控已在确认单列明；无生产发布或正式签名。后续只补回执文档，不因文档提交重复触发双端构建。
+
+## 用户停止监控（CE-20261107-T001-03）
+
+- 最新指令“不监控”覆盖此前持续检查要求。本地监控helper已终止，未取消云端作业；此后不再查询run/jobs/logs/artifacts，产物实际包名/导出检查也未执行。
+- 最后已知状态：Windows EXE与Android Native都在Build native dependencies；这是停止前观察，不代表当前实时状态。最终编译/签名/打包/上传结果未知，不声明PASS。
+- T8只关闭本次源码、V0、文档、test提交推送和单次编排触发交付。当前回执文档会另行提交推送test，产品及工作流树保持ad88665，不重复触发构建；main、正式发布、设备与凭据不变。
+- 回执静态复核：31份Markdown、274个本地链接全部通过，`git diff --check`通过；相对ad88665没有产品或工作流改动。

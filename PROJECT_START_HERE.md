@@ -1,6 +1,6 @@
 # OpenWorld Project Start Here
 
-当前产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”，来自main/7361d39之上的本次工作区，版本保持5.2.1 / 5.2.1+59。见[Baseline24](docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-001-openworld-identity.md)和[当前状态](.codex/PROJECT_STATE.md)。本次同步客户端、ADB、构建编排与当前文档；V0不等于编译通过，没有提交推送或云编排。
+当前产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”，实施起点为main/7361d39，已按用户要求交付test，版本保持5.2.1 / 5.2.1+59。见[Baseline24](docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-001-openworld-identity.md)和[当前状态](.codex/PROJECT_STATE.md)。本次同步客户端、ADB、构建编排与当前文档；准确源码SHA、双端编译run及结果见任务回执；V0不等于编译或真机通过。
 
 PC主窗口Ctrl+Shift+H双密码入口、ADB及原链行为保持。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 

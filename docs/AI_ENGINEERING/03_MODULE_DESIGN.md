@@ -1,6 +1,6 @@
 # OpenWorld 模块设计 / Module Design
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前整体源码快照为Baseline23 / test48226fb，PC开发者双密码设计与维护见本页第11节。ADB部分沿用2026-10-19复核的0dbe202快照：连接、2路Shell、媒体、遮罩和输入资源分别管理，instance/revision按真实状态变化推送；键盘与触摸共用control-only单writer并各自排队，显式粘贴与被动剪贴板同步区分paste标志。PC帧桥为独立二进制C ABI，不以base64装入状态JSON。V0，构建/ROM实测待证；历史快照见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 

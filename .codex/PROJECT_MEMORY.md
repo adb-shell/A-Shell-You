@@ -4,11 +4,11 @@
 
 ## 0. 当前恢复基线
 
-当前为main/7361d39之上的身份迁移工作区，[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me。T-2026-11-07-001 / STATE/WORK-20261107-001 / CE-20261107-T001-01 / D-034。
+身份迁移源码ad88665e74ef48e251a1faefda6461e3c0e8112b已提交推送test，main保持7361d39；[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)记录实施快照。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me。T-2026-11-07-001 / STATE/WORK-20261107-001 / CE-20261107-T001-01/02 / D-034。
 
 客户端、ADB JNI/帧桥/包路径、安装资源、本地及云编译同步；版本、依赖和原功能控制流保持。旧ZEGO wire key、构建环境变量及服务分类前缀受控兼容，见[迁移记录](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
 
-当前仅V0；正式编译/真机待验证，没有Git写入或云编排。PC开发者双密码入口保持；旧Task/run不能证明新产品构建通过。先读[PROJECT_STATE](PROJECT_STATE.md)和[CURRENT_WORK](CURRENT_WORK.md)。
+V0通过；用户已确认test提交推送与Both/常规编译，run42350649478/head ad88665已启动，随后要求“不监控”。本地helper已停止，未取消云编译，最终结果未知，真机仍未验证。仅源码/Git/触发交付T8关闭，不自动恢复轮询。PC开发者双密码入口保持；旧Task/run不能证明新产品构建通过。先读[PROJECT_STATE](PROJECT_STATE.md)和[CURRENT_WORK](CURRENT_WORK.md)。
 
 当前ADB能力：
 
@@ -22,7 +22,7 @@
 - 默认core连接服务运行期间静默常亮，无新增主页/齿轮/设置入口。ADB连接验证后尝试本应用电池优化豁免；Shell按钮“点亮屏”仅发送唤醒键。
 - PC没有无障碍权限控制或“进入开发者选项”菜单；Android本机ADB页原“打开开发者选项”入口仍在。不根据历史要求擅自补回PC菜单。
 
-完整合同：[本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。本轮仅V0，不继承历史构建/真机成功结论。旧任务细节保留在TASK_HISTORY和docs/tasks，不再混写到当前恢复快照。
+完整合同：[本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。本轮编译回执与真机证据分开，不继承历史成功结论。旧任务细节保留在TASK_HISTORY和docs/tasks，不再混写到当前恢复快照。
 
 ## 1. Entry and Source of Truth
 

@@ -10,8 +10,9 @@
 
 - 用户明确要求全量产品身份同步，范围包括后续ADB与云编排，禁止无关功能更改。main/7361d39初始clean；实现/当前文档完成，71个必要路径改名；历史/外部地址/第三方身份保留。
 - 新身份：开放世界 / OpenWorld / openworld / com.openworld.me；JNI/R8/Shell/C ABI、平台安装与动态库、portable和构建消费者同步。ZEGO已部署字段、旧签名变量/域名分类留兼容；不改版本、设备UUID或认证/采集行为。
-- V0：135项合同、四份Shell、CI 14段Bash/14段PowerShell及嵌入Python语法通过；本机无正式工具链，ID-03/04 NOT_RUN，不能声明编译或运行PASS。
-- T5完成、T6 awaiting-confirmation；无Git索引/分支/提交/推送、CI编排、签名上传或发布。STATE/WORK-20261107-001 / CE-20261107-T001-01 / D-034 / Baseline24；[任务](../docs/tasks/T-2026-11-07-001-openworld-identity.md)。
+- V0：135项合同、四份Shell、CI 14段Bash/14段PowerShell及嵌入Python语法通过；167处XOR字符串无旧身份。云编译已触发但最终结果未查询，真机NOT_RUN，不能声明编译或运行PASS。
+- 用户确认改用test后，源码ad88665提交推送成功，Both/常规编译HTTP204/run42350649478/head ad88665；main保持7361d39。用户续接“不监控”，本地helper已停止，未取消云编译；只补回执文档，不重复dispatch。
+- T8仅源码/文档/Git/触发交付完成，无生产发布/凭据轮换/设备操作。STATE/WORK-20261107-001 / CE-20261107-T001-01/02/03 / D-034 / Baseline24；[任务](../docs/tasks/T-2026-11-07-001-openworld-identity.md)。
 
 ## T-2026-10-25-002：开发者密码文档同步与main双端交付
 

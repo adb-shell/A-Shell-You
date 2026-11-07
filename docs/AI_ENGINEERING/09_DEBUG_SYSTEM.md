@@ -1,6 +1,6 @@
 # OpenWorld 调试与验证体系 / Debug System
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 2026-10-16 T001：当前4d3c446；区分paired、握手、UID验证、touchReady、媒体phase与首帧，命令忙不等于ADB失联。穿透排查按节点连接/读取、私有流、App绘图、helper退出阶段；exit134通常为SIGABRT但不单凭退出码定根因。黑屏先查App PNG生成、默认显示layerStack、READY及ROM截图排除；无节点与不支持/失败分开，不伪造就绪。V0，构建/真机待证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
