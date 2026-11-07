@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261107-002`
+Registry Revision：`WORK-20261107-003`
 Last Updated：2026-11-07
-Active Task Count：0
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-无活动任务。不恢复已撤销的版本调整，不自动监控或重复触发编译。
+T003 / active / T6：用户续接“提交并推送”，当前main版本修改按“更新版本号为2.0.26”提交并推送origin/main。版本与已复核文件范围不变；不触发或监控编译。
 
 ## 2. Concurrent Session Rules
 
@@ -25,6 +25,6 @@ Active Task Count：0
 
 ## 4. Last Closed Task
 
-T-2026-11-07-002 / complete / T8（main合并、推送与编排触发交付）。合并482eda5已推送origin/main，说明“更新产品信息及指纹”，test保持d9f1119，版本保持5.2.1 / 5.2.1+59。2026-11-07 17:38:48 +09:00，一次Both/常规编译HTTP204；不监控，未查询run ID或结果。随后只同步回执文档，不二次编排。
+T-2026-11-07-003 / complete / T8（本地版本编辑交付）。main/c27368c之上的Rust/portable版本为2.0.26、Flutter2.0.26+59，构建号59保持；122项静态身份合同及版本/锁文件/文档检查通过。尚未暂存、提交推送或编译；旧main编排不属于新版本证据。
 
-[详细任务](../docs/tasks/T-2026-11-07-002-openworld-main.md) / STATE-20261107-002 / CE-20261107-T002-01/02。T8仅关闭本次交付范围，不表示V2/V3通过；历史任务保留在TASK_HISTORY和CHANGELOG_AI，不继承旧授权或构建结论。
+[详细任务](../docs/tasks/T-2026-11-07-003-openworld-version.md) / STATE-20261107-003 / CE-20261107-T003-01。T8仅关闭本次本地修改范围，不表示V2/V3通过；历史任务保留在TASK_HISTORY和CHANGELOG_AI，不继承旧授权或构建结论。

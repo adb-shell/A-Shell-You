@@ -1,5 +1,7 @@
 # GitHub Actions 客户端编译
 
+T003当前本地版本为2.0.26 / 2.0.26+59，构建号59保持，未提交推送或触发编译；见[版本任务](tasks/T-2026-11-07-003-openworld-version.md)。以下T002及T001是旧版本触发回执，不表示本版本已构建。
+
 当前T002已将test/d9f1119合并main并推送482eda5，版本保持5.2.1 / 5.2.1+59；2026-11-07 17:38:48 +09:00一次Both/常规编译获HTTP204，按要求不监控，不查询run或结果。准确源码SHA与回执见[main交付任务](tasks/T-2026-11-07-002-openworld-main.md)。以下test运行属于迁移来源历史，不能替代本次main结果。
 
 2026-11-07产品身份迁为开放世界/OpenWorld，唯一手动工作流Build OpenWorld Clients-BT。jobs/输入/工具链/actions pins/权限保持，native/缓存/签名展示/产物名同步。已按用户要求交付test并运行Both/常规编译；准确head/run与结果见本次迁移回执，旧run不能替代。见[身份迁移](AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。

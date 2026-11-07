@@ -1,4 +1,4 @@
-# CLAUDE.md — OpenWorld / 开放世界 v5.2.1
+# CLAUDE.md — OpenWorld / 开放世界 v2.0.26
 
 2026-10-13 T008：当前main/aca7446，初始clean。PC已有独立配对/命令等弹窗，980f254固化无QR与模式控件/显式刷新；aca7446新增“移动端操作”左侧开关和可拖动Shell栏三键，原侧栏标题为“无障碍栏”。确认ADB可用时自动显示，手动关闭可保留并重新打开；会话级状态、无PC周期status。见 `docs/AI_ENGINEERING/13_REMOTE_ADB.md` / Baseline15 / T008；仅V0，当前构建/真机未验证。投屏传输仅为下一阶段待设计方向，原视频/Accessibility/输入链保持。本轮只同步文档。
 
@@ -36,7 +36,7 @@
 - Android deep link scheme：`openworld`
 - Runtime `APP_NAME`：`OpenWorld`（`libs/hbb_common/src/config.rs` / `hbb_common::config::APP_NAME`）
 - Runtime `ORG`：`com.carriez`（仍有历史来源，非 Android package）
-- 当前版本：Rust `5.2.1`，Flutter `5.2.1+59`
+- 当前版本：Rust `2.0.26`，Flutter `2.0.26+59`
 
 ---
 

@@ -16,17 +16,17 @@
 | 项目 | 当前源码值 |
 |---|---|
 | Rust package/crate | `openworld` |
-| Rust version | `5.2.1` |
+| Rust version | `2.0.26` |
 | Rust edition | `2021` |
 | Rust MSRV | `1.75` |
 | Flutter package | `flutter_hbb`（内部包名保留） |
-| Flutter version | `5.2.1+59` |
+| Flutter version | `2.0.26+59` |
 | Android applicationId | `com.openworld.me` |
 | Android compile/target/min SDK | `34 / 33 / 21` |
 | Android native library | `libopenworld.so` |
 | Windows native library | `openworld.dll` |
 
-版本号是发布资产。本轮和后续 AI 工作都不得自动修改。
+2026-11-07 T003按用户明确指令同步主Rust/portable版本2.0.26、Flutter2.0.26+59和build.cmd默认值；构建号59、依赖及工作流保持。本轮仅本地版本修改，未编译；见[Baseline25](../BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)。版本号是发布资产，后续变更仍需用户明确指令。
 
 ## 2. Cargo Workspace
 

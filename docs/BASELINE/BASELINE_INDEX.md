@@ -1,6 +1,6 @@
 # OpenWorld Engineering Baseline Index
 
-当前工作区：[Baseline24：开放世界产品身份](24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)，OW-BL-2026-11-07-7361d39-identity-worktree；V0，未提交/未编译。以下Baseline23及更早内容为冻结历史记录。
+当前工作区：[Baseline25：开放世界2.0.26版本](25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)，OW-BL-2026-11-07-c27368c-version-worktree；Rust/portable2.0.26、Flutter2.0.26+59，未提交/未编译。身份来源[Baseline24](24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)及以下更早内容为冻结历史记录。
 
 当前：[AS-BL-2026-10-25-48226fb-developer-password](23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)。观察源码test/48226fb，包含PC开发者双密码入口；T-2026-10-25-002同步文档并合并推送main，执行Both/常规编译。静态证据V0，准确main SHA和run见任务，不把dispatch当作构建PASS。
 

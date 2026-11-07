@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> Current product: **OpenWorld**. Internal identity/crate is `OpenWorld` / `openworld`; Android applicationId is `com.openworld.me`, application name is `OpenWorld`, launcher name is `开放世界`. Native artifacts are `libopenworld.so` / `openworld.dll` / `openworld.exe`. Version remains `5.2.1` (`5.2.1+59` for Flutter). See [identity migration and static verification](docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md). No product build was executed for this migration.
+> Current product: **OpenWorld**. Internal identity/crate is `OpenWorld` / `openworld`; Android applicationId is `com.openworld.me`, application name is `OpenWorld`, launcher name is `开放世界`. Native artifacts are `libopenworld.so` / `openworld.dll` / `openworld.exe`. Version is `2.0.26` (`2.0.26+59` for Flutter). See [identity migration and static verification](docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md). No product build was executed for this migration.
 >
 > The upstream RustDesk README below is retained as inherited background only. Every AI or maintainer must start with `PROJECT_START_HERE.md`, then follow `.codex/AI_RULES.md` and `docs/AI_ENGINEERING/AI_TASK_EXECUTION_PROTOCOL.md`. Current domain truth lives in `docs/AI_ENGINEERING/`; the former `ENGINEERING_*` suite remains historical detail.
 

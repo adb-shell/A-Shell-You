@@ -161,7 +161,7 @@ dependencies = [
 
 [[package]]
 name = "openworld-portable-packer"
-version = "5.2.1"
+version = "2.0.26"
 dependencies = [
  "brotli",
  "dirs",

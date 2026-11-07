@@ -21,8 +21,8 @@ OpenWorld 是 RustDesk 的深度二次开发产品，Android 可见名称为 `�
 | 项目 | 当前值 | 源码锚点 |
 |---|---|---|
 | Rust package/library | `openworld` / `openworld` | `Cargo.toml` |
-| Rust version | `5.2.1` | `Cargo.toml` |
-| Flutter package/version | `flutter_hbb` / `5.2.1+59`；内部包名保留 | `flutter/pubspec.yaml` |
+| Rust version | `2.0.26` | `Cargo.toml` |
+| Flutter package/version | `flutter_hbb` / `2.0.26+59`；内部包名保留 | `flutter/pubspec.yaml` |
 | Runtime app name | `OpenWorld` | `libs/hbb_common/src/config.rs::APP_NAME` |
 | Product display name | `开放世界` | `src/common.rs::get_display_app_name`、Flutter `appName` |
 | Android package | `com.openworld.me` | `flutter/android/app/build.gradle` |

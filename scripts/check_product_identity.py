@@ -44,10 +44,10 @@ def reference_files():
 def check():
     cargo = tomllib.loads(read("Cargo.toml"))
     require(cargo["package"]["name"] == NATIVE == cargo["lib"]["name"], "Cargo package/library")
-    require(cargo["package"]["version"] == "5.2.1", "Rust version unchanged")
+    require(cargo["package"]["version"] == "2.0.26", "Rust product version")
     pubspec = read("flutter/pubspec.yaml")
     require(re.search(r"^name: flutter_hbb$", pubspec, re.M), "Flutter internal package")
-    require(re.search(r"^version: 5\.2\.1\+59$", pubspec, re.M), "Flutter version unchanged")
+    require(re.search(r"^version: 2\.0\.26\+59$", pubspec, re.M), "Flutter product version/build number")
     gradle = read("flutter/android/app/build.gradle")
     require(f'namespace "{PACKAGE}"' in gradle and f'applicationId "{PACKAGE}"' in gradle, "Android namespace/applicationId")
     android = "{http://schemas.android.com/apk/res/android}"

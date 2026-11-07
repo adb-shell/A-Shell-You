@@ -1,6 +1,6 @@
 [package]
 name = "openworld"
-version = "5.2.1"
+version = "2.0.26"
 authors = ["OpenWorld contributors"]
 edition = "2021"
 build= "build.rs"

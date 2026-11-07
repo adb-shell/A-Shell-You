@@ -4,6 +4,8 @@
 
 ## 0. 当前恢复基线
 
+最新T003：用户重新明确要求只将5.2.1改为2.0.26，已在main/c27368c之上的本地工作区同步；Flutter2.0.26+59，构建号59保持。122项静态身份检查通过；未提交推送、未触发或监控编译。STATE/WORK-20261107-003 / CE-20261107-T003-01 / Baseline25，见[版本任务](../docs/tasks/T-2026-11-07-003-openworld-version.md)。以下T002/T001保留当时交付事实，不代表当前本地版本。
+
 最新任务T-2026-11-07-002已T8交付：保持Rust/portable5.2.1、Flutter5.2.1+59，test/d9f1119合并main为482eda5cd1404617512009cd032cc87e202c8d16并推送，说明“更新产品信息及指纹”。2026-11-07 17:38:48 +09:00一次Both/常规编译获HTTP204；不监控，未查询run或结果，后续仅补文档回执不再次编排。先前2.0.26/2026修改已按用户要求完全撤销；不从旧聊天恢复。STATE/WORK-20261107-002 / CE-20261107-T002-01/02；准确回执见[任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。以下T001为产品身份来源记录。
 
 身份迁移源码ad88665e74ef48e251a1faefda6461e3c0e8112b已提交推送test，main保持7361d39；[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)记录实施快照。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me。T-2026-11-07-001 / STATE/WORK-20261107-001 / CE-20261107-T001-01/02 / D-034。
@@ -54,7 +56,7 @@ V0通过；用户已确认test提交推送与Both/常规编译，run42350649478/
 - Flutter package：`flutter_hbb`。用户明确要求保留此内部包名及 `package:flutter_hbb/` 导入，与产品品牌无绑定关系。
 - Android applicationId：`com.openworld.me`。
 - Android deep link scheme：`openworld`。
-- 当前源码版本：Rust `5.2.1`，Flutter `5.2.1+59`；不得由 AI 自动修改。
+- 当前源码版本：Rust `2.0.26`，Flutter `2.0.26+59`；本次依用户明确指令修改，后续不得由 AI 自动改动。
 - 根 license：AGPL-3.0；第三方 license/provenance 尚需完整审计。
 
 ## 3. Architecture Anchors

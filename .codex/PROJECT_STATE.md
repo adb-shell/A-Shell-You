@@ -1,11 +1,13 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261107-002`
+State Revision：`STATE-20261107-003`
 Last Updated / Observed At：2026-11-07（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0`
 
 ## 当前源码基线
+
+- T003当前本地版本：main/c27368c之上按用户最新指令将5.2.1改为2.0.26，Flutter2.0.26+59，构建号59保持；未提交推送或编译。见[当前任务](../docs/tasks/T-2026-11-07-003-openworld-version.md)、[Baseline25](../docs/BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)。STATE/WORK-20261107-003 / CE-20261107-T003-01；以下T002/T001均为旧版本交付历史，不恢复其撤销的2026构建号方案，不监控旧编排。
 
 - T002当前交付完成：test/d9f1119已合并main并推送`482eda5cd1404617512009cd032cc87e202c8d16`，说明“更新产品信息及指纹”；版本保持5.2.1 / 5.2.1+59。2026-11-07 17:38:48 +09:00一次Both/常规编译获HTTP204，不监控、无run或结果查询；后续仅补交付文档，不二次dispatch。原2.0.26/2026修改已撤销，不能恢复。准确回执见[当前任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。下列T001记录为来源沿革。
 
@@ -18,7 +20,7 @@ Evidence Scope：`repository-observed / V0`
 
 | 领域 | 当前实现与限制 |
 |---|---|
-| 产品身份 | 显示“开放世界”；内部 OpenWorld/openworld、com.openworld.me；flutter_hbb保持；Rust 5.2.1 / Flutter 5.2.1+59 |
+| 产品身份 | 显示“开放世界”；内部 OpenWorld/openworld、com.openworld.me；flutter_hbb保持；Rust 2.0.26 / Flutter 2.0.26+59 |
 | Android 原链 | core连接服务、MediaProjection、无障碍输入/无视/穿透/黑屏保持各自原入口；服务运行不等于屏幕共享或首帧 |
 | ADB身份 | Android进程持有配对身份；双NSD发现，pairConnect后以真实 id -u 验证；配对记录不代表Shell已可用 |
 | ADB执行 | 2路独立命令、设备共享状态变化推送、有限意外断链恢复；PC无三秒远程status |
@@ -33,6 +35,8 @@ Evidence Scope：`repository-observed / V0`
 详见 [12本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[Android原链](../docs/AI_ENGINEERING/04_ANDROID_PIPELINE.md)。
 
 ## 本轮工作与验证
+
+- T003：7份版本配置/锁文件/静态校验文件仅预期版本差异，第三方依赖/checksum与构建号59不变；122项静态身份合同通过（当前HEAD已迁移，原135项中的13项迁移前基线检查不适用）。未执行产品编译、Git写入或外部操作；以下T002/T001为历史验证。
 
 - 当前Task T-2026-11-07-002 / T8 / STATE、WORK-20261107-002 / CE-20261107-T002-01/02；main no-ff merge test已提交推送，15处冲突仅文档且按test内容解决，补交付文档前合并树与test完全一致。135项静态身份合同、版本与137个本地文档链接/差异检查通过；产品及工作流保持test。编排只记录HTTP204，不监控，不代表编译或运行通过。
 
