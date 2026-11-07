@@ -1,6 +1,6 @@
 # OpenWorld Project Start Here
 
-当前产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”。main/c27368c之上的本地版本已按最新指令改为2.0.26 / 2.0.26+59，构建号59保持。见[Baseline25](docs/BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-003-openworld-version.md)和[当前状态](.codex/PROJECT_STATE.md)。本轮未提交推送或编译；此前main合并/触发回执属于旧版本，不代表本版本验证通过，按要求不监控。
+当前产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”，版本2.0.26 / 2.0.26+59，构建号59保持；源码df0e129已按用户要求提交推送main。见[Baseline25](docs/BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-003-openworld-version.md)和[当前状态](.codex/PROJECT_STATE.md)。本版本未编译；此前main合并/触发回执属于旧版本，不代表本版本验证通过，按要求不监控。
 
 PC主窗口Ctrl+Shift+H双密码入口、ADB及原链行为保持。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 

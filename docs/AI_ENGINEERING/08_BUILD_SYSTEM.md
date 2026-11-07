@@ -26,7 +26,7 @@
 | Android native library | `libopenworld.so` |
 | Windows native library | `openworld.dll` |
 
-2026-11-07 T003按用户明确指令同步主Rust/portable版本2.0.26、Flutter2.0.26+59和build.cmd默认值；构建号59、依赖及工作流保持。本轮仅本地版本修改，未编译；见[Baseline25](../BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)。版本号是发布资产，后续变更仍需用户明确指令。
+2026-11-07 T003按用户明确指令同步主Rust/portable版本2.0.26、Flutter2.0.26+59和build.cmd默认值；构建号59、依赖及工作流保持。源码df0e129已按后续指令提交推送main，未编译；见[Baseline25](../BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)。版本号是发布资产，后续变更仍需用户明确指令。
 
 ## 2. Cargo Workspace
 

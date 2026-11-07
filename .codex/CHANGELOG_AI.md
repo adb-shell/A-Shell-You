@@ -6,11 +6,11 @@ Last Updated：2026-11-07（开放世界产品身份）
 
 Mode：`append-only task-level index`
 
-## T-2026-11-07-003：产品版本2.0.26（本地修改）
+## T-2026-11-07-003：产品版本2.0.26与main交付
 
 - 用户重新要求将5.2.1改为2.0.26；main/c27368c初始clean，主Rust/portable及锁条目、Flutter2.0.26+59、Windows默认版本和静态校验同步，构建号59保持。
 - 122项静态身份合同通过；7份非文档文件仅版本/校验差异，第三方依赖/checksum、产品功能及工作流不变。当前版本文档、Baseline25及薄记忆同步；不改历史Task/Baseline。
-- 本轮未提交推送、未编译或监控；N/A — no decision delta，无外部资产变化。STATE/WORK-20261107-003 / CE-20261107-T003-01；[任务](../docs/tasks/T-2026-11-07-003-openworld-version.md)。
+- 用户续接“提交并推送”，源码df0e129已提交推送main，说明“更新版本号为2.0.26”，远端一致；随后仅补回执文档，未编译或监控。N/A — no decision delta，无外部资产变化。STATE/WORK-20261107-003 / CE-20261107-T003-01/02；[任务](../docs/tasks/T-2026-11-07-003-openworld-version.md)。
 
 ## T-2026-11-07-002：保持版本合并main与双端编排
 
