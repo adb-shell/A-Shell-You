@@ -1,4 +1,6 @@
-# AShell 调试与验证体系 / Debug System
+# OpenWorld 调试与验证体系 / Debug System
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 2026-10-16 T001：当前4d3c446；区分paired、握手、UID验证、touchReady、媒体phase与首帧，命令忙不等于ADB失联。穿透排查按节点连接/读取、私有流、App绘图、helper退出阶段；exit134通常为SIGABRT但不单凭退出码定根因。黑屏先查App PNG生成、默认显示layerStack、READY及ROM截图排除；无节点与不支持/失败分开，不伪造就绪。V0，构建/真机待证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
@@ -7,7 +9,7 @@
 
 ## 1. 调试原则
 
-AShell 的故障通常跨 Flutter、Rust、JNI、Kotlin、驱动和外部服务。调试必须先回答三个问题：
+OpenWorld 的故障通常跨 Flutter、Rust、JNI、Kotlin、驱动和外部服务。调试必须先回答三个问题：
 
 1. 失败发生在哪个状态层或 trust boundary？
 2. 能否用同一个 correlation ID 串起控制端、受控端和外部服务？
@@ -126,7 +128,7 @@ process start
 ## 8. 网络/API 调试树
 
 - 区分 rendezvous、relay、secure handshake、login 和 service permission。
-- AShell controller 预期始终 relay；出现 direct candidate 应记录为策略偏差。
+- OpenWorld controller 预期始终 relay；出现 direct candidate 应记录为策略偏差。
 - 抓包只能在批准的测试环境进行，并在采集前替换生产 credential。
 - API 记录 method、endpoint label、status class、latency、timeout/retry；不记录 URL query/token/body。
 - heartbeat/config/disconnect 必须验证 server authentication。
@@ -181,7 +183,7 @@ cargo test
 
 环境要求：与项目锁定依赖兼容的 Rust 1.75、C/C++ toolchain、vcpkg/system dependencies、protobuf/FRB 相关工具；按目标平台准备驱动和系统 SDK。
 
-执行目录：AShell 仓库根目录。
+执行目录：OpenWorld 仓库根目录。
 
 验证目标：workspace/feature 可编译；unit tests 通过；重点确认 `cli` feature/API drift、Android JNI symbol、generated bridge 与当前 FFI 一致。若要验证 `cli`，需另加显式 `--features cli` 的受控构建，不应混入发布构建。
 
@@ -198,7 +200,7 @@ flutter test
 
 环境要求：项目锁定 Flutter/Dart 版本与 plugin dependencies。当前仓库只有极少 Dart test，且 test dependency 状态需先确认。
 
-执行目录：`AShell/flutter`。
+执行目录：`OpenWorld/flutter`。
 
 验证目标：Dart analyzer、bridge API、widget/model lifecycle 和现有测试基线；不得把“无测试被发现”当作通过。
 
@@ -213,7 +215,7 @@ flutter test
 
 环境要求：项目规定 Linux Android 构建机、`/opt/rustdesk-toolchain` 等价受控环境、Rust/Flutter/JDK、Android SDK/NDK 27.2、vcpkg、签名环境、ZEGO SDK；Android 10/13/14/15 真机。
 
-执行目录：AShell 仓库根目录。
+执行目录：OpenWorld 仓库根目录。
 
 验证目标：目标ABI packaging、签名、JNI linkage；MediaProjection one-shot；share loss不杀core；DirectBuffer ownership；旋转/折叠/小于350px边界；input permission；旧ADB残留为零；AND-09—13本机ADB与ADB-R01—07远程多PC共享/权限/取消/撤销/旧端兼容；ZEGO接受/拒绝和麦克风。ADB证据见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)，本次未运行。
 
@@ -227,9 +229,9 @@ build.cmd
 
 环境要求：`PC-Build.md` 定义的 Windows Server/Windows 10-11 正式构建环境，`C:\DevEnv`、`C:\DevTool`、VS 2022 Build Tools、Rust 1.75 MSVC、Flutter 3.24.x、LLVM、vcpkg、Amyuni/driver/helper artifacts 和签名条件。
 
-执行目录：AShell 仓库根目录。
+执行目录：OpenWorld 仓库根目录。
 
-验证目标：`ashell.exe`/`ashell.dll`/portable pack 一致；capture/input/file/terminal；Amyuni 单/多显示器；privacy mode 进入、异常恢复和退出；driver/DLL signature；无 RustDesk naming break。
+验证目标：`openworld.exe`/`openworld.dll`/portable pack 一致；capture/input/file/terminal；Amyuni 单/多显示器；privacy mode 进入、异常恢复和退出；driver/DLL signature；无 RustDesk naming break。
 
 ### 11.5 安全与协议验证
 

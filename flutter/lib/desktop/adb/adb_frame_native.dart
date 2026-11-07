@@ -10,10 +10,10 @@ typedef _FreeNative = Void Function(Pointer<Uint8>, Uint32);
 typedef _Free = void Function(Pointer<Uint8>, int);
 
 // Same library handle as the existing desktop bridge; no generated API changes.
-final _library = Platform.isWindows ? DynamicLibrary.open('ashell.dll')
-    : Platform.isLinux ? DynamicLibrary.open('libashell.so') : DynamicLibrary.process();
-final _take = _library.lookupFunction<_TakeNative, _Take>('ashell_take_adb_frame');
-final _free = _library.lookupFunction<_FreeNative, _Free>('ashell_free_adb_frame');
+final _library = Platform.isWindows ? DynamicLibrary.open('openworld.dll')
+    : Platform.isLinux ? DynamicLibrary.open('libopenworld.so') : DynamicLibrary.process();
+final _take = _library.lookupFunction<_TakeNative, _Take>('openworld_take_adb_frame');
+final _free = _library.lookupFunction<_FreeNative, _Free>('openworld_free_adb_frame');
 
 Uint8List? takeAdbFrame(String session, String owner, int generation) {
   if (Platform.isAndroid || Platform.isIOS) return null;

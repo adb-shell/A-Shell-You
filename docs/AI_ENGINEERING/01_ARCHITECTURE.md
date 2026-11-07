@@ -1,6 +1,10 @@
-# AShell 完整架构 / Architecture
+# OpenWorld 完整架构 / Architecture
 
-当前实现基线0dbe202：Android持有ADB身份及设备状态；命令、媒体、黑屏、输入各有资源。视频复用scrcpy ScreenCapture，经独立GPU/H.264编码；截图优先常驻UiAutomation；节点由Shell读取、App绘制。普通采集/接收独立，QoS参数只读共享。 2026-10-19文档复核，仅V0，构建/ROM实测待证；[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+
+当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC开发者密码由Flutter主窗口本地校验两个摘要，任一匹配只改变进程内免登录状态；没有新增API、协议、持久化或endpoint授权边界。main合并与双端编排见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)，运行验收待证。
+
+ADB架构沿用既有实现：Android持有身份与设备状态，命令/媒体/黑屏/输入资源独立；视频复用scrcpy ScreenCapture，经独立GPU/H.264编码，截图优先常驻UiAutomation，节点由Shell读取/App绘制。普通采集/接收独立，QoS参数只读共享。本次密码任务不修改这些路径；详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
 
 历史接管基线：2026-07-12，`77062b4`；当前实现见本页顶部
@@ -59,7 +63,7 @@ flowchart LR
 
 - rendezvous registration、ID/PK、relay request：`rendezvous.proto`。
 - session login、permission、display switch、privacy、terminal、ZEGO invitation：`message.proto`。
-- Flutter/Android 状态同步：Rust event stream、MethodChannel、`ashell_status`。
+- Flutter/Android 状态同步：Rust event stream、MethodChannel、`openworld_status`。
 - 产品策略：`hbbs_http::sync` heartbeat/config/disconnect。
 
 ### 3.2 数据面
@@ -77,7 +81,7 @@ flowchart LR
 
 `LoginConfigHandler` 持有 peer、connection type、password/options、codec 和 relay 状态；`Client` 完成 rendezvous 与 stream 建立；`client/io_loop.rs` 是消息主循环；`FlutterSession` 将事件送到 Dart。
 
-AShell controller 固定 `force_relay = true`，拒绝显式 direct address，并跳过 direct candidate。这个决定只证明 AShell controller 的默认路径；`rendezvous_mediator.rs::handle_punch_hole()` 在 controlled endpoint 仍可响应未设置 `force_relay` 的兼容请求。
+OpenWorld controller 固定 `force_relay = true`，拒绝显式 direct address，并跳过 direct candidate。这个决定只证明 OpenWorld controller 的默认路径；`rendezvous_mediator.rs::handle_punch_hole()` 在 controlled endpoint 仍可响应未设置 `force_relay` 的兼容请求。
 
 ### 4.2 Controlled endpoint
 
@@ -112,8 +116,8 @@ core service 在线不等于投屏；projection 丢失不等于 relay 断开；�
 - capture：DXGI 优先、GDI fallback，privacy 可切 Magnifier。
 - input：`src/server/input_service.rs` → `libs/enigo/` / `SendInput`，portable service 可代理高权限操作。
 - privacy：exclude/topmost window、Magnifier、virtual display 三类实现。
-- virtual display：当前活跃选择为 Amyuni `usbmmidd_v2`，实际 platform addition 是 `amyuni_virtual_displays`；`ashell_virtual_displays` 只属于未选用 RustDesk IDD 分支。
-- helper/injection：`RuntimeBroker_ashell.exe`、`WindowInjection.dll`、low-level hooks。
+- virtual display：当前活跃选择为 Amyuni `usbmmidd_v2`，实际 platform addition 是 `amyuni_virtual_displays`；`openworld_virtual_displays` 只属于未选用 RustDesk IDD 分支。
+- helper/injection：`RuntimeBroker_openworld.exe`、`WindowInjection.dll`、low-level hooks。
 
 详见 `05_WINDOWS_PIPELINE.md`。
 

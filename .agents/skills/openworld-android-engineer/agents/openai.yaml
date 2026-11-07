@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenWorld Android Engineer"
+  short_description: "Maintain OpenWorld Android runtime and capture pipeline"
+  default_prompt: "Use $openworld-android-engineer to handle this Android runtime task."

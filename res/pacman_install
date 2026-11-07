@@ -5,43 +5,43 @@
 # arg 1:  the new package version
 post_install() {
 	# do something here
-	cp /usr/share/ashell/files/ashell.service /etc/systemd/system/ashell.service
-	cp /usr/share/ashell/files/ashell.desktop /usr/share/applications/
-	cp /usr/share/ashell/files/ashell-link.desktop /usr/share/applications/
+	cp /usr/share/openworld/files/openworld.service /etc/systemd/system/openworld.service
+	cp /usr/share/openworld/files/openworld.desktop /usr/share/applications/
+	cp /usr/share/openworld/files/openworld-link.desktop /usr/share/applications/
 	systemctl daemon-reload
-	systemctl enable ashell
-	systemctl start ashell
+	systemctl enable openworld
+	systemctl start openworld
 	update-desktop-database
 }
 
 # arg 1:  the new package version
 # arg 2:  the old package version
 pre_upgrade() {
-    systemctl stop ashell || true
+    systemctl stop openworld || true
 }
 
 # arg 1:  the new package version
 # arg 2:  the old package version
 post_upgrade() {
-	cp /usr/share/ashell/files/ashell.service /etc/systemd/system/ashell.service
-	cp /usr/share/ashell/files/ashell.desktop /usr/share/applications/
-	cp /usr/share/ashell/files/ashell-link.desktop /usr/share/applications/
+	cp /usr/share/openworld/files/openworld.service /etc/systemd/system/openworld.service
+	cp /usr/share/openworld/files/openworld.desktop /usr/share/applications/
+	cp /usr/share/openworld/files/openworld-link.desktop /usr/share/applications/
 	systemctl daemon-reload
-	systemctl enable ashell
-	systemctl start ashell
+	systemctl enable openworld
+	systemctl start openworld
 	update-desktop-database
 }
 
 # arg 1:  the old package version
 pre_remove() {
-	systemctl stop ashell || true
-	systemctl disable ashell || true
-	rm /etc/systemd/system/ashell.service || true
+	systemctl stop openworld || true
+	systemctl disable openworld || true
+	rm /etc/systemd/system/openworld.service || true
 }
 
 # arg 1:  the old package version
 post_remove() {
-	rm /usr/share/applications/ashell.desktop || true
-	rm /usr/share/applications/ashell-link.desktop || true
+	rm /usr/share/applications/openworld.desktop || true
+	rm /usr/share/applications/openworld-link.desktop || true
 	update-desktop-database
 }

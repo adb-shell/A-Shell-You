@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenWorld Security Engineer"
+  short_description: "Threat-model and review OpenWorld security boundaries"
+  default_prompt: "Use $openworld-security-engineer to perform this security review safely."

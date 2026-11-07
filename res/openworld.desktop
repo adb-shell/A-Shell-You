@@ -1,0 +1,19 @@
+[Desktop Entry]
+Name=开放世界
+GenericName=Remote Desktop
+Comment=Remote Desktop
+Exec=openworld %u
+Icon=openworld
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Network;RemoteAccess;GTK;
+Keywords=internet;
+Actions=new-window;
+StartupWMClass=openworld
+
+X-Desktop-File-Install-Version=0.23
+
+[Desktop Action new-window]
+Name=Open a New Window
+Exec=openworld %u

@@ -1,0 +1,21 @@
+[Unit]
+Description=开放世界
+Requires=network.target
+After=systemd-user-sessions.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/openworld --service
+# kill --tray and --server both
+ExecStop=pkill -f "openworld --"
+# below two lines do not work, have to use above one line
+#ExecStop=pkill -f "openworld --tray"
+#ExecStop=pkill -f "openworld --server"
+PIDFile=/run/openworld.pid
+KillMode=mixed
+TimeoutStopSec=30
+User=root
+LimitNOFILE=100000
+
+[Install]
+WantedBy=multi-user.target

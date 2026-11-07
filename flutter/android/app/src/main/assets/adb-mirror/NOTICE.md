@@ -10,7 +10,7 @@ Licensed under Apache License 2.0; see LICENSE.scrcpy in this directory.
 - SHA-256: 764eb6f79811d5211fe9df341120882ba9994c7a61b897d7bf3fb662e53bc536
 - Acquisition: 2026-10-14; file digest matched official GitHub release asset metadata.
 
-AShell's Java/Rust/Dart adapters are separate implementations. The bundled server
+OpenWorld's Java/Rust/Dart adapters are separate implementations. The bundled server
 is not modified. It is pushed through an already authorized, device-local ADB
 connection and launched as shell; it is never executed by the build host.
 Builds package this asset offline. No desktop scrcpy, adb executable, SDL, or new

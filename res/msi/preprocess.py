@@ -48,7 +48,7 @@ def make_parser():
         "-d",
         "--dist-dir",
         type=str,
-        default="../../ashell",
+        default="../../openworld",
         help="The dist directory to install.",
     )
     parser.add_argument(
@@ -73,7 +73,7 @@ def make_parser():
         help='Connection type, e.g. "incoming", "outgoing". Default is empty, means incoming-outgoing',
     )
     parser.add_argument(
-        "--app-name", type=str, default="AShell", help="The internal app name (no spaces)."
+        "--app-name", type=str, default="OpenWorld", help="The internal app name (no spaces)."
     )
     parser.add_argument(
         "-v", "--version", type=str, default="", help="The app version."
@@ -85,7 +85,7 @@ def make_parser():
         "-m",
         "--manufacturer",
         type=str,
-        default="A Shell You",
+        default="OpenWorld",
         help="The app manufacturer.",
     )
     return parser
@@ -151,12 +151,12 @@ def gen_auto_component(app_name, dist_dir):
 
 
 def display_app_name(app_name):
-    return "一个壳子" if app_name == "AShell" else app_name
+    return "开放世界" if app_name == "OpenWorld" else app_name
 
 
 def shortcut_app_name(app_name):
-    # Preserve filenames used by existing installs, startup and uninstall cleanup.
-    return "A Shell You" if app_name == "AShell" else app_name
+    # Match the EXE installer, startup and uninstall shortcut filenames.
+    return "开放世界" if app_name == "OpenWorld" else app_name
 
 
 def gen_pre_vars(args, dist_dir):

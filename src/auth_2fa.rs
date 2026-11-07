@@ -14,7 +14,7 @@ lazy_static::lazy_static! {
     static ref CURRENT_2FA: Mutex<Option<(TOTPInfo, TOTP)>> = Mutex::new(None);
 }
 
-const ISSUER: &str = "A Shell You";
+const ISSUER: &str = "OpenWorld";
 const TAG_LOGIN: &str = "Connection";
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

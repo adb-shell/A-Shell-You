@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenWorld Release Engineer"
+  short_description: "Plan reproducible OpenWorld builds and guarded releases"
+  default_prompt: "Use $openworld-release-engineer to prepare this build or release plan."

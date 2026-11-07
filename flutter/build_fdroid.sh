@@ -419,8 +419,8 @@ build)
 
 	mkdir -p "flutter/android/app/src/main/jniLibs/${ANDROID_ABI}"
 
-	cp "target/${RUST_TARGET}/release/libashell.so" \
-		"flutter/android/app/src/main/jniLibs/${ANDROID_ABI}/libashell.so"
+	cp "target/${RUST_TARGET}/release/libopenworld.so" \
+		"flutter/android/app/src/main/jniLibs/${ANDROID_ABI}/libopenworld.so"
 
 	cp "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/${NDK_TARGET}/libc++_shared.so" \
 		"flutter/android/app/src/main/jniLibs/${ANDROID_ABI}/"

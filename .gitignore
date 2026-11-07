@@ -19,7 +19,7 @@ cert.pfx
 # Product icon assets are source resources, not build output.
 !/flutter/assets/icon.png
 !/flutter/assets/icon-fallback.png
-!/flutter/android/app/src/main/res/drawable-nodpi/ashell_floating_icon.png
+!/flutter/android/app/src/main/res/drawable-nodpi/openworld_floating_icon.png
 !/flutter/android/app/src/main/res/mipmap-mdpi/ic_launcher_monochrome.png
 !/flutter/android/app/src/main/res/mipmap-hdpi/ic_launcher_monochrome.png
 !/flutter/android/app/src/main/res/mipmap-xhdpi/ic_launcher_monochrome.png

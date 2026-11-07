@@ -1,7 +1,7 @@
-# AShell AI Rules
+# OpenWorld AI Rules
 
 最后更新：2026-07-12  
-适用范围：所有 AI、agent、skill 和自动化在 AShell 仓库中的工作。
+适用范围：所有 AI、agent、skill 和自动化在 OpenWorld 仓库中的工作。
 
 ## 0. Mandatory Entry and Precedence
 
@@ -182,14 +182,14 @@
 
 ## 9. Skill Routing
 
-- 跨域/接管：`ashell-master`。
-- Rust/unsafe/FFI：`ashell-rust-engineer`。
-- Android runtime：`ashell-android-engineer`。
-- Flutter/UI/state：`ashell-flutter-engineer`。
-- relay/protocol/auth：`ashell-network-engineer`。
-- HTTP/account/backend contracts：`ashell-api-engineer`。
-- threat/secret/permission：`ashell-security-engineer`。
-- build/sign/release planning：`ashell-release-engineer`。
+- 跨域/接管：`openworld-master`。
+- Rust/unsafe/FFI：`openworld-rust-engineer`。
+- Android runtime：`openworld-android-engineer`。
+- Flutter/UI/state：`openworld-flutter-engineer`。
+- relay/protocol/auth：`openworld-network-engineer`。
+- HTTP/account/backend contracts：`openworld-api-engineer`。
+- threat/secret/permission：`openworld-security-engineer`。
+- build/sign/release planning：`openworld-release-engineer`。
 
 领域交叉时由 master 协调，security/release constraints 优先于实现便利。
 
@@ -203,9 +203,9 @@
 
 ## 10. Safe Superpowers Profile
 
-- AShell does not install or trust an external Superpowers package by default.
+- OpenWorld does not install or trust an external Superpowers package by default.
 - The only enabled local adapter capabilities are `brainstorming`、`planning`、`debugging`、`verification` and `review`.
-- `ashell-superpowers-safe` always remains read-only/C0；it cannot edit files or execute a plan.
+- `openworld-superpowers-safe` always remains read-only/C0；it cannot edit files or execute a plan.
 - All other Superpowers-style capabilities are denied, including worktrees、plan execution、TDD execution、branch finishing and release workflows.
 - The adapter never performs commit、push or release and cannot use another Skill/sub-agent to do so.
 - V1—V5、implementation and persisted documentation route back through normal C1/C2/C3 gates.

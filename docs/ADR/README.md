@@ -1,4 +1,6 @@
-# AShell Architecture Decision Records
+# OpenWorld Architecture Decision Records
+
+当前产品身份：[ADR-0027 开放世界产品身份](0027-openworld-product-identity.md)，D-034 / T-2026-11-07-001。替代ADR-0014的当前命名；以下日期记录保持历史含义。
 
 当前：[ADR-0026 ADB节点读取与App绘图分离](0026-adb-app-side-rendering.md)，D-031 / T-2026-10-16-001，补录227bbe0/a2fc3c3/e5c80ad。更新0023/0024的绘图进程职责，保持0025隔离与同步边界；V0、设备验证待证。以下为历史索引说明。
 

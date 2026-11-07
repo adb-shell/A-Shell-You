@@ -14,7 +14,7 @@ from pathlib import Path
 windows = platform.platform().startswith('Windows')
 osx = platform.platform().startswith(
     'Darwin') or platform.platform().startswith("macOS")
-hbb_name = 'ashell' + ('.exe' if windows else '')
+hbb_name = 'openworld' + ('.exe' if windows else '')
 exe_path = 'target/release/' + hbb_name
 if windows:
     flutter_build_dir = 'build/windows/x64/runner/Release/'
@@ -182,7 +182,7 @@ def generate_build_script_for_docker():
             vcpkg/bootstrap-vcpkg.sh
             popd
             $VCPKG_ROOT/vcpkg install --x-install-root="$VCPKG_ROOT/installed"
-            # build ashell
+            # build openworld
             ./build.py --flutter --hwcodec
         ''')
     system2("chmod +x /tmp/build.sh")
@@ -292,12 +292,12 @@ def generate_control_file(version):
     control_file_path = "../res/DEBIAN/control"
     system2('/bin/rm -rf %s' % control_file_path)
 
-    content = """Package: ashell
+    content = """Package: openworld
 Section: net
 Priority: optional
 Version: %s
 Architecture: %s
-Maintainer: A Shell You contributors
+Maintainer: OpenWorld contributors
 Homepage: https://rustdesk.com
 Depends: libgtk-3-0, libxcb-randr0, libxdo3, libxfixes3, libxcb-shape0, libxcb-xfixes0, libasound2, libsystemd0, curl, libva2, libva-drm2, libva-x11-2, libgstreamer-plugins-base1.0-0, libpam0g, gstreamer1.0-pipewire%s
 Recommends: libayatana-appindicator3-1
@@ -322,82 +322,82 @@ def build_flutter_deb(version, features):
     os.chdir('flutter')
     system2('flutter build linux --release')
     system2('mkdir -p tmpdeb/usr/bin/')
-    system2('mkdir -p tmpdeb/usr/share/ashell')
-    system2('mkdir -p tmpdeb/etc/ashell/')
+    system2('mkdir -p tmpdeb/usr/share/openworld')
+    system2('mkdir -p tmpdeb/etc/openworld/')
     system2('mkdir -p tmpdeb/etc/pam.d/')
-    system2('mkdir -p tmpdeb/usr/share/ashell/files/systemd/')
+    system2('mkdir -p tmpdeb/usr/share/openworld/files/systemd/')
     system2('mkdir -p tmpdeb/usr/share/icons/hicolor/256x256/apps/')
     system2('mkdir -p tmpdeb/usr/share/icons/hicolor/scalable/apps/')
     system2('mkdir -p tmpdeb/usr/share/applications/')
     system2('mkdir -p tmpdeb/usr/share/polkit-1/actions')
-    system2('rm tmpdeb/usr/bin/ashell || true')
+    system2('rm tmpdeb/usr/bin/openworld || true')
     system2(
-        f'cp -r {flutter_build_dir}/* tmpdeb/usr/share/ashell/')
+        f'cp -r {flutter_build_dir}/* tmpdeb/usr/share/openworld/')
     system2(
-        'cp ../res/ashell.service tmpdeb/usr/share/ashell/files/systemd/')
+        'cp ../res/openworld.service tmpdeb/usr/share/openworld/files/systemd/')
     system2(
-        'cp ../res/128x128@2x.png tmpdeb/usr/share/icons/hicolor/256x256/apps/ashell.png')
+        'cp ../res/128x128@2x.png tmpdeb/usr/share/icons/hicolor/256x256/apps/openworld.png')
     system2(
-        'cp ../res/scalable.svg tmpdeb/usr/share/icons/hicolor/scalable/apps/ashell.svg')
+        'cp ../res/scalable.svg tmpdeb/usr/share/icons/hicolor/scalable/apps/openworld.svg')
     system2(
-        'cp ../res/ashell.desktop tmpdeb/usr/share/applications/ashell.desktop')
+        'cp ../res/openworld.desktop tmpdeb/usr/share/applications/openworld.desktop')
     system2(
-        'cp ../res/ashell-link.desktop tmpdeb/usr/share/applications/ashell-link.desktop')
+        'cp ../res/openworld-link.desktop tmpdeb/usr/share/applications/openworld-link.desktop')
     system2(
-        'cp ../res/startwm.sh tmpdeb/etc/ashell/')
+        'cp ../res/startwm.sh tmpdeb/etc/openworld/')
     system2(
-        'cp ../res/xorg.conf tmpdeb/etc/ashell/')
+        'cp ../res/xorg.conf tmpdeb/etc/openworld/')
     system2(
-        'cp ../res/pam.d/ashell.debian tmpdeb/etc/pam.d/ashell')
+        'cp ../res/pam.d/openworld.debian tmpdeb/etc/pam.d/openworld')
     system2(
-        "echo \"#!/bin/sh\" >> tmpdeb/usr/share/ashell/files/polkit && chmod a+x tmpdeb/usr/share/ashell/files/polkit")
+        "echo \"#!/bin/sh\" >> tmpdeb/usr/share/openworld/files/polkit && chmod a+x tmpdeb/usr/share/openworld/files/polkit")
 
     system2('mkdir -p tmpdeb/DEBIAN')
     generate_control_file(version)
     system2('cp -a ../res/DEBIAN/* tmpdeb/DEBIAN/')
     md5_file_folder("tmpdeb/")
-    system2('dpkg-deb -b tmpdeb ashell.deb;')
+    system2('dpkg-deb -b tmpdeb openworld.deb;')
 
     system2('/bin/rm -rf tmpdeb/')
     system2('/bin/rm -rf ../res/DEBIAN/control')
-    os.rename('ashell.deb', '../ashell-%s.deb' % version)
+    os.rename('openworld.deb', '../openworld-%s.deb' % version)
     os.chdir("..")
 
 
 def build_deb_from_folder(version, binary_folder):
     os.chdir('flutter')
     system2('mkdir -p tmpdeb/usr/bin/')
-    system2('mkdir -p tmpdeb/usr/share/ashell')
-    system2('mkdir -p tmpdeb/usr/share/ashell/files/systemd/')
+    system2('mkdir -p tmpdeb/usr/share/openworld')
+    system2('mkdir -p tmpdeb/usr/share/openworld/files/systemd/')
     system2('mkdir -p tmpdeb/usr/share/icons/hicolor/256x256/apps/')
     system2('mkdir -p tmpdeb/usr/share/icons/hicolor/scalable/apps/')
     system2('mkdir -p tmpdeb/usr/share/applications/')
     system2('mkdir -p tmpdeb/usr/share/polkit-1/actions')
-    system2('rm tmpdeb/usr/bin/ashell || true')
+    system2('rm tmpdeb/usr/bin/openworld || true')
     system2(
-        f'cp -r ../{binary_folder}/* tmpdeb/usr/share/ashell/')
+        f'cp -r ../{binary_folder}/* tmpdeb/usr/share/openworld/')
     system2(
-        'cp ../res/ashell.service tmpdeb/usr/share/ashell/files/systemd/')
+        'cp ../res/openworld.service tmpdeb/usr/share/openworld/files/systemd/')
     system2(
-        'cp ../res/128x128@2x.png tmpdeb/usr/share/icons/hicolor/256x256/apps/ashell.png')
+        'cp ../res/128x128@2x.png tmpdeb/usr/share/icons/hicolor/256x256/apps/openworld.png')
     system2(
-        'cp ../res/scalable.svg tmpdeb/usr/share/icons/hicolor/scalable/apps/ashell.svg')
+        'cp ../res/scalable.svg tmpdeb/usr/share/icons/hicolor/scalable/apps/openworld.svg')
     system2(
-        'cp ../res/ashell.desktop tmpdeb/usr/share/applications/ashell.desktop')
+        'cp ../res/openworld.desktop tmpdeb/usr/share/applications/openworld.desktop')
     system2(
-        'cp ../res/ashell-link.desktop tmpdeb/usr/share/applications/ashell-link.desktop')
+        'cp ../res/openworld-link.desktop tmpdeb/usr/share/applications/openworld-link.desktop')
     system2(
-        "echo \"#!/bin/sh\" >> tmpdeb/usr/share/ashell/files/polkit && chmod a+x tmpdeb/usr/share/ashell/files/polkit")
+        "echo \"#!/bin/sh\" >> tmpdeb/usr/share/openworld/files/polkit && chmod a+x tmpdeb/usr/share/openworld/files/polkit")
 
     system2('mkdir -p tmpdeb/DEBIAN')
     generate_control_file(version)
     system2('cp -a ../res/DEBIAN/* tmpdeb/DEBIAN/')
     md5_file_folder("tmpdeb/")
-    system2('dpkg-deb -b tmpdeb ashell.deb;')
+    system2('dpkg-deb -b tmpdeb openworld.deb;')
 
     system2('/bin/rm -rf tmpdeb/')
     system2('/bin/rm -rf ../res/DEBIAN/control')
-    os.rename('ashell.deb', '../ashell-%s.deb' % version)
+    os.rename('openworld.deb', '../openworld-%s.deb' % version)
     os.chdir("..")
 
 
@@ -409,11 +409,11 @@ def build_flutter_dmg(version, features):
     # copy dylib
     os.chdir('flutter')
     system2('flutter build macos --release')
-    system2('cp -rf ../target/release/service ./build/macos/Build/Products/Release/AShell.app/Contents/MacOS/')
+    system2('cp -rf ../target/release/service ./build/macos/Build/Products/Release/OpenWorld.app/Contents/MacOS/')
     '''
     system2(
-        "create-dmg --volname \"AShell Installer\" --window-pos 200 120 --window-size 800 400 --icon-size 100 --app-drop-link 600 185 --icon AShell.app 200 190 --hide-extension AShell.app ashell.dmg ./build/macos/Build/Products/Release/AShell.app")
-    os.rename("ashell.dmg", f"../ashell-{version}.dmg")
+        "create-dmg --volname \"OpenWorld Installer\" --window-pos 200 120 --window-size 800 400 --icon-size 100 --app-drop-link 600 185 --icon OpenWorld.app 200 190 --hide-extension OpenWorld.app openworld.dmg ./build/macos/Build/Products/Release/OpenWorld.app")
+    os.rename("openworld.dmg", f"../openworld-{version}.dmg")
     '''
     os.chdir("..")
 
@@ -424,7 +424,7 @@ def build_flutter_arch_manjaro(version, features):
     ffi_bindgen_function_refactor()
     os.chdir('flutter')
     system2('flutter build linux --release')
-    system2(f'strip {flutter_build_dir}/lib/libashell.so')
+    system2(f'strip {flutter_build_dir}/lib/libopenworld.so')
     os.chdir('../res')
     system2('HBB=`pwd`/.. FLUTTER=1 makepkg -f')
 
@@ -432,7 +432,7 @@ def build_flutter_arch_manjaro(version, features):
 def build_flutter_windows(version, features, skip_portable_pack):
     if not skip_cargo:
         system2(f'cargo build --features {features} --lib --release')
-        if not os.path.exists("target/release/ashell.dll"):
+        if not os.path.exists("target/release/openworld.dll"):
             print("cargo build failed, please check rust source code.")
             exit(-1)
     os.chdir('flutter')
@@ -445,19 +445,19 @@ def build_flutter_windows(version, features, skip_portable_pack):
     os.chdir('libs/portable')
     system2('pip3 install -r requirements.txt')
     system2(
-        f'python3 ./generate.py -f ../../{flutter_build_dir_2} -o . -e ../../{flutter_build_dir_2}/ashell.exe')
+        f'python3 ./generate.py -f ../../{flutter_build_dir_2} -o . -e ../../{flutter_build_dir_2}/openworld.exe')
     os.chdir('../..')
-    if os.path.exists('./ashell_portable.exe'):
-        os.replace('./target/release/ashell-portable-packer.exe',
-                   './ashell_portable.exe')
+    if os.path.exists('./openworld_portable.exe'):
+        os.replace('./target/release/openworld-portable-packer.exe',
+                   './openworld_portable.exe')
     else:
-        os.rename('./target/release/ashell-portable-packer.exe',
-                  './ashell_portable.exe')
+        os.rename('./target/release/openworld-portable-packer.exe',
+                  './openworld_portable.exe')
     print(
-        f'output location: {os.path.abspath(os.curdir)}/ashell_portable.exe')
-    os.rename('./ashell_portable.exe', f'./ashell-{version}-install.exe')
+        f'output location: {os.path.abspath(os.curdir)}/openworld_portable.exe')
+    os.rename('./openworld_portable.exe', f'./openworld-{version}-install.exe')
     print(
-        f'output location: {os.path.abspath(os.curdir)}/ashell-{version}-install.exe')
+        f'output location: {os.path.abspath(os.curdir)}/openworld-{version}-install.exe')
 
 
 def main():
@@ -494,24 +494,24 @@ def main():
             build_flutter_windows(version, features, args.skip_portable_pack)
             return
         system2('cargo build --release --features ' + features)
-        # system2('upx.exe target/release/ashell.exe')
+        # system2('upx.exe target/release/openworld.exe')
         pa = os.environ.get('P')
         if pa:
             # https://certera.com/kb/tutorial-guide-for-safenet-authentication-client-for-code-signing/
             system2(
                 f'signtool sign /a /v /p {pa} /debug /f .\\cert.pfx /t http://timestamp.digicert.com  '
-                'target\\release\\ashell.exe')
+                'target\\release\\openworld.exe')
         else:
             print('Not signed')
         system2(
-            f'cp -rf target/release/ashell.exe {res_dir}')
+            f'cp -rf target/release/openworld.exe {res_dir}')
         os.chdir('libs/portable')
         system2('pip3 install -r requirements.txt')
         system2(
-            f'python3 ./generate.py -f ../../{res_dir} -o . -e ../../{res_dir}/ashell.exe')
+            f'python3 ./generate.py -f ../../{res_dir} -o . -e ../../{res_dir}/openworld.exe')
         os.chdir('../..')
-        os.replace('target/release/ashell-portable-packer.exe',
-                   f'ashell-{version}-win7-install.exe')
+        os.replace('target/release/openworld-portable-packer.exe',
+                   f'openworld-{version}-win7-install.exe')
     elif os.path.isfile('/usr/bin/pacman'):
         # pacman -S -needed base-devel
         system2("sed -i 's/pkgver=.*/pkgver=%s/g' res/PKGBUILD" % version)
@@ -520,32 +520,32 @@ def main():
         else:
             system2('cargo build --release --features ' + features)
             system2('git checkout src/ui/common.tis')
-            system2('strip target/release/ashell')
+            system2('strip target/release/openworld')
             system2('ln -s res/pacman_install && ln -s res/PKGBUILD')
             system2('HBB=`pwd` makepkg -f')
-        system2('mv ashell-%s-0-x86_64.pkg.tar.zst ashell-%s-manjaro-arch.pkg.tar.zst' % (
+        system2('mv openworld-%s-0-x86_64.pkg.tar.zst openworld-%s-manjaro-arch.pkg.tar.zst' % (
             version, version))
-        # pacman -U ./ashell.pkg.tar.zst
+        # pacman -U ./openworld.pkg.tar.zst
     elif os.path.isfile('/usr/bin/yum'):
         system2('cargo build --release --features ' + features)
-        system2('strip target/release/ashell')
+        system2('strip target/release/openworld')
         system2(
             "sed -i 's/Version:    .*/Version:    %s/g' res/rpm.spec" % version)
         system2('HBB=`pwd` rpmbuild -ba res/rpm.spec')
         system2(
-            'mv $HOME/rpmbuild/RPMS/x86_64/ashell-%s-0.x86_64.rpm ./ashell-%s-fedora28-centos8.rpm' % (
+            'mv $HOME/rpmbuild/RPMS/x86_64/openworld-%s-0.x86_64.rpm ./openworld-%s-fedora28-centos8.rpm' % (
                 version, version))
-        # yum localinstall ashell.rpm
+        # yum localinstall openworld.rpm
     elif os.path.isfile('/usr/bin/zypper'):
         system2('cargo build --release --features ' + features)
-        system2('strip target/release/ashell')
+        system2('strip target/release/openworld')
         system2(
             "sed -i 's/Version:    .*/Version:    %s/g' res/rpm-suse.spec" % version)
         system2('HBB=`pwd` rpmbuild -ba res/rpm-suse.spec')
         system2(
-            'mv $HOME/rpmbuild/RPMS/x86_64/ashell-%s-0.x86_64.rpm ./ashell-%s-suse.rpm' % (
+            'mv $HOME/rpmbuild/RPMS/x86_64/openworld-%s-0.x86_64.rpm ./openworld-%s-suse.rpm' % (
                 version, version))
-        # yum localinstall ashell.rpm
+        # yum localinstall openworld.rpm
     else:
         if flutter:
             if osx:
@@ -553,15 +553,15 @@ def main():
                 pass
             else:
                 # system2(
-                #     'mv target/release/bundle/deb/ashell*.deb ./flutter/ashell.deb')
+                #     'mv target/release/bundle/deb/openworld*.deb ./flutter/openworld.deb')
                 build_flutter_deb(version, features)
         else:
             system2('cargo bundle --release --features ' + features)
             if osx:
                 system2(
-                    'strip target/release/bundle/osx/AShell.app/Contents/MacOS/ashell')
+                    'strip target/release/bundle/osx/OpenWorld.app/Contents/MacOS/openworld')
                 system2(
-                    'cp libsciter.dylib target/release/bundle/osx/AShell.app/Contents/MacOS/')
+                    'cp libsciter.dylib target/release/bundle/osx/OpenWorld.app/Contents/MacOS/')
                 # https://github.com/sindresorhus/create-dmg
                 system2('/bin/rm -rf *.dmg')
                 pa = os.environ.get('P')
@@ -569,65 +569,65 @@ def main():
                     system2('''
     # buggy: rcodesign sign ... path/*, have to sign one by one
     # install rcodesign via cargo install apple-codesign
-    #rcodesign sign --p12-file ~/.p12/rustdesk-developer-id.p12 --p12-password-file ~/.p12/.cert-pass --code-signature-flags runtime ./target/release/bundle/osx/AShell.app/Contents/MacOS/ashell
-    #rcodesign sign --p12-file ~/.p12/rustdesk-developer-id.p12 --p12-password-file ~/.p12/.cert-pass --code-signature-flags runtime ./target/release/bundle/osx/AShell.app/Contents/MacOS/libsciter.dylib
-    #rcodesign sign --p12-file ~/.p12/rustdesk-developer-id.p12 --p12-password-file ~/.p12/.cert-pass --code-signature-flags runtime ./target/release/bundle/osx/AShell.app
+    #rcodesign sign --p12-file ~/.p12/rustdesk-developer-id.p12 --p12-password-file ~/.p12/.cert-pass --code-signature-flags runtime ./target/release/bundle/osx/OpenWorld.app/Contents/MacOS/openworld
+    #rcodesign sign --p12-file ~/.p12/rustdesk-developer-id.p12 --p12-password-file ~/.p12/.cert-pass --code-signature-flags runtime ./target/release/bundle/osx/OpenWorld.app/Contents/MacOS/libsciter.dylib
+    #rcodesign sign --p12-file ~/.p12/rustdesk-developer-id.p12 --p12-password-file ~/.p12/.cert-pass --code-signature-flags runtime ./target/release/bundle/osx/OpenWorld.app
     # goto "Keychain Access" -> "My Certificates" for below id which starts with "Developer ID Application:"
-    codesign -s "Developer ID Application: {0}" --force --options runtime  ./target/release/bundle/osx/AShell.app/Contents/MacOS/*
-    codesign -s "Developer ID Application: {0}" --force --options runtime  ./target/release/bundle/osx/AShell.app
+    codesign -s "Developer ID Application: {0}" --force --options runtime  ./target/release/bundle/osx/OpenWorld.app/Contents/MacOS/*
+    codesign -s "Developer ID Application: {0}" --force --options runtime  ./target/release/bundle/osx/OpenWorld.app
     '''.format(pa))
                 system2(
-                    'create-dmg "AShell %s.dmg" "target/release/bundle/osx/AShell.app"' % version)
-                os.rename('AShell %s.dmg' %
-                          version, 'ashell-%s.dmg' % version)
+                    'create-dmg "OpenWorld %s.dmg" "target/release/bundle/osx/OpenWorld.app"' % version)
+                os.rename('OpenWorld %s.dmg' %
+                          version, 'openworld-%s.dmg' % version)
                 if pa:
                     system2('''
     # https://pyoxidizer.readthedocs.io/en/apple-codesign-0.14.0/apple_codesign.html
     # https://pyoxidizer.readthedocs.io/en/stable/tugger_code_signing.html
     # https://developer.apple.com/developer-id/
     # goto xcode and login with apple id, manager certificates (Developer ID Application and/or Developer ID Installer) online there (only download and double click (install) cer file can not export p12 because no private key)
-    #rcodesign sign --p12-file ~/.p12/rustdesk-developer-id.p12 --p12-password-file ~/.p12/.cert-pass --code-signature-flags runtime ./ashell-{1}.dmg
-    codesign -s "Developer ID Application: {0}" --force --options runtime ./ashell-{1}.dmg
+    #rcodesign sign --p12-file ~/.p12/rustdesk-developer-id.p12 --p12-password-file ~/.p12/.cert-pass --code-signature-flags runtime ./openworld-{1}.dmg
+    codesign -s "Developer ID Application: {0}" --force --options runtime ./openworld-{1}.dmg
     # https://appstoreconnect.apple.com/access/api
     # https://gregoryszorc.com/docs/apple-codesign/stable/apple_codesign_getting_started.html#apple-codesign-app-store-connect-api-key
     # p8 file is generated when you generate api key (can download only once)
-    rcodesign notary-submit --api-key-path ../.p12/api-key.json  --staple ashell-{1}.dmg
-    # verify:  spctl -a -t exec -v /Applications/AShell.app
+    rcodesign notary-submit --api-key-path ../.p12/api-key.json  --staple openworld-{1}.dmg
+    # verify:  spctl -a -t exec -v /Applications/OpenWorld.app
     '''.format(pa, version))
                 else:
                     print('Not signed')
             else:
                 # build deb package
                 system2(
-                    'mv target/release/bundle/deb/ashell*.deb ./ashell.deb')
-                system2('dpkg-deb -R ashell.deb tmpdeb')
-                system2('mkdir -p tmpdeb/usr/share/ashell/files/systemd/')
+                    'mv target/release/bundle/deb/openworld*.deb ./openworld.deb')
+                system2('dpkg-deb -R openworld.deb tmpdeb')
+                system2('mkdir -p tmpdeb/usr/share/openworld/files/systemd/')
                 system2('mkdir -p tmpdeb/usr/share/icons/hicolor/256x256/apps/')
                 system2('mkdir -p tmpdeb/usr/share/icons/hicolor/scalable/apps/')
                 system2(
-                    'cp res/ashell.service tmpdeb/usr/share/ashell/files/systemd/')
+                    'cp res/openworld.service tmpdeb/usr/share/openworld/files/systemd/')
                 system2(
-                    'cp res/128x128@2x.png tmpdeb/usr/share/icons/hicolor/256x256/apps/ashell.png')
+                    'cp res/128x128@2x.png tmpdeb/usr/share/icons/hicolor/256x256/apps/openworld.png')
                 system2(
-                    'cp res/scalable.svg tmpdeb/usr/share/icons/hicolor/scalable/apps/ashell.svg')
+                    'cp res/scalable.svg tmpdeb/usr/share/icons/hicolor/scalable/apps/openworld.svg')
                 system2(
-                    'cp res/ashell.desktop tmpdeb/usr/share/applications/ashell.desktop')
+                    'cp res/openworld.desktop tmpdeb/usr/share/applications/openworld.desktop')
                 system2(
-                    'cp res/ashell-link.desktop tmpdeb/usr/share/applications/ashell-link.desktop')
-                os.system('mkdir -p tmpdeb/etc/ashell/')
-                os.system('cp -a res/startwm.sh tmpdeb/etc/ashell/')
-                os.system('mkdir -p tmpdeb/etc/X11/ashell/')
-                os.system('cp res/xorg.conf tmpdeb/etc/X11/ashell/')
+                    'cp res/openworld-link.desktop tmpdeb/usr/share/applications/openworld-link.desktop')
+                os.system('mkdir -p tmpdeb/etc/openworld/')
+                os.system('cp -a res/startwm.sh tmpdeb/etc/openworld/')
+                os.system('mkdir -p tmpdeb/etc/X11/openworld/')
+                os.system('cp res/xorg.conf tmpdeb/etc/X11/openworld/')
                 os.system('cp -a DEBIAN/* tmpdeb/DEBIAN/')
                 os.system('mkdir -p tmpdeb/etc/pam.d/')
-                os.system('cp pam.d/ashell.debian tmpdeb/etc/pam.d/ashell')
-                system2('strip tmpdeb/usr/bin/ashell')
-                system2('mkdir -p tmpdeb/usr/share/ashell')
-                system2('mv tmpdeb/usr/bin/ashell tmpdeb/usr/share/ashell/')
-                system2('cp libsciter-gtk.so tmpdeb/usr/share/ashell/')
+                os.system('cp pam.d/openworld.debian tmpdeb/etc/pam.d/openworld')
+                system2('strip tmpdeb/usr/bin/openworld')
+                system2('mkdir -p tmpdeb/usr/share/openworld')
+                system2('mv tmpdeb/usr/bin/openworld tmpdeb/usr/share/openworld/')
+                system2('cp libsciter-gtk.so tmpdeb/usr/share/openworld/')
                 md5_file_folder("tmpdeb/")
-                system2('dpkg-deb -b tmpdeb ashell.deb; /bin/rm -rf tmpdeb/')
-                os.rename('ashell.deb', 'ashell-%s.deb' % version)
+                system2('dpkg-deb -b tmpdeb openworld.deb; /bin/rm -rf tmpdeb/')
+                os.rename('openworld.deb', 'openworld-%s.deb' % version)
 
 
 def md5_file(fn):

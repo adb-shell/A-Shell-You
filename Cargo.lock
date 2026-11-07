@@ -6063,7 +6063,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ashell"
+name = "openworld"
 version = "5.2.1"
 dependencies = [
  "android-wakelock",
@@ -6168,7 +6168,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ashell-portable-packer"
+name = "openworld-portable-packer"
 version = "5.2.1"
 dependencies = [
  "brotli",

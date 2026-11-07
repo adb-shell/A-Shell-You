@@ -1,10 +1,23 @@
-# AShell AI Changelog
+# OpenWorld AI Changelog
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-25（PC开发者密码入口）
+Last Updated：2026-11-07（开放世界产品身份）
 
 Mode：`append-only task-level index`
+
+## T-2026-11-07-001：开放世界产品身份迁移
+
+- main/7361d39初始clean；当前源码、ADB、native/FFI/包路径、平台资源、构建编排与当前工程文档统一新品牌；71个必要文件路径重命名，PNG内容不变。
+- 135项V0合同及四份Shell、CI 14段Bash/14段PowerShell语法通过；锁文件版本/checksum、协议编号/类型、认证输入、依赖与工作流执行结构保持。外部ZEGO请求键/签名输入/域名分类兼容，历史记录保留原名。
+- T5完成、T6 awaiting-confirmation；V2/V3/V4 NOT_RUN，本机无正式工具链，无Git写入/CI编排/发布。STATE/WORK-20261107-001 / CE-20261107-T001-01 / D-034 / Baseline24；[任务](../docs/tasks/T-2026-11-07-001-openworld-identity.md)。
+
+## T-2026-10-25-002：开发者密码文档同步与main双端交付
+
+- 用户明确要求同步文档、合并main、提交说明“开发者密码增加”并推送，然后main双端编排。起点test/48226fb、main/fd233fa与远端一致、clean；no-ff merge已无冲突准备，保留test四项提交。
+- 更新密码维护说明、入口/总览/架构/源码地图、当前BT构建文档，新增Baseline23和任务薄记忆；无新产品/协议/版本/依赖/资产变更，no decision delta。
+- V0通过：20份Markdown/222个本地引用、diff及产品树与test一致性；main合并42ba32c已推送，说明“开发者密码增加”。Both/常规编译HTTP204，run40204268722/head42ba32c；首次核对Windows EXE/Android Native均in_progress。后续仅补交付文档，FLT-08交互仍NOT_RUN，无构建PASS或生产发布。
+- T8文档/Git/触发交付完成；STATE/WORK-20261025-002 / CE-20261025-T002-01/02；[任务](../docs/tasks/T-2026-10-25-002-developer-password-main.md)。
 
 ## T-2026-10-25-001：PC开发者免登录入口密码确认
 

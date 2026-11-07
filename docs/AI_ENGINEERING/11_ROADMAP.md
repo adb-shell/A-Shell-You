@@ -1,4 +1,6 @@
-# AShell 工程路线图 / Roadmap
+# OpenWorld 工程路线图 / Roadmap
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 接管基线：2026-07-12  
 状态：`proposed`
@@ -127,7 +129,7 @@
 - 补录上游 RustDesk/DaXianDesk 基线、license provenance 和本地修改边界。
 - 所有重大决定写入 `.codex/DECISION_LOG.md`。
 - 所有实施任务写入 `.codex/TASK_HISTORY.md`，包含验证和 rollback。
-- 重写 AShell README、security contact、contribution ownership；旧上游文档保留历史标识。
+- 重写 OpenWorld README、security contact、contribution ownership；旧上游文档保留历史标识。
 - 建立 code owner/domain owner、review SLA 和 incident owner。
 - 采用规范 commit/PR subject；保留可审计变更原因。
 

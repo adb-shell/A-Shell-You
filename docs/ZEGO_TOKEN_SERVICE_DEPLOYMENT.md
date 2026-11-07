@@ -2,7 +2,7 @@
 
 最后同步：2026-07-01
 
-本文是 AShell 1v1 ZEGO 语音通话 Token 服务部署文档。当前部署方式为 **Linux 服务器本机 IP + 端口直连**，不使用域名、SSL 或外层反向代理。
+本文是 OpenWorld 1v1 ZEGO 语音通话 Token 服务部署文档。当前部署方式为 **Linux 服务器本机 IP + 端口直连**，不使用域名、SSL 或外层反向代理。
 
 一键部署脚本：
 
@@ -69,10 +69,10 @@ sudo ./deploy_zego_token_service.sh
 
 - 检查是否 root 执行。
 - 自动安装 Go 构建环境和 curl。
-- 创建 `/www/wwwroot/ashell-zego-token`。
+- 创建 `/www/wwwroot/openworld-zego-token`。
 - 写入 `.env`、`go.mod`、`main.go`。
-- 拉取 Go 依赖并构建 `ashell-zego-token`。
-- 写入 systemd 服务 `/etc/systemd/system/ashell-zego-token.service`。
+- 拉取 Go 依赖并构建 `openworld-zego-token`。
+- 写入 systemd 服务 `/etc/systemd/system/openworld-zego-token.service`。
 - 启动并设置开机自启。
 - 自动测试：
   - `GET /api/v1/health`
@@ -97,12 +97,12 @@ sudo ./deploy_zego_token_service.sh
 
 输入 `2` 后开始卸载 Token 服务。脚本会自动完成：
 
-- 停止 `ashell-zego-token` systemd 服务。
+- 停止 `openworld-zego-token` systemd 服务。
 - 取消开机自启。
-- 删除 `/etc/systemd/system/ashell-zego-token.service`。
-- 删除 `/www/wwwroot/ashell-zego-token` 服务目录。
+- 删除 `/etc/systemd/system/openworld-zego-token.service`。
+- 删除 `/www/wwwroot/openworld-zego-token` 服务目录。
 - 执行 `systemctl daemon-reload`。
-- 清理 `ashell-zego-token` 的 failed 状态。
+- 清理 `openworld-zego-token` 的 failed 状态。
 - 删除脚本自检产生的临时文件。
 - 自检服务是否仍在运行、服务文件是否残留、服务目录是否残留。
 
@@ -130,8 +130,8 @@ PORT=10053 sudo -E ./deploy_zego_token_service.sh
 |---|---|
 | `HOST` | `0.0.0.0` |
 | `PORT` | `10053` |
-| `INSTALL_DIR` | `/www/wwwroot/ashell-zego-token` |
-| `SERVICE_NAME` | `ashell-zego-token` |
+| `INSTALL_DIR` | `/www/wwwroot/openworld-zego-token` |
+| `SERVICE_NAME` | `openworld-zego-token` |
 | `ZEGO_APP_ID` | `726162948` |
 | `ZEGO_SERVER_SECRET` | `360a56369441ee640841cb4c82144186` |
 | `VOICE_TOKEN_TTL_SECONDS` | `3600` |
@@ -169,7 +169,7 @@ Content-Type: application/json
 {
   "pcPeerId": "pc_test",
   "androidPeerId": "android_test",
-  "ashellSessionId": "sess_test"
+  "openworldSessionId": "sess_test"
 }
 ```
 
@@ -197,25 +197,25 @@ Content-Type: application/json
 查看状态：
 
 ```bash
-systemctl status ashell-zego-token --no-pager
+systemctl status openworld-zego-token --no-pager
 ```
 
 实时日志：
 
 ```bash
-journalctl -u ashell-zego-token -f
+journalctl -u openworld-zego-token -f
 ```
 
 最近日志：
 
 ```bash
-journalctl -u ashell-zego-token -n 100 --no-pager
+journalctl -u openworld-zego-token -n 100 --no-pager
 ```
 
 重启服务：
 
 ```bash
-systemctl restart ashell-zego-token
+systemctl restart openworld-zego-token
 ```
 
 检查监听：
@@ -229,7 +229,7 @@ ss -lntp | grep 10053
 ## 验收清单
 
 - 宝塔/云服务器安全组已放行 TCP `10053`。
-- `systemctl status ashell-zego-token --no-pager` 显示 `active (running)`。
+- `systemctl status openworld-zego-token --no-pager` 显示 `active (running)`。
 - `ss -lntp | grep 10053` 显示服务监听 `0.0.0.0:10053`。
 - `curl http://127.0.0.1:10053/api/v1/health` 返回 `{"ok":true}`。
 - `curl http://<当前服务器公网IP>:10053/api/v1/health` 返回 `{"ok":true}`。
@@ -248,7 +248,7 @@ ss -lntp | grep 10053
 
 ```bash
 ss -lntp | grep 10053
-systemctl status ashell-zego-token --no-pager
+systemctl status openworld-zego-token --no-pager
 ```
 
 ### `401 unauthorized`
@@ -256,7 +256,7 @@ systemctl status ashell-zego-token --no-pager
 说明 PC / curl 的 Bearer key 与服务端 `.env` 中 `VOICE_API_KEY` 不一致：
 
 ```bash
-grep '^VOICE_API_KEY=' /www/wwwroot/ashell-zego-token/.env
+grep '^VOICE_API_KEY=' /www/wwwroot/openworld-zego-token/.env
 ```
 
 ### `caller_token_failed`
@@ -265,13 +265,13 @@ grep '^VOICE_API_KEY=' /www/wwwroot/ashell-zego-token/.env
 
 - `ZEGO_APP_ID` 是否是 `726162948`。
 - `ZEGO_SERVER_SECRET` 是否属于同一个 ZEGO 项目。
-- 修改 `.env` 后是否执行 `systemctl restart ashell-zego-token`。
+- 修改 `.env` 后是否执行 `systemctl restart openworld-zego-token`。
 - 服务器时间是否正常。
 
 查看日志：
 
 ```bash
-journalctl -u ashell-zego-token -n 100 --no-pager
+journalctl -u openworld-zego-token -n 100 --no-pager
 ```
 
 ### PC 仍然请求旧服务器

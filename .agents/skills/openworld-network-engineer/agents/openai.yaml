@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenWorld Network Engineer"
+  short_description: "Maintain OpenWorld relay, protocol, and authentication"
+  default_prompt: "Use $openworld-network-engineer to analyze this network protocol task."

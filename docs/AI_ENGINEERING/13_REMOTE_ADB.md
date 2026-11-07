@@ -1,4 +1,6 @@
-# AShell 远程 ADB / Remote ADB
+# OpenWorld 远程 ADB / Remote ADB
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前实现基线：0dbe202，2026-10-19源码复核，[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。PC负责远程输入，身份、配对记录、Shell验证和执行归Android进程；支持多PC共享状态、独立命令、输入/剪贴板及[媒体与触摸](14_ADB_MIRROR.md)。本轮仅V0文档同步，不代表编译/设备通过。
 

@@ -123,7 +123,7 @@ pub mod android {
     // Java registers an instance from its own class loader. Rust owns a process-lifetime
     // GlobalRef; each call attaches this thread, and only posts work to Android's main looper.
     #[no_mangle]
-    pub extern "system" fn Java_me_ashell_localadb_RemoteAdbNative_register(
+    pub extern "system" fn Java_com_openworld_me_localadb_RemoteAdbNative_register(
         env: JNIEnv, _class: JClass, manager: JObject,
     ) {
         if let (Ok(vm), Ok(manager)) = (env.get_java_vm(), env.new_global_ref(manager)) {
@@ -165,7 +165,7 @@ pub mod android {
     }
 
     #[no_mangle]
-    pub extern "system" fn Java_me_ashell_localadb_RemoteAdbNative_state(
+    pub extern "system" fn Java_com_openworld_me_localadb_RemoteAdbNative_state(
         mut env: JNIEnv, _class: JClass, payload: JString,
     ) {
         let Ok(payload) = env.get_string(&payload).map(|s| s.to_string_lossy().into_owned()) else { return; };
@@ -176,7 +176,7 @@ pub mod android {
     }
 
     #[no_mangle]
-    pub extern "system" fn Java_me_ashell_localadb_RemoteAdbNative_complete(
+    pub extern "system" fn Java_com_openworld_me_localadb_RemoteAdbNative_complete(
         mut env: JNIEnv, _class: JClass, token: JString, payload: JString,
     ) {
         let Ok(token) = env.get_string(&token).map(|s| s.to_string_lossy().into_owned()) else { return; };

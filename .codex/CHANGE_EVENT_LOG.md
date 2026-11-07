@@ -1,12 +1,38 @@
-# AShell Change Event Log
+# OpenWorld Change Event Log
 
 > 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-10-25（PC开发者密码入口）
+Last Updated：2026-11-07（开放世界产品身份）
 
 Mode：`append-only logical persisted-change events`
+
+## CE-20261107-T001-02：test交付与双端编译授权续接
+
+- 用户对明确枚举的新分支提交推送、Both/常规编译/监控及临时测试签名/Actions产物确认单回复“切换到test分支，然后继续”；因此目标改为origin/test，main保持。
+- 核对远端main7361d39、test48226fb；两分支产品树相同，仅17份文档不同。保留工作区switch到test，文档冲突以切换前快照恢复，保留Git自动恢复stash；没有丢弃产品修改或历史文档。
+- stage/commit/push及准确workflow/head/run结果待回填；无部署、正式签名、生产发布或设备操作。STATE/WORK-20261107-001，任务继续T6。
+
+## CE-20261107-T001-01：产品身份源码与文档同步
+
+- 当前用户要求开放世界/OpenWorld/openworld/com.openworld.me；main/7361d39初始clean，参考f423335e历史迁移，不继承历史Git/构建授权。
+- Rust/Flutter/Android、JNI/C ABI/ADB Shell/R8、portable、Windows/Linux/Apple及唯一BT编排完成身份同步；当前入口、领域文档、九个Skill、Task/ADR/Baseline/矩阵/外部资产/薄记忆同步，冻结历史不改。
+- 135项身份合同与脚本语法V0通过；protobuf编号/类型、依赖checksum、认证输入/凭据/设备UUID保持。旧外部合同留兼容，新包独立安装；iOS原有XML模板缺陷单列。
+- 仅工作区修改，T6 awaiting-confirmation；无Git写入、dispatch、产品构建/运行/发布，ID-03/04 NOT_RUN。STATE/WORK-20261107-001 / D-034 / ADR-0027 / Baseline24；[任务](../docs/tasks/T-2026-11-07-001-openworld-identity.md)。
+
+## CE-20261025-T002-02：main合并与双端编排回执
+
+- main合并42ba32cc7fcb3cf3cb05959a139d181e870a5691已提交推送，说明“开发者密码增加”，parents fd233fa/48226fb；远端main核对一致，test保持48226fb。
+- main / Build-Clients-BT / Both / 常规编译HTTP204，run40204268722/head42ba32c；首次核对workflow、Windows EXE、Android Native均in_progress。仅一次dispatch，不声称构建或运行验收PASS。
+- 此事件仅补 `docs/tasks/T-2026-10-25-002-developer-password-main.md` 与PROJECT_STATE/PROJECT_MEMORY/CURRENT_WORK/CHANGELOG_AI/TASK_HISTORY/本日志七份Markdown；同说明提交回执，无产品/工作流增量，不再次编排。STATE/WORK-20261025-002，T8关闭。
+
+## CE-20261025-T002-01：密码文档同步与main合并准备
+
+- 当前用户授权文档更新、test合并main、以“开发者密码增加”提交推送及main双端编排；test/48226fb、main/fd233fa与远端一致、clean，无并发活动任务。
+- no-ff merge test已准备且无冲突；文档同步纳入同一merge commit，不新增产品实现。更新AGENTS/PROJECT_START_HERE、00/01/02/03/08领域文档、BUILD_CLIENTS_ACTIONS、Baseline23/index、新任务与六份.codex记忆；冻结旧基线保持。
+- 修正当前唯一Build-Clients-BT入口，Both/常规编译；密码维护只记录UTF-8 SHA-256摘要步骤，不记录明文。无Decision/ADR/外部资产/版本增量。
+- V0通过：20份Markdown/222本地引用、diff、产品/工作流树与test一致性；Git/CI实际回执待回填。STATE/WORK-20261025-002，无本机产品验证、生产发布或强推。
 
 ## CE-20261025-T001-04：双密码test交付与编排回执
 

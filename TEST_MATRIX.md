@@ -1,4 +1,15 @@
-# AShell Commercial Test Matrix
+# OpenWorld Commercial Test Matrix
+
+## 2026-11-07 产品身份迁移
+
+| Case | 范围 | 级别 | 结果 |
+|---|---|---|---|
+| ID-01 | scripts/check_product_identity.py：产品清单、组件/JNI/R8/Shell/C ABI、protobuf39/40/41、portable、macOS、CI及依赖/认证输入不变 | V0 | PASS：135项静态合同 |
+| ID-02 | 四份Shell语法、云编排14段Bash/14段PowerShell、嵌入Python AST、TOML/XML/plist及diff | V0 | PASS；iOS导出模板基线既有XML缺陷单列 |
+| ID-03 | Android两ABI模式/Windows正式构建、包和产物名、native加载及Release R8 | V2 | NOT_RUN：本机无正式工具链 |
+| ID-04 | 新包独立安装、权限、普通远控与ADB Shell/媒体/触摸/剪贴板、ZEGO、新旧peer、安装卸载 | V3/V4 | NOT_RUN |
+
+本次映射和兼容边界见[身份迁移](docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。旧运行记录不能替代ID-03/04。
 
 2026-10-19：按0dbe202 / [Baseline22](docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)同步当前ADB验收参数。以下均为待执行用例；本轮仅V0文档核对，不执行编排或产品测试，历史dispatch不等于PASS。下方注明日期的段落记录用例来源，不覆盖当前基线。
 
@@ -145,7 +156,7 @@ These are coverage facts, not pass results.
 | AND-10 | P0 | Shell-v2 result | id、Unicode stdout/stderr、非零退出码、空/NUL/超长输入；连续单次命令 | 输出/exitCode 真实；坏输入拒绝；无 PTY/会话持久化假象；原产品状态不受查询影响 | V3 / E-A | Android+Flutter / QA |
 | AND-11 | P0 | Timeout/cancel/output bound | 错误端口、阻塞命令、重复点击、取消、20 秒 watchdog；输出超过 64 KiB | UI 不阻塞/不重复回调；取消后实际清理完成才可重试；超限 truncated、exitCode 可空；不自动重试有副作用命令 | V3 / E-A | Android+Flutter / QA |
 | AND-12 | P0 | Identity/lifecycle | 同进程重复断开连接、进程重启、前后台/切页/engine 销毁；测试环境损坏身份/忘记配对 | 身份不静默替换；无配对码/命令内容日志；断开不伪称撤权；无 timer/worker 泄漏；恢复需明确操作 | V3 / E-A | Android+Security / QA |
-| AND-13 | P0 | New ADB Release dependencies | 本地模式1/2或独立CI；目标三ABI；Release shrink；全新依赖解析 | 四项版本/来源可追溯；SPAKE2/Conscrypt JNI 可加载；旧libadb.so缺席；原libashell/ZEGO完整；无新增敏感权限 | V2+V3 / E-A | Android+Release+Security / Release evidence owner |
+| AND-13 | P0 | New ADB Release dependencies | 本地模式1/2或独立CI；目标三ABI；Release shrink；全新依赖解析 | 四项版本/来源可追溯；SPAKE2/Conscrypt JNI 可加载；旧libadb.so缺席；原libopenworld/ZEGO完整；无新增敏感权限 | V2+V3 / E-A | Android+Release+Security / Release evidence owner |
 
 ADB 详细步骤、限制和取证项见 [本机 ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)。至少覆盖 Android 10 的拒绝路径、Android 11/13/14/15 与目标 ROM；pair 和 connect 两种端口必须分开测。以无副作用查询验证原 AND-01/02/04/05/07/08、FLT-04/05/06；不要把用户主动修改系统的 shell 副作用当成实现自动改动。取消只是关闭传输，不以后台子进程一定被终止作为当前实现保证。
 
@@ -297,7 +308,7 @@ Never include token、password、credential、production URL/IP、peer/device ID
 
 T002 / 2026-10-13：用户反馈初版 Android NDK step 因 sdkmanager 缺失而失败（127）；未提供 run URL/SHA/ABI，不能映射为任一完整 case 的结果。两个 Android job 已补 SDK setup；上表 NOT_RUN 指修复后的运行。CI-01/02/04 额外检查 JDK → setup-android → sdkmanager 顺序、CLI 16.0、统一 SDK root 与 NDK 安装；通过 Run workflow 选择修复分支重新发起，保留新 run URL 和 SHA。
 
-T005 / 2026-10-12 PC入口补充（全部NOT_RUN）：正式Windows环境从仓库根运行 `build.cmd`；确认仅一个入口、最终 `PC-Bulid/ashell.exe` 的解压清单与本次Release一致。缺外部DLL/驱动时仍能完成产物打包；缺Brotli在编译前失败；源目录越界链接被拒绝；portable Cargo失败时CMD非零、不交付旧packer；manifest成功/失败路径可恢复。WIN-03/05/06/07/08分别验证未附带组件时的功能边界、资产策略和启动行为；这些源码规则不等于测试通过。
+T005 / 2026-10-12 PC入口补充（全部NOT_RUN）：正式Windows环境从仓库根运行 `build.cmd`；确认仅一个入口、最终 `PC-Bulid/openworld.exe` 的解压清单与本次Release一致。缺外部DLL/驱动时仍能完成产物打包；缺Brotli在编译前失败；源目录越界链接被拒绝；portable Cargo失败时CMD非零、不交付旧packer；manifest成功/失败路径可恢复。WIN-03/05/06/07/08分别验证未附带组件时的功能边界、资产策略和启动行为；这些源码规则不等于测试通过。
 
 When execution is needed but not authorized, output and stop:
 

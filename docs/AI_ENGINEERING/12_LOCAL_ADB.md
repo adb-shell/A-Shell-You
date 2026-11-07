@@ -1,4 +1,6 @@
-# AShell 本机 ADB / Local ADB
+# OpenWorld 本机 ADB / Local ADB
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前实现基线：0dbe202，2026-10-19源码复核，见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。配对/UID连接验证、独立命令、进程状态推送、有限断链恢复和本应用电池优化豁免均在此源码内。[13_REMOTE_ADB](13_REMOTE_ADB.md)和[14_ADB_MIRROR](14_ADB_MIRROR.md)分别记录PC控制与媒体/输入；本轮只同步文档，未构建或真机验证。
 
@@ -23,7 +25,7 @@
 ```mermaid
 flowchart LR
     Page[LocalAdbPage] --> Bridge[LocalAdbBridge]
-    Bridge --> Channel[me.ashell/local_adb/v1]
+    Bridge --> Channel[com.openworld.me/local_adb/v1]
     Channel --> Plugin[LocalAdbPlugin]
     Plugin --> Manager[LocalAdbManager / process owner]
     Manager --> Client[LocalAdbClient]
@@ -40,15 +42,15 @@ flowchart LR
 |---|---|
 | `flutter/lib/mobile/adb/local_adb_page.dart` | 页面、输入校验、输出、生命周期与 3 秒状态轮询 |
 | `flutter/lib/mobile/adb/local_adb_bridge.dart` | 类型化 MethodChannel consumer；status/output/exitCode |
-| `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbPlugin.java` | FlutterPlugin + ActivityAware，本机 owner 的 MethodChannel adapter |
-| `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbManager.java` | 共享身份/记录、连接操作串行队列、默认20秒/一键配对35秒watchdog；每秒检查并按变化推送快照，有限恢复 |
-| `flutter/android/app/src/main/java/me/ashell/localadb/RemoteAdbNative.java` / `AdbPortDiscovery.java` | 独立远端JNI / 本机NSD配对与连接端口发现，见13_REMOTE_ADB |
-| `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbClient.java` | 配对/连接 owner，运行 `id -u` 验证后才置connected，区分握手与UID验证失败 |
-| `flutter/android/app/src/main/java/me/ashell/localadb/AdbLocalSocket.java` | 仅 loopback 的可关闭 socket 转发，让超时/取消中断上游阻塞 I/O |
-| `flutter/android/app/src/main/java/me/ashell/localadb/LocalAdbCommands.java` | 独立Shell命令队列，总计8项、最多2并发，各项私有连接/20秒超时及requestId取消 |
-| `flutter/android/app/src/main/java/me/ashell/localadb/AdbStreamCompat.java` | 固定libadb3.1.1的OPEN兼容层，锁内等待与UTF-8包长度、有界8秒等待、R8反射成员 |
-| `flutter/android/app/src/main/java/me/ashell/localadb/AdbShell.java` | shell-v2 帧、UTF-8 stdin、stdout/stderr、退出码与输出上限 |
-| `flutter/android/app/src/main/java/me/ashell/localadb/AdbIdentity.java` | 独立 RSA 身份、证书、AndroidKeyStore 包装加密与进程内缓存 |
+| `flutter/android/app/src/main/java/com/openworld/me/localadb/LocalAdbPlugin.java` | FlutterPlugin + ActivityAware，本机 owner 的 MethodChannel adapter |
+| `flutter/android/app/src/main/java/com/openworld/me/localadb/LocalAdbManager.java` | 共享身份/记录、连接操作串行队列、默认20秒/一键配对35秒watchdog；每秒检查并按变化推送快照，有限恢复 |
+| `flutter/android/app/src/main/java/com/openworld/me/localadb/RemoteAdbNative.java` / `AdbPortDiscovery.java` | 独立远端JNI / 本机NSD配对与连接端口发现，见13_REMOTE_ADB |
+| `flutter/android/app/src/main/java/com/openworld/me/localadb/LocalAdbClient.java` | 配对/连接 owner，运行 `id -u` 验证后才置connected，区分握手与UID验证失败 |
+| `flutter/android/app/src/main/java/com/openworld/me/localadb/AdbLocalSocket.java` | 仅 loopback 的可关闭 socket 转发，让超时/取消中断上游阻塞 I/O |
+| `flutter/android/app/src/main/java/com/openworld/me/localadb/LocalAdbCommands.java` | 独立Shell命令队列，总计8项、最多2并发，各项私有连接/20秒超时及requestId取消 |
+| `flutter/android/app/src/main/java/com/openworld/me/localadb/AdbStreamCompat.java` | 固定libadb3.1.1的OPEN兼容层，锁内等待与UTF-8包长度、有界8秒等待、R8反射成员 |
+| `flutter/android/app/src/main/java/com/openworld/me/localadb/AdbShell.java` | shell-v2 帧、UTF-8 stdin、stdout/stderr、退出码与输出上限 |
+| `flutter/android/app/src/main/java/com/openworld/me/localadb/AdbIdentity.java` | 独立 RSA 身份、证书、AndroidKeyStore 包装加密与进程内缓存 |
 | `flutter/android/app/local-adb.gradle`、`local-adb.pro` | 独立依赖声明、仓库范围和 Release keep 规则 |
 
 8662f23 本机实现有三个接入点：`home_page.dart` 在 `isAndroid && !bind.isOutgoingOnly()` 内把 `LocalAdbPage` 放在 `ServerPage` 后；`oFtTiPzsqzBHGigp.configureFlutterEngine()` 去重注册插件；`app/build.gradle` 加载 `local-adb.gradle`。该提交新增9文件、原3文件增加7行；T004 的远程增量另见13_REMOTE_ADB，不能继续用三个钩子描述全部当前实现。
@@ -59,7 +61,7 @@ flowchart LR
 
 ## 3. MethodChannel 合同
 
-通道：`me.ashell/local_adb/v1`。除只读状态、设置和取消入口外，操作要求 API 30+；连接管理通道最多1执行+7排队，Shell使用独立2并发/总计8项通道；本机页面根据本窗口忙状态和connectionBusy禁用提交，其他PC可独立执行命令。
+通道：`com.openworld.me/local_adb/v1`。除只读状态、设置和取消入口外，操作要求 API 30+；连接管理通道最多1执行+7排队，Shell使用独立2并发/总计8项通道；本机页面根据本窗口忙状态和connectionBusy禁用提交，其他PC可独立执行命令。
 
 | 方法 | 参数 | 成功返回 | 语义 |
 |---|---|---|---|
@@ -91,7 +93,7 @@ flowchart LR
 
 ## 5. 身份与安全边界
 
-`AdbIdentity` 生成 RSA-2048 私钥与自签名证书，以 AndroidKeyStore AES-GCM 密钥（alias `ashell.localadb.identity.v1`）加密后写入 `noBackupFilesDir/local-adb-identity.v1`。身份在需要 pair/connect 时加载，损坏或包装密钥缺失会报错，不静默替换。RSA 私钥会在进程内解密使用，不能描述为不可导出的硬件 RSA 密钥。
+`AdbIdentity` 生成 RSA-2048 私钥与自签名证书，以 AndroidKeyStore AES-GCM 密钥（alias `openworld.localadb.identity.v1`）加密后写入 `noBackupFilesDir/local-adb-identity.v1`。身份在需要 pair/connect 时加载，损坏或包装密钥缺失会报错，不静默替换。RSA 私钥会在进程内解密使用，不能描述为不可导出的硬件 RSA 密钥。
 
 为兼容上游连接关闭时销毁 key、SSLContext 又缓存该 key 的行为，`BorrowedRsaKey` 将身份生命周期保持到 App 进程结束，不能把断开连接称作私钥已清零。配对码提交即清空输入框，不落盘；命令/输出仅保留在页面状态，本模块无持久命令历史、审计日志或内容上传。
 

@@ -8,7 +8,7 @@
  <string>HZF9JMC8YN</string>
  <key>provisioningProfiles</key>
  <dict>
- <key>me.ashell</key>
+ <key>com.openworld.me</key>
  <string>rustdesk-ios-prod-app-store</string>
  </dict>
  </dict>

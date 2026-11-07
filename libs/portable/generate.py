@@ -46,7 +46,7 @@ def generate_md5_table(folder: str, level) -> dict:
 def write_package_metadata(md5_table: dict, output_folder: str, exe: str):
     output_path = os.path.join(output_folder, "data.bin")
     with open(output_path, "wb") as f:
-        f.write("ashell".encode(encoding=encoding))
+        f.write("openworld".encode(encoding=encoding))
         for path in md5_table.keys():
             (compressed_data, md5_code) = md5_table[path]
             data_length = len(compressed_data)
@@ -61,7 +61,7 @@ def write_package_metadata(md5_table: dict, output_folder: str, exe: str):
             # md5 code
             f.write(md5_code)
         # end
-        f.write("ashell".encode(encoding=encoding))
+        f.write("openworld".encode(encoding=encoding))
         # executable
         f.write(exe.encode(encoding='utf-8'))
     print(f"Metadata has been written to {output_path}")
@@ -80,7 +80,7 @@ def build_portable(output_folder: str, target: str):
     subprocess.run(command, cwd=output_folder, check=True)
 
 # Linux: python3 generate.py -f ../rustdesk-portable-packer/test -o . -e ./test/main.py
-# Windows: python3 .\generate.py -f ..\ashell\flutter\build\windows\runner\Debug\ -o . -e ..\ashell\flutter\build\windows\runner\Debug\ashell.exe
+# Windows: python3 .\generate.py -f ..\openworld\flutter\build\windows\runner\Debug\ -o . -e ..\openworld\flutter\build\windows\runner\Debug\openworld.exe
 
 
 if __name__ == '__main__':
@@ -90,13 +90,13 @@ if __name__ == '__main__':
     parser.add_option("-o", "--output", dest="output_folder",
                       help="the root of portable packer project, default is './'")
     parser.add_option("-e", "--executable", dest="executable",
-                      help="specify startup file in --folder, default is ashell.exe")
+                      help="specify startup file in --folder, default is openworld.exe")
     parser.add_option("-t", "--target", dest="target",
                       help="the target used by cargo")
     parser.add_option("-l", "--level", dest="level", type="int",
                       help="compression level, default is 11, highest", default=11)
     (options, args) = parser.parse_args()
-    source = Path(options.folder or './ashell').resolve()
+    source = Path(options.folder or './openworld').resolve()
     output = Path(options.output_folder or './').resolve()
     if not source.is_dir():
         parser.error("The source folder does not exist")
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     if output == source or source in output.parents:
         parser.error("The portable project must be outside the source bundle")
 
-    requested_exe = Path(options.executable or 'ashell.exe')
+    requested_exe = Path(options.executable or 'openworld.exe')
     executable = requested_exe.resolve()
     if source not in executable.parents:
         executable = (source / requested_exe).resolve()

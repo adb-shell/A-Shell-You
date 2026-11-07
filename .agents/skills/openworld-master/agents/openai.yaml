@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenWorld Master Engineer"
+  short_description: "Coordinate safe cross-domain OpenWorld engineering"
+  default_prompt: "Use $openworld-master to scope and coordinate this OpenWorld task."

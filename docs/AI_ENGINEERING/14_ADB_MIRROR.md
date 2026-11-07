@@ -1,4 +1,6 @@
-# AShell ADB 投屏、无视、穿透、黑屏与输入
+# OpenWorld ADB 投屏、无视、穿透、黑屏与输入
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前实现基线：`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`，2026-10-19源码复核；见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)及[文档任务T006](../tasks/T-2026-10-19-006-restored-docs-sync.md)。本文合并此前已经进入该提交的功能，历史任务仅用于追溯，不覆盖当前参数。只完成V0文档/源码核对，不宣称构建、流畅度或全ROM兼容通过。
 
@@ -49,7 +51,7 @@ ADB 画面在主界面内显示：单源居中；双源左侧普通共享/无障
 
 `AdbCaptureProfile`采用与普通采集相同的width/350整数缩放：divisor=max(1, sourceWidth/350)，宽高均除以divisor。例如1080×2400得到360×800。没有额外1280限缩；缩放结果单边不超过4096、总像素不超过4Mi，超限报错。H.264还需遵循实际编码器的尺寸能力/对齐；显示和输入另传真实source_width/source_height，旋转时重新匹配几何，不能拿编码尺寸冒充源尺寸。
 
-`src/remote_adb_video.rs::Java_me_ashell_localadb_AdbCaptureProfile_quality`只读取普通VideoQoS当前fps、ratio及选中画质。码率复用scrap基础公式/当前编码器预算，并用ADB源的缩放修正；普通共享未开始也可计算。ADB不写普通QoS状态，但会读取其变化，因此两路的自适应参数并非互不相关。
+`src/remote_adb_video.rs::Java_com_openworld_me_localadb_AdbCaptureProfile_quality`只读取普通VideoQoS当前fps、ratio及选中画质。码率复用scrap基础公式/当前编码器预算，并用ADB源的缩放修正；普通共享未开始也可计算。ADB不写普通QoS状态，但会读取其变化，因此两路的自适应参数并非互不相关。
 
 | 模式 | 采集/编码实现 | 当前参数与节奏 |
 |---|---|---|
@@ -93,7 +95,7 @@ PC H.264使用独立解码器输出RGBA，经独立C ABI二进制本机桥交给
 
 `AdbPrivacyHint` 在App进程以16.5sp、`Typeface.SANS_SERIF`及Android字体回退排版，生成最多1024×512、256KiB的PNG。`LocalAdbPrivacy` 先将启动字节、长度及PNG写入helper的私有stdin，再维持心跳。helper校验尺寸后只解码并显示像素，不初始化文字排版或厂商字体文件。位置为左下方约80dp，心跳更新旋转后的纵向位置。
 
-黑层与白字层分别绑定默认显示的真实 `layerStack` 和顶层Z序；事务应用后输出 `ASHELL_OVERLAY_READY` 才确认开启。两层创建时即设置采集排除：Android11采用 `WINDOW_TYPE_DONT_SCREENSHOT` 元数据，Android12+采用 `SKIP_SCREENSHOT` 创建标记并调用 `setSkipScreenshot`；12+同时标记自身 `setTrustedOverlay(true)`，没有输入窗口或触摸拦截通道。目标是手机看到遮罩/文字，PC继续看到底层真实画面；该目标需OEM真机验证，不能据静态标记保证所有ROM一致。
+黑层与白字层分别绑定默认显示的真实 `layerStack` 和顶层Z序；事务应用后输出 `OPENWORLD_OVERLAY_READY` 才确认开启。两层创建时即设置采集排除：Android11采用 `WINDOW_TYPE_DONT_SCREENSHOT` 元数据，Android12+采用 `SKIP_SCREENSHOT` 创建标记并调用 `setSkipScreenshot`；12+同时标记自身 `setTrustedOverlay(true)`，没有输入窗口或触摸拦截通道。目标是手机看到遮罩/文字，PC继续看到底层真实画面；该目标需OEM真机验证，不能据静态标记保证所有ROM一致。
 
 隐藏API缺失时真实失败并清理，不降级为会遮住采集的普通覆盖窗。停止等待helper退出确认或本机10秒租约到期，旧Run不能回写新状态；快速关后开保留待开启意图，后续关会清掉该意图。图层、Surface、私有连接随各自生命周期释放。仅排除ADB自己的图层，用户另行开启的无障碍黑屏仍按原逻辑运行。
 

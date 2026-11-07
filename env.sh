@@ -2,8 +2,8 @@
 set -Eeuo pipefail
 
 # ============================================================
-# AShell Android 全局环境菜单脚本(Ubuntu)
-# 目标: 为本地 AShell 源码构建准备全局环境
+# OpenWorld Android 全局环境菜单脚本(Ubuntu)
+# 目标: 为本地 OpenWorld 源码构建准备全局环境
 # 配套: 源码目录内 Build.sh
 # ============================================================
 
@@ -46,7 +46,7 @@ inc_failed() {
 TOOLCHAIN_ROOT="${TOOLCHAIN_ROOT:-/opt/rustdesk-toolchain}"
 CACHE_ROOT="${CACHE_ROOT:-$TOOLCHAIN_ROOT/cache}"
 SIGNING_ROOT="${SIGNING_ROOT:-$TOOLCHAIN_ROOT/signing/android}"
-SIGN_ENV_PATH="${ASHELL_SIGN_ENV:-${SIGN_ENV_PATH:-$SIGNING_ROOT/signing.env}}"
+SIGN_ENV_PATH="${OPENWORLD_SIGN_ENV:-${ASHELL_SIGN_ENV:-${SIGN_ENV_PATH:-$SIGNING_ROOT/signing.env}}}"
 
 RUST_VERSION="${RUST_VERSION:-1.75.0}"
 CARGO_NDK_VERSION="${CARGO_NDK_VERSION:-3.1.2}"
@@ -63,7 +63,7 @@ VCPKG_COMMIT_ID="${VCPKG_COMMIT_ID:-6f29f12e82a8293156836ad81cc9bf5af41fe836}"
 ANDROID_CMDLINE_TOOLS_URL="${ANDROID_CMDLINE_TOOLS_URL:-https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip}"
 FLUTTER_TARBALL_URL="${FLUTTER_TARBALL_URL:-https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz}"
 
-export ASHELL_TOOLCHAIN_ROOT="$TOOLCHAIN_ROOT"
+export OPENWORLD_TOOLCHAIN_ROOT="$TOOLCHAIN_ROOT"
 export FLUTTER_HOME="$TOOLCHAIN_ROOT/flutter"
 export ANDROID_SDK_ROOT="$TOOLCHAIN_ROOT/android-sdk"
 export ANDROID_HOME="$ANDROID_SDK_ROOT"
@@ -118,14 +118,14 @@ write_profile_env() {
   local f="/etc/profile.d/rustdesk-toolchain.sh"
 
   cat > "$f" <<EOF
-export ASHELL_TOOLCHAIN_ROOT="$TOOLCHAIN_ROOT"
-export FLUTTER_HOME="\$ASHELL_TOOLCHAIN_ROOT/flutter"
-export ANDROID_SDK_ROOT="\$ASHELL_TOOLCHAIN_ROOT/android-sdk"
+export OPENWORLD_TOOLCHAIN_ROOT="$TOOLCHAIN_ROOT"
+export FLUTTER_HOME="\$OPENWORLD_TOOLCHAIN_ROOT/flutter"
+export ANDROID_SDK_ROOT="\$OPENWORLD_TOOLCHAIN_ROOT/android-sdk"
 export ANDROID_HOME="\$ANDROID_SDK_ROOT"
 export ANDROID_NDK_HOME="\$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION_DIR"
 export ANDROID_NDK_ROOT="\$ANDROID_NDK_HOME"
-export VCPKG_ROOT="\$ASHELL_TOOLCHAIN_ROOT/vcpkg"
-export VCPKG_DEFAULT_BINARY_CACHE="\$ASHELL_TOOLCHAIN_ROOT/cache/vcpkg"
+export VCPKG_ROOT="\$OPENWORLD_TOOLCHAIN_ROOT/vcpkg"
+export VCPKG_DEFAULT_BINARY_CACHE="\$OPENWORLD_TOOLCHAIN_ROOT/cache/vcpkg"
 export JAVA_HOME="$JAVA_HOME"
 
 if [ -d "\$ANDROID_SDK_ROOT/build-tools" ]; then
@@ -397,6 +397,12 @@ load_signing_env_if_exists() {
   if [[ -f "$SIGN_ENV_PATH" ]]; then
     # shellcheck disable=SC1090
     source "$SIGN_ENV_PATH" || true
+    # Accept the existing build-host configuration; write only new names below.
+    : "${OPENWORLD_ANDROID_SIGN_ENABLED:=${ASHELL_ANDROID_SIGN_ENABLED:-0}}"
+    : "${OPENWORLD_ANDROID_KEYSTORE_PATH:=${ASHELL_ANDROID_KEYSTORE_PATH:-}}"
+    : "${OPENWORLD_ANDROID_KEY_ALIAS:=${ASHELL_ANDROID_KEY_ALIAS:-}}"
+    : "${OPENWORLD_ANDROID_STORE_PASSWORD:=${ASHELL_ANDROID_STORE_PASSWORD:-}}"
+    : "${OPENWORLD_ANDROID_KEY_PASSWORD:=${ASHELL_ANDROID_KEY_PASSWORD:-}}"
     return 0
   fi
   return 1
@@ -454,11 +460,11 @@ configure_global_signing_menu() {
   read -r -s -p "Key Password  : " key_pw; echo
 
   cat > "$sign_env" <<EOF
-ASHELL_ANDROID_SIGN_ENABLED=1
-ASHELL_ANDROID_KEYSTORE_PATH=$keystore_path
-ASHELL_ANDROID_KEY_ALIAS=$key_alias
-ASHELL_ANDROID_STORE_PASSWORD=$store_pw
-ASHELL_ANDROID_KEY_PASSWORD=$key_pw
+OPENWORLD_ANDROID_SIGN_ENABLED=1
+OPENWORLD_ANDROID_KEYSTORE_PATH=$keystore_path
+OPENWORLD_ANDROID_KEY_ALIAS=$key_alias
+OPENWORLD_ANDROID_STORE_PASSWORD=$store_pw
+OPENWORLD_ANDROID_KEY_PASSWORD=$key_pw
 EOF
 
   run chmod 600 "$sign_env"
@@ -478,17 +484,17 @@ verify_signing_env() {
     die "未找到 signing.env: $SIGN_ENV_PATH"
   fi
 
-  echo "SIGN_ENABLED=${ASHELL_ANDROID_SIGN_ENABLED:-0}"
-  echo "KEYSTORE_PATH=${ASHELL_ANDROID_KEYSTORE_PATH:-<unset>}"
-  echo "KEY_ALIAS=${ASHELL_ANDROID_KEY_ALIAS:-<unset>}"
+  echo "SIGN_ENABLED=${OPENWORLD_ANDROID_SIGN_ENABLED:-0}"
+  echo "KEYSTORE_PATH=${OPENWORLD_ANDROID_KEYSTORE_PATH:-<unset>}"
+  echo "KEY_ALIAS=${OPENWORLD_ANDROID_KEY_ALIAS:-<unset>}"
 
-  [[ "${ASHELL_ANDROID_SIGN_ENABLED:-0}" == "1" ]] || die "签名未启用"
-  [[ -f "${ASHELL_ANDROID_KEYSTORE_PATH:-}" ]] || die "keystore 不存在"
+  [[ "${OPENWORLD_ANDROID_SIGN_ENABLED:-0}" == "1" ]] || die "签名未启用"
+  [[ -f "${OPENWORLD_ANDROID_KEYSTORE_PATH:-}" ]] || die "keystore 不存在"
 
   if keytool -list \
-    -keystore "${ASHELL_ANDROID_KEYSTORE_PATH}" \
-    -alias "${ASHELL_ANDROID_KEY_ALIAS}" \
-    -storepass "${ASHELL_ANDROID_STORE_PASSWORD}" >/dev/null 2>&1; then
+    -keystore "${OPENWORLD_ANDROID_KEYSTORE_PATH}" \
+    -alias "${OPENWORLD_ANDROID_KEY_ALIAS}" \
+    -storepass "${OPENWORLD_ANDROID_STORE_PASSWORD}" >/dev/null 2>&1; then
     ok "keystore + alias + password 验证通过"
   else
     die "签名验证失败(alias 或密码错误)"
@@ -562,9 +568,9 @@ one_key_check_current_env_status() {
   if [[ -f "$SIGN_ENV_PATH" ]]; then
     load_signing_env_if_exists
     if ! check_item "signing.env 存在" "[[ -f '$SIGN_ENV_PATH' ]]"; then inc_failed; fi
-    if ! check_item "签名启用" "[[ '${ASHELL_ANDROID_SIGN_ENABLED:-0}' == '1' ]]"; then inc_failed; fi
-    if ! check_item "keystore 文件存在" "[[ -f '${ASHELL_ANDROID_KEYSTORE_PATH:-/nonexistent}' ]]"; then inc_failed; fi
-    if ! check_item "签名 alias 非空" "[[ -n '${ASHELL_ANDROID_KEY_ALIAS:-}' ]]"; then inc_failed; fi
+    if ! check_item "签名启用" "[[ '${OPENWORLD_ANDROID_SIGN_ENABLED:-0}' == '1' ]]"; then inc_failed; fi
+    if ! check_item "keystore 文件存在" "[[ -f '${OPENWORLD_ANDROID_KEYSTORE_PATH:-/nonexistent}' ]]"; then inc_failed; fi
+    if ! check_item "签名 alias 非空" "[[ -n '${OPENWORLD_ANDROID_KEY_ALIAS:-}' ]]"; then inc_failed; fi
   else
     printf "  ${C_YELLOW}[!]${C_RESET} signing.env 未配置(如果暂不签名可稍后配置)\n"
     inc_failed
@@ -707,7 +713,7 @@ prebuild_full_check_menu() {
   one_key_check_current_env_status || true
 
   echo
-  read -r -p "请输入本地 AShell 源码目录(例如 /root/AShell): " repo
+  read -r -p "请输入本地 OpenWorld 源码目录(例如 /root/OpenWorld): " repo
   [[ -n "$repo" ]] || die "源码目录不能为空"
 
   echo "(1) aarch64"
@@ -725,8 +731,8 @@ prebuild_full_check_menu() {
 
   if load_signing_env_if_exists; then
     ok "已自动读取 signing.env: $SIGN_ENV_PATH"
-    [[ "${ASHELL_ANDROID_SIGN_ENABLED:-0}" == "1" ]] || die "signing.env 已读取，但签名未启用"
-    [[ -f "${ASHELL_ANDROID_KEYSTORE_PATH:-}" ]] || die "签名 keystore 不存在"
+    [[ "${OPENWORLD_ANDROID_SIGN_ENABLED:-0}" == "1" ]] || die "signing.env 已读取，但签名未启用"
+    [[ -f "${OPENWORLD_ANDROID_KEYSTORE_PATH:-}" ]] || die "签名 keystore 不存在"
   else
     die "未找到全局 signing.env: $SIGN_ENV_PATH"
   fi
@@ -783,7 +789,7 @@ EOF
 menu_main() {
   while true; do
     clear || true
-    echo "${C_BOLD}${C_MAGENTA}AShell Android 全局环境部署菜单${C_RESET}"
+    echo "${C_BOLD}${C_MAGENTA}OpenWorld Android 全局环境部署菜单${C_RESET}"
     echo "=========================================================="
     echo " (1) 一键安装全局环境(系统更新 + 依赖 + Rust + Flutter + SDK + NDK + Vcpkg + FRB)"
     echo " (2) 配置全局固定签名(单独)"

@@ -61,10 +61,10 @@ class _RemoteDisplayLayoutState extends State<RemoteDisplayLayout> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-    animation: Listenable.merge([widget.mirror, widget.mirror.hasFrame, widget.ffi.ashellStatusModel, widget.ffi.ffiModel]),
+    animation: Listenable.merge([widget.mirror, widget.mirror.hasFrame, widget.ffi.openworldStatusModel, widget.ffi.ffiModel]),
     builder: (context, _) => Obx(() {
       final model = widget.ffi.ffiModel;
-      final status = widget.ffi.ashellStatusModel.data;
+      final status = widget.ffi.openworldStatusModel.data;
       final firstFrame = !model.waitForFirstImage.value;
       final ordinaryOff = status.video == false && status.screenshot == false && status.penetrate != true;
       if (ordinaryOff) _ordinaryEnabled = false;

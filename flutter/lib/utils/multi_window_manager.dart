@@ -52,10 +52,10 @@ class MultiWindowCallResult {
 /// Window Manager
 /// mainly use it in `Main Window`
 /// use it in sub window is not recommended
-class AShellMultiWindowManager {
-  AShellMultiWindowManager._();
+class OpenWorldMultiWindowManager {
+  OpenWorldMultiWindowManager._();
 
-  static final instance = AShellMultiWindowManager._();
+  static final instance = OpenWorldMultiWindowManager._();
 
   final Set<int> _inactiveWindows = {};
   final Set<int> _activeWindows = {};
@@ -560,4 +560,4 @@ class AShellMultiWindowManager {
   }
 }
 
-final rustDeskWinManager = AShellMultiWindowManager.instance;
+final rustDeskWinManager = OpenWorldMultiWindowManager.instance;

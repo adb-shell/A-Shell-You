@@ -1,11 +1,11 @@
 @echo off
 chcp 65001 > nul
 setlocal enabledelayedexpansion
-title AShell PC Build Script
+title OpenWorld PC Build Script
 color 0B
 
 :: ============================================================
-:: AShell Windows x64 portable build script
+:: OpenWorld Windows x64 portable build script
 :: Adapted for the PC-Build.md server layout:
 ::   C:\DevEnv + C:\DevTool
 :: Script location is always treated as source root.
@@ -16,9 +16,9 @@ if "%ROOT_FOLDER:~-1%"=="\" set "ROOT_FOLDER=%ROOT_FOLDER:~0,-1%"
 for %%A in ("%ROOT_FOLDER%") do set "FOLDER_NAME=%%~nxA"
 set "RELEASE_DIR=%ROOT_FOLDER%\flutter\build\windows\x64\runner\Release"
 set "OUTPUT_DIR=%ROOT_FOLDER%\PC-Bulid"
-set "FINAL_EXE=%OUTPUT_DIR%\ashell.exe"
+set "FINAL_EXE=%OUTPUT_DIR%\openworld.exe"
 set "PORTABLE_DIR=%ROOT_FOLDER%\libs\portable"
-set "PACKER_EXE=%ROOT_FOLDER%\target\release\ashell-portable-packer.exe"
+set "PACKER_EXE=%ROOT_FOLDER%\target\release\openworld-portable-packer.exe"
 set "MANIFEST_FILE=%ROOT_FOLDER%\res\manifest.xml"
 set "MANIFEST_BACKUP=%ROOT_FOLDER%\res\manifest.pc.bak.xml"
 set "manifest_changed=0"
@@ -45,10 +45,10 @@ set "VCVARS=%DEVTOOL%\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build
 if not exist "%VCVARS%" set "VCVARS=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
 
 echo ============================================================
-echo AShell PC build script
+echo OpenWorld PC build script
 echo ============================================================
 echo [INFO] Source root : "%ROOT_FOLDER%"
-echo [INFO] App name    : "一个壳子"
+echo [INFO] App name    : "开放世界"
 echo [INFO] DEVENV   : "%DEVENV%"
 echo [INFO] DEVTOOL  : "%DEVTOOL%"
 echo [INFO] VC vars     : "%VCVARS%"
@@ -70,7 +70,7 @@ echo [OK] Visual Studio Build Tools environment is ready.
 echo.
 
 :: vcvars64.bat can override VCPKG_ROOT to Visual Studio's bundled vcpkg.
-:: AShell must stay pinned to the PC-Build.md dependency cache under C:\DevEnv.
+:: OpenWorld must stay pinned to the PC-Build.md dependency cache under C:\DevEnv.
 set "VCPKG_ROOT=%DEVENV%\vcpkg"
 set "VCPKG_DEFAULT_TRIPLET=x64-windows-static"
 set "VCPKG_DEFAULT_HOST_TRIPLET=x64-windows-static"
@@ -80,7 +80,7 @@ set "VCPKG_INSTALLED_ROOT=%DEVENV%\vcpkg\installed"
 set "LIBCLANG_PATH=%DEVTOOL%\LLVM\bin"
 set "PATH=%CARGO_HOME%\bin;%DEVENV%\flutter\bin;%VCPKG_ROOT%;%DEVTOOL%\Python;%DEVTOOL%\Python\Scripts;%DEVTOOL%\Git\cmd;%DEVTOOL%\Git\bin;%DEVTOOL%\LLVM\bin;%PATH%"
 if errorlevel 1 goto fail
-echo [OK] AShell dependency roots were restored after vcvars64.
+echo [OK] OpenWorld dependency roots were restored after vcvars64.
 echo [INFO] VCPKG_ROOT          : "%VCPKG_ROOT%"
 echo [INFO] VCPKG_INSTALLED_ROOT: "%VCPKG_INSTALLED_ROOT%"
 echo.
@@ -282,7 +282,7 @@ if errorlevel 1 goto fail
 echo [SUCCESS] 3. Prepare a clean Windows Release directory
 
 echo.
-echo ========== Step: 4. Build AShell Windows release ==========
+echo ========== Step: 4. Build OpenWorld Windows release ==========
 echo [WORKDIR] "%ROOT_FOLDER%"
 echo [COMMAND] python .\build.py --portable --hwcodec --flutter --vram --skip-portable-pack
 pushd "%ROOT_FOLDER%"
@@ -291,12 +291,12 @@ python .\build.py --portable --hwcodec --flutter --vram --skip-portable-pack
 set "build_code=!errorlevel!"
 popd
 if not "!build_code!"=="0" goto fail
-echo [SUCCESS] 4. Build AShell Windows release
+echo [SUCCESS] 4. Build OpenWorld Windows release
 
 :: Compress only this freshly produced Release bundle. No external DLL/driver staging.
 for %%F in (
-    "%RELEASE_DIR%\ashell.exe"
-    "%RELEASE_DIR%\ashell.dll"
+    "%RELEASE_DIR%\openworld.exe"
+    "%RELEASE_DIR%\openworld.dll"
     "%RELEASE_DIR%\flutter_windows.dll"
     "%RELEASE_DIR%\dylib_virtual_display.dll"
     "%RELEASE_DIR%\data\icudtl.dat"
@@ -322,10 +322,10 @@ echo.
 echo ========== Step: 6. Generate portable self-extract EXE ==========
 echo [WORKDIR] "%PORTABLE_DIR%"
 echo [INPUT] "%RELEASE_DIR%"
-echo [COMMAND] python .\generate.py -f "%RELEASE_DIR%" -o . -e "%RELEASE_DIR%\ashell.exe"
+echo [COMMAND] python .\generate.py -f "%RELEASE_DIR%" -o . -e "%RELEASE_DIR%\openworld.exe"
 pushd "%PORTABLE_DIR%"
 if errorlevel 1 goto fail
-python .\generate.py -f "%RELEASE_DIR%" -o . -e "%RELEASE_DIR%\ashell.exe"
+python .\generate.py -f "%RELEASE_DIR%" -o . -e "%RELEASE_DIR%\openworld.exe"
 set "portable_pack_code=!errorlevel!"
 popd
 if not "!portable_pack_code!"=="0" (

@@ -1,10 +1,24 @@
-# AShell Task History
+# OpenWorld Task History
 
 > 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。
 
-最后更新：2026-10-25
+最后更新：2026-11-07
 
 > 本文件记录 AI 参与的工程任务、授权边界和验证结果。它不是产品 changelog，也不替代 Git history。
+
+## T-2026-11-07-001：开放世界产品身份迁移（正式验证待证）
+
+- 用户明确要求全量产品身份同步，范围包括后续ADB与云编排，禁止无关功能更改。main/7361d39初始clean；实现/当前文档完成，71个必要路径改名；历史/外部地址/第三方身份保留。
+- 新身份：开放世界 / OpenWorld / openworld / com.openworld.me；JNI/R8/Shell/C ABI、平台安装与动态库、portable和构建消费者同步。ZEGO已部署字段、旧签名变量/域名分类留兼容；不改版本、设备UUID或认证/采集行为。
+- V0：135项合同、四份Shell、CI 14段Bash/14段PowerShell及嵌入Python语法通过；本机无正式工具链，ID-03/04 NOT_RUN，不能声明编译或运行PASS。
+- T5完成、T6 awaiting-confirmation；无Git索引/分支/提交/推送、CI编排、签名上传或发布。STATE/WORK-20261107-001 / CE-20261107-T001-01 / D-034 / Baseline24；[任务](../docs/tasks/T-2026-11-07-001-openworld-identity.md)。
+
+## T-2026-10-25-002：开发者密码文档同步与main双端交付
+
+- 当前用户明确授权文档同步、合并提交推送main（说明“开发者密码增加”）及Both/常规编译。起点test/48226fb、main/fd233fa，clean且远端一致；保留test四项提交，以no-ff merge加入文档。
+- 新增Baseline23，更新密码维护、当前入口/架构/源码地图/唯一BT构建文档与记忆；无业务实现增量/新依赖/外部资产/版本或Decision/ADR变化。
+- V0通过：20份Markdown/222本地引用、diff、产品/工作流树与test一致；main合并42ba32c以“开发者密码增加”提交推送成功，test保持48226fb。main Both/常规编译HTTP204/run40204268722，首次核对Windows EXE/Android Native均in_progress；后续仅补文档，不再次编排。
+- T8文档/Git/触发交付完成，FLT-08运行仍NOT_RUN，无构建PASS。回滚需维护者单独指定revert，无自动reset/强推/生产发布。STATE/WORK-20261025-002 / CE-20261025-T002-01/02；[任务](../docs/tasks/T-2026-10-25-002-developer-password-main.md)。
 
 ## T-2026-10-25-001：PC开发者免登录入口密码确认
 

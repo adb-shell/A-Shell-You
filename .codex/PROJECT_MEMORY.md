@@ -1,14 +1,14 @@
-# AShell Project Memory
+# OpenWorld Project Memory
 
-最后更新：2026-10-25。用途：当前会话恢复入口，不替代源码。
+最后更新：2026-11-07。用途：当前会话恢复入口，不替代源码。
 
 ## 0. 当前恢复基线
 
-参考冻结基线为 `0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`。2026-10-25实际起点main/fd233fa已有后续源码/配置/工作流提交；T001将test快进至此并增加PC开发者密码入口。撤回的历史修改及其诊断不自动恢复，工程判断以当前源码与新证据为准。
+当前为main/7361d39之上的身份迁移工作区，[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me。T-2026-11-07-001 / STATE/WORK-20261107-001 / CE-20261107-T001-01 / D-034。
 
-T001-r3当前交付：test/4694e78初始clean，用户在同一会话要求保留原密码并增加第二个可接受密码；model使用两个摘要的const集合，任一精确匹配即可。STATE/WORK-20261025-001-r3、CE-20261025-T001-03/04；源码356f53b已推送test，Windows常规编排run40203581056/head356f53b已触发，首次核对in_progress，后续仅补文档。后续密码维护搜索 `_developerLoginPasswordHashes`；文档不保存明文，V1/V3仍未验。以下T001原交付为历史回执。
+客户端、ADB JNI/帧桥/包路径、安装资源、本地及云编译同步；版本、依赖和原功能控制流保持。旧ZEGO wire key、构建环境变量及服务分类前缀受控兼容，见[迁移记录](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
 
-先读 [PROJECT_STATE](PROJECT_STATE.md)、[CURRENT_WORK](CURRENT_WORK.md) 和 [Baseline22](../docs/BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)，核对HEAD/status。当前任务T-2026-10-25-001、STATE/WORK-20261025-001、CE-20261025-T001-01/02；源码fe3c7d4已推送test，Windows常规编排run40200073517已触发，首次核对in_progress，后续仅补交付文档；不继承授权或冒充构建PASS。Ctrl+Shift+H仅在密码校验成功后启用内存免登录，口令不保存在文档；见03_MODULE_DESIGN / FLT-08。
+当前仅V0；正式编译/真机待验证，没有Git写入或云编排。PC开发者双密码入口保持；旧Task/run不能证明新产品构建通过。先读[PROJECT_STATE](PROJECT_STATE.md)和[CURRENT_WORK](CURRENT_WORK.md)。
 
 当前ADB能力：
 
@@ -41,17 +41,17 @@ T001-r3当前交付：test/4694e78初始clean，用户在同一会话要求保�
 3. `docs/ENGINEERING_*` 与 `docs/TASK_ENTRYPOINTS.md`，作为旧主套件和历史细节。
 4. 本目录、`AGENTS.md`、`CLAUDE.md` 只作为规则、摘要和入口，不覆盖源码。
 
-开发任务执行 `DEVELOPMENT_WORKFLOW.md`；仓外服务、database、driver 或 binary 查询 `EXTERNAL_ASSET_REGISTRY.md`。安全 Superpowers 只通过 `ashell-superpowers-safe` 的五项只读 allowlist 使用，外部包未安装。冲突时以源码为准；构建/运行行为只有正式环境验证后才能从 `verification-required` 提升为已验证。
+开发任务执行 `DEVELOPMENT_WORKFLOW.md`；仓外服务、database、driver 或 binary 查询 `EXTERNAL_ASSET_REGISTRY.md`。安全 Superpowers 只通过 `openworld-superpowers-safe` 的五项只读 allowlist 使用，外部包未安装。冲突时以源码为准；构建/运行行为只有正式环境验证后才能从 `verification-required` 提升为已验证。
 
 ## 2. Stable Identity
 
-- 产品显示名：`一个壳子`；内部runtime：`AShell`；ORG：`me`。
-- Android application/后台/launcher：`一个壳子`。Windows旧快捷方式文件名、2FA issuer及作者/版权保留 `A Shell You`，不作全局替换。
+- 产品显示名：`开放世界`；内部runtime：`OpenWorld`；macOS ORG：`com.openworld`。
+- Android application/后台/launcher及Windows快捷方式：`开放世界`；2FA issuer及产品作者/版权信息：`OpenWorld`。第三方署名和许可保持。
 - 来源：RustDesk 深度二次开发；本地初始化与后续记忆提交，2026-04-13一次性导入来自历史源仓（证据见接管复核文档）；准确 upstream fork commit 未确认。
-- Rust crate/library：`ashell`。
+- Rust crate/library：`openworld`。
 - Flutter package：`flutter_hbb`。用户明确要求保留此内部包名及 `package:flutter_hbb/` 导入，与产品品牌无绑定关系。
-- Android applicationId：`me.ashell`。
-- Android deep link scheme：`ashell`。
+- Android applicationId：`com.openworld.me`。
+- Android deep link scheme：`openworld`。
 - 当前源码版本：Rust `5.2.1`，Flutter `5.2.1+59`；不得由 AI 自动修改。
 - 根 license：AGPL-3.0；第三方 license/provenance 尚需完整审计。
 
@@ -61,7 +61,7 @@ T001-r3当前交付：test/4694e78初始clean，用户在同一会话要求保�
 - shared config/protocol：`libs/hbb_common/`。
 - capture：`libs/scrap/`。
 - Flutter：`flutter/lib/`。
-- Android runtime：`flutter/android/app/src/main/kotlin/me/ashell/`。
+- Android runtime：`flutter/android/app/src/main/kotlin/com/openworld/me/`。
 - Android active JNI：`libs/scrap/src/android/pkg2230.rs`；`ffi.rs` 是未导出的兼容层。
 - Windows privacy/display：`src/privacy_mode.rs`、`src/privacy_mode/`、`src/virtual_display_manager.rs`。
 - account/API/sync/download：`src/hbbs_http/` 与 Flutter models。

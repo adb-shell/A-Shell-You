@@ -1,6 +1,10 @@
-# AShell 源码地图 / Source Map
+# OpenWorld 源码地图 / Source Map
 
-当前实现基线0dbe202：ADB模块位于localadb；AdbVideoCapture/AdbVideoSurface负责独立GPU视频，AdbScreenshotCapture/LocalAdbScreenshotSession负责常驻截图，AdbLayoutNodes/Snapshot/Renderer区分节点与绘图，AdbPrivacyHint/Overlay区分字图生成与显示。LocalAdbKeyboard/LocalAdbTouch负责输入，LocalAdbKeepAlive负责豁免；KeepScreenOnState负责默认静默常亮。 2026-10-19文档复核，仅V0，构建/ROM实测待证；[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；当前为main/7361d39之上的工作区，仅V0，正式构建待验。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+
+当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC开发者快捷键/弹窗在 `flutter/lib/desktop/pages/connection_page.dart`，两个密码摘要与校验在 `flutter/lib/models/developer_login_bypass_model.dart`；两者均PRIMARY手写源码，维护不涉及generated bridge。
+
+ADB模块仍位于localadb；AdbVideoCapture/AdbVideoSurface负责独立GPU视频，AdbScreenshotCapture/LocalAdbScreenshotSession负责常驻截图，AdbLayoutNodes/Snapshot/Renderer区分节点与绘图，AdbPrivacyHint/Overlay区分字图生成与显示。LocalAdbKeyboard/LocalAdbTouch负责输入，LocalAdbKeepAlive负责豁免；KeepScreenOnState负责默认静默常亮。本次密码任务不修改这些实现；详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
 
 历史接管基线：2026-07-12，`77062b4`；当前实现见本页顶部
@@ -23,7 +27,7 @@
 | `build.sh`, `env.sh` | PRIMARY/Android | Linux Android 环境与构建编排 |
 | `build.cmd` | PRIMARY/Windows | 当前 `C:\DevEnv` + `C:\DevTool` PC 构建 |
 | `build.py` | PRIMARY/Windows + COMPAT/other platforms | 当前PC入口调用的主编译包装，同时保留跨平台分支 |
-| `.github/workflows/Build-Clients.yml` / `Build-Clients-New.yml` | PRIMARY/CI | 手动Android aarch64/Windows；新入口常规/原始编译；Actions artifacts，实际构建待证 |
+| `.github/workflows/Build-Clients-BT.yml` | PRIMARY/CI | 唯一手动入口，Both/Android/Windows，常规/原始编译；Android aarch64、Windows x64；Actions artifacts，结果按run核对 |
 | `res/`, `appimage/`, `flatpak/`, `fastlane/` | PLATFORM | installer、driver、icons、store metadata |
 | `.info` | PRIMARY config | 跟踪的基础设施 endpoint 文件；高变更/泄露面 |
 
@@ -33,14 +37,14 @@
 
 | Crate | 关键目录 | 职责 |
 |---|---|---|
-| `ashell` | `src/` | controller、endpoint、FFI、平台与产品集成 |
+| `openworld` | `src/` | controller、endpoint、FFI、平台与产品集成 |
 | `hbb_common` | `libs/hbb_common/` | protobuf、config、crypto、socket、fs |
 | `scrap` | `libs/scrap/` | capture、codec、Android raw/JNI |
 | `enigo` | `libs/enigo/` | desktop input injection |
 | `clipboard` | `libs/clipboard/` | clipboard/CLIPRDR/file clipboard |
 | `virtual_display` | `libs/virtual_display/` | RustDesk IDD wrapper |
 | `dylib_virtual_display` | `libs/virtual_display/dylib/` | virtual display DLL ABI |
-| `ashell-portable-packer` | `libs/portable/` | Windows self-extracting package |
+| `openworld-portable-packer` | `libs/portable/` | Windows self-extracting package |
 | `remote_printer` | `libs/remote_printer/` | Windows printer/driver integration |
 
 `workspace.exclude` 指向的 `vdi/host`、`examples/custom_plugin` 当前不存在，是 manifest 历史残留。
@@ -141,7 +145,7 @@
 
 PC侧aca7446新增`remote_adb_sidebar.dart`与`remote_adb_session_state.dart`：前者持有拖动位置/导航controller，后者由RemotePage创建释放并通过Provider供顶栏共享。`remote_toolbar.dart::_AdbActionMenu`在“移动端操作”左侧；dialog controller向同一session state提交查询/操作状态。`common/widgets/overlay.dart::DraggableMobileActions`仅增加无障碍栏标题和布局空间，原回调不变。
 
-8662f23新增 `flutter/android/app/src/main/java/me/ashell/localadb/` 五类；T004追加LocalAdbManager、RemoteAdbNative、AdbPortDiscovery，本机Plugin转为adapter。me.ashell/local_adb/v1与新独立JNI均不使用产品mChannel/采集JNI。职责和合同见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
+8662f23新增 `flutter/android/app/src/main/java/com/openworld/me/localadb/` 五类；T004追加LocalAdbManager、RemoteAdbNative、AdbPortDiscovery，本机Plugin转为adapter。com.openworld.me/local_adb/v1与新独立JNI均不使用产品mChannel/采集JNI。职责和合同见 [12_LOCAL_ADB.md](12_LOCAL_ADB.md) / [13_REMOTE_ADB.md](13_REMOTE_ADB.md)。
 
 T009 已删除 AdbPage、Dart wrapper、11 个 MethodChannel 分支、adb/ 四个 Kotlin 文件及无线调试自动化。Gradle 排除旧 libadb.so；不再存在此运行模块。历史位置和回滚基准见 [T009](../tasks/T-2026-10-12-009-remove-legacy-adb.md)。
 
@@ -159,7 +163,7 @@ T009 已删除 AdbPage、Dart wrapper、11 个 MethodChannel 分支、adb/ 四�
 - privacy：`src/privacy_mode.rs`, `src/privacy_mode/win_*`。
 - virtual display：`src/virtual_display_manager.rs`；当前 Amyuni。
 - driver/package：`res/vcpkg/`, `res/msi/`, external `usbmmidd_v2`, printer driver。
-- runner/library：`flutter/windows/runner/`, `ashell.dll`。
+- runner/library：`flutter/windows/runner/`, `openworld.dll`。
 
 ## 8. Protocol 与 API 地图
 
