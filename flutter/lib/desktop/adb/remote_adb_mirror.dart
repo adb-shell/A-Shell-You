@@ -28,6 +28,7 @@ class RemoteAdbMirror extends ChangeNotifier {
   bool _ready = false;
   bool _watching = false;
   bool _polling = false;
+  bool _screenPaused = false;
   final Set<RemoteAdbController> _pasteRequests = {};
   int _accessibilityPasteCount = 0;
   int _epoch = 0;
@@ -163,6 +164,16 @@ class RemoteAdbMirror extends ChangeNotifier {
 
   void _peerChanged() {
     final model = ffi.ffiModel;
+    final paused = model.screenPausedByDeveloper.value;
+    if (paused != _screenPaused) {
+      _screenPaused = paused;
+      _touchQueue.clear();
+      _cancelPastes();
+      image = null;
+      hasFrame.value = false;
+      frameUpdates.value++;
+      notifyListeners();
+    }
     final ready = model.isPeerAndroid && model.pi.isSet.value;
     if (ready == _ready && identical(_peer, model.pi)) return;
     _peer = model.pi;
@@ -292,7 +303,8 @@ class RemoteAdbMirror extends ChangeNotifier {
       final nextPrivacySupported = value['privacySupported'] == true;
       final nextPrivacyPhase = value['privacyState'] as String? ?? 'idle';
       final nextPrivacyError = value['privacyError'] as String? ?? '';
-      final frame = next == 'streaming' ? takeAdbFrame(ffi.sessionId.toString(), _owner, nextGeneration) : null;
+      final frame = next == 'streaming' && !ffi.ffiModel.screenPausedByDeveloper.value
+          ? takeAdbFrame(ffi.sessionId.toString(), _owner, nextGeneration) : null;
       // Verified device Shell owns priority even while the private touch transport restarts.
       final priority = adbState is Map ? adbState['supported'] == true && adbState['connected'] == true
           : value['adbPriority'] == true;

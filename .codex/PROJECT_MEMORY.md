@@ -1,18 +1,16 @@
 # OpenWorld Project Memory
 
-最后更新：2026-11-07。用途：当前会话恢复入口，不替代源码。
+最后更新：2026-11-11。用途：当前会话恢复入口，不替代源码。
 
 ## 0. 当前恢复基线
 
-最新T003：产品版本2.0.26、Flutter2.0.26+59，构建号59保持；122项静态身份检查通过。用户续接“提交并推送”后，源码df0e129c2431b39c38b0ac004d340737cd87bdce以“更新版本号为2.0.26”提交推送main并核对远端一致；后续只补回执文档，未触发或监控编译。STATE/WORK-20261107-003 / CE-20261107-T003-01/02 / Baseline25，见[版本任务](../docs/tasks/T-2026-11-07-003-openworld-version.md)。以下T002/T001保留当时交付事实，不代表当前版本。
+当前恢复基线为[Baseline27](../docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)：main/9040c53版本2.0.26 / Flutter2.0.26+59，加上test/51292c2（功能源码25bc2ce）的开发者画面优先。T-2026-11-11-001负责文档同步及main合并推送，准确交付回执见[当前任务](../docs/tasks/T-2026-11-11-001-docs-main-merge.md)。STATE/WORK-20261111-001 / CE-20261111-T001-01。
 
-最新任务T-2026-11-07-002已T8交付：保持Rust/portable5.2.1、Flutter5.2.1+59，test/d9f1119合并main为482eda5cd1404617512009cd032cc87e202c8d16并推送，说明“更新产品信息及指纹”。2026-11-07 17:38:48 +09:00一次Both/常规编译获HTTP204；不监控，未查询run或结果，后续仅补文档回执不再次编排。先前2.0.26/2026修改已按用户要求完全撤销；不从旧聊天恢复。STATE/WORK-20261107-002 / CE-20261107-T002-01/02；准确回执见[任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。以下T001为产品身份来源记录。
+产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”，构建号59保持。版本来源[Baseline25](../docs/BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)、功能来源[Baseline26](../docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)、身份来源[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)及其任务冻结保留；旧文档里的5.2.1、未提交、main未改均指当时快照，不作为当前状态。
 
-身份迁移源码ad88665e74ef48e251a1faefda6461e3c0e8112b已提交推送test，main保持7361d39；[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)记录实施快照。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me。T-2026-11-07-001 / STATE/WORK-20261107-001 / CE-20261107-T001-01/02 / D-034。
+产品身份迁移已同步客户端、ADB JNI/帧桥/包路径、安装资源及编译入口；这不表示产物已经通过构建。旧ZEGO wire key、构建环境变量及服务分类前缀受控兼容，见[迁移记录](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
 
-客户端、ADB JNI/帧桥/包路径、安装资源、本地及云编译同步；版本、依赖和原功能控制流保持。旧ZEGO wire key、构建环境变量及服务分类前缀受控兼容，见[迁移记录](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
-
-V0通过；用户已确认test提交推送与Both/常规编译，run42350649478/head ad88665已启动，随后要求“不监控”。本地helper已停止，未取消云编译，最终结果未知，真机仍未验证。仅源码/Git/触发交付T8关闭，不自动恢复轮询。PC开发者双密码入口保持；旧Task/run不能证明新产品构建通过。先读[PROJECT_STATE](PROJECT_STATE.md)和[CURRENT_WORK](CURRENT_WORK.md)。
+本轮仅更新文档及main合并推送，V0结果与交付SHA记录在当前任务；不执行或监控编译。历史test/25bc2ce的Both/常规编译HTTP204只表示受理，最终结果未知，四项策略单测与真机语音待证。PC双密码摘要保持，解锁同时设置进程native模式，已有会话需重连；Android有开发者时普通PC暂停画面/盲输入/采集操作，连接与ZEGO保留，最后开发者退出恢复。见[ADR-0028](../docs/ADR/0028-developer-screen-priority.md)。先读[PROJECT_STATE](PROJECT_STATE.md)和[CURRENT_WORK](CURRENT_WORK.md)。
 
 当前ADB能力：
 
@@ -56,7 +54,7 @@ V0通过；用户已确认test提交推送与Both/常规编译，run42350649478/
 - Flutter package：`flutter_hbb`。用户明确要求保留此内部包名及 `package:flutter_hbb/` 导入，与产品品牌无绑定关系。
 - Android applicationId：`com.openworld.me`。
 - Android deep link scheme：`openworld`。
-- 当前源码版本：Rust `2.0.26`，Flutter `2.0.26+59`；本次依用户明确指令修改，后续不得由 AI 自动改动。
+- 当前源码版本：Rust `2.0.26`，Flutter `2.0.26+59`；沿用main既有版本，后续不得由 AI 自动改动。
 - 根 license：AGPL-3.0；第三方 license/provenance 尚需完整审计。
 
 ## 3. Architecture Anchors

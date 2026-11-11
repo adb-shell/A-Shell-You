@@ -1,11 +1,12 @@
 # OpenWorld 源码地图 / Source Map
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
 
-当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC开发者快捷键/弹窗在 `flutter/lib/desktop/pages/connection_page.dart`，两个密码摘要与校验在 `flutter/lib/models/developer_login_bypass_model.dart`；两者均PRIMARY手写源码，维护不涉及generated bridge。
+开发者模式PRIMARY：`src/developer_mode.rs`（进程模式与Android注册）、`src/screen_policy.rs`（纯策略/单测）。入口链为developer_login_bypass_model→native_model→LoginRequest17→server/connection→screen_access42→client/io_loop→FlutterHandler/FfiModel。普通视频分发/ACK/QoS及`remote_adb_video.rs`共同执行暂停，remote_page/remote_adb_mirror负责显示。`message.proto`是协议源；FRB不改签名、不手改generated。
 
-ADB模块仍位于localadb；AdbVideoCapture/AdbVideoSurface负责独立GPU视频，AdbScreenshotCapture/LocalAdbScreenshotSession负责常驻截图，AdbLayoutNodes/Snapshot/Renderer区分节点与绘图，AdbPrivacyHint/Overlay区分字图生成与显示。LocalAdbKeyboard/LocalAdbTouch负责输入，LocalAdbKeepAlive负责豁免；KeepScreenOnState负责默认静默常亮。本次密码任务不修改这些实现；详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
+PC快捷键/弹窗在`flutter/lib/desktop/pages/connection_page.dart`，两个摘要及校验在`flutter/lib/models/developer_login_bypass_model.dart`；均PRIMARY手写源码。[密码维护](03_MODULE_DESIGN.md)不涉及generated bridge。
 
+ADB模块位于localadb：AdbVideoCapture/AdbVideoSurface负责GPU视频，AdbScreenshotCapture/LocalAdbScreenshotSession负责常驻截图，AdbLayoutNodes/Snapshot/Renderer区分节点与绘图，AdbPrivacyHint/Overlay区分字图生成与显示。LocalAdbKeyboard/LocalAdbTouch负责输入，LocalAdbKeepAlive负责豁免；KeepScreenOnState负责静默常亮。详见[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
 历史接管基线：2026-07-12，`77062b4`；当前实现见本页顶部
 

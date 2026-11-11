@@ -1,9 +1,10 @@
 # OpenWorld 模块设计 / Module Design
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
 
-当前整体源码快照为Baseline23 / test48226fb，PC开发者双密码设计与维护见本页第11节。ADB部分沿用2026-10-19复核的0dbe202快照：连接、2路Shell、媒体、遮罩和输入资源分别管理，instance/revision按真实状态变化推送；键盘与触摸共用control-only单writer并各自排队，显式粘贴与被动剪贴板同步区分paste标志。PC帧桥为独立二进制C ABI，不以base64装入状态JSON。V0，构建/ROM实测待证；历史快照见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
+开发者密码成功后调用手写C ABI `openworld_enable_developer_mode()`，Rust进程标志供desktop各engine连接/重连使用；已有会话需重连。`screen_policy.rs`持有纯连接策略，`developer_mode.rs`负责Android注册与状态排队；`connection.rs`、service/video_qos/video_service与remote_adb_video过滤普通画面和操作，保留语音。PC `io_loop.rs`串行化策略与解码发布，`FlutterHandler`缓存/重放状态并重新启用Texture首帧通知，`FfiModel`区分策略暂停与首帧等待，`RemoteAdbMirror`清旧图但保持订阅。暂停/恢复不关闭ZEGO、不改变录屏选择或MediaProjection。详见[ADR-0028](../ADR/0028-developer-screen-priority.md)。
 
+PC双密码维护见第11节及[使用说明](../DEVELOPER_MODE.md)。ADB连接、2路Shell、媒体、遮罩和输入资源分别管理，instance/revision按真实状态变化推送；键盘与触摸共用control-only单writer并各自排队，显式粘贴与被动剪贴板同步区分paste标志。PC帧桥为独立二进制C ABI，不以base64装入状态JSON。详见[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
 历史接管基线：2026-07-12，`77062b4`；当前实现见本页顶部
 
@@ -108,9 +109,9 @@ Privacy abstraction 支持 exclude/topmost、Magnifier、virtual display。当�
 
 ### PC开发者免登录入口（2026-10-25 / T001）
 
-`flutter/lib/desktop/pages/connection_page.dart` 的 Ctrl+Shift+H 仅在desktop main处理KeyDownEvent，先显示开发者密码框。`developer_login_bypass_model.dart::enableDeveloperLoginBypass(String password)` 精确校验UTF-8输入摘要，匹配 `_developerLoginPasswordHashes` 集合中任一摘要才设置内存开关；T001-r3保留原密码并新增第二个可接受密码。确认按钮、Enter/小键盘Enter共用提交逻辑，空值/错误输入保留弹窗并提示。
+`flutter/lib/desktop/pages/connection_page.dart` 的 Ctrl+Shift+H 仅在desktop main处理KeyDownEvent，先显示开发者密码框。`developer_login_bypass_model.dart::enableDeveloperLoginBypass(String password)` 精确校验UTF-8输入摘要，匹配 `_developerLoginPasswordHashes` 集合中任一摘要且`platformFFI.enableDeveloperMode()`成功后才设置本地免登录开关；native模式供同进程新建/重连会话使用，已有连接需重连。T001-r3加入的两个摘要保持不变。确认按钮、Enter/小键盘Enter共用提交逻辑，空值/错误输入保留弹窗并提示。
 
-输入隐藏且禁用纠错/建议/个性化学习，不trim、不保存或发送。重复快捷键不叠窗；取消/Esc不启用；页面dispose只按自身tag关闭弹窗，关闭后丢弃输入引用。已解锁不再次弹窗，进程重启恢复默认false。主连接按钮和peer card继续消费原开关；不改工具栏另一个开发者选项、产品API或endpoint认证。V0，运行验收见TEST_MATRIX FLT-08与[任务](../tasks/T-2026-10-25-001-developer-login-password.md)。
+输入隐藏且禁用纠错/建议/个性化学习，不trim、不保存或发送。弹窗已打开时重复快捷键不叠窗，错误输入可在原框重试；取消/Esc关闭且不启用，随后可再次按快捷键打开；页面dispose只按自身tag关闭弹窗，关闭后丢弃输入引用。已解锁不再次弹窗，进程重启恢复默认false。主连接按钮和peer card继续消费原开关；不改工具栏另一个开发者选项、产品API或endpoint认证。V0，运行验收见TEST_MATRIX FLT-08与[任务](../tasks/T-2026-10-25-001-developer-login-password.md)。
 
 维护密码时，在本地把新口令按UTF-8计算SHA-256，并将小写64位十六进制摘要加入 `_developerLoginPasswordHashes`；替换某一个密码时仅替换对应摘要，其他项保留。不要把明文直接填入摘要集合，也不要把口令抄入文档/日志；重新编译PC端才影响已安装程序。两个有效密码须分别在新启动、尚未解锁的进程验证。文档与main交付见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)。
 

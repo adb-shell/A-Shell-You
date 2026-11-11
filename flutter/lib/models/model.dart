@@ -133,6 +133,9 @@ class FfiModel with ChangeNotifier {
   RxBool waitForImageDialogShow = true.obs;
   Timer? waitForImageTimer;
   RxBool waitForFirstImage = true.obs;
+  final screenPausedByDeveloper = false.obs;
+  final screenResumePending = false.obs;
+  final developerPriorityUnsupported = false.obs;
   bool isRefreshing = false;
 
   // Presentation-only connection hint; real frames clear it without changing capture.
@@ -221,12 +224,13 @@ class FfiModel with ChangeNotifier {
   }
 
   void _requestAndroidVideoRefresh({int delayMSecs = 0}) {
-    if (!isPeerAndroid || _pi.displays.isEmpty) {
+    if (screenPausedByDeveloper.isTrue || !isPeerAndroid || _pi.displays.isEmpty) {
       return;
     }
     Timer(Duration(milliseconds: delayMSecs), () {
       final target = parent.target;
       if (!isPeerAndroid ||
+          screenPausedByDeveloper.isTrue ||
           target == null ||
           target.closed ||
           target.connType != ConnType.defaultConn ||
@@ -331,7 +335,7 @@ class FfiModel with ChangeNotifier {
     }
   }
 
-  bool get viewOnly => _viewOnly;
+  bool get viewOnly => _viewOnly || screenPausedByDeveloper.isTrue;
 
   set inputBlocked(v) {
     _inputBlocked = v;
@@ -390,9 +394,12 @@ class FfiModel with ChangeNotifier {
     notifyListeners();
   }
 
-  bool get keyboard => _permissions['keyboard'] != false;
+  bool get keyboard => _permissions['keyboard'] != false && screenPausedByDeveloper.isFalse;
 
   clear() {
+    screenPausedByDeveloper.value = false;
+    screenResumePending.value = false;
+    developerPriorityUnsupported.value = false;
     resetAndroidFrameWait();
     _pi = PeerInfo();
     _secure = null;
@@ -527,6 +534,24 @@ class FfiModel with ChangeNotifier {
         parent.target?.qualityMonitorModel.updateQualityStatus(evt);
       } else if (name == 'update_openworld_status') {
         parent.target?.openworldStatusModel.updateFromEvent(evt);
+      } else if (name == 'screen_access') {
+        final paused = evt['paused'] == 'true';
+        final wasPaused = screenPausedByDeveloper.value;
+        screenPausedByDeveloper.value = paused;
+        developerPriorityUnsupported.value = isPeerAndroid &&
+            evt['developer'] == 'true' && evt['supported'] != 'true';
+        if (paused) {
+          screenResumePending.value = true;
+          waitForImageTimer?.cancel();
+          waitForImageTimer = null;
+          androidConnectedWaitingForImage.value = false;
+          waitForImageDialogShow.value = false;
+          parent.target?.dialogManager.dismissByTag('$sessionId-waiting-for-image');
+        } else if (wasPaused) {
+          androidConnectedWaitingForImage.value = true;
+          _requestAndroidVideoRefresh();
+        }
+        notifyListeners();
       } else if (name == 'update_block_input_state') {
         updateBlockInputState(evt, peerId);
       } else if (name == 'update_privacy_mode') {
@@ -1210,7 +1235,7 @@ class FfiModel with ChangeNotifier {
       closeConnection();
     }
 
-    if (waitForFirstImage.isFalse) return;
+    if (screenPausedByDeveloper.isTrue || waitForFirstImage.isFalse) return;
     if (isPeerAndroid) {
       dialogManager.dismissAll();
       if (usesInlineAndroidFrameWait) {
@@ -3675,6 +3700,8 @@ class FFI {
   }
 
   void onEvent2UIRgba() async {
+    if (ffiModel.screenPausedByDeveloper.isTrue) return;
+    ffiModel.screenResumePending.value = false;
     ffiModel.resetAndroidFrameWait();
     ffiModel.waitForImageTimer?.cancel();
     ffiModel.waitForImageTimer = null;

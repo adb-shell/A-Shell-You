@@ -45,6 +45,14 @@ class PlatformFFI {
 
   RustdeskImpl get ffiBind => _ffiBind;
   F3? _session_get_rgba;
+  void Function()? _enableDeveloperMode;
+
+  bool enableDeveloperMode() {
+    final enable = _enableDeveloperMode;
+    if (enable == null) return false;
+    enable();
+    return true;
+  }
 
   static get localeName => Platform.localeName;
 
@@ -142,6 +150,13 @@ class PlatformFFI {
     debugPrint('initializing FFI $_appType');
     try {
       _session_get_rgba = dylib.lookupFunction<F3Dart, F3>("session_get_rgba");
+      try {
+        _enableDeveloperMode = dylib.lookupFunction<Void Function(), void Function()>(
+            'openworld_enable_developer_mode');
+      } catch (_) {
+        // A mismatched native library cannot enable developer session priority.
+        _enableDeveloperMode = null;
+      }
       _setLoginUsername = dylib
           .lookup<NativeFunction<set_login_username_func>>('set_login_username')
           .asFunction();

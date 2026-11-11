@@ -130,6 +130,10 @@ impl Default for VideoQoS {
 
 // Basic functionality
 impl VideoQoS {
+    fn active_users(&self) -> impl Iterator<Item = &UserData> {
+        self.users.iter().filter(|(id, _)| crate::developer_mode::video_allowed(**id))
+            .map(|(_, user)| user)
+    }
     // Calculate seconds per frame based on current FPS
     pub fn spf(&self) -> Duration {
         Duration::from_secs_f32(1. / (self.fps() as f32))
@@ -165,7 +169,7 @@ impl VideoQoS {
 
     // Check if any user is in recording mode
     pub fn record(&self) -> bool {
-        self.users.iter().any(|u| u.1.record)
+        self.active_users().any(|user| user.record)
     }
 
     pub fn set_support_changing_quality(&mut self, video_service_name: &str, support: bool) {
@@ -244,6 +248,7 @@ impl VideoQoS {
     }
 
     pub fn user_network_delay(&mut self, id: i32, delay: u32) {
+        if !crate::developer_mode::video_allowed(id) { return; }
         let highest_fps = self.highest_fps();
         let target_ratio = self.latest_quality().ratio();
 
@@ -334,6 +339,7 @@ impl VideoQoS {
     }
 
     pub fn user_delay_response_elapsed(&mut self, id: i32, elapsed: u128) {
+        if !crate::developer_mode::video_allowed(id) { return; }
         if let Some(user) = self.users.get_mut(&id) {
             user.delay.response_delayed = elapsed > 2000;
             if user.delay.response_delayed {
@@ -390,9 +396,8 @@ impl VideoQoS {
         };
 
         let fps = self
-            .users
-            .iter()
-            .map(|(_, u)| user_fps(u))
+            .active_users()
+            .map(user_fps)
             .filter(|u| *u >= MIN_FPS)
             .min()
             .unwrap_or(FPS);
@@ -402,9 +407,8 @@ impl VideoQoS {
 
     // Get latest quality settings from all users
     pub fn latest_quality(&self) -> Quality {
-        self.users
-            .iter()
-            .map(|(_, u)| u.quality)
+        self.active_users()
+            .map(|u| u.quality)
             .filter(|q| *q != None)
             .max_by(|a, b| a.unwrap_or_default().0.cmp(&b.unwrap_or_default().0))
             .flatten()
@@ -418,7 +422,7 @@ impl VideoQoS {
             return;
         }
         // Get maximum delay from all users
-        let max_delay = self.users.iter().map(|u| u.1.delay.avg_delay()).max();
+        let max_delay = self.active_users().map(|u| u.delay.avg_delay()).max();
         let Some(max_delay) = max_delay else {
             return;
         };
@@ -512,13 +516,12 @@ impl VideoQoS {
         let highest_fps = self.highest_fps();
         // Get minimum fps from all users
         let mut fps = self
-            .users
-            .iter()
-            .map(|u| u.1.delay.fps.unwrap_or(INIT_FPS))
+            .active_users()
+            .map(|u| u.delay.fps.unwrap_or(INIT_FPS))
             .min()
             .unwrap_or(INIT_FPS);
 
-        if self.users.iter().any(|u| u.1.delay.response_delayed) {
+        if self.active_users().any(|u| u.delay.response_delayed) {
             if fps > MIN_FPS + 1 {
                 fps = MIN_FPS + 1;
             }

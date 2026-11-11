@@ -2,9 +2,26 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-11-07（开放世界产品身份）
+Last Updated：2026-11-11（开发者画面优先）
 
 Mode：`append-only task-level index`
+
+## T-2026-11-11-001：项目文档同步与main合并
+
+- 用户要求更新项目文档后合并推送主分支；起点test/51292c2与main/9040c53均clean且远端一致。保留主分支2.0.26 / 2.0.26+59，纳入源码25bc2ce的开发者画面优先。
+- 十处冲突仅文档；保留两分支历史任务/事件及Baseline25/26，统一当前入口、架构、模块、协议、构建说明和薄记忆；新增使用说明与Baseline27。无新产品、依赖、生成桥或工作流改动。
+- 仅V0核验和Git交付，不触发/监控编译；旧HTTP204不视为PASS。静态结果、合并SHA与push回执见[任务](../docs/tasks/T-2026-11-11-001-docs-main-merge.md)。沿用D-034/035，Decision Log及External Asset Registry reviewed-no-change；STATE/WORK-20261111-001 / CE-20261111-T001-01。
+
+## T-2026-11-07-004：开发者画面优先（正式验证待证）
+
+- 最新交付：用户授权test提交推送、双端编译且不监控；源码25bc2ce已推送，说明“开发者模式画面优先”；Both/常规编译HTTP204，单次定位尚无run，未轮询后续状态，无编译PASS结论。T8关闭指定交付范围，仅补回执文档不二次编排；CE-20261107-T004-04/05 / STATE、WORK-20261107-004-r4。
+
+- 续接：用户明确选择同时暂停操作、保留语音，与现有源码一致；仅确认记录同步，CE-20261107-T004-03 / STATE、WORK-20261107-004-r2。提交推送及编排仍待确认，验证等级未提升。
+
+- 用户指定切换现有test并实现。起点main/9040c53 clean，切换test/d9f1119 clean；保留test版本，未合main版本提交。
+- 实现Android认证后连接策略、普通/截图/ADB帧过滤、ACK/QoS、暂停输入/采集操作；PC进程模式、状态通知、旧帧清理、Texture恢复与多窗缓存。连接与ZEGO生命周期保持。
+- V0：身份合同122项、协议编号/类型兼容、C ABI、既有口令摘要/依赖/generated边界、diff通过。四项纯策略单测存在但未跑，本机无Rust/Flutter工具链；双端编译和真机/语音矩阵NOT_RUN。
+- T6 handoff，源码和T7文档就绪；test未提交，无push/merge/编排/部署。STATE/WORK-20261107-004，CE-20261107-T004-01/02，D-035 / ADR-0028 / Baseline26；[任务](../docs/tasks/T-2026-11-07-004-developer-screen-priority.md)。
 
 ## T-2026-11-07-003：产品版本2.0.26与main交付
 

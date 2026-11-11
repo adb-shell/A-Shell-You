@@ -297,6 +297,9 @@ class _RemotePageState extends State<RemotePage>
 
   void _onAdbFrameAvailability() {
     if (!_remoteAdbMirror.hasFrame.value) return;
+    if (_ffi.ffiModel.screenPausedByDeveloper.isFalse) {
+      _ffi.ffiModel.screenResumePending.value = false;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _remoteAdbMirror.hasFrame.value) {
         // A real ADB picture replaces only the waiting hint, not normal capture state.
@@ -374,6 +377,23 @@ class _RemotePageState extends State<RemotePage>
                             if (!_rawKeyFocusNode.hasFocus) _rawKeyFocusNode.requestFocus();
                           })
                       : getBodyForDesktop(context))),
+          Obx(() {
+            final paused = _ffi.ffiModel.screenPausedByDeveloper.value;
+            final waiting = _ffi.ffiModel.screenResumePending.value;
+            if (!paused && !waiting) return const SizedBox.shrink();
+            return Positioned.fill(child: ColoredBox(
+              color: kColorCanvas,
+              child: Center(child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(paused ? '画面已暂停，语音仍可使用' : '正在恢复画面…',
+                    textAlign: TextAlign.center),
+              )),
+            ));
+          }),
+          Obx(() => _ffi.ffiModel.developerPriorityUnsupported.value
+              ? const Positioned(bottom: 16, left: 16, right: 16,
+                  child: IgnorePointer(child: Center(child: Text('此安卓版本不支持开发者画面优先，请更新安卓端'))))
+              : const SizedBox.shrink()),
           Positioned(top: 10, right: 10,
             child: IgnorePointer(child: _buildStatusMonitors())),
           Stack(

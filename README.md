@@ -1,9 +1,10 @@
 > [!IMPORTANT]
-> Current product: **OpenWorld**. Internal identity/crate is `OpenWorld` / `openworld`; Android applicationId is `com.openworld.me`, application name is `OpenWorld`, launcher name is `开放世界`. Native artifacts are `libopenworld.so` / `openworld.dll` / `openworld.exe`. Version is `2.0.26` (`2.0.26+59` for Flutter). See [identity migration and static verification](docs/AI_ENGINEERING/ASHELL_IDENTITY_MIGRATION_2026-10-12.md). No product build was executed for this migration.
+> Current product: **开放世界 / OpenWorld**. Runtime/crate identity is `OpenWorld` / `openworld`; Android applicationId is `com.openworld.me`, application and launcher name are `开放世界`. Native artifacts are `libopenworld.so` / `openworld.dll` / `openworld.exe`. Version is `2.0.26` (`2.0.26+59` for Flutter). The main integration retains this version and includes developer screen priority. See the [current baseline](docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md) and [developer mode guide](docs/DEVELOPER_MODE.md). This documentation/merge task does not run or monitor builds; the earlier test build was accepted but its final result is unknown.
 >
 > The upstream RustDesk README below is retained as inherited background only. Every AI or maintainer must start with `PROJECT_START_HERE.md`, then follow `.codex/AI_RULES.md` and `docs/AI_ENGINEERING/AI_TASK_EXECUTION_PROTOCOL.md`. Current domain truth lives in `docs/AI_ENGINEERING/`; the former `ENGINEERING_*` suite remains historical detail.
 
 <p align="center">
+  <a href="docs/DEVELOPER_MODE.md">开发者模式：密码入口、画面优先与语音保留</a><br>
   <a href="docs/BUILD_CLIENTS_ACTIONS.md">OpenWorld Android / Windows builds in GitHub Actions</a><br>
   <a href="docs/AI_ENGINEERING/12_LOCAL_ADB.md">本机 ADB：无线配对、Shell、构建与验证说明</a><br>
   <a href="docs/AI_ENGINEERING/13_REMOTE_ADB.md">PC 远程 ADB：配对、命令、多 PC 共享与验收（待编译验证）</a><br>

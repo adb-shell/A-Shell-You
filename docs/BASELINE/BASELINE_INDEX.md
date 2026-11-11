@@ -1,13 +1,19 @@
 # OpenWorld Engineering Baseline Index
 
-当前版本：[Baseline25：开放世界2.0.26版本](25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)，OW-BL-2026-11-07-c27368c-version-worktree；Rust/portable2.0.26、Flutter2.0.26+59，已作为源码df0e129提交推送main，未编译。身份来源[Baseline24](24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)及以下更早内容为冻结历史记录。
+当前合并基线：[Baseline27：main版本与开发者画面优先](27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，`OW-BL-2026-11-11-main-developer-priority-merge`。输入main/9040c53与test/51292c2，保留Rust/portable 2.0.26、Flutter 2.0.26+59，并纳入开发者画面优先源码25bc2ce；准确提交/推送回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。本轮仅V0，不触发或监控构建。
 
-当前：[AS-BL-2026-10-25-48226fb-developer-password](23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)。观察源码test/48226fb，包含PC开发者双密码入口；T-2026-10-25-002同步文档并合并推送main，执行Both/常规编译。静态证据V0，准确main SHA和run见任务，不把dispatch当作构建PASS。
+版本来源[Baseline25](25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)、功能来源[Baseline26](26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)、身份来源[Baseline24](24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)冻结保留。test/25bc2ce的Both/常规编译仅记录HTTP204，结果未知。以下“当前”、未提交、旧版本等描述均是对应快照冻结时的事实。
+
+历史：[AS-BL-2026-10-25-48226fb-developer-password](23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)。观察源码test/48226fb，包含PC开发者双密码入口；T-2026-10-25-002同步文档并合并推送main，执行Both/常规编译。静态证据V0，准确main SHA和run见任务，不把dispatch当作构建PASS。
 
 ## 快照索引
 
-以下01—22均为冻结的历史快照，不代表当前HEAD或可继承授权。当前源码与对应领域合同优先。
+以下01—26均为冻结的历史快照，不代表当前HEAD或可继承授权。当前源码与对应领域合同优先。
 
+- [Baseline27：main版本与开发者画面优先整合](27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)
+- [Baseline26：开发者画面优先实施快照](26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)
+- [Baseline25：开放世界2.0.26版本](25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)
+- [Baseline24：开放世界产品身份](24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)
 - [Baseline23：PC开发者双密码与当前编排源码快照](23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)
 - [Baseline22：回退后的源码与文档基线](22_RESTORED_SOURCE_BASELINE_2026-10-19.md)
 - [Baseline21 — ADB绘图与PC展示文档同步](21_ADB_RENDER_UI_BASELINE_2026-10-16.md)
@@ -65,7 +71,7 @@
 - 基线更新只能追加新 Baseline ID；旧 baseline 不删除、不静默重写。
 - accepted baseline 不授权 build、Git、version、sign、package、upload 或 release。
 
-## 4. 当前封版边界
+## 4. 历史初始封版边界（2026-07-12）
 
 - 当前 source HEAD 固定，但工作树包含未提交的 AI 工程文档/Skill 资产；本目录没有把它们冒充 commit 内容。
 - 本次只做 V0 静态核验，没有执行项目编译、测试、codegen、设备、服务或发布验证。

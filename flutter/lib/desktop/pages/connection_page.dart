@@ -477,7 +477,7 @@ class _ConnectionPageState extends State<ConnectionPage>
         tag: _developerLoginDialogTag,
       );
       if (mounted && unlocked == true) {
-        showToast('已进入开发者模式');
+        showToast('已进入开发者模式；已连接窗口请重连以启用画面优先');
       }
     } catch (_) {
       if (mounted) showToast('无法打开开发者密码框，请重试');

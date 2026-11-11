@@ -1,19 +1,15 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261107-003`
-Last Updated / Observed At：2026-11-07（Asia/Tokyo）
+State Revision：`STATE-20261111-001`
+Last Updated / Observed At：2026-11-11（Asia/Tokyo）
 Evidence Scope：`repository-observed / V0`
 
 ## 当前源码基线
 
-- T003当前版本：2.0.26 / Flutter2.0.26+59，构建号59保持；源码df0e129c2431b39c38b0ac004d340737cd87bdce已按用户续接要求提交推送main，说明“更新版本号为2.0.26”，远端一致。后续只补回执文档；未编译。见[当前任务](../docs/tasks/T-2026-11-07-003-openworld-version.md)、[Baseline25](../docs/BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)。STATE/WORK-20261107-003 / CE-20261107-T003-01/02；以下T002/T001均为旧版本交付历史，不恢复其撤销的2026构建号方案，不监控旧编排。
-
-- T002当前交付完成：test/d9f1119已合并main并推送`482eda5cd1404617512009cd032cc87e202c8d16`，说明“更新产品信息及指纹”；版本保持5.2.1 / 5.2.1+59。2026-11-07 17:38:48 +09:00一次Both/常规编译获HTTP204，不监控、无run或结果查询；后续仅补交付文档，不二次dispatch。原2.0.26/2026修改已撤销，不能恢复。准确回执见[当前任务](../docs/tasks/T-2026-11-07-002-openworld-main.md)。下列T001记录为来源沿革。
-
-- 本次起点 main / `7361d39d34ad0bb147827e30fa61419a00b84038`，初始clean；用户指定test交付后，身份迁移源码已提交推送`ad88665e74ef48e251a1faefda6461e3c0e8112b`，说明“更新开放世界产品信息及指纹”；main保持。
-- 当前工作区快照：[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)，`OW-BL-2026-11-07-7361d39-identity-worktree`；实现与验证范围见[身份迁移](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。Baseline23与历史Git/编排回执只作追溯。
-- 用户续接确认改用test提交推送及Both/常规编译；起点test/48226fb与main产品树一致，17份文档恢复切换前快照。dispatch HTTP204，run42350649478/head ad88665；用户随后要求“不监控”，已停止本地轮询，未取消云编译；真机及生产未操作。
+- 当前任务：[T-2026-11-11-001](../docs/tasks/T-2026-11-11-001-docs-main-merge.md)，按用户要求同步文档后合并推送main；输入main/9040c53d37e3542c7ab8948b64beec1f0df0cd93、test/51292c29a025ee3ad6a3915285b8f21e7e260ee8，初始工作区干净且远端一致。
+- 当前合并基线：[Baseline27](../docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)。产品源码沿用test/25bc2ce，版本及校验文件保留main的2.0.26 / 2.0.26+59；不引入新的业务逻辑改动。
+- 本轮只同步文档和Git交付，不触发或监控编译。此前test/25bc2ce的Both/常规编译HTTP204仅表示受理；最终结果未知，不能替代合并后版本验证。
 - 回退后撤回的实现、实验方案和诊断结论不属于当前实现。后续会话先核对 HEAD/status，再由代码重新建立证据；不能沿用历史聊天中的“已修改”判断。
 
 ## 当前能力摘要
@@ -30,22 +26,14 @@ Evidence Scope：`repository-observed / V0`
 | 黑屏 | 独立黑色buffer层及App预渲染白字PNG，排除自身采集；OEM表现待真机证据 |
 | PC界面 | 普通左/ADB右、单源居中；Shell栏无悬浮提示；状态分组；无障碍栏无视频/特殊/防触状态文字 |
 | PC开发者入口 | Ctrl+Shift+H先弹密码框；两个可接受密码任一精确匹配后确认/回车启用内存免登录，取消/错误不启用，重启复位；V0/FLT-08待运行 |
+| 开发者画面优先 | 进程模式供新建/重连使用；Android认证后暂停普通画面/盲输入/采集控制，保留会话与ZEGO；多开发者可接收，最后退出恢复；协作角色可由修改版伪造，正式验证待证 |
 | 常亮与保活 | 默认连接服务运行期间静默常亮，无新增设置入口；ADB连接验证后尝试本应用电池优化豁免，不保证进程免杀 |
 
 详见 [12本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)、[Android原链](../docs/AI_ENGINEERING/04_ANDROID_PIPELINE.md)。
 
 ## 本轮工作与验证
 
-- T003：7份版本配置/锁文件/静态校验文件仅预期版本差异，第三方依赖/checksum与构建号59不变；122项静态身份合同通过（当前HEAD已迁移，原135项中的13项迁移前基线检查不适用）。用户续接授权后已完成main提交推送；未执行产品编译或发布，以下T002/T001为历史验证。
-
-- 当前Task T-2026-11-07-002 / T8 / STATE、WORK-20261107-002 / CE-20261107-T002-01/02；main no-ff merge test已提交推送，15处冲突仅文档且按test内容解决，补交付文档前合并树与test完全一致。135项静态身份合同、版本与137个本地文档链接/差异检查通过；产品及工作流保持test。编排只记录HTTP204，不监控，不代表编译或运行通过。
-
-以下为T001静态验证与旧test触发回执，不能替代本次main交付结果：
-
-- 当前交付：[T-2026-11-07-001](../docs/tasks/T-2026-11-07-001-openworld-identity.md)，T8源码/文档/Git/触发交付完成；按用户要求不监控，正式编译与运行验收仍待证。
-- Registry：WORK-20261107-001；Events：CE-20261107-T001-01/02/03；Decision：D-034 / ADR-0027。
-- 当前交付授权覆盖产品身份与文档、test切换/stage/commit/push origin/test及Build-Clients-BT / Both / 常规编译，沿用工作流临时测试签名和Actions产物；用户最新要求停止监控，无main写入/部署/凭据轮换。
-- V0：135项静态身份合同通过；四份Shell、工作流14段Bash/14段PowerShell语法、嵌入Python AST、TOML/XML/plist及diff检查。已有iOS exportOptions.plist非法引号单列，未混入本次修复。
-- 变更范围：156个原路径文件修改、71个必要文件改名及5个新文件；旧路径均有新文件对应，58份Markdown/324个本地链接通过。
-- 新包是独立安装身份，旧数据/系统权限/ADB配对不自动迁移；设备UUID/硬件指纹算法、凭据和版本保持。外部ZEGO请求键、签名环境变量和旧域名分类保留显式兼容。
-- 唯一workflow为Build-Clients-BT.yml / Build OpenWorld Clients-BT / Both / 常规编译；run42350649478最后观察为Windows EXE与Android Native均在原生依赖构建，停止监控后不再查询，最终结果未知。ID-03未取得PASS，ID-04真机仍NOT_RUN。SEC-016与既有外部资产缺口保持。
+- Registry：WORK-20261111-001；Events：CE-20261111-T001-01；沿用D-034/035、ADR-0027/0028，本轮无新决策或外部资产变化。
+- V0核对合并来源、版本边界、文档链接、身份合同和差异；结果与Git回执记录在当前任务。主分支版本历史、test功能历史及冻结Baseline25/26均保留。
+- 四项纯策略单测未执行；DSP-02及04—10单测/真机通话/兼容验收仍NOT_RUN，DSP-03仅有历史受理回执。本轮无编译、codegen、设备或生产操作。
+- 开发者角色是协作声明，不是可信凭证；SEC-016及既有外部资产缺口保持。旧任务详情见TASK_HISTORY，不继承其授权或构建结论。

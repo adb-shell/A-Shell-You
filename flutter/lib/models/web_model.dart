@@ -21,6 +21,7 @@ final List<StreamSubscription<KeyboardEvent>> keyListeners = [];
 typedef HandleEvent = Future<void> Function(Map<String, dynamic> evt);
 
 class PlatformFFI {
+  bool enableDeveloperMode() => false;
   final _eventHandlers = <String, Map<String, HandleEvent>>{};
   final RustdeskImpl _ffiBind = RustdeskImpl();
 

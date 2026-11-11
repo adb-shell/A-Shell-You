@@ -1,8 +1,18 @@
 # OpenWorld 网络与协议 / Network Protocol
 
+## 2026-11-07 / T004：开发者画面优先
+
+源码25bc2ce（test/51292c2内，现纳入main合并基线）新增`LoginRequest.developer_mode = 17`（bool）、`Features.developer_screen_priority = 3`（bool）、`Misc.screen_access = 42`（ScreenAccess：paused1/revision2/developer_mode3）。已有编号与类型不变。PC角色来自密码校验后的Rust进程标志；仅认证成功且有效登录的Android普通远控会话登记，先登记再订阅视频。其他会话类型及认证失败不参与。
+
+Android存在至少一个开发者连接时，只给开发者分发普通VideoFrame、截图、ADB H.264/JPEG/layout。普通连接保留传输、心跳、状态和ZEGO信令；普通新建/重连也暂停。多开发者共享接收，最后开发者关闭/异常断链清理后恢复；退出清理幂等。屏幕暂停不重启服务或申请MediaProjection权限。
+
+生产端与网络出队双重过滤，切换前排队帧按入队时刻废弃；暂停连接不参与视频ACK等待及QoS聚合，ADB清在途计数、恢复等待关键帧。控制入口拒绝普通连接的输入、截图、采集/隐私切换及ADB变更，仍处理状态/ACK/语音；无操作计时不会因策略暂停关闭连接。已经开始网络发送的包不能撤回，PC收到状态后遮住旧图并停止发布帧。
+
+旧PC缺省普通，无法显示新暂停说明但仍受发送端过滤；旧Android忽略新字段且不具备策略，新PC明确提示更新。角色位是协作声明而非可信凭据，端点认证保持，修改版已授权客户端可伪造角色。详见[ADR-0028](../ADR/0028-developer-screen-priority.md)、[任务](../tasks/T-2026-11-07-004-developer-screen-priority.md)。V0，双端编译与运行未验。下方为历史沿革。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
-ADB当前源码4d3c446：字段40请求/回执/instance与revision状态推送，apiVersion3；字段41独立媒体/触摸、mirrorVersion2模式化停止，每PC8帧/8MiB在途。App-helper的LAYN/LAYP/LAYE节点帧及黑屏PNG属于本机私有流，不增加peer协议字段。原认证/传输策略及VideoFrame不变。2026-10-16 T001/Baseline21，V0。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
+ADB当前合同：字段40请求/回执/instance与revision状态推送，apiVersion3；字段41独立媒体/触摸、mirrorVersion2模式化停止，H.264每PC最多24帧、独立JPEG/layout最多4帧，均限制8MiB在途。App-helper的LAYN/LAYP/LAYE节点帧及黑屏PNG属于本机私有流，不增加peer协议字段。原认证与传输策略保持，媒体发送同时受上方开发者策略约束。参数与`src/remote_adb_video.rs`、14_ADB_MIRROR对齐（2026-11-11 V0）。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
 
 
 接管基线：2026-07-12  

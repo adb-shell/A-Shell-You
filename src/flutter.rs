@@ -218,6 +218,7 @@ pub struct FlutterHandler {
     session_handlers: Arc<RwLock<HashMap<SessionID, SessionHandler>>>,
     display_rgbas: Arc<RwLock<HashMap<usize, RgbaData>>>,
     peer_info: Arc<RwLock<PeerInfo>>,
+    screen_access: Arc<RwLock<Option<(bool, bool, bool)>>>,
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     hooks: Arc<RwLock<HashMap<String, SessionHook>>>,
     use_texture_render: Arc<AtomicBool>,
@@ -229,6 +230,7 @@ impl Default for FlutterHandler {
             session_handlers: Default::default(),
             display_rgbas: Default::default(),
             peer_info: Default::default(),
+            screen_access: Default::default(),
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
             hooks: Default::default(),
             use_texture_render: Arc::new(
@@ -718,6 +720,23 @@ impl InvokeUiSession for FlutterHandler {
 
     fn update_openworld_status(&self, json: String) {
         self.push_event("update_openworld_status", &[("status", &json)], &[]);
+    }
+
+    fn update_screen_access(&self, paused: bool, supported: bool, developer: bool) {
+        let mut access = self.screen_access.write().unwrap();
+        let resumed = access.as_ref().map(|a| a.0 && !paused).unwrap_or(false);
+        *access = Some((paused, supported, developer));
+        if resumed {
+            // Texture renderers normally emit only their first frame/type change.
+            // Re-arm that notification so Dart can remove the resume placeholder.
+            for session in self.session_handlers.read().unwrap().values() {
+                session.renderer.reset_all_display_render_type();
+            }
+        }
+        self.push_event("screen_access", &[
+            ("paused", &paused.to_string()), ("supported", &supported.to_string()),
+            ("developer", &developer.to_string()),
+        ], &[]);
     }
 
     fn set_connection_type(&self, is_secured: bool, direct: bool) {
@@ -1395,6 +1414,17 @@ pub fn session_start_(
 
     if let Some(session) = sessions::get_session_by_session_id(session_id) {
         let is_first_ui_session = session.session_handlers.read().unwrap().len() == 1;
+        if is_connected || !is_first_ui_session {
+            // Keep the read guard until delivery: a tab move must not overwrite or
+            // replay an older snapshot after the network thread changes policy.
+            let access = session.screen_access.read().unwrap();
+            if let Some((paused, supported, developer)) = *access {
+                session.push_event_to("screen_access", &[
+                    ("paused", &paused.to_string()), ("supported", &supported.to_string()),
+                    ("developer", &developer.to_string()),
+                ], &[session_id]);
+            }
+        }
         if !is_connected && is_first_ui_session {
             log::info!(
                 "Session {} start, use texture render: {}",

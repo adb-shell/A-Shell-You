@@ -1,8 +1,8 @@
 # OpenWorld Project Start Here
 
-当前产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”，版本2.0.26 / 2.0.26+59，构建号59保持；源码df0e129已按用户要求提交推送main。见[Baseline25](docs/BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-003-openworld-version.md)和[当前状态](.codex/PROJECT_STATE.md)。本版本未编译；此前main合并/触发回执属于旧版本，不代表本版本验证通过，按要求不监控。
+当前主分支合并基线由 main/9040c53 的版本配置与 test/51292c2 的开发者画面优先实现组成；产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”，Rust/portable 2.0.26、Flutter 2.0.26+59，构建号59保持。见[Baseline27](docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)、[当前任务](docs/tasks/T-2026-11-11-001-docs-main-merge.md)和[当前状态](.codex/PROJECT_STATE.md)。本轮更新文档并合并推送main，不执行编译或监控；此前源码25bc2ce的Both/常规编译仅有HTTP204受理记录，最终结果未知，四项策略单测及真机验证仍待证。
 
-PC主窗口Ctrl+Shift+H双密码入口、ADB及原链行为保持。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
+PC主窗口Ctrl+Shift+H双密码验证保持；成功后增加进程native模式，新建/重连携带角色。Android有已认证开发者连接时，普通连接暂停普通/截图/ADB画面及盲输入/采集控制，保留会话与ZEGO；最后开发者离开恢复。角色是协作声明而非抗伪造凭证，见ADR-0028。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 
 当前ADB包含远程配对/独立Shell、投屏/无视/节点穿透、独立白字黑屏、全局优先触摸、键盘/远程输入/剪贴板同步和本应用电池优化豁免。Android默认连接服务运行期间静默常亮。详细实现、参数和待验边界见[12本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。
 

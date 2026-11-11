@@ -1,8 +1,10 @@
 # OpenWorld ADB 投屏、无视、穿透、黑屏与输入
 
+当前规则（源码25bc2ce，纳入2026-11-11 main合并基线）：有开发者普通远控连接时，Android仅向开发者分发H.264/JPEG/layout；普通PC保持watch/状态/ACK及语音，清待显示旧图并显示暂停。暂停连接不能触摸、键盘/粘贴、操作Shell或切换采集/黑屏；设备本机操作保持。暂停只释放对应owner触摸/待剪贴板同步，不停止ADB源或其他PC资源。最后开发者离开后普通PC等待新关键帧/独立截图恢复。此前“所有PC接收/任意PC停止”的共享规则只在没有开发者优先限制时成立；来源与边界见[ADR-0028](../ADR/0028-developer-screen-priority.md)。V0，正式编译与设备矩阵未验。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
-当前实现基线：`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`，2026-10-19源码复核；见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)及[文档任务T006](../tasks/T-2026-10-19-006-restored-docs-sync.md)。本文合并此前已经进入该提交的功能，历史任务仅用于追溯，不覆盖当前参数。只完成V0文档/源码核对，不宣称构建、流畅度或全ROM兼容通过。
+当前整合基线见[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)；ADB基础沿用`0dbe2027ceb3f1a72ae2700fe8e4942cfe67cec5`及后续身份迁移，新增开发者连接策略。历史[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)只用于追溯，不覆盖当前参数。仅V0文档/源码核对，不宣称构建、流畅度或全ROM兼容通过。
 
 ## 使用与界面
 
@@ -37,7 +39,7 @@ ADB 画面在主界面内显示：单源居中；双源左侧普通共享/无障
 
 ## 采集模式与原链隔离
 
-三种 ADB 画面模式 `h264 / jpeg / layout` 在设备上互斥；它们与普通 MediaProjection、无障碍无视/穿透分别采集和接收。切换 ADB 模式会先清理旧 Run，再启动最后一个待启动模式。任一有控制权限的 PC 可切换或关闭共享的 ADB 模式，所有订阅 PC 同步状态和画面；不能承诺帧级严格同步。
+三种 ADB 画面模式 `h264 / jpeg / layout` 在设备上互斥；它们与普通 MediaProjection、无障碍无视/穿透分别采集和接收。切换 ADB 模式会先清理旧 Run，再启动最后一个待启动模式。有控制权限且未被开发者策略暂停的 PC 可切换或关闭共享的 ADB 模式；所有订阅 PC 同步状态，只有具备画面资格的 PC 接收画面，不能承诺帧级严格同步。
 
 状态中的 `mirrorVersion=2` 表示支持 `stop_video / stop_screenshot / stop_layout`：关闭按钮只针对对应当前或待启动模式，迟到的“关投屏”不会关闭已切换的无视/穿透。旧端使用兼容 `stop`，需两端更新才能获得完整模式隔离。视频动作、黑屏动作、触摸分别使用序号，旧调用不覆盖新操作；这些序号不替代服务端权限校验。
 

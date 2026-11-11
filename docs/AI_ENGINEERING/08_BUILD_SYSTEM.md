@@ -1,8 +1,8 @@
 # OpenWorld 构建系统 / Build System
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
 
-当前源码快照为[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb，2026-10-25复核。当前唯一手动CI为Build-Clients-BT，本地入口不变；本轮按用户授权在main合并后执行Both/常规编译，实际回执见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)与[Actions说明](../BUILD_CLIENTS_ACTIONS.md)。文档同步不改构建配置或版本，V0/dispatch不等于编译通过。
+唯一手动CI为Build-Clients-BT，正式Windows/Android本地入口不变。2026-11-07 T004为源码test/25bc2ce请求Platform=Both、BuildMode=常规编译，HTTP204；沿用既有临时测试签名和Actions产物。用户要求不监控，单次定位尚无run，最终产物未验证。该旧test版本回执不能证明当前main的2.0.26整合版本已编译；本轮不再次编排。详见[历史任务回执](../tasks/T-2026-11-07-004-developer-screen-priority.md)和[Actions说明](../BUILD_CLIENTS_ACTIONS.md)。
 
 历史接管基线：2026-07-12；当前实现基线见页首
 状态：`verified` + `verification-required`

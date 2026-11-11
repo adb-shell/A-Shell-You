@@ -366,6 +366,10 @@ impl Subscriber for ConnInner {
 
     #[inline]
     fn send(&mut self, msg: Arc<Message>) {
+        if crate::developer_mode::is_screen_frame(&msg)
+            && !crate::developer_mode::video_allowed(self.id) {
+            return;
+        }
         // Send SwitchDisplay on the same channel as VideoFrame to avoid send order problems.
         let tx_by_video = match &msg.union {
             Some(message::Union::VideoFrame(_)) => true,
@@ -826,6 +830,11 @@ impl Connection {
                     }
                 }
                 Some((instant, value)) = rx_video.recv() => {
+                    if crate::developer_mode::is_screen_frame(&value)
+                        && !crate::developer_mode::frame_allowed(id, instant.into_std()) {
+                        video_service::notify_video_frame_fetched(id, None);
+                        continue;
+                    }
                     if !conn.video_ack_required {
                         video_service::notify_video_frame_fetched(id, Some(instant.into()));
                     }
@@ -835,6 +844,10 @@ impl Connection {
                     }
                 },
                 Some((instant, value)) = rx.recv() => {
+                    if crate::developer_mode::is_screen_frame(&value)
+                        && !crate::developer_mode::frame_allowed(id, instant.into_std()) {
+                        continue;
+                    }
                     let latency = instant.elapsed().as_millis() as i64;
                     #[allow(unused_mut)]
                     let mut msg = value;
@@ -851,6 +864,21 @@ impl Connection {
                     match &msg.union {
                         Some(message::Union::Misc(m)) => {
                             match &m.union {
+                                #[cfg(target_os = "android")]
+                                Some(misc::Union::ScreenAccess(access)) => {
+                                    // Superseded pause/resume events must not reverse current policy.
+                                    if crate::developer_mode::android::access(id)
+                                        .map(|current| current.revision != access.revision)
+                                        .unwrap_or(true) { continue; }
+                                    video_service::notify_video_frame_fetched(id, None);
+                                    crate::remote_adb_video::android::reset_screen_access(id);
+                                    if access.paused {
+                                        crate::remote_adb_video::android::release_touch(id);
+                                        crate::remote_adb::android::cancel_clipboard(id);
+                                    } else if conn.services_subed {
+                                        conn.refresh_video_display(None);
+                                    }
+                                }
                                 Some(misc::Union::StopService(_)) => {
                                     conn.send_close_reason_no_retry("").await;
                                     conn.on_close("stop service", false).await;
@@ -912,6 +940,10 @@ impl Connection {
                     #[cfg(windows)]
                     conn.portable_check();
                     conn.clear_expired_pending_zego_voice_call().await;
+                    if !crate::developer_mode::video_allowed(id) {
+                        // Intentional screen suspension is not inactivity/disconnection.
+                        conn.update_auto_disconnect_timer();
+                    }
                     if let Some((instant, minute)) = conn.auto_disconnect_timer.as_ref() {
                         if instant.elapsed().as_secs() > minute * 60 {
                             conn.send_close_reason_no_retry("Connection failed due to inactivity").await;
@@ -1564,6 +1596,7 @@ impl Connection {
         pi.username = username;
         pi.sas_enabled = sas_enabled;
         pi.features = Some(Features {
+            developer_screen_priority: cfg!(target_os = "android") && self.is_remote(),
             privacy_mode: privacy_mode::is_privacy_mode_supported(),
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
             terminal: true, // Terminal feature is supported on desktop only
@@ -1658,6 +1691,11 @@ impl Connection {
         // If MainService/JNI is not ready yet, skip and let the timer retry.
         #[cfg(target_os = "android")]
         if self.authorized {
+            if sub_service && self.is_remote() {
+                if let Some(tx) = self.inner.tx.clone() {
+                    crate::developer_mode::android::register(self.inner.id, self.lr.developer_mode, tx);
+                }
+            }
             if let Some(msg) = openworld_status_message().await {
                 self.send(msg).await;
             }
@@ -2317,6 +2355,42 @@ impl Connection {
         } else if self.authorized {
             if self.port_forward_socket.is_some() {
                 return true;
+            }
+            if !crate::developer_mode::video_allowed(self.inner.id) {
+                // Preserve heartbeat and ZEGO signaling. Block blind input and global
+                // capture changes at the endpoint, including clients without the new UI.
+                if let Some(message::Union::ScreenshotRequest(request)) = &msg.union {
+                    let mut response = Message::new();
+                    response.set_screenshot_response(ScreenshotResponse {
+                        sid: request.sid.clone(),
+                        msg: "画面已暂停，暂时无法截图。".into(),
+                        ..Default::default()
+                    });
+                    self.send(response).await;
+                    return true;
+                }
+                let blocked = match &msg.union {
+                    Some(message::Union::MouseEvent(_))
+                    | Some(message::Union::KeyEvent(_))
+                    | Some(message::Union::PointerDeviceEvent(_))
+                    | Some(message::Union::Clipboard(_))
+                    | Some(message::Union::MultiClipboards(_))
+                    | Some(message::Union::ScreenshotRequest(_)) => true,
+                    Some(message::Union::Misc(m)) => matches!(&m.union,
+                        Some(misc::Union::RefreshVideo(_))
+                        | Some(misc::Union::RefreshVideoDisplay(_))
+                        | Some(misc::Union::SwitchDisplay(_))
+                        | Some(misc::Union::CaptureDisplays(_))
+                        | Some(misc::Union::TogglePrivacyMode(_))
+                        | Some(misc::Union::ToggleVirtualDisplay(_))
+                        | Some(misc::Union::ChangeDisplayResolution(_))
+                        | Some(misc::Union::ChangeResolution(_))
+                        | Some(misc::Union::FollowCurrentDisplay(_))
+                        | Some(misc::Union::RestartRemoteDevice(_))
+                        | Some(misc::Union::SwitchSidesRequest(_))),
+                    _ => false,
+                };
+                if blocked { return true; }
             }
             match msg.union {
                 #[allow(unused_mut)]
@@ -3039,14 +3113,15 @@ impl Connection {
                             && !self.terminal && !self.view_camera;
                         if let Some(tx) = self.inner.tx.as_ref() {
                             crate::remote_adb::dispatch(self.inner.id, normal_session,
-                                !self.disable_keyboard, self.clipboard_enabled(), &json, tx.clone());
+                                !self.disable_keyboard && crate::developer_mode::video_allowed(self.inner.id),
+                                self.clipboard_enabled(), &json, tx.clone());
                         }
                     }
                     Some(misc::Union::RemoteAdbVideo(packet)) => {
                         if let Some(tx) = self.inner.tx.as_ref() {
                             crate::remote_adb_video::dispatch(self.inner.id,
                                 self.file_transfer.is_none() && !self.terminal && !self.view_camera,
-                                !self.disable_keyboard, packet, tx.clone());
+                                !self.disable_keyboard && crate::developer_mode::video_allowed(self.inner.id), packet, tx.clone());
                         }
                     }
                     _ => {}
@@ -3194,6 +3269,7 @@ impl Connection {
     }
 
     fn refresh_video_display(&self, display: Option<usize>) {
+        if !crate::developer_mode::video_allowed(self.inner.id) { return; }
         video_service::refresh();
         self.server.upgrade().map(|s| {
             s.read().unwrap().set_video_service_opt(
@@ -3685,7 +3761,7 @@ impl Connection {
             < hbb_common::get_version_number("1.2.4")
         {
             if let Ok(q) = o.privacy_mode.enum_value() {
-                if self.keyboard {
+                if self.keyboard && crate::developer_mode::video_allowed(self.inner.id) {
                     match q {
                         BoolOption::Yes => {
                             self.turn_on_privacy("".to_owned()).await;
@@ -3699,7 +3775,7 @@ impl Connection {
             }
         }
         if let Ok(q) = o.block_input.enum_value() {
-            if self.keyboard && self.block_input {
+            if self.keyboard && self.block_input && crate::developer_mode::video_allowed(self.inner.id) {
                 match q {
                     BoolOption::Yes => {
                         self.tx_input.send(MessageInput::BlockOn).ok();
@@ -3851,6 +3927,8 @@ impl Connection {
             return;
         }
         self.closed = true;
+        #[cfg(target_os = "android")]
+        crate::developer_mode::android::remove(self.inner.id);
         // OpenWorld voice calls are handled by ZEGO; connection close must not
         // reset legacy RustDesk audio_service voice-call devices.
         log::info!("#{} Connection closed: {}", self.inner.id(), reason);
@@ -3902,6 +3980,8 @@ impl Connection {
 
     #[inline]
     async fn send(&mut self, msg: Message) {
+        if crate::developer_mode::is_screen_frame(&msg)
+            && !crate::developer_mode::video_allowed(self.inner.id) { return; }
         allow_err!(self.stream.send(&msg).await);
     }
 
@@ -4542,6 +4622,8 @@ impl Default for PortableState {
 
 impl Drop for Connection {
     fn drop(&mut self) {
+        #[cfg(target_os = "android")]
+        crate::developer_mode::android::remove(self.inner.id);
         #[cfg(target_os = "android")]
         crate::remote_adb_video::android::disconnect(self.inner.id);
         #[cfg(target_os = "android")]

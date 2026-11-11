@@ -46,7 +46,7 @@ use std::{
     num::NonZeroI64,
     path::PathBuf,
     sync::{
-        atomic::{AtomicUsize, Ordering},
+        atomic::{AtomicBool, AtomicUsize, Ordering},
         Arc, Mutex, RwLock,
     },
 };
@@ -92,6 +92,11 @@ pub struct Remote<T: InvokeUiSession> {
     last_update_jobs_status: (Instant, HashMap<i32, u64>),
     is_connected: bool,
     first_frame: bool,
+    screen_paused: Arc<AtomicBool>,
+    screen_revision: u64,
+    video_generation: Arc<AtomicUsize>,
+    video_publish_gate: Arc<Mutex<()>>,
+    preserve_record_state: bool,
     #[cfg(any(target_os = "windows", feature = "unix-file-copy-paste"))]
     client_conn_id: i32, // used for file clipboard
     data_count: Arc<AtomicUsize>,
@@ -138,6 +143,11 @@ impl<T: InvokeUiSession> Remote<T> {
             last_update_jobs_status: (Instant::now(), Default::default()),
             is_connected: false,
             first_frame: false,
+            screen_paused: Arc::new(AtomicBool::new(false)),
+            screen_revision: 0,
+            video_generation: Arc::new(AtomicUsize::new(0)),
+            video_publish_gate: Arc::new(Mutex::new(())),
+            preserve_record_state: false,
             #[cfg(any(target_os = "windows", feature = "unix-file-copy-paste"))]
             client_conn_id: 0,
             data_count: Arc::new(AtomicUsize::new(0)),
@@ -1336,6 +1346,7 @@ impl<T: InvokeUiSession> Remote<T> {
         if let Ok(msg_in) = Message::parse_from_bytes(&data) {
             match msg_in.union {
                 Some(message::Union::VideoFrame(vf)) => {
+                    if self.screen_paused.load(Ordering::Acquire) { return true; }
                     if !self.first_frame {
                         self.first_frame = true;
                         self.handler.close_success();
@@ -1383,6 +1394,10 @@ impl<T: InvokeUiSession> Remote<T> {
                         }
                     }
                     Some(login_response::Union::PeerInfo(pi)) => {
+                        let priority_supported = pi.platform.eq_ignore_ascii_case("android")
+                            && pi.features.as_ref().map(|f| f.developer_screen_priority).unwrap_or(false);
+                        self.screen_revision = 0;
+                        self.screen_paused.store(false, Ordering::Release);
                         let peer_version = pi.version.clone();
                         let peer_platform = pi.platform.clone();
                         self.set_peer_info(&pi);
@@ -1399,6 +1414,9 @@ impl<T: InvokeUiSession> Remote<T> {
                             }
                         }
                         self.handler.handle_peer_info(pi);
+                        if self.handler.is_default() {
+                            self.handler.update_screen_access(false, priority_supported, crate::developer_mode::enabled());
+                        }
                         #[cfg(all(target_os = "windows", not(feature = "flutter")))]
                         self.check_clipboard_file_context();
                         if self.handler.is_default() {
@@ -1925,11 +1943,30 @@ impl<T: InvokeUiSession> Remote<T> {
                     Some(misc::Union::OpenworldStatus(json)) => {
                         self.handler.update_openworld_status(json);
                     }
+                    Some(misc::Union::ScreenAccess(access)) => {
+                        if !self.handler.is_default() || !self.peer_info.platform.eq_ignore_ascii_case("android")
+                            || access.revision <= self.screen_revision { return true; }
+                        self.screen_revision = access.revision;
+                        // Serialize policy events with decoder publication, including a
+                        // callback already in flight when pause/resume arrives.
+                        let publish_gate = self.video_publish_gate.clone();
+                        let _publish_guard = publish_gate.lock().unwrap();
+                        let previous = self.screen_paused.swap(access.paused, Ordering::AcqRel);
+                        if previous != access.paused {
+                            self.preserve_record_state |= self.first_frame;
+                            self.video_generation.fetch_add(1, Ordering::AcqRel);
+                            self.video_threads.clear();
+                            #[cfg(all(feature = "flutter", not(any(target_os = "android", target_os = "ios"))))]
+                            crate::remote_adb_video::pc::set_screen_paused(&self.handler, access.paused);
+                        }
+                        self.handler.update_screen_access(access.paused, true, access.developer_mode);
+                    }
                     Some(misc::Union::RemoteAdb(json)) => {
                         #[cfg(any(target_os = "android", target_os = "ios", feature = "flutter"))]
                         crate::remote_adb::receive(&self.handler.get_id(), &json);
                     }
                     Some(misc::Union::RemoteAdbVideo(packet)) => {
+                        if packet.action == "frame" && self.screen_paused.load(Ordering::Acquire) { return true; }
                         #[cfg(all(feature = "flutter", not(any(target_os = "android", target_os = "ios"))))]
                         crate::remote_adb_video::pc::receive(&self.handler.get_id(), packet);
                     }
@@ -2043,6 +2080,10 @@ impl<T: InvokeUiSession> Remote<T> {
                     self.handler.set_platform_additions(&pi.platform_additions);
                 }
                 Some(message::Union::ScreenshotResponse(response)) => {
+                    if self.screen_paused.load(Ordering::Acquire) {
+                        self.handler.handle_screenshot_resp(response.sid, "画面已暂停，暂时无法截图。".into());
+                        return true;
+                    }
                     crate::client::screenshot::set_screenshot(response.data);
                     self.handler
                         .handle_screenshot_resp(response.sid, response.msg);
@@ -2371,6 +2412,10 @@ impl<T: InvokeUiSession> Remote<T> {
             discard_queue: discard_queue.clone(),
         };
         let handler = self.handler.ui_handler.clone();
+        let screen_paused = self.screen_paused.clone();
+        let video_generation = self.video_generation.clone();
+        let video_publish_gate = self.video_publish_gate.clone();
+        let generation = video_generation.load(Ordering::Acquire);
         crate::client::start_video_thread(
             self.handler.clone(),
             display,
@@ -2383,6 +2428,9 @@ impl<T: InvokeUiSession> Remote<T> {
                   data: &mut scrap::ImageRgb,
                   _texture: *mut c_void,
                   pixelbuffer: bool| {
+                let _publish_guard = video_publish_gate.lock().unwrap();
+                if screen_paused.load(Ordering::Acquire)
+                    || video_generation.load(Ordering::Acquire) != generation { return; }
                 *frame_count.write().unwrap() += 1;
                 if pixelbuffer {
                     handler.on_rgba(display, data);
@@ -2394,9 +2442,12 @@ impl<T: InvokeUiSession> Remote<T> {
         );
         self.video_threads.insert(display, video_thread);
         if self.video_threads.len() == 1 {
-            let auto_record =
-                LocalConfig::get_bool_option(config::keys::OPTION_ALLOW_AUTO_RECORD_OUTGOING);
-            self.handler.lc.write().unwrap().record_state = auto_record;
+            if !self.preserve_record_state {
+                let auto_record =
+                    LocalConfig::get_bool_option(config::keys::OPTION_ALLOW_AUTO_RECORD_OUTGOING);
+                self.handler.lc.write().unwrap().record_state = auto_record;
+            }
+            self.preserve_record_state = false;
             self.update_record_state();
         }
     }

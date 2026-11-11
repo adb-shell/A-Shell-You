@@ -110,6 +110,7 @@ impl VideoFrameController {
 
     #[tokio::main(flavor = "current_thread")]
     async fn try_wait_next(&mut self, fetched_conn_ids: &mut HashSet<i32>, timeout_millis: u64) {
+        self.send_conn_ids.retain(|id| crate::developer_mode::video_allowed(*id));
         if self.send_conn_ids.is_empty() {
             return;
         }
@@ -798,7 +799,7 @@ fn run(vs: VideoService) -> ResultType<()> {
             }
             frame_controller.try_wait_next(&mut fetched_conn_ids, 300);
             // break if all connections have received current frame
-            if fetched_conn_ids.len() >= frame_controller.send_conn_ids.len() {
+            if frame_controller.send_conn_ids.is_subset(&fetched_conn_ids) {
                 break;
             }
         }

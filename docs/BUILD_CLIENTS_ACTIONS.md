@@ -1,8 +1,12 @@
 # GitHub Actions 客户端编译
 
+2026-11-11 T001：主分支合并保留2.0.26 / 2.0.26+59并纳入开发者画面优先，见[文档与合并任务](tasks/T-2026-11-11-001-docs-main-merge.md)。本轮不触发或监控编译；以下历史回执都不能证明本次合并版本已编译通过。
+
+2026-11-07 T004回执：开发者画面优先源码test/25bc2ce04484c6d40f8c06325008d78a347432f7已推送，Build-Clients-BT / Both / 常规编译POST HTTP204（09:26:23 UTC）。单次定位尚未列出run；用户要求不监控，未继续查询结果。仅补回执文档不再dispatch；具体边界见[任务](tasks/T-2026-11-07-004-developer-screen-priority.md)，不据HTTP204宣称编译成功。
+
 T003版本源码df0e129已提交推送main，版本2.0.26 / 2.0.26+59，构建号59保持；未触发编译，见[版本任务](tasks/T-2026-11-07-003-openworld-version.md)。以下T002及T001是旧版本触发回执，不表示本版本已构建。
 
-当前T002已将test/d9f1119合并main并推送482eda5，版本保持5.2.1 / 5.2.1+59；2026-11-07 17:38:48 +09:00一次Both/常规编译获HTTP204，按要求不监控，不查询run或结果。准确源码SHA与回执见[main交付任务](tasks/T-2026-11-07-002-openworld-main.md)。以下test运行属于迁移来源历史，不能替代本次main结果。
+历史T002已将test/d9f1119合并main并推送482eda5，版本保持5.2.1 / 5.2.1+59；2026-11-07 17:38:48 +09:00一次Both/常规编译获HTTP204，按要求不监控，不查询run或结果。准确源码SHA与回执见[main交付任务](tasks/T-2026-11-07-002-openworld-main.md)。以下test运行属于迁移来源历史，不能替代本次main结果。
 
 2026-11-07产品身份迁为开放世界/OpenWorld，唯一手动工作流Build OpenWorld Clients-BT。jobs/输入/工具链/actions pins/权限保持，native/缓存/签名展示/产物名同步。已按用户要求交付test并运行Both/常规编译；准确head/run与结果见本次迁移回执，旧run不能替代。见[身份迁移](AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
 

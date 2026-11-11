@@ -1616,6 +1616,7 @@ pub trait InvokeUiSession: Send + Sync + Clone + 'static + Sized + Default {
     fn close_success(&self);
     fn update_quality_status(&self, qs: QualityStatus);
     fn update_openworld_status(&self, json: String);
+    fn update_screen_access(&self, _paused: bool, _supported: bool, _developer: bool) {}
     fn set_connection_type(&self, is_secured: bool, direct: bool);
     fn set_fingerprint(&self, fingerprint: String);
     fn job_error(&self, id: i32, err: String, file_num: i32);

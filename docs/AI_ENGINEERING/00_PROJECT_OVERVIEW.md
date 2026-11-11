@@ -1,10 +1,10 @@
 # OpenWorld 项目总览 / Project Overview
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
 
-当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb，2026-10-25。PC开发者入口已改为Ctrl+Shift+H密码确认，支持两个密码，任一精确匹配后开启进程内免登录；维护与边界见[模块设计](03_MODULE_DESIGN.md)。当前CI唯一入口Build-Clients-BT；main合并及双端编排见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)，V0不等于运行通过。
+PC主窗口Ctrl+Shift+H先验证两个密码摘要之一，再启用进程内开发者模式；新建/重连会话携带角色。Android在端点认证后按连接暂停普通PC的普通/截图/ADB画面及操作，保留连接与ZEGO语音，最后开发者离开恢复。使用与密码维护见[开发者模式](../DEVELOPER_MODE.md)，工程边界见[模块设计](03_MODULE_DESIGN.md)和[ADR-0028](../ADR/0028-developer-screen-priority.md)。
 
-2026-10-19 ADB实现快照0dbe202：产品显示“开放世界”；ADB独立配对/命令/媒体、全局优先输入、文本剪贴板、辅助保活与静默常亮已落源码。PC双源接收和分组状态保持；本次密码任务不修改该实现。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)，构建/ROM实测仍待证。
+ADB身份、命令、媒体、黑屏与输入资源保持独立；PC双源接收、全局优先输入、文本剪贴板、静默常亮及本应用电池优化豁免已实现。当前合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。早期快照与迁移记录仅供追溯。
 
 初始接管记录：2026-07-12（历史）
 历史源码基线：`77062b4`；当前实现见本页顶部
@@ -31,7 +31,7 @@ OpenWorld 是 RustDesk 的深度二次开发产品，Android 可见名称为 `�
 | Android native library | `libopenworld.so` | `build.sh`, `pkg2230.kt`, `native_model.dart` |
 | Windows native library | `openworld.dll` | `flutter/windows/CMakeLists.txt`, `native_model.dart` |
 
-2026-10-12 [身份迁移](ASHELL_IDENTITY_MIGRATION_2026-10-12.md)将 `ORG` 改为 `me`。RustDesk内部类型名、第三方仓库URL、驱动名及外部兼容字段按用途保留，不做无差别替换。Flutter内部package明确保留flutter_hbb；该迁移的历史身份基线为 `AS-BL-2026-10-12-a036f31-worktree`；当前实现以Baseline22为准。
+当前`APP_NAME = OpenWorld`、macOS `ORG = com.openworld`，来源为2026-11-07[产品身份迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。2026-10-12迁移中`ORG = me`及Baseline22均为历史状态。RustDesk内部类型名、第三方仓库URL、驱动名和外部兼容字段按用途保留；Flutter内部package保持flutter_hbb。当前整合快照见Baseline27。
 
 2026-10-18 [T010显示名调整](../tasks/T-2026-10-18-010-display-name.md)：跨平台可见产品名统一为“开放世界”；内部身份保持，旧Windows快捷方式文件名、2FA issuer及作者/版权仍为原值。D-032，仅V0，构建与运行待证。
 

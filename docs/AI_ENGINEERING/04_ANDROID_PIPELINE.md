@@ -1,5 +1,7 @@
 # OpenWorld Android 完整链路 / Android Pipeline
 
+2026-11-07 T004：Android Rust在认证后的普通远控连接之间实施开发者画面优先；暂停普通帧/截图/ADB输出和盲输入，保留连接、设备状态与ZEGO。策略不更改Kotlin/JNI采集入口，不停止MediaProjection、不自动申请权限；最后开发者离开后只刷新既有正常源/等待ADB关键帧。实际控制流与异常清理见[协议](06_NETWORK_PROTOCOL.md)、[ADR-0028](../ADR/0028-developer-screen-priority.md)。V0，双端/真机待验；下文为历史沿革。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 test T004（2026-10-18）：显式 `KeyEvent.seq` 文本在 AccessibilityService 主线程提交一次，33+ 有 AccessibilityInputConnection 时使用 commitText，否则对当前输入焦点的可编辑节点执行 ACTION_SET_TEXT/SET_SELECTION，按选区替换并将光标移到插入文本后；未知选区追加，不搜索其他字段，不依赖后台手机剪贴板或模拟 EditText。仅修改文本序列入口，其他按键、无障碍手势、采集及 MediaProjection 保持。PC Ctrl+V 无 ADB 时通过既有 sessionInputString 发送文本，ADB 可用时仍走独立 ADB 输入。见[T004](../tasks/T-2026-10-18-004-accessibility-paste-cursor.md)，V0，设备兼容待证。

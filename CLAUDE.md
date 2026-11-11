@@ -1,11 +1,12 @@
 # CLAUDE.md — OpenWorld / 开放世界 v2.0.26
 
-2026-10-13 T008：当前main/aca7446，初始clean。PC已有独立配对/命令等弹窗，980f254固化无QR与模式控件/显式刷新；aca7446新增“移动端操作”左侧开关和可拖动Shell栏三键，原侧栏标题为“无障碍栏”。确认ADB可用时自动显示，手动关闭可保留并重新打开；会话级状态、无PC周期status。见 `docs/AI_ENGINEERING/13_REMOTE_ADB.md` / Baseline15 / T008；仅V0，当前构建/真机未验证。投屏传输仅为下一阶段待设计方向，原视频/Accessibility/输入链保持。本轮只同步文档。
+2026-11-11当前主分支文档与合并见[Baseline27](docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)和[当前任务](docs/tasks/T-2026-11-11-001-docs-main-merge.md)：保留main版本2.0.26 / 2.0.26+59，纳入test开发者画面优先。PC双密码解锁后新建/重连携带角色；Android有开发者连接时暂停普通PC画面及操作、保留会话与ZEGO，最后开发者离开恢复。本轮无编译或监控，历史编排结果未知。
 
-2026-10-13 T004历史：main/917e661工作树初次增加PC远程ADB，随后已提交；旧本地组件仍退役。旧任务的“未提交”只表示当时快照，不覆盖当前HEAD。
+ADB投屏/无视/节点穿透、独立黑屏、触摸/键盘/剪贴板已实现；详见[12本机ADB](docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[13远程ADB](docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[14媒体与输入](docs/AI_ENGINEERING/14_ADB_MIRROR.md)。2026-10-13的Shell栏/配对快照仅供历史追溯，不能再视作投屏尚未实现。
 
 最后一次与全仓源码对齐：2026-07-12
 最近一次文档分层整理：2026-07-12
+当前入口同步：2026-11-11（非全仓源码审计）
 
 > 本文件是 **Claude Code** 的项目入口说明。
 > 它是补充导航，不是最终真相层。

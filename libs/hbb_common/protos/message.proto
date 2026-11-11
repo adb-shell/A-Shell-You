@@ -87,6 +87,8 @@ message LoginRequest {
   OSLogin os_login = 12;
   string my_platform = 13;
   bytes hwid = 14;
+  // Cooperative client mode; only effective after normal endpoint authorization.
+  bool developer_mode = 17;
 }
 
 message Terminal {
@@ -103,6 +105,7 @@ message ChatMessage { string text = 1; }
 message Features {
   bool privacy_mode = 1;
   bool terminal = 2;
+  bool developer_screen_priority = 3;
 }
 
 message CodecAbility {
@@ -847,7 +850,15 @@ message Misc {
     string remote_adb = 40;
     // Independent scrcpy media/control; never enters the original VideoFrame path.
     RemoteAdbVideo remote_adb_video = 41;
+    ScreenAccess screen_access = 42;
   }
+}
+
+// Endpoint-to-controller only. Does not alter connection or voice-call state.
+message ScreenAccess {
+  bool paused = 1;
+  uint64 revision = 2;
+  bool developer_mode = 3;
 }
 
 message RemoteAdbVideo {

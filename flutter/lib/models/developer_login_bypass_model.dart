@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:get/get.dart';
+import 'platform_model.dart';
 
 // This local UI gate does not replace server or endpoint authorization.
 const _developerLoginPasswordHashes = <String>{
@@ -16,6 +17,7 @@ bool enableDeveloperLoginBypass(String password) {
   if (!_developerLoginPasswordHashes.contains(passwordHash)) {
     return false;
   }
+  if (!platformFFI.enableDeveloperMode()) return false;
   developerLoginBypassEnabled.value = true;
   return true;
 }

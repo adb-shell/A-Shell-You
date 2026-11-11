@@ -1,11 +1,10 @@
 # OpenWorld 完整架构 / Architecture
 
-2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
+当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
 
-当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb。PC开发者密码由Flutter主窗口本地校验两个摘要，任一匹配只改变进程内免登录状态；没有新增API、协议、持久化或endpoint授权边界。main合并与双端编排见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)，运行验收待证。
+PC本地密码校验经手写native C ABI设置进程模式，供desktop各engine连接/重连写入LoginRequest。Android在原端点认证后统一裁定各普通远控会话的画面资格；有开发者时暂停普通画面与控制，保留会话和ZEGO，最后开发者离开恢复。普通VideoFrame和独立ADB媒体共用连接策略，两条采集链仍独立。角色声明不是抗伪造授权；详见[ADR-0028](../ADR/0028-developer-screen-priority.md)、[协议](06_NETWORK_PROTOCOL.md)。
 
-ADB架构沿用既有实现：Android持有身份与设备状态，命令/媒体/黑屏/输入资源独立；视频复用scrcpy ScreenCapture，经独立GPU/H.264编码，截图优先常驻UiAutomation，节点由Shell读取/App绘制。普通采集/接收独立，QoS参数只读共享。本次密码任务不修改这些路径；详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
-
+ADB由Android持有身份和设备状态，命令/媒体/黑屏/输入资源独立；视频复用scrcpy ScreenCapture，经独立GPU/H.264编码，截图优先常驻UiAutomation，节点由Shell读取/App绘制。普通采集与接收独立，QoS参数只读共享。详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与输入](14_ADB_MIRROR.md)。
 
 历史接管基线：2026-07-12，`77062b4`；当前实现见本页顶部
 

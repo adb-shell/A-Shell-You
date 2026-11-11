@@ -1,5 +1,7 @@
 # OpenWorld 调试与验证体系 / Debug System
 
+2026-11-07 T004增加`screenPausedByDeveloper`与`screenResumePending`：前者是端点策略暂停，后者等待恢复后的真实普通/ADB帧，均不代表断连或共享服务停止。先查LoginRequest角色、Features能力、ScreenAccess revision，再查发送资格、ACK/QoS、解码generation和Texture首帧通知；不要用重启采集/挂断语音“修复”策略暂停。DSP-01—DSP-10见TEST_MATRIX；当前仅V0，本机无Rust/Flutter工具链，正式命令/环境/停止边界见[任务验证需求](../tasks/T-2026-11-07-004-developer-screen-priority.md)。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 2026-10-16 T001：当前4d3c446；区分paired、握手、UID验证、touchReady、媒体phase与首帧，命令忙不等于ADB失联。穿透排查按节点连接/读取、私有流、App绘图、helper退出阶段；exit134通常为SIGABRT但不单凭退出码定根因。黑屏先查App PNG生成、默认显示layerStack、READY及ROM截图排除；无节点与不支持/失败分开，不伪造就绪。V0，构建/真机待证。 当前详细合同：[本机ADB](12_LOCAL_ADB.md)、[远程ADB](13_REMOTE_ADB.md)、[媒体与触摸](14_ADB_MIRROR.md)。
