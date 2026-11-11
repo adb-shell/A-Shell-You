@@ -1,9 +1,11 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261112-001-r3`
+State Revision：`STATE-20261112-001-r5`
 Last Updated / Observed At：2026-11-12（Asia/Tokyo）
 Evidence Scope：`repository-observed / local checks + prior CI failure logs + new dispatch HTTP204`
+
+最新续接：T-2026-11-12-001 / active/T7，test/bbebc74 clean。f4a71c6的Android依赖步骤仍DNS失败，并出现_apt索引权限警告；此前7项命令桩不代表Linux/网络通过。已修正/tmp沙箱路径与有界三镜像选择，Bash语法/13项离线回归通过，Linux权限与runner DNS仍待CI证据。待test提交推送、双端编译，不监控。WORK-20261112-001-r5 / CE-20261112-T001-04/05。
 
 当前任务T-2026-11-12-001 / complete/T8（指定交付范围）：test/e0ea612 clean恢复；用户ZIP证实cd21705的Windows编译失败与Android依赖镜像DNS阻塞后取消。源码与CI修复已提交为f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b并推送test，Bash语法/离线流程7/7通过；保留PC2新地址。Both/常规编译已HTTP204受理，不监控，未查询新结果；后续只补回执文档。WORK-20261112-001-r3 / CE-20261112-T001-01—03；[详情](../docs/tasks/T-2026-11-12-001-build-fixes.md)。下方T002回执保留当时证据，不再代表最终结果未知。
 

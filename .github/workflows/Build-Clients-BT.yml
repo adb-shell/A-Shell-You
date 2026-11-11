@@ -55,7 +55,7 @@ jobs:
           persist-credentials: false
 
       - name: Install native build prerequisites
-        timeout-minutes: 17
+        timeout-minutes: 24
         run: |
           bash scripts/ci/install_ubuntu_dependencies.sh \
             build-essential autoconf automake libtool libtool-bin m4 gettext \

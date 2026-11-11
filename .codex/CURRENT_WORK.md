@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261112-001-r3`
+Registry Revision：`WORK-20261112-001-r5`
 Last Updated：2026-11-12
-Active Task Count：0
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none；本次指定交付范围已关闭，新编译及运行验证结果待证。
+T-2026-11-12-001 / active / T7续修：用户报告主源DNS失败和_apt权限警告；沿用本任务修复、test提交推送、双端常规编译且不监控授权。起点test/bbebc74 clean；CI沙箱路径与三候选镜像修复完成，Bash语法及13项离线回归通过；待提交推送/dispatch。CE-20261112-T001-04/05；[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
 
 ## 2. Concurrent Session Rules
 

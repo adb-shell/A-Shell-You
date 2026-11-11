@@ -1,5 +1,17 @@
 # OpenWorld Change Event Log
 
+## CE-20261112-T001-05：沙箱目录与镜像回退验证
+
+2026-11-12 T001续修：f4a71c6的Android主源DNS仍失败且_apt无法穿过RUNNER_TEMP父路径。现改/tmp独立目录、root 0755父目录与_apt:root 0700 partial，实际以_apt检查目录/源文件/解析器配置访问；主源→kernel.org→MIT顺序探测完整Jammy三套索引，APT官方签名验证成功才使用。每候选索引隔离，全部失败禁止安装；索引更新每次3分钟、安装10分钟、步骤总限24分钟。
+
+Bash语法及scripts/ci/test_install_ubuntu_dependencies.py的13项离线回归通过；测试不执行真实sudo/APT/curl，不证明Linux权限或runner DNS恢复。本机只读HTTP检查两后备镜像的六个InRelease均200且有签名文本头，未在本机验证GPG；CI继续用Ubuntu keyring执行实际验证。
+
+STATE、WORK-20261112-001-r5 / active/T7。产品源码/配置/版本/依赖锁保持；只变CI辅助脚本、总时限、回归测试与文档。
+
+## CE-20261112-T001-04：Android DNS与APT沙箱续修
+
+用户补充f4a71c6错误；一次性核对既有run 43057903776，Android依赖步骤失败且APK跳过，Windows在观察时仍运行。主源DNS失败与RUNNER_TEMP父目录_apt不可访问均有日志证据。沿用当前任务授权续修、提交推送test、Both/常规编译，不监控新构建；起点bbebc74 clean，STATE、WORK-20261112-001-r4 / active/T5。改动限定APT镜像选择和沙箱目录，不修改系统DNS/hosts或产品配置。
+
 ## CE-20261112-T001-03：test修复与不监控双端编译回执
 
 修复源码f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b已提交推送origin/test，dispatch前远端SHA一致。2026-11-11 16:23:49 UTC（2026-11-12 01:23:49 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求未查询新run/jobs/logs/artifacts，未监控，最终构建结果未知。

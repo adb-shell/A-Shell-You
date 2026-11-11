@@ -1,5 +1,7 @@
 # OpenWorld Project Memory
 
+2026-11-12 T001续修：f4a71c6的Android主源DNS仍失败且_apt无法穿过RUNNER_TEMP父路径。现改/tmp独立目录、root 0755父目录与_apt:root 0700 partial，实际以_apt检查目录/源文件/解析器配置访问；主源→kernel.org→MIT顺序探测完整Jammy三套索引，APT官方签名验证成功才使用。每候选索引隔离，全部失败禁止安装；索引更新每次3分钟、安装10分钟、步骤总限24分钟。 13项离线回归与Bash语法通过，实际runner权限/DNS/签名验证待证；当前T7待test提交推送及Both/常规编译，不监控。STATE、WORK-20261112-001-r5 / CE-20261112-T001-04/05；[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
 2026-11-12 / T-2026-11-12-001交付：修复源码f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b已提交推送origin/test，dispatch前远端SHA一致。2026-11-11 16:23:49 UTC（2026-11-12 01:23:49 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求未查询新run/jobs/logs/artifacts，未监控，最终构建结果未知。 T8仅指定交付范围；Bash语法/离线流程7/7通过，真实构建待证。STATE、WORK-20261112-001-r3 / CE-20261112-T001-01—03；补回执文档不二次触发。
 
 2026-11-12 / T-2026-11-12-001：依据用户ZIP修复cd21705的Windows三处Rust编译错误；Android卡在APT镜像DNS解析，更新失败后旧索引继续安装，约28分钟后取消。Rust补宏导入与async move所有权；CI改独立官方HTTPS源/新索引，更新错误即退出，更新5分钟、安装10分钟、步骤17分钟上限。 Bash语法与7/7离线命令桩流程检查通过（成功、更新失败/超时、安装失败/超时、空包参数、缺少RUNNER_TEMP），未调用真实sudo/APT/网络。工作流仅替换依赖安装入口并加步骤时限，包清单、其他jobs、工具链、签名、权限保持；diff通过。YAML解析器与Rust/Flutter工具链缺失，采用精确工作流差异/缩进和Rust所有权复核，不能记作完整编译PASS。 当前active/T7，待提交test并触发双端常规编译，不监控；STATE、WORK-20261112-001-r2 / CE-20261112-T001-01/02。PC2现有四项地址更新一并保留，Android/PC1与共享Key保持。

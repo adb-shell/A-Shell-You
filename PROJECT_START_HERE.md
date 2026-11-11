@@ -1,6 +1,6 @@
 # OpenWorld Project Start Here
 
-T-2026-11-12-001修复源码f4a71c6已推送test：Rust编译错误与Android CI镜像DNS阻塞路径已修正，PC2现有四项地址编辑一并保留，Android/PC1与公共Key保持。Both/常规编译已HTTP204受理，按用户要求不监控，结果未知。维护见[服务器配置](docs/AI_ENGINEERING/15_SERVER_PROFILES.md)，日志、局部检查与回执见[本次任务](docs/tasks/T-2026-11-12-001-build-fixes.md)和[当前状态](.codex/PROJECT_STATE.md)。版本5.2.1/5.2.1+59保持；局部检查不能替代完整编译或运行验收。
+T-2026-11-12-001正在test/bbebc74上续修Android CI：上次主源DNS仍失败，并有_apt目录权限警告；已改/tmp沙箱路径、三候选签名镜像和有界失败，13项离线回归通过。待按原授权提交推送test、重新触发双端常规编译，不监控。产品源码/三套服务器配置和版本5.2.1/5.2.1+59保持；真实runner验证待证。见[任务](docs/tasks/T-2026-11-12-001-build-fixes.md)与[当前状态](.codex/PROJECT_STATE.md)。
 
 PC主窗口Ctrl+Shift+H双密码验证保持；成功后增加进程native模式，新建/重连携带角色。Android有已认证开发者连接时，普通连接暂停普通/截图/ADB画面及盲输入/采集控制，保留会话与ZEGO；最后开发者离开恢复。角色是协作声明而非抗伪造凭证，见ADR-0028。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 
