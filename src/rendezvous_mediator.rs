@@ -47,6 +47,7 @@ pub struct RendezvousMediator {
     host: String,
     host_prefix: String,
     keep_alive: i32,
+    profile_generation: u64,
 }
 
 impl RendezvousMediator {
@@ -143,6 +144,7 @@ impl RendezvousMediator {
     }
 
     pub async fn start_udp(server: ServerPtr, host: String) -> ResultType<()> {
+        let profile_generation = hbb_common::server_profiles::generation();
         let host = check_port(&host, RENDEZVOUS_PORT);
         log::info!("start udp: {host}");
         let (mut socket, mut addr) = new_udp_for(&host, CONNECT_TIMEOUT).await?;
@@ -151,6 +153,7 @@ impl RendezvousMediator {
             host: host.clone(),
             host_prefix: Self::get_host_prefix(&host),
             keep_alive: crate::DEFAULT_KEEP_ALIVE,
+            profile_generation,
         };
 
         let mut timer = crate::rustdesk_interval(interval(crate::TIMER_OUT));
@@ -189,7 +192,7 @@ impl RendezvousMediator {
                     n = 3000;
                 }
                 if (latency - old_latency).abs() > n || old_latency <= 0 {
-                    Config::update_latency(&host, latency);
+                    Config::update_latency_for_profile(&host, latency, profile_generation);
                     log::debug!("Latency of {}: {}ms", host, latency as f64 / 1000.);
                     old_latency = latency;
                 }
@@ -211,7 +214,10 @@ impl RendezvousMediator {
                     }
                 },
                 _ = timer.tick() => {
-                    if SHOULD_EXIT.load(Ordering::SeqCst) {
+                    if SHOULD_EXIT.load(Ordering::SeqCst)
+                        || profile_generation != hbb_common::server_profiles::generation()
+                        || host != Config::server_profile().id_server
+                    {
                         break;
                     }
                     let now = Some(Instant::now());
@@ -228,7 +234,7 @@ impl RendezvousMediator {
                         if timeout {
                             fails += 1;
                             if fails >= MAX_FAILS2 {
-                                Config::update_latency(&host, -1);
+                                Config::update_latency_for_profile(&host, -1, profile_generation);
                                 old_latency = 0;
                                 if last_dns_check.elapsed().as_millis() as i64 > DNS_INTERVAL {
                                     // in some case of network reconnect (dial IP network),
@@ -241,7 +247,7 @@ impl RendezvousMediator {
                                     last_dns_check = Instant::now();
                                 }
                             } else if fails >= MAX_FAILS1 {
-                                Config::update_latency(&host, 0);
+                                Config::update_latency_for_profile(&host, 0, profile_generation);
                                 old_latency = 0;
                             }
                         }
@@ -262,6 +268,11 @@ impl RendezvousMediator {
         server: &ServerPtr,
         update_latency: &mut impl FnMut(),
     ) -> ResultType<()> {
+        if self.profile_generation != hbb_common::server_profiles::generation()
+            || self.host != Config::server_profile().id_server
+        {
+            return Ok(());
+        }
         match msg {
             Some(rendezvous_message::Union::RegisterPeerResponse(rpr)) => {
                 update_latency();
@@ -328,6 +339,7 @@ impl RendezvousMediator {
     }
 
     pub async fn start_tcp(server: ServerPtr, host: String) -> ResultType<()> {
+        let profile_generation = hbb_common::server_profiles::generation();
         let host = check_port(&host, RENDEZVOUS_PORT);
         log::info!("start tcp: {}", hbb_common::websocket::check_ws(&host));
         let mut conn = connect_tcp(host.clone(), CONNECT_TIMEOUT).await?;
@@ -338,6 +350,7 @@ impl RendezvousMediator {
             host: host.clone(),
             host_prefix: Self::get_host_prefix(&host),
             keep_alive: crate::DEFAULT_KEEP_ALIVE,
+            profile_generation,
         };
         let mut timer = crate::rustdesk_interval(interval(crate::TIMER_OUT));
         let mut last_register_sent: Option<Instant> = None;
@@ -349,7 +362,7 @@ impl RendezvousMediator {
                 let latency = last_register_sent
                     .map(|x| x.elapsed().as_micros() as i64)
                     .unwrap_or(0);
-                Config::update_latency(&host, latency);
+                Config::update_latency_for_profile(&host, latency, profile_generation);
                 log::debug!("Latency of {}: {}ms", host, latency as f64 / 1000.);
             };
             select! {
@@ -366,7 +379,10 @@ impl RendezvousMediator {
                     rz.handle_resp(msg.union, Sink::Stream(&mut conn), &server, &mut update_latency).await?
                 }
                 _ = timer.tick() => {
-                    if SHOULD_EXIT.load(Ordering::SeqCst) {
+                    if SHOULD_EXIT.load(Ordering::SeqCst)
+                        || profile_generation != hbb_common::server_profiles::generation()
+                        || host != Config::server_profile().id_server
+                    {
                         break;
                     }
                     // https://www.emqx.com/en/blog/mqtt-keep-alive
@@ -400,6 +416,12 @@ impl RendezvousMediator {
     }
 
     async fn handle_request_relay(&self, rr: RequestRelay, server: ServerPtr) -> ResultType<()> {
+        let relay_server = Config::server_profile().relay_server;
+        if !rr.relay_server.is_empty()
+            && check_port(&rr.relay_server, config::RELAY_PORT) != relay_server
+        {
+            bail!("Requested relay does not match the configured relay server");
+        }
         let addr = AddrMangle::decode(&rr.socket_addr);
         let last = *LAST_RELAY_MSG.lock().await;
         *LAST_RELAY_MSG.lock().await = (addr, Instant::now());
@@ -410,7 +432,7 @@ impl RendezvousMediator {
 
         self.create_relay(
             rr.socket_addr.into(),
-            rr.relay_server,
+            relay_server.to_owned(),
             rr.uuid,
             server,
             rr.secure,
@@ -691,15 +713,8 @@ impl RendezvousMediator {
         Ok(())
     }
 
-    fn get_relay_server(&self, provided_by_rendezvous_server: String) -> String {
-        let mut relay_server = "103.112.1.29:10057".to_string();
-        if relay_server.is_empty() {
-            relay_server = provided_by_rendezvous_server;
-        }
-        if relay_server.is_empty() {
-            relay_server = crate::increase_port(&self.host, 1);
-        }
-        relay_server
+    fn get_relay_server(&self, _provided_by_rendezvous_server: String) -> String {
+        Config::server_profile().relay_server.to_owned()
     }
 }
 

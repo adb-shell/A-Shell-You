@@ -1313,6 +1313,8 @@ pub fn session_add(
     is_shared_password: bool,
     conn_token: Option<String>,
 ) -> ResultType<FlutterSession> {
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    let _profile_guard = crate::server_profile::CHANGE_LOCK.lock().unwrap();
     let conn_type = if is_file_transfer {
         ConnType::FILE_TRANSFER
     } else if is_view_camera {
@@ -2351,7 +2353,12 @@ pub(super) mod async_tasks {
         loop {
             match rx_onlines.recv() {
                 Ok(ids) => {
-                    crate::client::peer_online::query_online_states(ids, handle_query_onlines).await
+                    let revision = hbb_common::config::Config::server_profile_revision();
+                    crate::client::peer_online::query_online_states(ids, move |onlines, offlines| {
+                        if revision == hbb_common::config::Config::server_profile_revision() {
+                            handle_query_onlines(onlines, offlines, revision);
+                        }
+                    }).await
                 }
                 _ => {
                     // unreachable!
@@ -2371,11 +2378,12 @@ pub(super) mod async_tasks {
         Ok(())
     }
 
-    fn handle_query_onlines(onlines: Vec<String>, offlines: Vec<String>) {
+    fn handle_query_onlines(onlines: Vec<String>, offlines: Vec<String>, revision: u64) {
         let data = HashMap::from([
             ("name", "callback_query_onlines".to_owned()),
             ("onlines", onlines.join(",")),
             ("offlines", offlines.join(",")),
+            ("server_profile_revision", revision.to_string()),
         ]);
         let _res = super::push_global_event(
             super::APP_TYPE_MAIN,

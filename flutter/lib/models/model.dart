@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../utils/server_profile_state.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -3439,7 +3440,7 @@ class FFI {
     if (_lastSessionPassword.isNotEmpty) {
       return _lastSessionPassword;
     }
-    final cached = _androidSessionPasswordCache[id];
+    final cached = _androidSessionPasswordCache[ServerProfileState.cacheKey(id)];
     if ((cached ?? '').isNotEmpty) {
       _lastSessionPassword = cached!;
       return cached;
@@ -3458,7 +3459,7 @@ class FFI {
     }
     _lastSessionPassword = password;
     if (peerId.isNotEmpty) {
-      _androidSessionPasswordCache[peerId] = password;
+      _androidSessionPasswordCache[ServerProfileState.cacheKey(peerId)] = password;
     }
   }
 
@@ -3470,7 +3471,7 @@ class FFI {
     _lastSessionOsUsername = osUsername;
     _lastSessionOsPassword = osPassword;
     if (peerId.isNotEmpty) {
-      _androidSessionOsPasswordCache[peerId] =
+      _androidSessionOsPasswordCache[ServerProfileState.cacheKey(peerId)] =
           Tuple2(osUsername, osPassword);
     }
   }
@@ -3479,7 +3480,7 @@ class FFI {
     if (_lastSessionOsUsername.isNotEmpty || _lastSessionOsPassword.isNotEmpty) {
       return;
     }
-    final cached = _androidSessionOsPasswordCache[id];
+    final cached = _androidSessionOsPasswordCache[ServerProfileState.cacheKey(id)];
     if (cached == null) {
       return;
     }

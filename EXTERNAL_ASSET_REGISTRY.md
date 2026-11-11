@@ -1,5 +1,13 @@
 # OpenWorld External Asset Registry
 
+2026-11-12 T001续修：Ubuntu依赖源增加kernel.org和MIT SIPB的HTTPS Ubuntu镜像作为固定后备，主源不可达/索引失败时顺序尝试；包与索引仍须通过系统Ubuntu archive keyring签名和有效期验证，不新增信任密钥。已只读核对服务归属及六套InRelease返回；这不证明GitHub runner网络恢复。产品服务、地址/凭据无变更。详见[续修](docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
+2026-11-12 T-2026-11-12-001：Android Native CI的APT依赖下载由runner mirror+file列表改为Ubuntu官方archive/security HTTPS（jammy与updates/security），使用系统ubuntu-archive-keyring.gpg验证签名；独立源/新索引仅作用于该步骤，包清单及版本工具链不变。PC2四项现有地址编辑纳入源码，实际部署/连通性未验证；没有产品服务或凭据操作。见[构建修复](docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
+2026-11-12提交前：三套端点已有工作区编辑更新，Android=PC1、PC2四项独立且填齐；保留现有值，公共ID Key和客户端既有broker凭据保持。部署归属/服务连通性/对应Android与broker兼容未验证，不能把地址填写等同新增部署完成。用户已授权test提交推送与Actions双端编译，不监控；原条目为初次迁移快照。
+
+2026-11-12 T-2026-11-11-002：现有ID/relay/API/ZEGO Token地址集中迁入`server_profiles.rs`，Android/PC1目标不变，PC2四项按用户要求留空；没有新增已部署服务器、依赖、binary、凭据或外部访问。B部署owner仍为维护者，需准备对应Android及现有broker鉴权合同；[配置与待验边界](docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。
+
 2026-11-07 / T-2026-11-07-001：当前产品包/bundle迁至com.openworld.me、native为openworld。现有外部服务地址/凭据和二进制资产保持；ZEGO旧wire key与构建机旧变量仅保留兼容。新Apple/Google bundle注册、正式证书/profile及客户端真实构建证据尚未取得；没有远端部署或密钥轮换。详见[身份迁移](docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
 
 2026-10-19 T006：按0dbe202同步文档，无新增、下载或替换外部资产。EXT-LIB-ADB-004—007及EXT-BIN-SCRCPY-001保持；视频helper复用固定scrcpy 5.0.1，常驻截图/节点/遮罩helper来自APK。字体使用App内公开SANS_SERIF与系统回退，无外部字体文件。新旧CI入口以[当前构建说明](docs/BUILD_CLIENTS_ACTIONS.md)为准；以下登记保留各时点证据，当前构建/设备结果仍待验证。

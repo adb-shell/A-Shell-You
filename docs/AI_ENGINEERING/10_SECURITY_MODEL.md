@@ -1,5 +1,9 @@
 # OpenWorld 安全模型 / Security Model
 
+## 2026-11-12：配置切换隔离
+
+PC1/PC2为独立信任环境；共用ID公钥不共享API Bearer授权。空闲切换、旧响应revision过滤、账号/设备/保存密码分区，未知/不完整配置拒绝。端点源码属于公开客户端配置，不能放服务私钥或固定RTC Token；现有broker凭据未修改/验证，旧HTTP部署保持既有风险。详见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)与[ADR-0029](../ADR/0029-central-server-profiles.md)。
+
 2026-11-07 T004安全边界：新增客户端`developer_mode`声明用于已认证Android普通会话之间的画面协作策略，密码不入协议/日志。注册在原端点认证后、视频订阅前；未认证请求不能暂停其他连接，普通角色无法通过重复登录升级。画面在Android生产/出队及PC发布多处过滤；语音授权/忙状态保持。固定本地密码和bool角色无法防止修改版已授权客户端伪造，SEC-016继续开放，不把本功能称为服务端特权认证。可抵抗伪造的能力凭证需另立签发/撤销合同。见[ADR-0028](../ADR/0028-developer-screen-priority.md)，V0，攻击/兼容与真机测试未执行。
 
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。

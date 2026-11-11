@@ -96,6 +96,7 @@ async fn start_hbbs_sync_async() {
     loop {
         tokio::select! {
             _ = interval.tick() => {
+                let profile_generation = hbb_common::server_profiles::generation();
                 let url = heartbeat_url();
                 let id = Config::get_id();
                 if url.is_empty() {
@@ -217,6 +218,7 @@ async fn start_hbbs_sync_async() {
                             // When the api doesn't exist, Ok("") will be returned in test.
                             let samever = match crate::post_request(url.replace("heartbeat", "sysinfo_ver"), "".to_owned(), "").await {
                                 Ok(x)  => {
+                                    if profile_generation != hbb_common::server_profiles::generation() { continue; }
                                     sysinfo_ver = x.clone();
                                     *PRO.lock().unwrap() = true;
                                     x == ver
@@ -235,6 +237,7 @@ async fn start_hbbs_sync_async() {
                     }
                     match crate::post_request(url.replace("heartbeat", "sysinfo"), v, "").await {
                         Ok(x)  => {
+                            if profile_generation != hbb_common::server_profiles::generation() { continue; }
                             if x == "SYSINFO_UPDATED" {
                                 info_uploaded = InfoUploaded::uploaded(url.clone(), id.clone(), sys_username);
                                 log::info!("sysinfo updated");
@@ -254,6 +257,7 @@ async fn start_hbbs_sync_async() {
                         }
                     }
                 }
+                if profile_generation != hbb_common::server_profiles::generation() { continue; }
                 if conns.is_empty() && last_sent.map(|x| x.elapsed() < TIME_HEARTBEAT).unwrap_or(false) {
                     continue;
                 }
@@ -268,6 +272,7 @@ async fn start_hbbs_sync_async() {
                 let modified_at = LocalConfig::get_option("strategy_timestamp").parse::<i64>().unwrap_or(0);
                 v["modified_at"] = json!(modified_at);
                 if let Ok(s) = crate::post_request(url.clone(), v.to_string(), "").await {
+                    if profile_generation != hbb_common::server_profiles::generation() { continue; }
                     if let Ok(mut rsp) = serde_json::from_str::<HashMap::<&str, Value>>(&s) {
                         if rsp.remove("sysinfo").is_some() {
                             info_uploaded.uploaded = false;

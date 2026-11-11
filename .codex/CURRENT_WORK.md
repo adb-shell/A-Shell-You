@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261111-001-r2`
-Last Updated：2026-11-11
-Active Task Count：0
+Registry Revision：`WORK-20261112-002-r1`
+Last Updated：2026-11-12
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-无活动任务。文档同步与test→main合并推送已完成；仅补交付回执，不触发或监控编译。
+T-2026-11-12-002 / active / T7：[统一配置合并任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)。main/5d2d2e9合并test/a8abdd4，文档冲突已整合；正在完成V0与Git交付，不编译、不监控。
 
 ## 2. Concurrent Session Rules
 
@@ -25,6 +25,6 @@ Active Task Count：0
 
 ## 4. Last Closed Task
 
-T-2026-11-11-001 / complete / T8（文档与main合并推送）。合并`d58196214f5006da0e26cdce050f5229063f5194`已推送origin/main并核对远端一致；test保持51292c2。版本2.0.26 / 2.0.26+59保持，纳入源码25bc2ce的开发者画面优先。V0身份122项、31份Markdown/351个本地链接及来源/差异检查通过；后续仅补回执文档。
+T-2026-11-12-001 / complete / T8续修交付：test/c788e8d已推送，APT改/tmp沙箱路径与三候选签名镜像，13项离线回归通过；产品源码/配置无增量。Both/常规编译HTTP204受理，不监控且未查询新运行，结果未知；后续只补回执文档。
 
-[详细任务](../docs/tasks/T-2026-11-11-001-docs-main-merge.md) / STATE-20261111-001-r2 / CE-20261111-T001-01/02 / Baseline27。未触发或监控构建，旧test编排最终结果未知；T8不表示编译或真机验收通过。历史任务保留在TASK_HISTORY与CHANGELOG_AI，不继承旧授权或构建结论。
+[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md) / STATE-20261112-001-r6 / CE-20261112-T001-01—06 / D-036 / ADR-0029。真实Linux权限、runner DNS和完整编译仍待证，不将离线检查提升为运行PASS。

@@ -1,5 +1,11 @@
 # OpenWorld API 系统 / API System
 
+2026-11-12 T002续接复查：PC HTTP暂停/超时只作用桌面端，移动端请求及缓存异步调度沿用原流程。ZEGO仍由PC请求双方Token、Android接收callee邀请，不新增Android独立Token请求；签发URL来自当前PC配置，既有鉴权不变。V0 31/31；[详情](15_SERVER_PROFILES.md)。
+
+## 2026-11-12：API与Token配置
+
+API和语音Token URL从`server_profiles.rs`的平台/当前PC配置读取；不再由`.info`或旧option地址覆盖。两套PC服务独立，切换重新登录，账号/Ab/Group/策略时间戳按配置隔离，旧异步结果丢弃；Token broker鉴权和ZEGO字段保持。部署与B鉴权匹配未验证，详见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 接管基线：2026-07-12  

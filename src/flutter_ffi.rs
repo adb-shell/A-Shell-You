@@ -1217,8 +1217,12 @@ fn load_recent_peers(
 }
 
 pub fn main_load_recent_peers() {
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    let _profile_guard = crate::server_profile::CHANGE_LOCK.lock().unwrap();
+    let profile_revision = config::Config::server_profile_revision().to_string();
     let push_to_flutter = |peers, ids| {
         let mut data = HashMap::from([("name", "load_recent_peers".to_owned()), ("peers", peers)]);
+        data.insert("server_profile_revision", profile_revision.clone());
         if let Some(ids) = ids {
             data.insert("ids", ids);
         }
@@ -1270,6 +1274,8 @@ pub fn main_load_recent_peers() {
 }
 
 pub fn main_load_recent_peers_for_ab(filter: String) -> String {
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    let _profile_guard = crate::server_profile::CHANGE_LOCK.lock().unwrap();
     let id_filters = serde_json::from_str::<Vec<String>>(&filter).unwrap_or_default();
     let id_filters = if id_filters.is_empty() {
         None
@@ -1287,8 +1293,12 @@ pub fn main_load_recent_peers_for_ab(filter: String) -> String {
 }
 
 pub fn main_load_fav_peers() {
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    let _profile_guard = crate::server_profile::CHANGE_LOCK.lock().unwrap();
+    let profile_revision = config::Config::server_profile_revision().to_string();
     let push_to_flutter = |peers| {
-        let data = HashMap::from([("name", "load_fav_peers".to_owned()), ("peers", peers)]);
+        let data = HashMap::from([("name", "load_fav_peers".to_owned()), ("peers", peers),
+            ("server_profile_revision", profile_revision.clone())]);
         let _res = flutter::push_global_event(
             flutter::APP_TYPE_MAIN,
             serde_json::ser::to_string(&data).unwrap_or("".to_owned()),
@@ -1549,6 +1559,12 @@ pub fn cm_get_clients_length() -> usize {
 
 pub fn main_init(app_dir: String, custom_client_config: String) {
     initialize(&app_dir, &custom_client_config);
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    {
+        // Synchronize the service's selected profile before Dart creates account models.
+        let _ = crate::ipc::get_options();
+        ui_interface::refresh_options();
+    }
 }
 
 pub fn main_device_id(id: String) {
@@ -1603,12 +1619,20 @@ pub fn main_start_dbus_server() {
 }
 
 pub fn main_save_ab(json: String) {
-    if json.len() > 1024 {
-        std::thread::spawn(|| {
-            config::Ab::store(json);
-        });
-    } else {
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    {
+        // FRB already dispatches this on a worker; PC switching must wait for the write.
+        let _profile_guard = crate::server_profile::CHANGE_LOCK.lock().unwrap();
         config::Ab::store(json);
+    }
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    {
+        // Preserve the existing mobile cache-write scheduling.
+        if json.len() > 1024 {
+            std::thread::spawn(|| { config::Ab::store(json); });
+        } else {
+            config::Ab::store(json);
+        }
     }
 }
 
@@ -1621,12 +1645,20 @@ pub fn main_load_ab() -> String {
 }
 
 pub fn main_save_group(json: String) {
-    if json.len() > 1024 {
-        std::thread::spawn(|| {
-            config::Group::store(json);
-        });
-    } else {
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    {
+        // FRB already dispatches this on a worker; PC switching must wait for the write.
+        let _profile_guard = crate::server_profile::CHANGE_LOCK.lock().unwrap();
         config::Group::store(json);
+    }
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    {
+        // Preserve the existing mobile cache-write scheduling.
+        if json.len() > 1024 {
+            std::thread::spawn(|| { config::Group::store(json); });
+        } else {
+            config::Group::store(json);
+        }
     }
 }
 

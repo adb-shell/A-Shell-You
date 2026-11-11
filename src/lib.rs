@@ -12,6 +12,8 @@ mod server;
 pub use self::server::*;
 mod client;
 mod developer_mode;
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+mod server_profile;
 #[cfg(any(target_os = "android", test))]
 mod screen_policy;
 mod remote_adb;

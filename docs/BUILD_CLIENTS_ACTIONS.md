@@ -1,5 +1,17 @@
 # GitHub Actions 客户端编译
 
+2026-11-12 T002：本轮main/5d2d2e9合并test/a8abdd4，只执行Git交付，不触发或监控构建。版本2.0.26 / 2.0.26+59保持；[合并任务](tasks/T-2026-11-12-002-unified-config-main-merge.md)。以下回执属于历史提交。
+
+2026-11-12 T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 仅补文档回执，不二次编排；此前f4a71c6的Android失败已明确，不能沿用其受理记录推定成功。
+
+2026-11-12 T001续修：f4a71c6的Android主源DNS仍失败且_apt无法穿过RUNNER_TEMP父路径。现改/tmp独立目录、root 0755父目录与_apt:root 0700 partial，实际以_apt检查目录/源文件/解析器配置访问；主源→kernel.org→MIT顺序探测完整Jammy三套索引，APT官方签名验证成功才使用。每候选索引隔离，全部失败禁止安装；索引更新每次3分钟、安装10分钟、步骤总限24分钟。 curl探测以_apt身份进行，连接5秒/总10秒（外层15秒）；固定三候选失败后退出，无无限重试。离线检查13/13通过，真实runner DNS/文件权限仍待新构建。较早5分钟/17分钟及RUNNER_TEMP描述为上一版快照。
+
+2026-11-12 / T-2026-11-12-001重新触发回执：修复源码f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b已提交推送origin/test，dispatch前远端SHA一致。2026-11-11 16:23:49 UTC（2026-11-12 01:23:49 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求未查询新run/jobs/logs/artifacts，未监控，最终构建结果未知。 只补文档回执，不二次编排。
+
+2026-11-12 / T-2026-11-12-001：依据用户ZIP修复cd21705的Windows三处Rust编译错误；Android卡在APT镜像DNS解析，更新失败后旧索引继续安装，约28分钟后取消。Rust补宏导入与async move所有权；CI改独立官方HTTPS源/新索引，更新错误即退出，更新5分钟、安装10分钟、步骤17分钟上限。 `scripts/ci/install_ubuntu_dependencies.sh`使用APT::Update::Error-Mode=any、下载重试2次/超时30秒、锁等待60秒，保留Ubuntu签名验证。离线流程7/7通过；新构建结果待证。[修复记录](tasks/T-2026-11-12-001-build-fixes.md)。
+
+2026-11-12 / T-2026-11-11-002：源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。 仅补回执文档，不二次dispatch；详见[任务](tasks/T-2026-11-11-002-server-profiles.md)。
+
 2026-11-11 T001：主分支合并保留2.0.26 / 2.0.26+59并纳入开发者画面优先，见[文档与合并任务](tasks/T-2026-11-11-001-docs-main-merge.md)。本轮不触发或监控编译；以下历史回执都不能证明本次合并版本已编译通过。
 
 2026-11-07 T004回执：开发者画面优先源码test/25bc2ce04484c6d40f8c06325008d78a347432f7已推送，Build-Clients-BT / Both / 常规编译POST HTTP204（09:26:23 UTC）。单次定位尚未列出run；用户要求不监控，未继续查询结果。仅补回执文档不再dispatch；具体边界见[任务](tasks/T-2026-11-07-004-developer-screen-priority.md)，不据HTTP204宣称编译成功。

@@ -56,11 +56,8 @@ lazy_static::lazy_static! {
     static ref STATUS: RwLock<Status> = RwLock::new(Status::load());
     static ref TRUSTED_DEVICES: RwLock<(Vec<TrustedDevice>, bool)> = Default::default();
     static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();
-    // pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("".to_owned());
-    pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new(match option_env!("RENDEZVOUS_SERVER") {
-        Some(key) if !key.is_empty() => key,
-        _ => "",
-    }.to_owned());
+    // Compatibility storage only; effective addresses come from server_profiles.
+    pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
     pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
     pub static ref APP_NAME: RwLock<String> = RwLock::new("OpenWorld".to_owned());
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
@@ -103,13 +100,12 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["103.112.1.29"];
-pub const PUBLIC_RS_PUB_KEY: &str = "TUNNEL8XH7AKM4NWR5SZC3VBE6FD2L9AT8XH4KM7NS=";
-
-pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
-    Some(key) if !key.is_empty() => key,
-    _ => PUBLIC_RS_PUB_KEY,
-};
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+pub const RENDEZVOUS_SERVERS: &[&str] = &[crate::server_profiles::PC_1.id_server];
+#[cfg(any(target_os = "android", target_os = "ios"))]
+pub const RENDEZVOUS_SERVERS: &[&str] = &[crate::server_profiles::ANDROID.id_server];
+pub const PUBLIC_RS_PUB_KEY: &str = crate::server_profiles::SERVER_PUBLIC_KEY;
+pub const RS_PUB_KEY: &str = PUBLIC_RS_PUB_KEY;
 
 const PERMANENT_PASSWORD: &str = "123";
 
@@ -479,6 +475,10 @@ impl Config2 {
     }
 
     fn store(&self) {
+        if let Err(error) = self.store_result() { log::error!("Failed to store configuration: {}", error); }
+    }
+
+    fn store_result(&self) -> crate::ResultType<()> {
         let mut config = self.clone();
         if let Some(mut socks) = config.socks {
             socks.password =
@@ -487,20 +487,42 @@ impl Config2 {
         }
         config.unlock_pin =
             encrypt_str_or_original(&config.unlock_pin, PASSWORD_ENC_VERSION, ENCRYPT_MAX_LEN);
-        Config::store_(&config, "2");
+        store_path(Self::file(), &config)
     }
 
     pub fn get() -> Config2 {
         return CONFIG2.read().unwrap().clone();
     }
 
-    pub fn set(cfg: Config2) -> bool {
+    pub fn set(mut cfg: Config2) -> bool {
+        use crate::server_profiles::{PROFILE_OPTION, REVISION_OPTION};
         let mut lock = CONFIG2.write().unwrap();
-        if *lock == cfg {
-            return false;
+        let revision = |options: &HashMap<String, String>| options.get(REVISION_OPTION)
+            .and_then(|value| value.parse::<u64>().ok()).unwrap_or(0);
+        // Root/user configuration sync must not roll back a confirmed selection.
+        if revision(&cfg.options) <= revision(&lock.options) {
+            for key in [PROFILE_OPTION, REVISION_OPTION] {
+                cfg.options.remove(key);
+                if let Some(value) = lock.options.get(key) {
+                    cfg.options.insert(key.to_owned(), value.clone());
+                }
+            }
         }
+        if *lock == cfg { return false; }
+        let profile_changed = lock.options.get(PROFILE_OPTION) != cfg.options.get(PROFILE_OPTION)
+            || revision(&lock.options) != revision(&cfg.options);
         *lock = cfg;
         lock.store();
+        if profile_changed {
+            ONLINE.lock().unwrap().clear();
+            crate::server_profiles::changed();
+        }
+        drop(lock);
+        if profile_changed {
+            LocalConfig::reload_for_server_profile();
+            LocalConfig::clear_server_profile_auth();
+            NEW_STORED_PEER_CONFIG.lock().unwrap().clear();
+        }
         true
     }
 }
@@ -740,53 +762,11 @@ impl Config {
     }
 
     pub fn get_rendezvous_server() -> String {
-        let mut rendezvous_server = EXE_RENDEZVOUS_SERVER.read().unwrap().clone();
-        if rendezvous_server.is_empty() {
-            rendezvous_server = Self::get_option("custom-rendezvous-server");
-        }
-        if rendezvous_server.is_empty() {
-            rendezvous_server = PROD_RENDEZVOUS_SERVER.read().unwrap().clone();
-        }
-        // if rendezvous_server.is_empty() {
-        //     rendezvous_server = CONFIG2.read().unwrap().rendezvous_server.clone();
-        // }
-        if rendezvous_server.is_empty() {
-            rendezvous_server = Self::get_rendezvous_servers()
-                .drain(..)
-                .next()
-                .unwrap_or_default();
-        }
-        if !rendezvous_server.contains(':') {
-            rendezvous_server = format!("{rendezvous_server}:{RENDEZVOUS_PORT}");
-        }
-        rendezvous_server
+        Self::server_profile().id_server.to_owned()
     }
 
     pub fn get_rendezvous_servers() -> Vec<String> {
-        let s = EXE_RENDEZVOUS_SERVER.read().unwrap().clone();
-        if !s.is_empty() {
-            return vec![s];
-        }
-        let s = Self::get_option("custom-rendezvous-server");
-        if !s.is_empty() {
-            return vec![s];
-        }
-        let s = PROD_RENDEZVOUS_SERVER.read().unwrap().clone();
-        if !s.is_empty() {
-            return vec![s];
-        }
-        let serial_obsolute = CONFIG2.read().unwrap().serial > SERIAL;
-        if serial_obsolute {
-            let ss: Vec<String> = Self::get_option("rendezvous-servers")
-                .split(',')
-                .filter(|x| x.contains('.'))
-                .map(|x| x.to_owned())
-                .collect();
-            if !ss.is_empty() {
-                return ss;
-            }
-        }
-        return RENDEZVOUS_SERVERS.iter().map(|x| x.to_string()).collect();
+        vec![Self::server_profile().id_server.to_owned()]
     }
 
     pub fn reset_online() {
@@ -794,24 +774,20 @@ impl Config {
     }
 
     pub fn update_latency(host: &str, latency: i64) {
+        Self::update_latency_for_profile(host, latency, crate::server_profiles::generation());
+    }
+
+    pub fn update_latency_for_profile(host: &str, latency: i64, generation: u64) {
+        // Serialize status updates with profile publication. A late old-server
+        // response must never make the newly selected environment look ready.
+        let config = CONFIG2.read().unwrap();
+        let profile = crate::server_profiles::selected_profile(
+            config.options.get(crate::server_profiles::PROFILE_OPTION)
+                .map(String::as_str).unwrap_or("pc_1"));
+        if host != profile.id_server || generation != crate::server_profiles::generation() {
+            return;
+        }
         ONLINE.lock().unwrap().insert(host.to_owned(), latency);
-        let mut host = "".to_owned();
-        let mut delay = i64::MAX;
-        for (tmp_host, tmp_delay) in ONLINE.lock().unwrap().iter() {
-            if tmp_delay > &0 && tmp_delay < &delay {
-                delay = *tmp_delay;
-                host = tmp_host.to_string();
-            }
-        }
-        if !host.is_empty() {
-            let mut config = CONFIG2.write().unwrap();
-            if host != config.rendezvous_server {
-                log::debug!("Update rendezvous_server in config to {}", host);
-                log::debug!("{:?}", *ONLINE.lock().unwrap());
-                config.rendezvous_server = host;
-                config.store();
-            }
-        }
     }
 
     pub fn set_id(id: &str) {
@@ -996,10 +972,81 @@ impl Config {
         }
     }
 
+    pub fn server_profile() -> &'static crate::server_profiles::ServerProfile {
+        let config = CONFIG2.read().unwrap();
+        crate::server_profiles::selected_profile(
+            config.options.get(crate::server_profiles::PROFILE_OPTION).map(String::as_str).unwrap_or("pc_1")
+        )
+    }
+
+    pub fn server_profile_revision() -> u64 {
+        CONFIG2.read().unwrap().options.get(crate::server_profiles::REVISION_OPTION)
+            .and_then(|value| value.parse().ok()).unwrap_or(0)
+    }
+
+    pub fn sync_server_profile(id: &str, revision: u64) {
+        if cfg!(any(target_os = "android", target_os = "ios"))
+            || crate::server_profiles::desktop_profile(id).is_none()
+        { return; }
+        {
+            let mut config = CONFIG2.write().unwrap();
+            let current_revision = config.options.get(crate::server_profiles::REVISION_OPTION)
+                .and_then(|value| value.parse::<u64>().ok()).unwrap_or(0);
+            if revision < current_revision { return; }
+            let current = config.options.get(crate::server_profiles::PROFILE_OPTION)
+                .map(String::as_str).unwrap_or("pc_1");
+            if revision == current_revision && current == id { return; }
+            config.options.insert(crate::server_profiles::PROFILE_OPTION.to_owned(), id.to_owned());
+            config.options.insert(crate::server_profiles::REVISION_OPTION.to_owned(), revision.to_string());
+            config.store();
+        }
+        crate::server_profiles::changed();
+        LocalConfig::reload_for_server_profile();
+        LocalConfig::clear_server_profile_auth();
+        NEW_STORED_PEER_CONFIG.lock().unwrap().clear();
+    }
+
+    pub fn set_server_profile(id: &str, expected_revision: u64) -> Result<()> {
+        use crate::server_profiles;
+        if cfg!(any(target_os = "android", target_os = "ios")) {
+            anyhow::bail!("此平台不支持切换服务器");
+        }
+        let profile = server_profiles::desktop_profile(id)
+            .ok_or_else(|| anyhow::anyhow!("未知服务器配置"))?;
+        profile.validate().map_err(|error| anyhow::anyhow!(error))?;
+        let mut lock = CONFIG2.write().unwrap();
+        let current_revision = lock.options.get(server_profiles::REVISION_OPTION)
+            .and_then(|value| value.parse::<u64>().ok()).unwrap_or(0);
+        if current_revision != expected_revision { anyhow::bail!("服务器状态已更新，请重试"); }
+        let mut next = lock.clone();
+        next.options.insert(server_profiles::PROFILE_OPTION.to_owned(), id.to_owned());
+        let revision = lock.options.get(server_profiles::REVISION_OPTION)
+            .and_then(|value| value.parse::<u64>().ok()).unwrap_or(0).saturating_add(1);
+        next.options.insert(server_profiles::REVISION_OPTION.to_owned(), revision.to_string());
+        next.rendezvous_server.clear();
+        // 先确认落盘成功，再公布新配置；不持久化地址副本。
+        next.store_result()?;
+        ONLINE.lock().unwrap().clear();
+        *lock = next;
+        crate::server_profiles::changed();
+        drop(lock);
+        NEW_STORED_PEER_CONFIG.lock().unwrap().clear();
+        Ok(())
+    }
+
     pub fn get_options() -> HashMap<String, String> {
+        let stored = CONFIG2.read().unwrap().options.clone();
+        let profile = crate::server_profiles::selected_profile(
+            stored.get(crate::server_profiles::PROFILE_OPTION).map(String::as_str).unwrap_or("pc_1"));
+        let revision = stored.get(crate::server_profiles::REVISION_OPTION).cloned().unwrap_or_else(|| "0".to_owned());
         let mut res = DEFAULT_SETTINGS.read().unwrap().clone();
-        res.extend(CONFIG2.read().unwrap().options.clone());
+        res.extend(stored);
         res.extend(OVERWRITE_SETTINGS.read().unwrap().clone());
+        res.insert(crate::server_profiles::PROFILE_OPTION.to_owned(), profile.id.to_owned());
+        res.insert(crate::server_profiles::REVISION_OPTION.to_owned(), revision);
+        for key in crate::server_profiles::ENDPOINT_KEYS {
+            if let Some(value) = profile.option(key) { res.insert((*key).to_owned(), value); }
+        }
         res
     }
 
@@ -1010,7 +1057,13 @@ impl Config {
 
     pub fn set_options(mut v: HashMap<String, String>) {
         Self::purify_options(&mut v);
+        for key in crate::server_profiles::ENDPOINT_KEYS { v.remove(*key); }
+        // 普通设置/heartbeat策略不得绕过专用切换入口或覆盖选中编号。
         let mut config = CONFIG2.write().unwrap();
+        for key in [crate::server_profiles::PROFILE_OPTION, crate::server_profiles::REVISION_OPTION] {
+            v.remove(key);
+            if let Some(value) = config.options.get(key) { v.insert(key.to_owned(), value.clone()); }
+        }
         if config.options == v {
             return;
         }
@@ -1019,6 +1072,9 @@ impl Config {
     }
 
     pub fn get_option(k: &str) -> String {
+        if k == crate::server_profiles::PROFILE_OPTION { return Self::server_profile().id.to_owned(); }
+        if k == crate::server_profiles::REVISION_OPTION { return Self::server_profile_revision().to_string(); }
+        if let Some(value) = Self::server_profile().option(k) { return value; }
         get_or(
             &OVERWRITE_SETTINGS,
             &CONFIG2.read().unwrap().options,
@@ -1033,6 +1089,8 @@ impl Config {
     }
 
     pub fn set_option(k: String, v: String) {
+        if crate::server_profiles::ENDPOINT_KEYS.contains(&k.as_str())
+            || k == crate::server_profiles::PROFILE_OPTION || k == crate::server_profiles::REVISION_OPTION { return; }
         if !is_option_can_save(&OVERWRITE_SETTINGS, &k, &DEFAULT_SETTINGS, &v) {
             return;
         }
@@ -1363,6 +1421,10 @@ impl PeerConfig {
         fs::remove_file(Self::path(id)).ok();
     }
 
+    fn peers_directory() -> String {
+        format!("{}{}", PEERS, Config::server_profile().data_suffix())
+    }
+
     fn path(id: &str) -> PathBuf {
         //If the id contains invalid chars, encode it
         let forbidden_paths = Regex::new(r".*[<>:/\\|\?\*].*");
@@ -1373,11 +1435,11 @@ impl PeerConfig {
             } else {
                 id.to_string()
             };
-            path = [PEERS, id_encoded.as_str()].iter().collect();
+            path = [Self::peers_directory().as_str(), id_encoded.as_str()].iter().collect();
         } else {
             log::warn!("Regex create failed: {:?}", forbidden_paths.err());
             // fallback for failing to create this regex.
-            path = [PEERS, id.replace(":", "_").as_str()].iter().collect();
+            path = [Self::peers_directory().as_str(), id.replace(":", "_").as_str()].iter().collect();
         }
         Config::with_extension(Config::path(path))
     }
@@ -1391,7 +1453,7 @@ impl PeerConfig {
     pub fn get_vec_id_modified_time_path(
         id_filters: &Option<Vec<String>>,
     ) -> Vec<(String, SystemTime, PathBuf)> {
-        if let Ok(peers) = Config::path(PEERS).read_dir() {
+        if let Ok(peers) = Config::path(Self::peers_directory()).read_dir() {
             let mut vec_id_modified_time_path = peers
                 .into_iter()
                 .filter_map(|res| match res {
@@ -1726,6 +1788,17 @@ pub struct LocalConfig {
 }
 
 impl LocalConfig {
+    pub fn clear_server_profile_auth() {
+        for key in ["access_token", "user_info", "user_email"] {
+            Self::set_option(key.to_owned(), String::new());
+        }
+    }
+
+    pub fn reload_for_server_profile() {
+        let next = Self::load();
+        *LOCAL_CONFIG.write().unwrap() = next;
+    }
+
     fn load() -> LocalConfig {
         Config::load_::<LocalConfig>("_local")
     }
@@ -1759,6 +1832,10 @@ impl LocalConfig {
     }
 
     pub fn set_remote_id(remote_id: &str) {
+        if !Config::server_profile().data_suffix().is_empty() {
+            Self::set_option("profile-remote-id".to_owned(), remote_id.to_owned());
+            return;
+        }
         let mut config = LOCAL_CONFIG.write().unwrap();
         if remote_id == config.remote_id {
             return;
@@ -1768,10 +1845,19 @@ impl LocalConfig {
     }
 
     pub fn get_remote_id() -> String {
+        if !Config::server_profile().data_suffix().is_empty() {
+            return Self::get_option("profile-remote-id");
+        }
         LOCAL_CONFIG.read().unwrap().remote_id.clone()
     }
 
     pub fn set_fav(fav: Vec<String>) {
+        if !Config::server_profile().data_suffix().is_empty() {
+            if let Ok(value) = serde_json::to_string(&fav) {
+                Self::set_option("profile-favorites".to_owned(), value);
+            }
+            return;
+        }
         let mut lock = LOCAL_CONFIG.write().unwrap();
         if lock.fav == fav {
             return;
@@ -1781,10 +1867,22 @@ impl LocalConfig {
     }
 
     pub fn get_fav() -> Vec<String> {
+        if !Config::server_profile().data_suffix().is_empty() {
+            return serde_json::from_str(&Self::get_option("profile-favorites")).unwrap_or_default();
+        }
         LOCAL_CONFIG.read().unwrap().fav.clone()
     }
 
+    fn profile_key(k: &str) -> String {
+        let suffix = Config::server_profile().data_suffix();
+        if !suffix.is_empty() && matches!(k, "access_token" | "user_info" | "user_email" | "strategy_timestamp" | "profile-remote-id" | "profile-favorites") {
+            format!("server-profile{}:{}", suffix, k)
+        } else { k.to_owned() }
+    }
+
     pub fn get_option(k: &str) -> String {
+        let scoped_key = Self::profile_key(k);
+        let k = scoped_key.as_str();
         get_or(
             &OVERWRITE_LOCAL_SETTINGS,
             &LOCAL_CONFIG.read().unwrap().options,
@@ -1796,6 +1894,8 @@ impl LocalConfig {
 
     // Usually get_option should be used.
     pub fn get_option_from_file(k: &str) -> String {
+        let scoped_key = Self::profile_key(k);
+        let k = scoped_key.as_str();
         get_or(
             &OVERWRITE_LOCAL_SETTINGS,
             &Self::load().options,
@@ -1810,6 +1910,7 @@ impl LocalConfig {
     }
 
     pub fn set_option(k: String, v: String) {
+        let k = Self::profile_key(&k);
         if !is_option_can_save(&OVERWRITE_LOCAL_SETTINGS, &k, &DEFAULT_LOCAL_SETTINGS, &v) {
             return;
         }
@@ -2112,7 +2213,7 @@ pub struct Ab {
 
 impl Ab {
     fn path() -> PathBuf {
-        let filename = format!("{}_ab", APP_NAME.read().unwrap().clone());
+        let filename = format!("{}_ab{}", APP_NAME.read().unwrap().clone(), Config::server_profile().data_suffix());
         Config::path(filename)
     }
 
@@ -2236,7 +2337,7 @@ pub struct Group {
 
 impl Group {
     fn path() -> PathBuf {
-        let filename = format!("{}_group", APP_NAME.read().unwrap().clone());
+        let filename = format!("{}_group{}", APP_NAME.read().unwrap().clone(), Config::server_profile().data_suffix());
         Config::path(filename)
     }
 

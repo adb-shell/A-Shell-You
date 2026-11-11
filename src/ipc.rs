@@ -222,8 +222,11 @@ pub enum Data {
     SAS,
     UserSid(Option<u32>),
     OnlineStatus(Option<(i64, bool)>),
+    ServerProfileStatus(Option<(i64, bool, u64)>),
     Config((String, Option<String>)),
     Options(Option<HashMap<String, String>>),
+    // Local desktop IPC only. None requests a switch; Some carries its result.
+    ServerProfile { id: String, revision: u64, error: Option<String> },
     NatType(Option<i32>),
     ConfirmedKey(Option<(Vec<u8>, Vec<u8>)>),
     RawMessage(Vec<u8>),
@@ -453,6 +456,14 @@ async fn handle(data: Data, stream: &mut Connection) {
             let confirmed = Config::get_key_confirmed();
             allow_err!(stream.send(&Data::OnlineStatus(Some((x, confirmed)))).await);
         }
+        Data::ServerProfileStatus(_) => {
+            let revision = Config::server_profile_revision();
+            let x = config::get_online_state();
+            let confirmed = Config::get_key_confirmed();
+            if revision == Config::server_profile_revision() {
+                allow_err!(stream.send(&Data::ServerProfileStatus(Some((x, confirmed, revision)))).await);
+            }
+        }
         Data::ConfirmedKey(None) => {
             let out = if Config::get_key_confirmed() {
                 Some(Config::get_key_pair())
@@ -558,6 +569,26 @@ async fn handle(data: Data, stream: &mut Connection) {
                 log::info!("{} updated", name);
             }
         },
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
+        Data::ServerProfile { id, revision, error: None } => {
+            let result = if !crate::updater::has_no_active_conns() {
+                Err(hbb_common::anyhow::anyhow!("请先结束所有活动连接"))
+            } else {
+                Config::set_server_profile(&id, revision)
+            };
+            if result.is_ok() {
+                config::LocalConfig::reload_for_server_profile();
+                config::LocalConfig::clear_server_profile_auth();
+                crate::common::LOGIN_USERNAME.lock().unwrap().clear();
+                Config::reset_online();
+                Config::set_key_confirmed(false);
+                RendezvousMediator::restart();
+            }
+            let error = result.err().map(|error| error.to_string()).unwrap_or_default();
+            allow_err!(stream.send(&Data::ServerProfile {
+                id: Config::server_profile().id.to_owned(), revision: Config::server_profile_revision(), error: Some(error),
+            }).await);
+        }
         Data::Options(value) => match value {
             None => {
                 let v = Config::get_options();
@@ -1086,24 +1117,20 @@ pub fn get_id() -> String {
     }
 }
 
-pub async fn get_rendezvous_server(ms_timeout: u64) -> (String, Vec<String>) {
-    if let Ok(Some(v)) = get_config_async("rendezvous_server", ms_timeout).await {
-        let mut urls = v.split(",");
-        let a = urls.next().unwrap_or_default().to_owned();
-        let b: Vec<String> = urls.map(|x| x.to_owned()).collect();
-        (a, b)
-    } else {
-        (
-            Config::get_rendezvous_server(),
-            Config::get_rendezvous_servers(),
-        )
-    }
+pub async fn get_rendezvous_server(_ms_timeout: u64) -> (String, Vec<String>) {
+    (Config::get_rendezvous_server(), Config::get_rendezvous_servers())
 }
 
 async fn get_options_(ms_timeout: u64) -> ResultType<HashMap<String, String>> {
     let mut c = connect(ms_timeout, "").await?;
     c.send(&Data::Options(None)).await?;
     if let Some(Data::Options(Some(value))) = c.next_timeout(ms_timeout).await? {
+        if let Some(id) = value.get(hbb_common::server_profiles::PROFILE_OPTION) {
+            let revision = value.get(hbb_common::server_profiles::REVISION_OPTION)
+                .and_then(|value| value.parse().ok()).unwrap_or(0);
+            if revision < Config::server_profile_revision() { return Ok(Config::get_options()); }
+            Config::sync_server_profile(id, revision);
+        }
         Config::set_options(value.clone());
         Ok(value)
     } else {
@@ -1150,6 +1177,28 @@ pub async fn set_options(value: HashMap<String, String>) -> ResultType<()> {
     Ok(())
 }
 
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[tokio::main(flavor = "current_thread")]
+pub async fn switch_server_profile(id: &str) -> ResultType<()> {
+    let mut connection = connect(1000, "").await
+        .map_err(|_| hbb_common::anyhow::anyhow!("无法连接本机后台服务，配置未切换"))?;
+    connection.send(&Data::ServerProfile { id: id.to_owned(), revision: Config::server_profile_revision(), error: None }).await?;
+    match connection.next_timeout(5000).await {
+        Ok(Some(Data::ServerProfile { id: active, revision, error: Some(error) })) => {
+            // A reply is authoritative even if the requested switch was rejected.
+            Config::sync_server_profile(&active, revision);
+            if !error.is_empty() { bail!(error); }
+            if active != id { bail!("后台服务未应用所选配置"); }
+            Ok(())
+        }
+        _ => {
+            let _ = get_options_(1000).await;
+            if Config::server_profile().id == id { return Ok(()); }
+            bail!("未收到后台服务确认，请等待状态刷新后重试")
+        },
+    }
+}
+
 #[inline]
 async fn get_nat_type_(ms_timeout: u64) -> ResultType<i32> {
     let mut c = connect(ms_timeout, "").await?;
@@ -1168,11 +1217,8 @@ pub async fn get_nat_type(ms_timeout: u64) -> i32 {
         .unwrap_or(Config::get_nat_type())
 }
 
-pub async fn get_rendezvous_servers(ms_timeout: u64) -> Vec<String> {
-    if let Ok(Some(v)) = get_config_async("rendezvous_servers", ms_timeout).await {
-        return v.split(',').map(|x| x.to_owned()).collect();
-    }
-    return Config::get_rendezvous_servers();
+pub async fn get_rendezvous_servers(_ms_timeout: u64) -> Vec<String> {
+    Config::get_rendezvous_servers()
 }
 
 #[inline]

@@ -1,6 +1,8 @@
 # OpenWorld Architecture Decision Records
 
-当前：[ADR-0028 开发者画面优先](0028-developer-screen-priority.md)，D-035 / T-2026-11-07-004；功能源码25bc2ce已推送test，现纳入[main合并基线](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)。本轮沿用该决定，V0，历史编排结果未知，多PC/语音验收待证。
+当前：[ADR-0029：集中端点与PC服务器配置切换](0029-central-server-profiles.md)，D-036；实现与编译修复来自test/a8abdd4，本轮纳入main，正式运行验证待证。
+
+同时沿用：[ADR-0028 开发者画面优先](0028-developer-screen-priority.md)，D-035 / T-2026-11-07-004；功能源码25bc2ce已推送test，现纳入[main合并基线](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)。本轮沿用该决定，V0，历史编排结果未知，多PC/语音验收待证。
 
 当前产品身份：[ADR-0027 开放世界产品身份](0027-openworld-product-identity.md)，D-034 / T-2026-11-07-001。替代ADR-0014的当前命名；以下日期记录保持历史含义。
 

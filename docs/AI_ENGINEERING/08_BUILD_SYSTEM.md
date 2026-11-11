@@ -1,6 +1,22 @@
 # OpenWorld 构建系统 / Build System
 
-当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
+当前整合输入为main/5d2d2e9与test/a8abdd4，见[Baseline28](../BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)及[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。保留Rust/portable 2.0.26、Flutter 2.0.26+59与OpenWorld产品身份，纳入服务器配置、PC切换及编译/CI修复。本轮只合并推送；历史编排受理及离线检查不能证明合并后编译或运行通过。
+
+2026-11-12 T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 仅补文档回执，不二次编排；此前f4a71c6的Android失败已明确，不能沿用其受理记录推定成功。
+
+2026-11-12 T001续修：f4a71c6的Android主源DNS仍失败且_apt无法穿过RUNNER_TEMP父路径。现改/tmp独立目录、root 0755父目录与_apt:root 0700 partial，实际以_apt检查目录/源文件/解析器配置访问；主源→kernel.org→MIT顺序探测完整Jammy三套索引，APT官方签名验证成功才使用。每候选索引隔离，全部失败禁止安装；索引更新每次3分钟、安装10分钟、步骤总限24分钟。 curl探测以_apt身份进行，连接5秒/总10秒（外层15秒）；固定三候选失败后退出，无无限重试。离线检查13/13通过，真实runner DNS/文件权限仍待新构建。较早5分钟/17分钟及RUNNER_TEMP描述为上一版快照。
+
+2026-11-12 / T-2026-11-12-001重新触发回执：修复源码f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b已提交推送origin/test，dispatch前远端SHA一致。2026-11-11 16:23:49 UTC（2026-11-12 01:23:49 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求未查询新run/jobs/logs/artifacts，未监控，最终构建结果未知。 只补文档回执，不二次编排。
+
+2026-11-12 / T-2026-11-12-001：依据用户ZIP修复cd21705的Windows三处Rust编译错误；Android卡在APT镜像DNS解析，更新失败后旧索引继续安装，约28分钟后取消。Rust补宏导入与async move所有权；CI改独立官方HTTPS源/新索引，更新错误即退出，更新5分钟、安装10分钟、步骤17分钟上限。 `scripts/ci/install_ubuntu_dependencies.sh`使用APT::Update::Error-Mode=any、下载重试2次/超时30秒、锁等待60秒，保留Ubuntu签名验证。离线流程7/7通过；新构建结果待证。[修复记录](../tasks/T-2026-11-12-001-build-fixes.md)。
+
+2026-11-12 / T-2026-11-11-002：源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。 仅补回执文档，不二次dispatch；详见[任务](../tasks/T-2026-11-11-002-server-profiles.md)。
+
+## 2026-11-12：服务器地址编译输入
+
+地址唯一输入改为`libs/hbb_common/src/server_profiles.rs`；`.info`保留为`build.cmd`兼容文件但不再含API/ID端点。旧环境变量/文件名端点覆盖不改变有效地址；修改配置需重新编译，构建脚本、版本、锁文件保持。当前仅V0，无本轮构建结果；命令和环境见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)。
+
+2026-11-07 T004：源码test/25bc2ce已推送并触发唯一BT工作流，Platform=Both、BuildMode=常规编译，HTTP204；沿用既有临时测试签名和Actions产物。用户要求不监控，单次定位尚无run，最终编译/产物未验证；无工作流、依赖或版本变更。后续文档提交不重复编排，详见[任务回执](../tasks/T-2026-11-07-004-developer-screen-priority.md)。
 
 唯一手动CI为Build-Clients-BT，正式Windows/Android本地入口不变。2026-11-07 T004为源码test/25bc2ce请求Platform=Both、BuildMode=常规编译，HTTP204；沿用既有临时测试签名和Actions产物。用户要求不监控，单次定位尚无run，最终产物未验证。该旧test版本回执不能证明当前main的2.0.26整合版本已编译；本轮不再次编排。详见[历史任务回执](../tasks/T-2026-11-07-004-developer-screen-priority.md)和[Actions说明](../BUILD_CLIENTS_ACTIONS.md)。
 

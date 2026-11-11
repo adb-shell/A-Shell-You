@@ -1,8 +1,36 @@
 # OpenWorld Project Memory
 
-最后更新：2026-11-11。用途：当前会话恢复入口，不替代源码。
+最后更新：2026-11-12。用途：当前会话恢复入口，不替代源码。
 
 ## 0. 当前恢复基线
+
+[Baseline28](../docs/BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)整合main/5d2d2e9与test/a8abdd4：保留2.0.26 / 2.0.26+59及产品身份，纳入集中服务器配置、PC切换和编译/CI修复。`server_profiles.rs`完全保留test最新配置，Android与PC1当前不同，历史相同/留空描述仅为当时快照。
+
+当前[T002合并任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)为active/T7，STATE、WORK-20261112-002-r1 / CE-20261112-T002-01。只合并推送，不编译或监控；c788e8d双端编排结果未知，V0不能提升为运行PASS。优先核对HEAD/status、[PROJECT_STATE](PROJECT_STATE.md)及[CURRENT_WORK](CURRENT_WORK.md)。
+
+### 历史恢复记录（按原观察时点保留）
+
+2026-11-12 / T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 T8仅指定交付范围；13项离线检查通过，真实runner验证未取得。STATE、WORK-20261112-001-r6 / CE-20261112-T001-04—06；补回执不二次编排。
+
+2026-11-12 T001续修：f4a71c6的Android主源DNS仍失败且_apt无法穿过RUNNER_TEMP父路径。现改/tmp独立目录、root 0755父目录与_apt:root 0700 partial，实际以_apt检查目录/源文件/解析器配置访问；主源→kernel.org→MIT顺序探测完整Jammy三套索引，APT官方签名验证成功才使用。每候选索引隔离，全部失败禁止安装；索引更新每次3分钟、安装10分钟、步骤总限24分钟。 13项离线回归与Bash语法通过，实际runner权限/DNS/签名验证待证；当前T7待test提交推送及Both/常规编译，不监控。STATE、WORK-20261112-001-r5 / CE-20261112-T001-04/05；[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
+2026-11-12 / T-2026-11-12-001交付：修复源码f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b已提交推送origin/test，dispatch前远端SHA一致。2026-11-11 16:23:49 UTC（2026-11-12 01:23:49 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求未查询新run/jobs/logs/artifacts，未监控，最终构建结果未知。 T8仅指定交付范围；Bash语法/离线流程7/7通过，真实构建待证。STATE、WORK-20261112-001-r3 / CE-20261112-T001-01—03；补回执文档不二次触发。
+
+2026-11-12 / T-2026-11-12-001：依据用户ZIP修复cd21705的Windows三处Rust编译错误；Android卡在APT镜像DNS解析，更新失败后旧索引继续安装，约28分钟后取消。Rust补宏导入与async move所有权；CI改独立官方HTTPS源/新索引，更新错误即退出，更新5分钟、安装10分钟、步骤17分钟上限。 Bash语法与7/7离线命令桩流程检查通过（成功、更新失败/超时、安装失败/超时、空包参数、缺少RUNNER_TEMP），未调用真实sudo/APT/网络。工作流仅替换依赖安装入口并加步骤时限，包清单、其他jobs、工具链、签名、权限保持；diff通过。YAML解析器与Rust/Flutter工具链缺失，采用精确工作流差异/缩进和Rust所有权复核，不能记作完整编译PASS。 当前active/T7，待提交test并触发双端常规编译，不监控；STATE、WORK-20261112-001-r2 / CE-20261112-T001-01/02。PC2现有四项地址更新一并保留，Android/PC1与共享Key保持。
+
+最后更新：2026-11-12。用途：当前会话恢复入口，不替代源码。
+
+### test服务器配置实施快照
+
+T-2026-11-11-002源码cd2170512613291d48709bc5ec9e393c8feb42e8已推送origin/test，后续仅补回执文档；输入Baseline26，test版本5.2.1/5.2.1+59保持。服务器地址唯一入口`libs/hbb_common/src/server_profiles.rs`：现有编辑已填齐三套四项地址，Android与PC1相同、PC2独立，空闲经后台确认后切换，独立账号/peer缓存。见[15_SERVER_PROFILES](../docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。
+
+STATE、WORK-20261111-002-r5 / CE-20261111-T002-01—05 / D-036 / ADR-0029；首轮V0 27/27、续接31/31及diff通过，六项相关单测/联调NOT_RUN，complete/T8仅本次交付范围。已推送test并触发双端常规编译，HTTP204受理；用户要求不监控，未查询run/jobs/logs/artifacts，构建结果未知。历史任务和编译回执只供追溯。
+
+原PC双密码/开发者画面优先与Android采集/ADB/ZEGO合同保持，见ADR-0028；不把历史构建HTTP204当本轮证据。先核对HEAD/status与[PROJECT_STATE](PROJECT_STATE.md)、[CURRENT_WORK](CURRENT_WORK.md)。
+
+最后更新：2026-11-11。用途：当前会话恢复入口，不替代源码。
+
+### main既有版本与功能快照
 
 当前恢复基线为[Baseline27](../docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)：main/9040c53版本2.0.26 / Flutter2.0.26+59，加上test/51292c2（功能源码25bc2ce）的开发者画面优先。T-2026-11-11-001已完成文档同步及main合并推送，合并提交`d58196214f5006da0e26cdce050f5229063f5194`与远端核对一致，test保持51292c2；后续仅补回执文档，准确交付回执见[当前任务](../docs/tasks/T-2026-11-11-001-docs-main-merge.md)。STATE/WORK-20261111-001-r2 / CE-20261111-T001-01/02。
 

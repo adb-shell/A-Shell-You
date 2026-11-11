@@ -1,6 +1,6 @@
 # AGENTS.md — 开放世界 / OpenWorld v2.0.26
 
-当前主分支合并基线由 main/9040c53 的版本配置与 test/51292c2 的开发者画面优先实现组成；产品身份为“开放世界 / OpenWorld / openworld / com.openworld.me”，Rust/portable 2.0.26、Flutter 2.0.26+59，构建号59保持。见[Baseline27](docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)、[当前任务](docs/tasks/T-2026-11-11-001-docs-main-merge.md)和[当前状态](.codex/PROJECT_STATE.md)。本轮更新文档并合并推送main，不执行编译或监控；此前源码25bc2ce的Both/常规编译仅有HTTP204受理记录，最终结果未知，四项策略单测及真机验证仍待证。
+当前主分支合并输入为main/5d2d2e9与test/a8abdd4：保留Rust/portable 2.0.26、Flutter 2.0.26+59，纳入集中服务器配置、PC空闲切换、Windows编译修复与Android APT续修。三套地址以test最新源码为准，Android与PC1分别配置，共用ID公钥。见[Baseline28](docs/BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)、[当前任务](docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)及[当前状态](.codex/PROJECT_STATE.md)。本轮仅合并推送，不触发或监控编译；此前c788e8d双端编排仅有HTTP204受理，最终结果未知。
 
 PC主窗口Ctrl+Shift+H双密码验证保持；成功后增加进程native模式，新建/重连携带角色。Android有已认证开发者连接时，普通连接暂停普通/截图/ADB画面及盲输入/采集控制，保留会话与ZEGO；最后开发者离开恢复。角色是协作声明而非抗伪造凭证，见ADR-0028。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 

@@ -117,7 +117,7 @@ PC voice button
 默认接口：
 
 ```text
-POST http://103.112.1.29:10053
+POST http://216.236.63.58:10053
 Authorization: Bearer <VOICE_API_KEY>
 Content-Type: application/json
 ```
@@ -125,10 +125,10 @@ Content-Type: application/json
 当前部署方式：
 
 ```text
-PC/controller -> http://103.112.1.29:10053 -> openworld-zego-token
+PC/controller -> http://216.236.63.58:10053 -> openworld-zego-token
 ```
 
-当前 PC/controller 直接访问 `http://103.112.1.29:10053`，由当前服务器上的 Token 服务直接处理，不再反向代理到任何上游域名。服务端必须兼容当前 PC 请求的 `POST /`，同时保留标准路径 `POST /api/v1/voice-call/create` 供运维测试。
+当前 PC/controller 直接访问 `http://216.236.63.58:10053`，由当前服务器上的 Token 服务直接处理，不再反向代理到任何上游域名。服务端必须兼容当前 PC 请求的 `POST /`，同时保留标准路径 `POST /api/v1/voice-call/create` 供运维测试。
 
 Security note: current PC endpoint uses plain HTTP, so the Bearer key is visible to anyone who can observe that network path. Prefer HTTPS for public production traffic when available.
 
@@ -161,7 +161,7 @@ Security note: current PC endpoint uses plain HTTP, so the Bearer key is visible
 
 PC/controller hardcoded endpoint:
 
-- `http://103.112.1.29:10053`
+- `http://216.236.63.58:10053`
 
 PC/controller Bearer key source anchor:
 

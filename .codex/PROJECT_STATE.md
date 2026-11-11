@@ -1,17 +1,17 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261111-001-r2`
-Last Updated / Observed At：2026-11-11（Asia/Tokyo）
-Evidence Scope：`repository-observed / V0`
+State Revision：`STATE-20261112-002-r1`
+Last Updated / Observed At：2026-11-12（Asia/Tokyo）
+Evidence Scope：`repository-observed / merge V0；历史CI结果单独记录`
 
 ## 当前源码基线
 
-- main合并交付：`d58196214f5006da0e26cdce050f5229063f5194`已推送origin/main并核对远端一致；test保持51292c2，推送后工作区clean。后续仅补回执文档，不二次编排。
-- 当前任务：[T-2026-11-11-001](../docs/tasks/T-2026-11-11-001-docs-main-merge.md)，T8文档与main合并推送完成；输入main/9040c53d37e3542c7ab8948b64beec1f0df0cd93、test/51292c29a025ee3ad6a3915285b8f21e7e260ee8，初始工作区干净且远端一致。
-- 当前合并基线：[Baseline27](../docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)。产品源码沿用test/25bc2ce，版本及校验文件保留main的2.0.26 / 2.0.26+59；不引入新的业务逻辑改动。
-- 本轮只同步文档和Git交付，不触发或监控编译。此前test/25bc2ce的Both/常规编译HTTP204仅表示受理；最终结果未知，不能替代合并后版本验证。
-- 回退后撤回的实现、实验方案和诊断结论不属于当前实现。后续会话先核对 HEAD/status，再由代码重新建立证据；不能沿用历史聊天中的“已修改”判断。
+- 本轮任务：[T-2026-11-12-002](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)，active/T7；用户授权合并推送main，提交说明“统一配置文件(大改造节点一)”。远端无mian，按实际main执行。
+- 输入main/5d2d2e932cfb390a7b3d0278bea6a7e080746c95、test/a8abdd4c04951f930ea240c9951378ee3b8c165f；起始test工作区clean，两个远端分支与本地一致。
+- [Baseline28](../docs/BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)继承Baseline27的2.0.26 / 2.0.26+59和开发者画面优先，合入test服务器配置、Windows编译及Android CI修复；三套四项地址完整保留a8abdd4，Android与PC1当前不同。
+- 本轮不触发或监控构建。c788e8d的Both/常规编译仅有HTTP204回执，最终结果未知；此前失败和13项离线检查见[T001](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
+- 历史任务/版本/编译回执只供追溯；后续会话先核对HEAD/status，不继承旧授权或运行结论。
 
 ## 当前能力摘要
 
@@ -34,7 +34,7 @@ Evidence Scope：`repository-observed / V0`
 
 ## 本轮工作与验证
 
-- Registry：WORK-20261111-001-r2；Events：CE-20261111-T001-01/02；沿用D-034/035、ADR-0027/0028，本轮无新决策或外部资产变化。
-- V0通过：合并来源与版本边界、31份Markdown/351个本地链接、122项身份合同、差异和历史保留检查；结果与Git回执记录在当前任务。主分支版本历史、test功能历史及冻结Baseline25/26均保留。
-- 四项纯策略单测未执行；DSP-02及04—10单测/真机通话/兼容验收仍NOT_RUN，DSP-03仅有历史受理回执。本轮无编译、codegen、设备或生产操作。
-- 开发者角色是协作声明，不是可信凭证；SEC-016及既有外部资产缺口保持。旧任务详情见TASK_HISTORY，不继承其授权或构建结论。
+- Registry：WORK-20261112-002-r1；Events：CE-20261112-T002-01；沿用D-034/035/036、ADR-0027/0028/0029，无新增架构决定或外部部署。
+- 源码自动合并、15份Markdown冲突已解决；41个非文档差异文件与预期来源哈希一致，32份Markdown的375个本地链接有效，冲突标记为零、历史引用保留、diff检查通过。版本来自main、产品改动与用户地址来自test；Git回执见当前任务。
+- 配置唯一维护处为`libs/hbb_common/src/server_profiles.rs`；Android固定、PC空闲切换、账号/peer隔离、后台确认和旧响应过滤保持。见[15_SERVER_PROFILES](../docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。
+- SCP-02/04—09、DSP-02/04—10等单测/真机/服务联调仍待证；本轮不执行编译、codegen、设备或生产操作。开发者角色仍为协作声明，不是可信凭证；SEC-016等外部缺口保持。

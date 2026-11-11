@@ -1,6 +1,8 @@
 # OpenWorld Engineering Baseline Index
 
-当前合并基线：[Baseline27：main版本与开发者画面优先](27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，`OW-BL-2026-11-11-main-developer-priority-merge`。输入main/9040c53与test/51292c2，保留Rust/portable 2.0.26、Flutter 2.0.26+59，并纳入开发者画面优先源码25bc2ce；准确提交/推送回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。本轮仅V0，不触发或监控构建。
+当前合并基线：[Baseline28：统一配置合并main](28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)，`OW-BL-2026-11-12-unified-config-main`；main/5d2d2e9与test/a8abdd4，版本2.0.26 / 2.0.26+59保持，当前任务为[T002](../tasks/T-2026-11-12-002-unified-config-main-merge.md)，仅Git交付和V0，无本轮编译。
+
+此前合并基线：[Baseline27：main版本与开发者画面优先](27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，`OW-BL-2026-11-11-main-developer-priority-merge`。输入main/9040c53与test/51292c2，保留Rust/portable 2.0.26、Flutter 2.0.26+59，并纳入开发者画面优先源码25bc2ce；准确提交/推送回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。本轮仅V0，不触发或监控构建。
 
 版本来源[Baseline25](25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)、功能来源[Baseline26](26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)、身份来源[Baseline24](24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)冻结保留。test/25bc2ce的Both/常规编译仅记录HTTP204，结果未知。以下“当前”、未提交、旧版本等描述均是对应快照冻结时的事实。
 
@@ -8,8 +10,9 @@
 
 ## 快照索引
 
-以下01—26均为冻结的历史快照，不代表当前HEAD或可继承授权。当前源码与对应领域合同优先。
+以下01—27均为冻结的历史快照，不代表当前HEAD或可继承授权。当前源码与对应领域合同优先。
 
+- [Baseline28：统一配置合并main](28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)
 - [Baseline27：main版本与开发者画面优先整合](27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)
 - [Baseline26：开发者画面优先实施快照](26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)
 - [Baseline25：开放世界2.0.26版本](25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)

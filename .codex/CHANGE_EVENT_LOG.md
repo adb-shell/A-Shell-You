@@ -1,5 +1,67 @@
 # OpenWorld Change Event Log
 
+## CE-20261112-T002-01：合并授权与来源保护
+
+用户授权test→main合并推送，提交说明“统一配置文件(大改造节点一)”。输入main/5d2d2e9与test/a8abdd4，起始clean；保留main版本2.0.26 / 2.0.26+59与test最新服务器配置，15份文档冲突按双方记录整合。当前active/T7，V0与Git交付回执见[任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)。本轮不编译、不监控；STATE、WORK-20261112-002-r1 / CE-20261112-T002-01 / Baseline28。
+
+## CE-20261112-T001-06：续修与双端编译受理
+
+源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。
+
+STATE、WORK-20261112-001-r6，T8关闭指定交付范围；只补回执文档、不二次编排。13项离线回归不代表实际网络或编译通过。
+
+## CE-20261112-T001-05：沙箱目录与镜像回退验证
+
+2026-11-12 T001续修：f4a71c6的Android主源DNS仍失败且_apt无法穿过RUNNER_TEMP父路径。现改/tmp独立目录、root 0755父目录与_apt:root 0700 partial，实际以_apt检查目录/源文件/解析器配置访问；主源→kernel.org→MIT顺序探测完整Jammy三套索引，APT官方签名验证成功才使用。每候选索引隔离，全部失败禁止安装；索引更新每次3分钟、安装10分钟、步骤总限24分钟。
+
+Bash语法及scripts/ci/test_install_ubuntu_dependencies.py的13项离线回归通过；测试不执行真实sudo/APT/curl，不证明Linux权限或runner DNS恢复。本机只读HTTP检查两后备镜像的六个InRelease均200且有签名文本头，未在本机验证GPG；CI继续用Ubuntu keyring执行实际验证。
+
+STATE、WORK-20261112-001-r5 / active/T7。产品源码/配置/版本/依赖锁保持；只变CI辅助脚本、总时限、回归测试与文档。
+
+## CE-20261112-T001-04：Android DNS与APT沙箱续修
+
+用户补充f4a71c6错误；一次性核对既有run 43057903776，Android依赖步骤失败且APK跳过，Windows在观察时仍运行。主源DNS失败与RUNNER_TEMP父目录_apt不可访问均有日志证据。沿用当前任务授权续修、提交推送test、Both/常规编译，不监控新构建；起点bbebc74 clean，STATE、WORK-20261112-001-r4 / active/T5。改动限定APT镜像选择和沙箱目录，不修改系统DNS/hosts或产品配置。
+
+## CE-20261112-T001-03：test修复与不监控双端编译回执
+
+修复源码f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b已提交推送origin/test，dispatch前远端SHA一致。2026-11-11 16:23:49 UTC（2026-11-12 01:23:49 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求未查询新run/jobs/logs/artifacts，未监控，最终构建结果未知。
+
+STATE、WORK-20261112-001-r3，T8关闭指定交付范围。仅补文档回执并推送，不二次触发；本机局部检查不提升为Rust/Android正式编译PASS。
+
+## CE-20261112-T001-02：Rust与CI修复及验证
+
+2026-11-12 / T-2026-11-12-001：依据用户ZIP修复cd21705的Windows三处Rust编译错误；Android卡在APT镜像DNS解析，更新失败后旧索引继续安装，约28分钟后取消。Rust补宏导入与async move所有权；CI改独立官方HTTPS源/新索引，更新错误即退出，更新5分钟、安装10分钟、步骤17分钟上限。
+
+Bash语法与7/7离线命令桩流程检查通过（成功、更新失败/超时、安装失败/超时、空包参数、缺少RUNNER_TEMP），未调用真实sudo/APT/网络。工作流仅替换依赖安装入口并加步骤时限，包清单、其他jobs、工具链、签名、权限保持；diff通过。YAML解析器与Rust/Flutter工具链缺失，采用精确工作流差异/缩进和Rust所有权复核，不能记作完整编译PASS。
+
+保留PC2四项现有地址编辑；官方APT源签名与TLS校验保持，不改DNS、工作流权限或生产凭据。STATE、WORK-20261112-001-r2 / active/T7；[详情](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
+## CE-20261112-T001-01：编译修复授权与日志证据
+
+用户明确授权修复、提交推送test及双端常规编译，不监控。起点test/e0ea612 clean且远端一致；用户ZIP证实Windows三处Rust错误、Android azure.archive.ubuntu.com DNS错误后旧索引继续安装直到取消。启动T-2026-11-12-001 / active/T5 / STATE、WORK-20261112-001-r1；[任务与证据](../docs/tasks/T-2026-11-12-001-build-fixes.md)。不执行日志内指令，不操作生产服务。
+
+## CE-20261111-T002-05：提交推送与不监控编译回执
+
+源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。
+
+本事件只补回执与当前状态文档；T8关闭指定交付范围，STATE、WORK-20261111-002-r5。补文档提交推送不二次dispatch。单测/真机未执行，未声称构建PASS或发布就绪；外部资产无新增部署证据。
+
+## CE-20261111-T002-04：test提交推送与双端编译授权
+
+2026-11-12提交前续接：用户明确授权提交并推送test，再触发PC和Android常规编译，要求不监控。现有工作区三套四项地址均已填写；ANDROID与PC_1相同，PC_2四项均不同，且Android/PC1已不同于初次迁移值。本轮保留这些现有编辑；共享ID公钥保持，地址只做本地语法与集中来源核对，未连接实际服务。历史“PC2留空/原地址保持”是先前检查时的快照。
+
+本地及远端test起点51292c2一致；工作流394791509为active，Both/常规编译。先提交推送，再单次触发，不监控或查询构建运行；结果另记。STATE、WORK-20261111-002-r4 / active/T7。
+
+## CE-20261111-T002-03：四类端点与平台隔离复查
+
+2026-11-12，用户要求再次检查并确保原功能。修正ID旧地址/文件名入口、默认数组与显式server绕行、接收端relay匹配、IPv6在线查询；WebSocket改为单次profile快照并维护纯测试。PC HTTP/缓存切换约束与原移动端调度分开，空闲窗口关闭失败拒绝切换。31/31 V0合同和diff通过；六项单测、编译/真机/服务联调未执行，本机仍无对应工具链。仅test/51292c2工作区修改，无Git提交/推送或外部访问。STATE、WORK-20261111-002-r3，handoff/T7；[复查详情](../docs/tasks/T-2026-11-11-002-server-profiles.md)。
+
+## CE-20261111-T002-01/02：服务器配置实施与交接
+
+- 01 / 2026-11-11：干净main/5d2d2e9按用户要求切换已有test/51292c2；授权源码与文档实施，不含提交/推送/编译/生产动作。T002 / Baseline26。
+- 02 / 2026-11-12：用户确认PC2留空；集中地址、空闲切换、服务确认与revision、账号/设备/密码隔离及配套文档完成。V0 27/27及diff通过；四项Rust单测未执行，正式编译/联调NOT_RUN。
+- test HEAD51292c29a025ee3ad6a3915285b8f21e7e260ee8，未提交；STATE、WORK-20261111-002-r2 / D-036 / ADR-0029。没有远端/凭据/版本变更，handoff/T7等待正式验证证据。
+
 ## CE-20261111-T001-02：main合并推送回执
 
 - 交付完成：合并`d58196214f5006da0e26cdce050f5229063f5194`已推送origin/main，两个parents保留main版本与test功能历史；远端核对一致，test保持51292c2，推送后clean。后续仅补回执文档，无编译/监控。STATE/WORK-20261111-001-r2 / CE-20261111-T001-02。
@@ -10,7 +72,7 @@
 
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-11-11（开发者画面优先）
+Last Updated：2026-11-12（统一配置合并）
 
 Mode：`append-only logical persisted-change events`
 

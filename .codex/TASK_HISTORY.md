@@ -1,5 +1,30 @@
 # OpenWorld Task History
 
+## T-2026-11-12-002：统一配置合并main
+
+用户授权test→main合并推送，提交说明“统一配置文件(大改造节点一)”。输入main/5d2d2e9与test/a8abdd4，起始clean；保留main版本2.0.26 / 2.0.26+59与test最新服务器配置，15份文档冲突按双方记录整合。当前active/T7，V0与Git交付回执见[任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)。本轮不编译、不监控；STATE、WORK-20261112-002-r1 / CE-20261112-T002-01 / Baseline28。
+
+2026-11-12 / T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 T8仅指定交付范围；13项离线检查通过，真实runner验证未取得。STATE、WORK-20261112-001-r6 / CE-20261112-T001-04—06；补回执不二次编排。
+
+2026-11-12 T001续修：f4a71c6的Android主源DNS仍失败且_apt无法穿过RUNNER_TEMP父路径。现改/tmp独立目录、root 0755父目录与_apt:root 0700 partial，实际以_apt检查目录/源文件/解析器配置访问；主源→kernel.org→MIT顺序探测完整Jammy三套索引，APT官方签名验证成功才使用。每候选索引隔离，全部失败禁止安装；索引更新每次3分钟、安装10分钟、步骤总限24分钟。 13项离线回归与Bash语法通过，实际runner权限/DNS/签名验证待证；当前T7待test提交推送及Both/常规编译，不监控。STATE、WORK-20261112-001-r5 / CE-20261112-T001-04/05；[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
+2026-11-12 / T-2026-11-12-001交付：修复源码f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b已提交推送origin/test，dispatch前远端SHA一致。2026-11-11 16:23:49 UTC（2026-11-12 01:23:49 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求未查询新run/jobs/logs/artifacts，未监控，最终构建结果未知。 T8仅指定交付范围；Bash语法/离线流程7/7通过，真实构建待证。STATE、WORK-20261112-001-r3 / CE-20261112-T001-01—03；补回执文档不二次触发。
+
+2026-11-12 / T-2026-11-12-001：依据用户ZIP修复cd21705的Windows三处Rust编译错误；Android卡在APT镜像DNS解析，更新失败后旧索引继续安装，约28分钟后取消。Rust补宏导入与async move所有权；CI改独立官方HTTPS源/新索引，更新错误即退出，更新5分钟、安装10分钟、步骤17分钟上限。 Bash语法/离线流程7/7通过，完整编译待重新触发；保留PC2现有地址编辑。用户授权test提交推送和双端常规编译，不监控。T7 / STATE、WORK-20261112-001-r2 / CE-20261112-T001-01/02；[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
+2026-11-12 / T-2026-11-11-002交付回执：源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。 T8仅关闭源码/文档/Git/触发交付，正式验证待证。CE-20261111-T002-05 / STATE、WORK-20261111-002-r5；补回执文档不二次编排。
+
+2026-11-12 / T-2026-11-11-002续接提交：2026-11-12提交前续接：用户明确授权提交并推送test，再触发PC和Android常规编译，要求不监控。现有工作区三套四项地址均已填写；ANDROID与PC_1相同，PC_2四项均不同，且Android/PC1已不同于初次迁移值。本轮保留这些现有编辑；共享ID公钥保持，地址只做本地语法与集中来源核对，未连接实际服务。历史“PC2留空/原地址保持”是先前检查时的快照。 CE-20261111-T002-04 / STATE、WORK-20261111-002-r4，active/T7，Git与dispatch回执待记录。
+
+2026-11-12 / T-2026-11-11-002续接：用户要求四类端点和Android/原功能复查，已修正遗留ID/relay入口及桌面/移动调度边界；V0 31/31及diff通过，六项单测、双端编译和联调NOT_RUN。CE-20261111-T002-03 / STATE、WORK-20261111-002-r3；[详情](../docs/tasks/T-2026-11-11-002-server-profiles.md)。
+
+## T-2026-11-11-002：服务器配置集中与PC切换（正式验证待证）
+
+- 用户授权从main/5d2d2e9切换既有test/51292c2并实施；当前HEAD未变、工作区修改未提交。Android/PC1原地址保留，PC2按用户续接明确留空。
+- 单一配置源、左下角选择器、服务IPC确认、独立账号/peer缓存、旧异步结果过滤已实现；版本/协议/generated/依赖保持。维护见[Server Profiles](../docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。
+- 27/27 V0合同及diff通过；四项单测已添加未运行，双端构建/真机/真实服务NOT_RUN，本机无对应工具链。handoff/T7仅源码文档交接，无commit/push/merge/build/codegen/发布。
+- [任务](../docs/tasks/T-2026-11-11-002-server-profiles.md) / STATE、WORK-20261111-002-r2 / CE-20261111-T002-01/02 / D-036 / ADR-0029。
+
 - 交付完成：合并`d58196214f5006da0e26cdce050f5229063f5194`已推送origin/main，两个parents保留main版本与test功能历史；远端核对一致，test保持51292c2，推送后clean。后续仅补回执文档，无编译/监控。STATE/WORK-20261111-001-r2 / CE-20261111-T001-02。
 
 > 名称规范化说明（2026-10-12）：按用户明确要求，本页品牌术语、字段和路径已统一为当前名称；历史日期、提交标识及验证结论不变。这不是当年文本的逐字副本，原文和真实历史源仓地址请从 Git 提交 a036f31 的对应文件恢复。

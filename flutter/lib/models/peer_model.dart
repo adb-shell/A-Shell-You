@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../utils/server_profile_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'platform_model.dart';
@@ -207,6 +208,8 @@ class Peers extends ChangeNotifier {
   }
 
   void _updateOnlineState(Map<String, dynamic> evt) {
+    if (evt['server_profile_revision'] != null &&
+        evt['server_profile_revision'] != ServerProfileState.serverRevision) return;
     int changedCount = 0;
     evt['onlines'].split(',').forEach((online) {
       for (var i = 0; i < peers.length; i++) {
@@ -237,6 +240,8 @@ class Peers extends ChangeNotifier {
   }
 
   void _updatePeers(Map<String, dynamic> evt) {
+    if (evt['server_profile_revision'] != null &&
+        evt['server_profile_revision'] != ServerProfileState.serverRevision) return;
     final onlineStates = _getOnlineStates();
     if (getInitPeers != null) {
       peers = getInitPeers?.call() ?? [];

@@ -55,9 +55,9 @@ jobs:
           persist-credentials: false
 
       - name: Install native build prerequisites
+        timeout-minutes: 24
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          bash scripts/ci/install_ubuntu_dependencies.sh \
             build-essential autoconf automake libtool libtool-bin m4 gettext \
             pkg-config libssl-dev cmake ninja-build perl patch python3 jq \
             clang libclang-dev llvm-dev nasm yasm curl zip unzip tar xz-utils \

@@ -1,6 +1,15 @@
 # OpenWorld 源码地图 / Source Map
 
-当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
+当前整合输入为main/5d2d2e9与test/a8abdd4，见[Baseline28](../BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)及[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。保留Rust/portable 2.0.26、Flutter 2.0.26+59与OpenWorld产品身份，纳入服务器配置、PC切换及编译/CI修复。本轮只合并推送；历史编排受理及离线检查不能证明合并后编译或运行通过。
+
+## 服务器配置维护入口
+
+- `libs/hbb_common/src/server_profiles.rs`：Android、PC1、PC2四项地址及公共Key唯一维护处。
+- `src/server_profile.rs` / `src/ipc.rs`：空闲切换与后台确认。
+- `flutter/lib/desktop/widgets/server_profile_switch.dart`：状态栏选择器。
+- 详细消费者/隔离路径与验证：[15_SERVER_PROFILES](15_SERVER_PROFILES.md)。
+
+2026-11-07 T004新增PRIMARY：`src/developer_mode.rs`（进程模式与Android注册）、`src/screen_policy.rs`（纯策略/单测）；入口链为developer_login_bypass_model→native_model→LoginRequest17→server/connection→screen_access42→client/io_loop→FlutterHandler/FfiModel。普通视频分发/ACK/QoS及`remote_adb_video.rs`共同执行暂停，remote_page/remote_adb_mirror负责显示。`message.proto`是协议源；FRB不改签名、不手改generated。详见[Baseline26](../BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)，当前仅V0；下方旧基线只作追溯。
 
 开发者模式PRIMARY：`src/developer_mode.rs`（进程模式与Android注册）、`src/screen_policy.rs`（纯策略/单测）。入口链为developer_login_bypass_model→native_model→LoginRequest17→server/connection→screen_access42→client/io_loop→FlutterHandler/FfiModel。普通视频分发/ACK/QoS及`remote_adb_video.rs`共同执行暂停，remote_page/remote_adb_mirror负责显示。`message.proto`是协议源；FRB不改签名、不手改generated。
 

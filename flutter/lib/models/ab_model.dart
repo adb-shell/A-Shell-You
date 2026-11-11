@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:bot_toast/bot_toast.dart';
 
 import '../utils/http_service.dart' as http;
+import '../utils/server_profile_state.dart';
 import '../common.dart';
 
 final syncAbOption = 'sync-ab-with-recent-sessions';
@@ -71,6 +72,9 @@ class AbModel {
   var listInitialized = false;
   var _maxPeerOneAb = 0;
 
+  bool get serverProfileBusy => _pulling || _syncFromRecentLock ||
+      addressbooks.values.any((book) => book.abLoading.value);
+
   late final Peers peersModel;
 
   WeakReference<FFI> parent;
@@ -83,6 +87,7 @@ class AbModel {
         loadEvent: LoadEvent.addressBook);
     if (desktopType == DesktopType.main) {
       Timer.periodic(Duration(milliseconds: 500), (timer) async {
+        if (ServerProfileState.switching.value || ServerProfileState.requiresReset) return;
         if (_timerCounter++ % 6 == 0) {
           if (!gFFI.userModel.isLogin) return;
           if (!listInitialized) return;
@@ -99,6 +104,14 @@ class AbModel {
     _currentName.value = '';
     await bind.mainClearAb();
     listInitialized = false;
+    _cacheLoadOnceFlag = false;
+    _personalAbGuid = null;
+    _maxPeerOneAb = 0;
+    legacyMode.value = false;
+    _syncAllFromRecent = true;
+    peersModel.peers = [];
+    peersModel.restPeerIds = [];
+    peersModel.notifyListeners();
   }
 
 // #region ab
@@ -110,6 +123,7 @@ class AbModel {
   var _pulling = false;
   Future<void> pullAb(
       {required ForcePullAb? force, required bool quiet}) async {
+    if (ServerProfileState.switching.value || ServerProfileState.requiresReset) return;
     if (_pulling) return;
     _pulling = true;
     try {
@@ -537,16 +551,19 @@ class AbModel {
 // #endregion
 
 // #region cache
-  _saveCache() {
+  Future<void> _saveCache() async {
+    http.HttpService.pendingProfileWrites++;
     try {
       var ab_entries = _serializeCache();
       Map<String, dynamic> m = <String, dynamic>{
         "access_token": bind.mainGetLocalOption(key: 'access_token'),
         "ab_entries": ab_entries,
       };
-      bind.mainSaveAb(json: jsonEncode(m));
+      await bind.mainSaveAb(json: jsonEncode(m));
     } catch (e) {
       debugPrint('ab save:$e');
+    } finally {
+      http.HttpService.pendingProfileWrites--;
     }
   }
 

@@ -1,5 +1,11 @@
 # OpenWorld 网络与协议 / Network Protocol
 
+2026-11-12 T002续接复查：ID获取仅用当前profile，移除文件名/旧后台地址和默认数组回退；显式server必须匹配配置。接收端RequestRelay校验本端relay，不接受跨配置目的地址；PC与对应Android需使用一致的relay地址形式。IPv6在线查询及WebSocket单次profile快照见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)；V0，协议字段不变，兼容/运行待验证。
+
+## 2026-11-12：PC服务器配置
+
+ID/relay/公钥从集中配置取得；只在无活动会话时通过本机IPC切换并重新注册。维持strict relay-only；中继与返回值不同时用原`RequestRelay`协调双方，不仅替换PC socket。新增本机profile IPC，无protobuf修改；状态revision阻止旧服务器响应回显就绪。见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)，V0，双端兼容/连接待联调。
+
 ## 2026-11-07 / T004：开发者画面优先
 
 源码25bc2ce（test/51292c2内，现纳入main合并基线）新增`LoginRequest.developer_mode = 17`（bool）、`Features.developer_screen_priority = 3`（bool）、`Misc.screen_access = 42`（ScreenAccess：paused1/revision2/developer_mode3）。已有编号与类型不变。PC角色来自密码校验后的Rust进程标志；仅认证成功且有效登录的Android普通远控会话登记，先登记再订阅视频。其他会话类型及认证失败不参与。

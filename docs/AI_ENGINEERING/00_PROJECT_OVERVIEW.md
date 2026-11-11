@@ -1,6 +1,12 @@
 # OpenWorld 项目总览 / Project Overview
 
-当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
+当前整合输入为main/5d2d2e9与test/a8abdd4，见[Baseline28](../BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)及[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。保留Rust/portable 2.0.26、Flutter 2.0.26+59与OpenWorld产品身份，纳入服务器配置、PC切换及编译/CI修复。本轮只合并推送；历史编排受理及离线检查不能证明合并后编译或运行通过。
+
+## 2026-11-12：集中服务器配置
+
+Android固定一套，PC默认配置1并可在左下角状态栏选择配置2；PC2当前四项已填写。唯一地址源码、切换/缓存合同和验证边界见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)。cd21705实际编译失败，Windows源码与Android CI修复见[T001](../tasks/T-2026-11-12-001-build-fixes.md)；原先“留空”是初次实现快照，运行联调仍待证。
+
+2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 PC主窗口Ctrl+Shift+H先验证两个密码摘要之一，再启用进程内开发者模式；新建/重连会话携带角色。Android在端点认证后按连接暂停普通PC的普通/截图/ADB画面及操作，保留连接与ZEGO语音，最后开发者离开恢复。使用与密码维护见[开发者模式](../DEVELOPER_MODE.md)，工程边界见[模块设计](03_MODULE_DESIGN.md)和[ADR-0028](../ADR/0028-developer-screen-priority.md)。
 

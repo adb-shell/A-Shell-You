@@ -1,6 +1,12 @@
 # OpenWorld 完整架构 / Architecture
 
-当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
+当前整合输入为main/5d2d2e9与test/a8abdd4，见[Baseline28](../BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)及[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。保留Rust/portable 2.0.26、Flutter 2.0.26+59与OpenWorld产品身份，纳入服务器配置、PC切换及编译/CI修复。本轮只合并推送；历史编排受理及离线检查不能证明合并后编译或运行通过。
+
+## 2026-11-12：Server Profiles
+
+`hbb_common::server_profiles`提供编译期Android/PC1/PC2端点及共用公钥；桌面经服务IPC持久化profile+revision后重启注册，按配置隔离账号/peer数据。Flutter复用option桥接并过滤旧异步结果；Android固定配置、不参与PC选择。完整当前合同见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)，后续旧端点优先级描述由该合同取代。
+
+2026-11-07 T004当前：在test/d9f1119工作区增加开发者画面优先。PC本地模式通过进程native标志进入LoginRequest；Android在原端点认证后统一裁定各普通远控会话的画面资格。暂停媒体分发而保留会话与ZEGO，最后开发者离开恢复。普通VideoFrame和独立ADB媒体共用策略，不合并两条采集链。角色声明不是抗伪造授权，原认证不变。见[ADR-0028](../ADR/0028-developer-screen-priority.md)、[协议](06_NETWORK_PROTOCOL.md)；V0，正式编译/运行待证。以下密码任务描述仅代表当时快照。
 
 PC本地密码校验经手写native C ABI设置进程模式，供desktop各engine连接/重连写入LoginRequest。Android在原端点认证后统一裁定各普通远控会话的画面资格；有开发者时暂停普通画面与控制，保留会话和ZEGO，最后开发者离开恢复。普通VideoFrame和独立ADB媒体共用连接策略，两条采集链仍独立。角色声明不是抗伪造授权；详见[ADR-0028](../ADR/0028-developer-screen-priority.md)、[协议](06_NETWORK_PROTOCOL.md)。
 
