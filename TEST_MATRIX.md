@@ -1,5 +1,15 @@
 # OpenWorld Commercial Test Matrix
 
+## 2026-11-12 编译修复 / T-2026-11-12-001
+
+| Case | 验证目标 | Result |
+|---|---|---|
+| BCF-01 | 宏导入、future所有权、保留原ID结果、公共配置/协议边界 | 源码核对通过；Rust实际编译待重跑 |
+| BCF-02 | APT官方源/独立索引、失败传播与超时、空参数保护 | Bash语法、7/7离线命令桩检查通过；未在本机执行APT或网络下载 |
+| BCF-03 | test修复提交Both/常规编译 | 待触发，按用户要求不监控；运行结果不得推定为PASS |
+
+[任务与证据](docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
 ## 2026-11-12 服务器配置 / T-2026-11-11-002
 
 输入test/51292c2 / Baseline26；[维护、实现合同和正式命令](docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。提交前现有三套地址均已填齐，Android=PC1、PC2独立；地址语法、公共Key与集中来源已静态核对，服务可用性未验证。
@@ -8,7 +18,7 @@
 |---|---|---|---|
 | SCP-01 | 原地址/公钥保留、三配置字段/平台分支、独立缓存、revision/IPC/FRB合同、无版本/依赖/协议/generated更改、diff | V0 | PASS（当时快照）：首轮27/27、续接31/31；提交前现有地址编辑另做语法/唯一来源检查，原地址与空PC2条件不再适用 |
 | SCP-02 | server_profiles四项单测与websocket两项转换测试（14情形），不写真实配置 | V1 | NOT_RUN |
-| SCP-03 | Windows/Android完整构建与native加载；无需FRB/protobuf签名生成变更 | V2 | cd21705 / Both / 常规编译，2026-11-11 15:47:44 UTC HTTP204受理；按用户要求不监控，结果未知，native加载待验 |
+| SCP-03 | Windows/Android完整构建与native加载；无需FRB/protobuf签名生成变更 | V2 | cd21705 / run 43051900247：Windows三处Rust错误，FAIL；Android APT DNS故障后取消，未到源码编译；修复重跑见BCF-03 |
 | SCP-04 | 首启PC1；空PC2禁用；补齐B后A→B→A四项消费一致，重启记忆；Android不受PC选择影响 | V3/V4 | NOT_RUN |
 | SCP-05 | 远控/文件/终端/语音窗口及OIDC/账号/设备同步期间拒绝；无会话时完成切换 | V3/V4 | NOT_RUN |
 | SCP-06 | 相同peer ID的A/B密码/收藏/最近记录隔离；Ab/Group/搜索/输入栏/账号不串用；重新登录与重复切换 | V3/V4 | NOT_RUN |

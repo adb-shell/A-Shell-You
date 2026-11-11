@@ -1,5 +1,7 @@
 # GitHub Actions 客户端编译
 
+2026-11-12 / T-2026-11-12-001：依据用户ZIP修复cd21705的Windows三处Rust编译错误；Android卡在APT镜像DNS解析，更新失败后旧索引继续安装，约28分钟后取消。Rust补宏导入与async move所有权；CI改独立官方HTTPS源/新索引，更新错误即退出，更新5分钟、安装10分钟、步骤17分钟上限。 `scripts/ci/install_ubuntu_dependencies.sh`使用APT::Update::Error-Mode=any、下载重试2次/超时30秒、锁等待60秒，保留Ubuntu签名验证。离线流程7/7通过；新构建结果待证。[修复记录](tasks/T-2026-11-12-001-build-fixes.md)。
+
 2026-11-12 / T-2026-11-11-002：源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。 仅补回执文档，不二次dispatch；详见[任务](tasks/T-2026-11-11-002-server-profiles.md)。
 
 2026-11-07 T004回执：开发者画面优先源码test/25bc2ce04484c6d40f8c06325008d78a347432f7已推送，Build-Clients-BT / Both / 常规编译POST HTTP204（09:26:23 UTC）。单次定位尚未列出run；用户要求不监控，未继续查询结果。仅补回执文档不再dispatch；具体边界见[任务](tasks/T-2026-11-07-004-developer-screen-priority.md)，不据HTTP204宣称编译成功。

@@ -476,11 +476,13 @@ impl Client {
                         let reuse_relay = desired_relay == rr.relay_server;
                         let relay_uuid = rr.uuid;
                         let secure = !signed_id_pk.is_empty();
-                        let fut = async {
+                        // Own the relay attempt's inputs; keep the original ID server for the result.
+                        let relay_rendezvous = rendezvous_server.clone();
+                        let fut = async move {
                             if reuse_relay {
                                 Self::create_relay(peer, relay_uuid, desired_relay, key, conn_type, my_addr.is_ipv4()).await
                             } else {
-                                Self::request_relay(peer, desired_relay, &rendezvous_server,
+                                Self::request_relay(peer, desired_relay, &relay_rendezvous,
                                     secure, key, token, conn_type).await
                             }
                         };
@@ -3813,7 +3815,7 @@ async fn hc_connection_(
 
 pub mod peer_online {
     use hbb_common::{
-        anyhow::bail,
+        anyhow::{anyhow, bail},
         config::{Config, CONNECT_TIMEOUT, READ_TIMEOUT},
         log,
         rendezvous_proto::*,

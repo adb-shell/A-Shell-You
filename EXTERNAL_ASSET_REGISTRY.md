@@ -1,5 +1,7 @@
 # OpenWorld External Asset Registry
 
+2026-11-12 T-2026-11-12-001：Android Native CI的APT依赖下载由runner mirror+file列表改为Ubuntu官方archive/security HTTPS（jammy与updates/security），使用系统ubuntu-archive-keyring.gpg验证签名；独立源/新索引仅作用于该步骤，包清单及版本工具链不变。PC2四项现有地址编辑纳入源码，实际部署/连通性未验证；没有产品服务或凭据操作。见[构建修复](docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
 2026-11-12提交前：三套端点已有工作区编辑更新，Android=PC1、PC2四项独立且填齐；保留现有值，公共ID Key和客户端既有broker凭据保持。部署归属/服务连通性/对应Android与broker兼容未验证，不能把地址填写等同新增部署完成。用户已授权test提交推送与Actions双端编译，不监控；原条目为初次迁移快照。
 
 2026-11-12 T-2026-11-11-002：现有ID/relay/API/ZEGO Token地址集中迁入`server_profiles.rs`，Android/PC1目标不变，PC2四项按用户要求留空；没有新增已部署服务器、依赖、binary、凭据或外部访问。B部署owner仍为维护者，需准备对应Android及现有broker鉴权合同；[配置与待验边界](docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。

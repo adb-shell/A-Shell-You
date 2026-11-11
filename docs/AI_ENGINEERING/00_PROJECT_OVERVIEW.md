@@ -2,7 +2,7 @@
 
 ## 2026-11-12：集中服务器配置
 
-Android固定一套，PC默认配置1并可在左下角状态栏选择配置2；PC2当前按用户要求留空。唯一地址源码、切换/缓存合同和验证边界见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)。test/51292c2工作区，V0，未编译/联调。
+Android固定一套，PC默认配置1并可在左下角状态栏选择配置2；PC2当前四项已填写。唯一地址源码、切换/缓存合同和验证边界见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)。cd21705实际编译失败，Windows源码与Android CI修复见[T001](../tasks/T-2026-11-12-001-build-fixes.md)；原先“留空”是初次实现快照，运行联调仍待证。
 
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 

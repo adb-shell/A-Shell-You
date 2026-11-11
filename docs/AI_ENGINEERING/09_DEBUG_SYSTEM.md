@@ -1,5 +1,7 @@
 # OpenWorld 调试与验证体系 / Debug System
 
+2026-11-12 T001：若Android Native停在Install native build prerequisites，先读APT源/DNS与索引日志；此次azure.archive.ubuntu.com解析失败，旧apt-get update仅警告后继续install，不是Rust编译或Android应用死锁。现用独立官方HTTPS源/新索引，索引失败即退出，更新/安装分别5/10分钟，步骤17分钟。Windows源码编译错误另核对anyhow!宏作用域及异步future变量所有权。见[日志与修复](../tasks/T-2026-11-12-001-build-fixes.md)。
+
 2026-11-07 T004增加`screenPausedByDeveloper`与`screenResumePending`：前者是端点策略暂停，后者等待恢复后的真实普通/ADB帧，均不代表断连或共享服务停止。先查LoginRequest角色、Features能力、ScreenAccess revision，再查发送资格、ACK/QoS、解码generation和Texture首帧通知；不要用重启采集/挂断语音“修复”策略暂停。DSP-01—DSP-10见TEST_MATRIX；当前仅V0，本机无Rust/Flutter工具链，正式命令/环境/停止边界见[任务验证需求](../tasks/T-2026-11-07-004-developer-screen-priority.md)。
 
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。

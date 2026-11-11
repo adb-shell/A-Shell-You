@@ -1,5 +1,7 @@
 # T-2026-11-11-002：集中服务器配置与 PC 双配置切换
 
+2026-11-12后续证据：用户提供的ZIP确认cd21705的Windows三处client.rs编译失败；Android在系统依赖下载时发生镜像DNS失败后取消。早期dispatch仅受理，不能表示通过。用户已授权修复并重新提交推送/编译且不监控，详见[T-2026-11-12-001](T-2026-11-12-001-build-fixes.md)。
+
 ## 2026-11-12提交推送与双端编译回执 / CE-20261111-T002-05
 
 - 源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。

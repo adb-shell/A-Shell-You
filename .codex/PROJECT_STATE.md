@@ -1,9 +1,11 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261111-002-r5`
+State Revision：`STATE-20261112-001-r2`
 Last Updated / Observed At：2026-11-12（Asia/Tokyo）
-Evidence Scope：`repository-observed / V0 + dispatch-accepted (HTTP204)`
+Evidence Scope：`repository-observed / V0 + supplied CI failure logs`
+
+当前任务T-2026-11-12-001 / active/T7：test/e0ea612 clean恢复；用户ZIP证实cd21705的Windows编译失败与Android依赖镜像DNS阻塞后取消。源码与CI修复已完成，Bash语法/离线流程7/7通过；保留PC2新地址，待按授权提交推送test、触发双端常规编译，不监控。WORK-20261112-001-r2 / CE-20261112-T001-01/02；[详情](../docs/tasks/T-2026-11-12-001-build-fixes.md)。下方T002回执保留当时证据，不再代表最终结果未知。
 
 ## 当前源码基线
 

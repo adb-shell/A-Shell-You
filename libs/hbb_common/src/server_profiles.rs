@@ -53,10 +53,10 @@ pub const PC_1: ServerProfile = ServerProfile {
 pub const PC_2: ServerProfile = ServerProfile {
     id: "pc_2",
     name: "服务器 2",
-    id_server: "64.204.67.5:10056",
-    relay_server: "64.204.67.5:10057",
-    api_server: "http://64.204.67.5:10054",
-    voice_token_url: "http://64.204.67.5:10053",
+    id_server: "43.255.158.17:10056",
+    relay_server: "43.255.158.17:10057",
+    api_server: "http://43.255.158.17:10054",
+    voice_token_url: "http://43.255.158.17:10053",
 };
 
 pub const PC_PROFILES: &[ServerProfile] = &[PC_1, PC_2];

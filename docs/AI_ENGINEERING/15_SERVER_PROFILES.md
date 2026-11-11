@@ -1,5 +1,7 @@
 # 集中服务器配置 / Server Profiles
 
+2026-11-12修正：cd21705的Windows实际编译失败（三处client.rs错误），Android依赖安装发生镜像DNS失败后取消；上方/下方早期HTTP204不代表成功。修复与重新编译回执见[T001](../tasks/T-2026-11-12-001-build-fixes.md)，保留当前PC2四项地址编辑，Android/PC1与Key保持。
+
 交付回执：源码cd21705已推送test，Both/常规编译HTTP204受理；用户要求不监控，结果未知，后续仅补回执文档。详细时间与范围见[任务](../tasks/T-2026-11-11-002-server-profiles.md)。
 
 2026-11-12，T-2026-11-11-002；输入test/51292c2，基线[Baseline26](../BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)。提交前已有三套地址更新；V0静态检查不能证明编译或服务联调通过。

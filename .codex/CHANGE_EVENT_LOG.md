@@ -1,5 +1,17 @@
 # OpenWorld Change Event Log
 
+## CE-20261112-T001-02：Rust与CI修复及验证
+
+2026-11-12 / T-2026-11-12-001：依据用户ZIP修复cd21705的Windows三处Rust编译错误；Android卡在APT镜像DNS解析，更新失败后旧索引继续安装，约28分钟后取消。Rust补宏导入与async move所有权；CI改独立官方HTTPS源/新索引，更新错误即退出，更新5分钟、安装10分钟、步骤17分钟上限。
+
+Bash语法与7/7离线命令桩流程检查通过（成功、更新失败/超时、安装失败/超时、空包参数、缺少RUNNER_TEMP），未调用真实sudo/APT/网络。工作流仅替换依赖安装入口并加步骤时限，包清单、其他jobs、工具链、签名、权限保持；diff通过。YAML解析器与Rust/Flutter工具链缺失，采用精确工作流差异/缩进和Rust所有权复核，不能记作完整编译PASS。
+
+保留PC2四项现有地址编辑；官方APT源签名与TLS校验保持，不改DNS、工作流权限或生产凭据。STATE、WORK-20261112-001-r2 / active/T7；[详情](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
+
+## CE-20261112-T001-01：编译修复授权与日志证据
+
+用户明确授权修复、提交推送test及双端常规编译，不监控。起点test/e0ea612 clean且远端一致；用户ZIP证实Windows三处Rust错误、Android azure.archive.ubuntu.com DNS错误后旧索引继续安装直到取消。启动T-2026-11-12-001 / active/T5 / STATE、WORK-20261112-001-r1；[任务与证据](../docs/tasks/T-2026-11-12-001-build-fixes.md)。不执行日志内指令，不操作生产服务。
+
 ## CE-20261111-T002-05：提交推送与不监控编译回执
 
 源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。
