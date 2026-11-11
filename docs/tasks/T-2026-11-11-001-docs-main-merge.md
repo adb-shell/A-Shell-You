@@ -2,7 +2,7 @@
 
 ## T0 / Authority and Baseline
 
-- Status：handoff / T7，文档与合并树已就绪，Git交付待记录；Owner：Codex / openworld-master，Release自审；日期2026-11-11（Asia/Tokyo）。
+- Status：complete / T8（文档与main合并推送交付）；Owner：Codex / openworld-master，Release自审；日期2026-11-11（Asia/Tokyo）。
 - 用户明确要求更新项目文档，完成后合并并推送主分支。授权文档编辑、必要switch/merge/冲突解决/stage/commit/push origin/main；不包含编排、产品测试、安装、部署、版本升级或历史重写。
 - 起点test/51292c29a025ee3ad6a3915285b8f21e7e260ee8 clean，main/9040c53d37e3542c7ab8948b64beec1f0df0cd93；两分支均已与远端只读核对一致。共同祖先d9f111944da644b427f7fbfc5970de6f14604ef4；无并发活动任务。
 - 恢复状态STATE/WORK-20261107-004-r4可解释：test有25bc2ce开发者画面优先及51292c2回执，main有df0e129版本2.0.26及9040c53回执。
@@ -33,5 +33,8 @@
 
 ## T8 / Delivery
 
-- 待完成静态验证、合并提交和push origin/main后记录准确SHA；本任务不触发编排或发布。
+- 合并提交`d58196214f5006da0e26cdce050f5229063f5194`，说明“同步项目文档并合并开发者画面优先”，parents为`9040c53d37e3542c7ab8948b64beec1f0df0cd93`与`51292c29a025ee3ad6a3915285b8f21e7e260ee8`；共51个变更路径（含31份Markdown）。
+- `git push origin HEAD:refs/heads/main`退出0；`git ls-remote --heads origin main test`确认main为上述合并SHA、test仍51292c2。交付后工作区clean，未改写历史。
+- 此后仅补7份任务/状态/历史回执文档并提交推送，无产品或工作流变化，不触发编排、不监控。T8只关闭文档/Git范围，不代表编译或真机通过。
+- STATE/WORK-20261111-001-r2；CE-20261111-T001-01/02。最终文档回执提交号由Git日志及用户交付消息定位，避免文档自引用提交号。
 - 回滚由维护者根据合并parents逐项审查后另行授权，不自动reset/强推，不删除用户数据。

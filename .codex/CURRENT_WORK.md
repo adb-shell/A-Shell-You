@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261111-001`
+Registry Revision：`WORK-20261111-001-r2`
 Last Updated：2026-11-11
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-T-2026-11-11-001 / handoff / T7：文档与合并树已就绪，准备提交推送main。Owner：Codex；十处文档冲突已解，V0身份122项、31份Markdown/351链接、来源/差异检查通过。输入main/9040c53、test/51292c2；保留2.0.26 / 2.0.26+59，无额外产品改动或编排。STATE-20261111-001 / CE-20261111-T001-01；[任务](../docs/tasks/T-2026-11-11-001-docs-main-merge.md)。
+无活动任务。文档同步与test→main合并推送已完成；仅补交付回执，不触发或监控编译。
 
 ## 2. Concurrent Session Rules
 
@@ -25,6 +25,6 @@ T-2026-11-11-001 / handoff / T7：文档与合并树已就绪，准备提交推�
 
 ## 4. Last Closed Task
 
-T-2026-11-07-004 / complete / T8（源码、文档、test提交推送及编排触发交付）。源码25bc2ce已推送origin/test，说明“开发者模式画面优先”；当时main保持9040c53；后续合并见当前任务。Both/常规编译HTTP204，单次定位尚无run；用户要求不监控，最终编译结果未知。仅补回执文档不二次编排，真机与生产未操作。
+T-2026-11-11-001 / complete / T8（文档与main合并推送）。合并`d58196214f5006da0e26cdce050f5229063f5194`已推送origin/main并核对远端一致；test保持51292c2。版本2.0.26 / 2.0.26+59保持，纳入源码25bc2ce的开发者画面优先。V0身份122项、31份Markdown/351个本地链接及来源/差异检查通过；后续仅补回执文档。
 
-[详细任务](../docs/tasks/T-2026-11-07-004-developer-screen-priority.md) / STATE-20261107-004-r4 / CE-20261107-T004-01—05 / D-035。T8仅关闭本次指定交付范围，不表示V1/V2/V3/V4通过；历史任务保留在TASK_HISTORY和CHANGELOG_AI，不继承旧授权或构建结论。
+[详细任务](../docs/tasks/T-2026-11-11-001-docs-main-merge.md) / STATE-20261111-001-r2 / CE-20261111-T001-01/02 / Baseline27。未触发或监控构建，旧test编排最终结果未知；T8不表示编译或真机验收通过。历史任务保留在TASK_HISTORY与CHANGELOG_AI，不继承旧授权或构建结论。

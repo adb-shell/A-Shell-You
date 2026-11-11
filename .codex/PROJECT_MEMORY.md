@@ -4,7 +4,7 @@
 
 ## 0. 当前恢复基线
 
-当前恢复基线为[Baseline27](../docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)：main/9040c53版本2.0.26 / Flutter2.0.26+59，加上test/51292c2（功能源码25bc2ce）的开发者画面优先。T-2026-11-11-001负责文档同步及main合并推送，准确交付回执见[当前任务](../docs/tasks/T-2026-11-11-001-docs-main-merge.md)。STATE/WORK-20261111-001 / CE-20261111-T001-01。
+当前恢复基线为[Baseline27](../docs/BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)：main/9040c53版本2.0.26 / Flutter2.0.26+59，加上test/51292c2（功能源码25bc2ce）的开发者画面优先。T-2026-11-11-001已完成文档同步及main合并推送，合并提交`d58196214f5006da0e26cdce050f5229063f5194`与远端核对一致，test保持51292c2；后续仅补回执文档，准确交付回执见[当前任务](../docs/tasks/T-2026-11-11-001-docs-main-merge.md)。STATE/WORK-20261111-001-r2 / CE-20261111-T001-01/02。
 
 产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”，构建号59保持。版本来源[Baseline25](../docs/BASELINE/25_OPENWORLD_VERSION_BASELINE_2026-11-07.md)、功能来源[Baseline26](../docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)、身份来源[Baseline24](../docs/BASELINE/24_OPENWORLD_IDENTITY_BASELINE_2026-11-07.md)及其任务冻结保留；旧文档里的5.2.1、未提交、main未改均指当时快照，不作为当前状态。
 
