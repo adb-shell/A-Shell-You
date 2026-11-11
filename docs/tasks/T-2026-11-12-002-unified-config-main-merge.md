@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Task ID / Title | T-2026-11-12-002 / 统一配置合并main |
-| Status / Current T-State | verifying / T7，Git交付待完成 |
+| Status / Current T-State | complete / T8（本次合并交付） |
 | Requester / Product Owner | 用户 |
 | Principal Engineer / Primary Skill | Codex / openworld-master |
 | Domain Owners / Security Reviewer / Release Owner | Codex按master与release/security边界核对；无子代理 |
@@ -17,8 +17,8 @@
 | Related ADR / D-ID | ADR-0027/0028/0029，D-034/035/036 |
 | Related TEST_MATRIX IDs | UCM-01；SCP、BCF、DSP历史结论保持 |
 | Related External Asset IDs | N/A — 沿用既有hbbs/hbbr/API/ZEGO与CI记录，无新增部署 |
-| Project State / Work Registry Revision | STATE-20261112-002-r1 / WORK-20261112-002-r1 |
-| Change Event IDs | CE-20261112-T002-01 |
+| Project State / Work Registry Revision | STATE-20261112-002-r2 / WORK-20261112-002-r2 |
+| Change Event IDs | CE-20261112-T002-01/02 |
 
 ## T0. Authority and Baseline
 
@@ -104,7 +104,9 @@ EXTERNAL_ASSET_REGISTRY：沿用test已登记的CI镜像与目录事实，无额
 
 ## T8. Handoff and Closure
 
-- 当前状态：V0完成，Git交付中；最终merge SHA、push与clean回执待实际完成后补记。
+- Outcome：合并提交`c30efd61449a0e02b5b0546a25ddf948c5ad5d4e`已推送origin/main，并核对远端SHA一致；两个parents分别为main/5d2d2e9、test/a8abdd4。test仍为a8abdd4，推送后工作区clean。提交说明“统一配置文件(大改造节点一)”。本次只补交付回执，不改变源码、不触发或监控编译。
+- Git动作：switch main、merge --no-ff --no-commit test、解决文档冲突、add/commit/push；合并标题准确，远端main与本地一致，test不变。V0及Git交付验收通过。
+- 本回执仅修改任务和6份全局记忆文件；补记后提交推送，不二次构建。最终本地/远端SHA与clean状态在完成回复前再次核对。
 - 兼容性/回滚：保留双方历史；未运行任何回滚动作。
 - 未执行：构建、单测、codegen、监控、设备/生产服务访问、删除、改版本、签名或发布。
-- Definition of Done：UCM-01通过；origin/main包含两输入并与本地一致；test保持a8abdd4；工作区clean；任务/全局状态回执同步。T8仅源码合并交付，不表示全部运行验收通过。
+- Definition of Done：已满足UCM-01、两输入父提交、origin/main同步、test不变及推送后clean；任务/全局状态回执已同步。T8仅源码合并交付，不表示全部运行验收通过。

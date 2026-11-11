@@ -1,5 +1,11 @@
 # OpenWorld Change Event Log
 
+## CE-20261112-T002-02：main推送回执
+
+合并提交`c30efd61449a0e02b5b0546a25ddf948c5ad5d4e`已推送origin/main，并核对远端SHA一致；两个parents分别为main/5d2d2e9、test/a8abdd4。test仍为a8abdd4，推送后工作区clean。提交说明“统一配置文件(大改造节点一)”。本次只补交付回执，不改变源码、不触发或监控编译。
+
+66个路径的合并含32份Markdown；41个跨分支非文档差异与预期来源一致，375个本地链接有效、冲突清零、双方任务/事件引用保留、staged diff检查通过。STATE、WORK-20261112-002-r2 / complete/T8；本事件仅补7份任务/记忆回执。
+
 ## CE-20261112-T002-01：合并授权与来源保护
 
 用户授权test→main合并推送，提交说明“统一配置文件(大改造节点一)”。输入main/5d2d2e9与test/a8abdd4，起始clean；保留main版本2.0.26 / 2.0.26+59与test最新服务器配置，15份文档冲突按双方记录整合。当前active/T7，V0与Git交付回执见[任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)。本轮不编译、不监控；STATE、WORK-20261112-002-r1 / CE-20261112-T002-01 / Baseline28。

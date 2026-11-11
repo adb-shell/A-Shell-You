@@ -6,7 +6,7 @@
 
 [Baseline28](../docs/BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)整合main/5d2d2e9与test/a8abdd4：保留2.0.26 / 2.0.26+59及产品身份，纳入集中服务器配置、PC切换和编译/CI修复。`server_profiles.rs`完全保留test最新配置，Android与PC1当前不同，历史相同/留空描述仅为当时快照。
 
-当前[T002合并任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)为active/T7，STATE、WORK-20261112-002-r1 / CE-20261112-T002-01。只合并推送，不编译或监控；c788e8d双端编排结果未知，V0不能提升为运行PASS。优先核对HEAD/status、[PROJECT_STATE](PROJECT_STATE.md)及[CURRENT_WORK](CURRENT_WORK.md)。
+当前[T002合并任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)已complete/T8，STATE、WORK-20261112-002-r2 / CE-20261112-T002-01/02。合并提交`c30efd61449a0e02b5b0546a25ddf948c5ad5d4e`已推送origin/main，并核对远端SHA一致；两个parents分别为main/5d2d2e9、test/a8abdd4。test仍为a8abdd4，推送后工作区clean。提交说明“统一配置文件(大改造节点一)”。本次只补交付回执，不改变源码、不触发或监控编译。只合并推送，不编译或监控；c788e8d双端编排结果未知，V0不能提升为运行PASS。优先核对HEAD/status、[PROJECT_STATE](PROJECT_STATE.md)及[CURRENT_WORK](CURRENT_WORK.md)。
 
 ### 历史恢复记录（按原观察时点保留）
 
