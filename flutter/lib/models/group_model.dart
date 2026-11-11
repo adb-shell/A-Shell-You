@@ -8,6 +8,7 @@ import 'package:flutter_hbb/models/platform_model.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import '../utils/http_service.dart' as http;
+import '../utils/server_profile_state.dart';
 
 class GroupModel {
   final RxBool groupLoading = false.obs;
@@ -22,6 +23,7 @@ class GroupModel {
   var initialized = false;
   var _cacheLoadOnceFlag = false;
   var _statusCode = 200;
+  bool serverProfileBusy = false;
 
   final Map<String, VoidCallback> _peerIdUpdateListeners = {};
 
@@ -37,6 +39,7 @@ class GroupModel {
   }
 
   Future<void> pull({force = true, quiet = false}) async {
+    if (ServerProfileState.switching.value || ServerProfileState.requiresReset || serverProfileBusy) return;
     if (bind.isDisableGroupPanel()) return;
     if (!gFFI.userModel.isLogin || groupLoading.value) return;
     if (gFFI.userModel.networkError.isNotEmpty) return;
@@ -45,19 +48,22 @@ class GroupModel {
       groupLoading.value = true;
       groupLoadError.value = "";
     }
+    serverProfileBusy = true;
     try {
       await _pull();
       _tryHandlePullError();
+      initialized = true;
+      platformFFI.tryHandle({'name': LoadEvent.group});
+      if (_statusCode == 401) {
+        await gFFI.userModel.reset(resetOther: true);
+      } else {
+        await _saveCache();
+      }
     } catch (e) {
       print("pull accessibles error: $e");
-    }
-    groupLoading.value = false;
-    initialized = true;
-    platformFFI.tryHandle({'name': LoadEvent.group});
-    if (_statusCode == 401) {
-      gFFI.userModel.reset(resetOther: true);
-    } else {
-      _saveCache();
+    } finally {
+      groupLoading.value = false;
+      serverProfileBusy = false;
     }
   }
 
@@ -294,7 +300,8 @@ class GroupModel {
     }
   }
 
-  void _saveCache() {
+  Future<void> _saveCache() async {
+    http.HttpService.pendingProfileWrites++;
     try {
       final map = (<String, dynamic>{
         "access_token": bind.mainGetLocalOption(key: 'access_token'),
@@ -302,9 +309,11 @@ class GroupModel {
         "users": users.map((e) => e.toGroupCacheJson()).toList(),
         'peers': peers.map((e) => e.toGroupCacheJson()).toList()
       });
-      bind.mainSaveGroup(json: jsonEncode(map));
+      await bind.mainSaveGroup(json: jsonEncode(map));
     } catch (e) {
       debugPrint('group save:$e');
+    } finally {
+      http.HttpService.pendingProfileWrites--;
     }
   }
 
@@ -343,12 +352,18 @@ class GroupModel {
   }
 
   reset() async {
+    initialized = false;
+    _cacheLoadOnceFlag = false;
+    _statusCode = 200;
     groupLoadError.value = '';
     deviceGroups.clear();
     users.clear();
     peers.clear();
     selectedAccessibleItemName.value = '';
     await bind.mainClearGroup();
+    peersModel.peers = [];
+    peersModel.restPeerIds = [];
+    peersModel.notifyListeners();
   }
 
   void _callbackPeerUpdate() {

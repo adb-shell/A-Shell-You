@@ -1,5 +1,9 @@
 # OpenWorld 项目总览 / Project Overview
 
+## 2026-11-12：集中服务器配置
+
+Android固定一套，PC默认配置1并可在左下角状态栏选择配置2；PC2当前按用户要求留空。唯一地址源码、切换/缓存合同和验证边界见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)。test/51292c2工作区，V0，未编译/联调。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前源码快照：[Baseline23](../BASELINE/23_DEVELOPER_PASSWORD_BASELINE_2026-10-25.md)，test/48226fb，2026-10-25。PC开发者入口已改为Ctrl+Shift+H密码确认，支持两个密码，任一精确匹配后开启进程内免登录；维护与边界见[模块设计](03_MODULE_DESIGN.md)。当前CI唯一入口Build-Clients-BT；main合并及双端编排见[T002](../tasks/T-2026-10-25-002-developer-password-main.md)，V0不等于运行通过。

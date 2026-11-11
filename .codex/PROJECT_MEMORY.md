@@ -1,14 +1,14 @@
 # OpenWorld Project Memory
 
-最后更新：2026-11-07。用途：当前会话恢复入口，不替代源码。
+最后更新：2026-11-12。用途：当前会话恢复入口，不替代源码。
 
 ## 0. 当前恢复基线
 
-当前开发者画面优先源码25bc2ce04484c6d40f8c06325008d78a347432f7已提交推送test，说明“开发者模式画面优先”；main9040c53未改，未合入main版本变化。显示“开放世界”，runtime OpenWorld，crate/artifact openworld，包名com.openworld.me，test版本5.2.1/5.2.1+59。T-2026-11-07-004 / STATE、WORK-20261107-004-r4 / CE-20261107-T004-01—05 / D-035 / [Baseline26实施快照](../docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)。
+当前test HEAD51292c29a025ee3ad6a3915285b8f21e7e260ee8，T-2026-11-11-002工作区实现未提交；输入Baseline26，test版本5.2.1/5.2.1+59保持。服务器地址唯一入口`libs/hbb_common/src/server_profiles.rs`：现有编辑已填齐三套四项地址，Android与PC1相同、PC2独立，空闲经后台确认后切换，独立账号/peer缓存。见[15_SERVER_PROFILES](../docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。
 
-客户端、ADB JNI/帧桥/包路径、安装资源、本地及云编译同步；版本、依赖和原功能控制流保持。旧ZEGO wire key、构建环境变量及服务分类前缀受控兼容，见[迁移记录](../docs/AI_ENGINEERING/OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。
+STATE、WORK-20261111-002-r4 / CE-20261111-T002-01—04 / D-036 / ADR-0029；首轮V0 27/27、续接31/31及diff通过，六项相关单测与双端编译/联调NOT_RUN，active/T7。用户最新授权提交推送test及双端常规编译，要求不监控；实际回执另记。历史任务和编译回执只供追溯。
 
-当前V0身份122项及协议/ABI/diff检查通过，四项策略单测未跑。本次按用户要求推送test并触发Both/常规编译，HTTP204；单次定位尚无run，遵从“不监控”未继续查询，最终结果未知。T8仅关闭源码/文档/Git/触发交付范围，真机与语音待证；只补回执文档不二次编排。PC双密码摘要保持，解锁同时设置进程native模式，已有会话需重连；Android有开发者时普通PC暂停画面/盲输入/采集操作，连接与ZEGO保留，最后开发者退出恢复。见[ADR-0028](../docs/ADR/0028-developer-screen-priority.md)。先读[PROJECT_STATE](PROJECT_STATE.md)和[CURRENT_WORK](CURRENT_WORK.md)。
+原PC双密码/开发者画面优先与Android采集/ADB/ZEGO合同保持，见ADR-0028；不把历史构建HTTP204当本轮证据。先核对HEAD/status与[PROJECT_STATE](PROJECT_STATE.md)、[CURRENT_WORK](CURRENT_WORK.md)。
 
 当前ADB能力：
 

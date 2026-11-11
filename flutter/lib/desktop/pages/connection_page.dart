@@ -27,6 +27,8 @@ import '../../desktop/widgets/material_mod_popup_menu.dart' as mod_menu;
 import '../../common/widgets/login.dart';
 import 'package:flutter_hbb/models/user_model.dart';
 import 'package:flutter/services.dart';
+import '../../utils/server_profile_state.dart';
+import '../widgets/server_profile_switch.dart';
 
 class OnlineStatusWidget extends StatefulWidget {
   const OnlineStatusWidget({Key? key, this.onSvcStatusChanged})
@@ -46,6 +48,7 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
   
   final RxMap<String, dynamic> _expiryInfo = <String, dynamic>{}.obs;
   Timer? _expiryUpdateTimer;
+  Worker? _userNameWorker;
 
   double get em => 14.0;
   double? get height => bind.isIncomingOnly() ? null : em * 3;
@@ -66,7 +69,7 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
       updateStatus();
     });
     
-    ever(gFFI.userModel.userName, (value) {
+    _userNameWorker = ever(gFFI.userModel.userName, (value) {
       if (value.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _updateExpiryInfo();
@@ -91,6 +94,7 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
   void dispose() {
     _updateTimer?.cancel();
     _expiryUpdateTimer?.cancel();
+    _userNameWorker?.dispose();
     super.dispose();
   }
 
@@ -104,7 +108,10 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
   void _updateExpiryInfo() async {
     try {
       if (gFFI.userModel.userName.value.isNotEmpty) {
+        final revision = ServerProfileState.serverRevision;
         final info = await _getExpiryInfo();
+        if (!mounted || ServerProfileState.requiresReset ||
+            revision != ServerProfileState.serverRevision) return;
         _expiryInfo.value = info;
       } else {
         _expiryInfo.value = {'daysLeft': null, 'expiryDate': null};
@@ -284,7 +291,7 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
 
   _buildConnStatusMsg() {
     widget.onSvcStatusChanged?.call();
-    return Text(
+    final status = Text(
       _svcStopped.value
           ? translate("Service is not running")
           : stateGlobal.svcStatus.value == SvcStatus.connecting
@@ -294,9 +301,22 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
                   : translate('Ready'),
       style: TextStyle(fontSize: em),
     );
+    return InkWell(
+      onTap: ServerProfileState.switching.value ? null : () => showServerProfileSwitch(context),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        status,
+        Text(ServerProfileState.switching.value
+            ? ' · 切换中'
+            : ' · ${ServerProfileState.activeId == 'pc_2' ? '服务器 2' : '服务器 1'}',
+            style: TextStyle(fontSize: em)),
+        const Icon(Icons.arrow_drop_down, size: 18),
+      ]),
+    );
   }
 
   updateStatus() async {
+    await reconcileServerProfileState();
+    if (!mounted) return;
     final status =
         jsonDecode(await bind.mainGetConnectStatus()) as Map<String, dynamic>;
     final statusNum = status['status_num'] as int;
@@ -343,6 +363,7 @@ class _ConnectionPageState extends State<ConnectionPage>
   bool isWindowMinimized = false;
 
   final AllPeersLoader _allPeersLoader = AllPeersLoader();
+  Worker? _profileWorker;
 
   // https://github.com/flutter/flutter/issues/157244
   Iterable<Peer> _autocompleteOpts = [];
@@ -356,10 +377,18 @@ class _ConnectionPageState extends State<ConnectionPage>
   void initState() {
     super.initState();
     _allPeersLoader.init(setState);
+    _profileWorker = ever(ServerProfileState.revision, (_) {
+      if (!mounted) return;
+      _idFocusNode.unfocus();
+      _idController.clear();
+      _idEditingController.clear();
+      setState(() => _autocompleteOpts = []);
+    });
     _idFocusNode.addListener(onFocusChanged);
     if (_idController.text.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         final lastRemoteId = await bind.mainGetLastRemoteId();
+        if (!mounted) return;
         if (lastRemoteId != _idController.id) {
           setState(() {
             _idController.id = lastRemoteId;
@@ -376,6 +405,7 @@ class _ConnectionPageState extends State<ConnectionPage>
   @override
   void dispose() {
     _idController.dispose();
+    _profileWorker?.dispose();
     windowManager.removeListener(this);
     _allPeersLoader.clear();
     _idFocusNode.removeListener(onFocusChanged);

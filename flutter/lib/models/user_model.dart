@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 
 import '../common.dart';
 import '../utils/http_service.dart' as http;
+import '../utils/server_profile_state.dart';
 import 'model.dart';
 import 'platform_model.dart';
 import 'native_model.dart';
@@ -134,23 +135,23 @@ class UserModel {
 
 
   void refreshCurrentUser() async {
+    if (ServerProfileState.switching.value || ServerProfileState.requiresReset) return;
     //  return;
     if (bind.isDisableAccount()) return;
-    networkError.value = '';
-    final token = bind.mainGetLocalOption(key: 'access_token');
-    if (token == '') {
-      await updateOtherModels();
-      return;
-    }
-    _updateLocalUserInfo();
-    final url = await bind.mainGetApiServer();
-    final body = {
-      'id': await bind.mainGetMyId(),
-      'uuid': await bind.mainGetUuid()
-    };
     if (refreshingUser) return;
+    refreshingUser = true;
+    final profileRevision = ServerProfileState.serverRevision;
     try {
-      refreshingUser = true;
+      networkError.value = '';
+      final token = bind.mainGetLocalOption(key: 'access_token');
+      if (token == '') return;
+      _updateLocalUserInfo();
+      final url = await bind.mainGetApiServer();
+      final body = {
+        'id': await bind.mainGetMyId(),
+        'uuid': await bind.mainGetUuid()
+      };
+      if (profileRevision != ServerProfileState.serverRevision) return;
       final http.Response response;
       try {
         response = await http.post(Uri.parse('$url/api/currentUser'),
@@ -163,7 +164,6 @@ class UserModel {
         networkError.value = e.toString();
         rethrow;
       }
-      refreshingUser = false;
       final status = response.statusCode;
       if (status == 401 || status == 400) {
         reset(resetOther: status == 401);
@@ -178,6 +178,7 @@ class UserModel {
       final user = UserPayload.fromJson(data);
 
       String? validationError = await validateUser(user);
+      if (profileRevision != ServerProfileState.serverRevision) return;
       if (validationError != null) {
         await reset(resetOther: true);
         
@@ -205,8 +206,11 @@ class UserModel {
     } catch (e) {
       debugPrint('Failed to refreshCurrentUser: $e');
     } finally {
-      refreshingUser = false;
-      await updateOtherModels();
+      try {
+        await updateOtherModels();
+      } finally {
+        refreshingUser = false;
+      }
     }
   }
 
@@ -242,6 +246,7 @@ class UserModel {
       await gFFI.groupModel.reset();
     }
     userName.value = '';
+    isAdmin.value = false;
   }
 
   void parseAndUpdateUser(UserPayload user) {

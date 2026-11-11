@@ -14,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../common.dart';
 import '../generated_bridge.dart';
+import '../utils/server_profile_state.dart';
 
 final class RgbaFrame extends Struct {
   @Uint32()
@@ -240,6 +241,8 @@ class PlatformFFI {
         appDir: _dir,
         customClientConfig: '',
       );
+      ServerProfileState.markApplied(
+          _ffiBind.mainGetOptionSync(key: 'server-profile-revision'));
     } catch (e) {
       debugPrintStack(label: 'initialize failed: $e');
     }

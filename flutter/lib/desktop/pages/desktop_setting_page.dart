@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../widgets/server_profile_switch.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -1597,7 +1598,7 @@ class _NetworkState extends State<_Network> with AutomaticKeepAliveClientMixin {
                 listTile(
                   icon: Icons.dns_outlined,
                   title: 'ID/Relay Server',
-                  onTap: () => showServerSettings(gFFI.dialogManager),
+                  onTap: () => showServerProfileSwitch(context),
                 ),
               if (!hideServer && (!hideProxy || !hideWebSocket))
                 Divider(height: 1, indent: 16, endIndent: 16),

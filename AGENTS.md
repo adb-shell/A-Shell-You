@@ -1,6 +1,6 @@
 # AGENTS.md — 开放世界 / OpenWorld v5.2.1
 
-开发者画面优先源码25bc2ce已提交推送test，Both/常规编译HTTP204；按用户要求不监控，最终结果未知。产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”，test版本5.2.1 / 5.2.1+59保持；未合入main的版本变化。见[Baseline26实施快照](docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)、[当前任务](docs/tasks/T-2026-11-07-004-developer-screen-priority.md)和[当前状态](.codex/PROJECT_STATE.md)。V0不等于编译/真机PASS，四项策略单测未跑；仅补回执文档不二次编排。
+当前test上的T-2026-11-11-002已实现集中服务器配置与PC双配置切换，正按用户授权提交推送并触发双端常规编译，不监控。现有配置三套四项均已填齐，Android与PC1相同、PC2独立；维护入口为`libs/hbb_common/src/server_profiles.rs`，见[服务器配置](docs/AI_ENGINEERING/15_SERVER_PROFILES.md)和[当前状态](.codex/PROJECT_STATE.md)。test版本5.2.1 / 5.2.1+59保持；静态检查不代替构建或联调结果。
 
 PC主窗口Ctrl+Shift+H双密码验证保持；成功后增加进程native模式，新建/重连携带角色。Android有已认证开发者连接时，普通连接暂停普通/截图/ADB画面及盲输入/采集控制，保留会话与ZEGO；最后开发者离开恢复。角色是协作声明而非抗伪造凭证，见ADR-0028。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 

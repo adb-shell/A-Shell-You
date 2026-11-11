@@ -1,5 +1,23 @@
 # OpenWorld Commercial Test Matrix
 
+## 2026-11-12 服务器配置 / T-2026-11-11-002
+
+输入test/51292c2 / Baseline26；[维护、实现合同和正式命令](docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。提交前现有三套地址均已填齐，Android=PC1、PC2独立；地址语法、公共Key与集中来源已静态核对，服务可用性未验证。
+
+| Case | 验证目标 | Level | Result |
+|---|---|---|---|
+| SCP-01 | 原地址/公钥保留、三配置字段/平台分支、独立缓存、revision/IPC/FRB合同、无版本/依赖/协议/generated更改、diff | V0 | PASS（当时快照）：首轮27/27、续接31/31；提交前现有地址编辑另做语法/唯一来源检查，原地址与空PC2条件不再适用 |
+| SCP-02 | server_profiles四项单测与websocket两项转换测试（14情形），不写真实配置 | V1 | NOT_RUN |
+| SCP-03 | Windows/Android完整构建与native加载；无需FRB/protobuf签名生成变更 | V2 | NOT_RUN |
+| SCP-04 | 首启PC1；空PC2禁用；补齐B后A→B→A四项消费一致，重启记忆；Android不受PC选择影响 | V3/V4 | NOT_RUN |
+| SCP-05 | 远控/文件/终端/语音窗口及OIDC/账号/设备同步期间拒绝；无会话时完成切换 | V3/V4 | NOT_RUN |
+| SCP-06 | 相同peer ID的A/B密码/收藏/最近记录隔离；Ab/Group/搜索/输入栏/账号不串用；重新登录与重复切换 | V3/V4 | NOT_RUN |
+| SCP-07 | IPC断开/超时/迟到确认、旧后台、B离线、配置落盘失败；不假就绪、不自动回A、不重复提交 | V3/V4 | NOT_RUN |
+| SCP-08 | 延迟HTTP/heartbeat/OIDC/设备列表结果、后台/GUI重启与同步、缓存落盘交错；旧结果不覆盖当前环境；文件名/显式server入口无绕行、relay匹配、IPv6/WS、移动HTTP与缓存调度、空闲窗口关闭失败 | V3/V4 | NOT_RUN |
+| SCP-09 | A/B各自远控/文件/终端/ADB/剪贴板/双向ZEGO；strict relay-only、开发者画面优先、Android采集权限回归 | V3/V4 | NOT_RUN |
+
+同时沿用NET-01/02/04/05/07、API-01/02/03/04/08、FLT-02/04/05/06/08及AND-01/04/07。未连接生产或填写虚构B，不能把静态PASS扩展为功能验收。
+
 ## 2026-11-07 开发者画面优先 / T004
 
 实现快照：[Baseline26](docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)；[任务与命令](docs/tasks/T-2026-11-07-004-developer-screen-priority.md)。V0不能代替双端编译或通话验收。

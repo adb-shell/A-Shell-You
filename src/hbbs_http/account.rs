@@ -112,6 +112,7 @@ pub struct OidcSession {
     keep_querying: bool,
     running: bool,
     query_timeout: Duration,
+    profile_generation: u64,
 }
 
 #[derive(Serialize)]
@@ -129,6 +130,10 @@ impl Default for UserStatus {
 }
 
 impl OidcSession {
+    pub fn is_running() -> bool {
+        OIDC_SESSION.read().unwrap().running
+    }
+
     fn new() -> Self {
         Self {
             client: create_http_client(),
@@ -139,6 +144,7 @@ impl OidcSession {
             keep_querying: false,
             running: false,
             query_timeout: Duration::from_secs(QUERY_TIMEOUT_SECS),
+            profile_generation: hbb_common::server_profiles::generation(),
         }
     }
 
@@ -194,6 +200,7 @@ impl OidcSession {
     fn before_task(&mut self) {
         self.reset();
         self.running = true;
+        self.profile_generation = hbb_common::server_profiles::generation();
     }
 
     fn after_task(&mut self) {
@@ -205,8 +212,10 @@ impl OidcSession {
     }
 
     fn auth_task(api_server: String, op: String, id: String, uuid: String, remember_me: bool) {
+        let generation = hbb_common::server_profiles::generation();
         let auth_request_res = Self::auth(&api_server, &op, &id, &uuid);
         log::info!("Request oidc auth result: {:?}", &auth_request_res);
+        if generation != hbb_common::server_profiles::generation() { return; }
         let code_url = match auth_request_res {
             Ok(HbbHttpResponse::<_>::Data(code_url)) => code_url,
             Ok(HbbHttpResponse::<_>::Error(err)) => {
@@ -241,7 +250,9 @@ impl OidcSession {
         let begin = Instant::now();
         let query_timeout = OIDC_SESSION.read().unwrap().query_timeout;
         while OIDC_SESSION.read().unwrap().keep_querying && begin.elapsed() < query_timeout {
-            match Self::query(&api_server, &code_url.code, &id, &uuid) {
+            let response = Self::query(&api_server, &code_url.code, &id, &uuid);
+            if generation != hbb_common::server_profiles::generation() { return; }
+            match response {
                 Ok(HbbHttpResponse::<_>::Data(auth_body)) => {
                     if auth_body.r#type == "access_token" {
                         if remember_me {
@@ -323,6 +334,9 @@ impl OidcSession {
     }
 
     fn get_result_(&self) -> AuthResult {
+        if self.profile_generation != hbb_common::server_profiles::generation() {
+            return AuthResult { state_msg: String::new(), failed_msg: "服务器已切换，请重新登录".to_owned(), url: None, auth_body: None };
+        }
         AuthResult {
             state_msg: self.state_msg.to_string(),
             failed_msg: self.failed_msg.clone(),

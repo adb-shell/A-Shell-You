@@ -153,8 +153,26 @@ pub fn refresh_options() {
     }
 }
 
+pub fn reset_connect_status() {
+    UI_STATUS.lock().unwrap().status_num = 0;
+}
+
 #[inline]
 pub fn get_option<T: AsRef<str>>(key: T) -> String {
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    match key.as_ref() {
+        hbb_common::server_profiles::PROFILE_STATE_OPTION => return crate::server_profile::state(),
+        hbb_common::server_profiles::PROFILE_ERROR_OPTION => return crate::server_profile::last_error(),
+        _ => {}
+    }
+    if key.as_ref() == hbb_common::server_profiles::PROFILE_OPTION
+        || hbb_common::server_profiles::ENDPOINT_KEYS.contains(&key.as_ref())
+    {
+        return Config::get_option(key.as_ref());
+    }
+    if key.as_ref() == hbb_common::server_profiles::REVISION_OPTION {
+        return Config::server_profile_revision().to_string();
+    }
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
         let map = OPTIONS.lock().unwrap();
@@ -388,6 +406,14 @@ pub fn set_options(m: HashMap<String, String>) {
 
 #[inline]
 pub fn set_option(key: String, value: String) {
+    if hbb_common::server_profiles::ENDPOINT_KEYS.contains(&key.as_str()) {
+        return;
+    }
+    if key == hbb_common::server_profiles::PROFILE_OPTION {
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
+        crate::server_profile::select(&value);
+        return;
+    }
     if &key == "stop-service" {
         #[cfg(target_os = "macos")]
         {
@@ -1157,6 +1183,7 @@ async fn check_connect_status_(reconnect: bool, rx: mpsc::UnboundedReceiver<ipc:
 
     loop {
         if let Ok(mut c) = ipc::connect(1000, "").await {
+            let mut profile_status_supported = false;
             let mut timer = crate::rustdesk_interval(time::interval(time::Duration::from_secs(1)));
             loop {
                 tokio::select! {
@@ -1175,6 +1202,13 @@ async fn check_connect_status_(reconnect: bool, rx: mpsc::UnboundedReceiver<ipc:
                                 UI_STATUS.lock().unwrap().mouse_time = v;
                             }
                             Ok(Some(ipc::Data::Options(Some(v)))) => {
+                                profile_status_supported = v.contains_key(hbb_common::server_profiles::PROFILE_OPTION);
+                                if let Some(id) = v.get(hbb_common::server_profiles::PROFILE_OPTION) {
+                                    let revision = v.get(hbb_common::server_profiles::REVISION_OPTION)
+                                        .and_then(|value| value.parse().ok()).unwrap_or(0);
+                                    if revision < Config::server_profile_revision() { continue; }
+                                    Config::sync_server_profile(id, revision);
+                                }
                                 *OPTIONS.lock().unwrap() = v;
                                 *OPTION_SYNCED.lock().unwrap() = true;
 
@@ -1201,7 +1235,15 @@ async fn check_connect_status_(reconnect: bool, rx: mpsc::UnboundedReceiver<ipc:
                             Ok(Some(ipc::Data::VideoConnCount(Some(n)))) => {
                                 video_conn_count = n;
                             }
-                            Ok(Some(ipc::Data::OnlineStatus(Some((mut x, _c))))) => {
+                            Ok(Some(ipc::Data::OnlineStatus(Some((x, _c))))) => {
+                                // Compatibility with an old service is limited to the original profile.
+                                if !profile_status_supported && Config::server_profile_revision() == 0 {
+                                    UI_STATUS.lock().unwrap().status_num = if x > 0 { 1 } else { x as i32 };
+                                }
+                            }
+                            Ok(Some(ipc::Data::ServerProfileStatus(Some((mut x, _c, revision))))) => {
+                                profile_status_supported = true;
+                                if revision != Config::server_profile_revision() { continue; }
                                 if x > 0 {
                                     x = 1
                                 }
@@ -1229,6 +1271,9 @@ async fn check_connect_status_(reconnect: bool, rx: mpsc::UnboundedReceiver<ipc:
                     }
                     _ = timer.tick() => {
                         c.send(&ipc::Data::OnlineStatus(None)).await.ok();
+                        if profile_status_supported {
+                            c.send(&ipc::Data::ServerProfileStatus(None)).await.ok();
+                        }
                         c.send(&ipc::Data::Options(None)).await.ok();
                         c.send(&ipc::Data::Config(("id".to_owned(), None))).await.ok();
                         c.send(&ipc::Data::Config(("temporary-password".to_owned(), None))).await.ok();

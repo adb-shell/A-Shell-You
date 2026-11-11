@@ -1,5 +1,7 @@
 # OpenWorld Architecture Decision Records
 
+新增：[ADR-0029：集中端点与PC服务器配置切换](0029-central-server-profiles.md)，D-036 / accepted for implementation；test/51292c2工作区，V0，正式验证待证。
+
 当前：[ADR-0028 开发者画面优先](0028-developer-screen-priority.md)，D-035 / T-2026-11-07-004；test工作区实现，V0，双端编译及多PC/语音验收待证。
 
 当前产品身份：[ADR-0027 开放世界产品身份](0027-openworld-product-identity.md)，D-034 / T-2026-11-07-001。替代ADR-0014的当前命名；以下日期记录保持历史含义。

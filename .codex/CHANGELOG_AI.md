@@ -1,8 +1,19 @@
 # OpenWorld AI Changelog
 
+2026-11-12 / T-2026-11-11-002续接提交：2026-11-12提交前续接：用户明确授权提交并推送test，再触发PC和Android常规编译，要求不监控。现有工作区三套四项地址均已填写；ANDROID与PC_1相同，PC_2四项均不同，且Android/PC1已不同于初次迁移值。本轮保留这些现有编辑；共享ID公钥保持，地址只做本地语法与集中来源核对，未连接实际服务。历史“PC2留空/原地址保持”是先前检查时的快照。 CE-20261111-T002-04 / STATE、WORK-20261111-002-r4，active/T7，Git与dispatch回执待记录。
+
+2026-11-12 / T-2026-11-11-002续接：用户要求四类端点和Android/原功能复查，已修正遗留ID/relay入口及桌面/移动调度边界；V0 31/31及diff通过，六项单测、双端编译和联调NOT_RUN。CE-20261111-T002-03 / STATE、WORK-20261111-002-r3；[详情](../docs/tasks/T-2026-11-11-002-server-profiles.md)。
+
+## T-2026-11-11-002：服务器配置集中与PC切换（正式验证待证）
+
+- 用户授权从main/5d2d2e9切换既有test/51292c2并实施；当前HEAD未变、工作区修改未提交。Android/PC1原地址保留，PC2按用户续接明确留空。
+- 单一配置源、左下角选择器、服务IPC确认、独立账号/peer缓存、旧异步结果过滤已实现；版本/协议/generated/依赖保持。维护见[Server Profiles](../docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。
+- 27/27 V0合同及diff通过；四项单测已添加未运行，双端构建/真机/真实服务NOT_RUN，本机无对应工具链。handoff/T7仅源码文档交接，无commit/push/merge/build/codegen/发布。
+- [任务](../docs/tasks/T-2026-11-11-002-server-profiles.md) / STATE、WORK-20261111-002-r2 / CE-20261111-T002-01/02 / D-036 / ADR-0029。
+
 Schema Version：`1.0`  
 Coverage Start：2026-07-12  
-Last Updated：2026-11-07（开发者画面优先）
+Last Updated：2026-11-12（集中服务器配置）
 
 Mode：`append-only task-level index`
 

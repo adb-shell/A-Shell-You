@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261107-004-r4`
-Last Updated：2026-11-07
-Active Task Count：0
+Registry Revision：`WORK-20261111-002-r4`
+Last Updated：2026-11-12
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-无活动任务。用户指定的test提交推送、双端编排触发已完成；按要求不监控，不自动查询构建结果或再次dispatch。
+T-2026-11-11-002 / active / T7：按用户最新授权提交推送test并触发Both/常规编译，不监控。当前三套地址已由工作区编辑填齐，Android=PC1，PC2独立；保留现有配置。本地/远端起点51292c2；源码静态检查已完成，实际Git/dispatch回执另记。CE-20261111-T002-01—04；D-036 / ADR-0029；[任务](../docs/tasks/T-2026-11-11-002-server-profiles.md)。
 
 ## 2. Concurrent Session Rules
 

@@ -1,5 +1,9 @@
 # OpenWorld 构建系统 / Build System
 
+## 2026-11-12：服务器地址编译输入
+
+地址唯一输入改为`libs/hbb_common/src/server_profiles.rs`；`.info`保留为`build.cmd`兼容文件但不再含API/ID端点。旧环境变量/文件名端点覆盖不改变有效地址；修改配置需重新编译，构建脚本、版本、锁文件保持。当前仅V0，无本轮构建结果；命令和环境见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)。
+
 2026-11-07 T004：源码test/25bc2ce已推送并触发唯一BT工作流，Platform=Both、BuildMode=常规编译，HTTP204；沿用既有临时测试签名和Actions产物。用户要求不监控，单次定位尚无run，最终编译/产物未验证；无工作流、依赖或版本变更。后续文档提交不重复编排，详见[任务回执](../tasks/T-2026-11-07-004-developer-screen-priority.md)。
 
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
