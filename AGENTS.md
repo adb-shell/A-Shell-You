@@ -1,6 +1,6 @@
 # AGENTS.md — 开放世界 / OpenWorld v5.2.1
 
-test/e0ea612上的T-2026-11-12-001已修复服务器配置的Rust编译错误及Android CI镜像DNS阻塞，待按用户授权提交推送并重新触发双端常规编译，不监控。现有PC2四项地址编辑一并保留；Android/PC1与公共Key保持。维护见[服务器配置](docs/AI_ENGINEERING/15_SERVER_PROFILES.md)，验证与回执见[本次任务](docs/tasks/T-2026-11-12-001-build-fixes.md)和[当前状态](.codex/PROJECT_STATE.md)。版本5.2.1/5.2.1+59不变；局部检查不能替代完整编译或运行验收。
+T-2026-11-12-001修复源码f4a71c6已推送test：Rust编译错误与Android CI镜像DNS阻塞路径已修正，PC2现有四项地址编辑一并保留，Android/PC1与公共Key保持。Both/常规编译已HTTP204受理，按用户要求不监控，结果未知。维护见[服务器配置](docs/AI_ENGINEERING/15_SERVER_PROFILES.md)，日志、局部检查与回执见[本次任务](docs/tasks/T-2026-11-12-001-build-fixes.md)和[当前状态](.codex/PROJECT_STATE.md)。版本5.2.1/5.2.1+59保持；局部检查不能替代完整编译或运行验收。
 
 PC主窗口Ctrl+Shift+H双密码验证保持；成功后增加进程native模式，新建/重连携带角色。Android有已认证开发者连接时，普通连接暂停普通/截图/ADB画面及盲输入/采集控制，保留会话与ZEGO；最后开发者离开恢复。角色是协作声明而非抗伪造凭证，见ADR-0028。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 

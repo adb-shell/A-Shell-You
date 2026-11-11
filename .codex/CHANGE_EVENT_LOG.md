@@ -1,5 +1,11 @@
 # OpenWorld Change Event Log
 
+## CE-20261112-T001-03：test修复与不监控双端编译回执
+
+修复源码f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b已提交推送origin/test，dispatch前远端SHA一致。2026-11-11 16:23:49 UTC（2026-11-12 01:23:49 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求未查询新run/jobs/logs/artifacts，未监控，最终构建结果未知。
+
+STATE、WORK-20261112-001-r3，T8关闭指定交付范围。仅补文档回执并推送，不二次触发；本机局部检查不提升为Rust/Android正式编译PASS。
+
 ## CE-20261112-T001-02：Rust与CI修复及验证
 
 2026-11-12 / T-2026-11-12-001：依据用户ZIP修复cd21705的Windows三处Rust编译错误；Android卡在APT镜像DNS解析，更新失败后旧索引继续安装，约28分钟后取消。Rust补宏导入与async move所有权；CI改独立官方HTTPS源/新索引，更新错误即退出，更新5分钟、安装10分钟、步骤17分钟上限。

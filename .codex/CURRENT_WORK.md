@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261112-001-r2`
+Registry Revision：`WORK-20261112-001-r3`
 Last Updated：2026-11-12
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-T-2026-11-12-001 / active / T7：Windows宏导入/异步所有权与Android APT官方源/新索引/超时修复完成，Bash语法及离线流程7/7通过；用户授权test提交推送及Both/常规编译，触发后不监控。起点e0ea612 clean，保留PC2现有地址编辑；待提交推送及dispatch。CE-20261112-T001-01/02；[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
+none；本次指定交付范围已关闭，新编译及运行验证结果待证。
 
 ## 2. Concurrent Session Rules
 
@@ -25,6 +25,6 @@ T-2026-11-12-001 / active / T7：Windows宏导入/异步所有权与Android APT�
 
 ## 4. Last Closed Task
 
-T-2026-11-11-002 / complete / T8（源码、文档、test提交推送与双端编译触发交付）。源码cd21705已推送origin/test；Both/常规编译HTTP204。用户要求不监控，未查询运行/日志/产物，最终结果未知。三套现有地址已填齐，Android=PC1、PC2独立；共享Key保持。补回执文档不二次编排。
+T-2026-11-12-001 / complete / T8：Rust宏导入与异步所有权、Android APT官方源/独立索引/有界失败修复已推送test/f4a71c6，保留PC2地址编辑。Both/常规编译HTTP204，用户要求不监控，未查询新运行或产物，结果未知。补文档回执不再次编排。
 
-[详细任务](../docs/tasks/T-2026-11-11-002-server-profiles.md) / STATE-20261111-002-r5 / CE-20261111-T002-01—05 / D-036 / ADR-0029。T8不表示V1/V2/V3/V4通过；历史任务留在TASK_HISTORY和CHANGELOG_AI。
+[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md) / STATE-20261112-001-r3 / CE-20261112-T001-01—03 / D-036 / ADR-0029。Bash语法与离线流程7/7通过，不表示正式编译、服务或真机验收完成。
