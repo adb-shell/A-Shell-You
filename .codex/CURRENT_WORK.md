@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261112-001-r5`
+Registry Revision：`WORK-20261112-001-r6`
 Last Updated：2026-11-12
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-T-2026-11-12-001 / active / T7续修：用户报告主源DNS失败和_apt权限警告；沿用本任务修复、test提交推送、双端常规编译且不监控授权。起点test/bbebc74 clean；CI沙箱路径与三候选镜像修复完成，Bash语法及13项离线回归通过；待提交推送/dispatch。CE-20261112-T001-04/05；[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
+none；本次续修交付范围已关闭，真实runner验证和新构建结果待证。
 
 ## 2. Concurrent Session Rules
 
@@ -25,6 +25,6 @@ T-2026-11-12-001 / active / T7续修：用户报告主源DNS失败和_apt权限�
 
 ## 4. Last Closed Task
 
-T-2026-11-12-001 / complete / T8：Rust宏导入与异步所有权、Android APT官方源/独立索引/有界失败修复已推送test/f4a71c6，保留PC2地址编辑。Both/常规编译HTTP204，用户要求不监控，未查询新运行或产物，结果未知。补文档回执不再次编排。
+T-2026-11-12-001 / complete / T8续修交付：test/c788e8d已推送，APT改/tmp沙箱路径与三候选签名镜像，13项离线回归通过；产品源码/配置无增量。Both/常规编译HTTP204受理，不监控且未查询新运行，结果未知；后续只补回执文档。
 
-[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md) / STATE-20261112-001-r3 / CE-20261112-T001-01—03 / D-036 / ADR-0029。Bash语法与离线流程7/7通过，不表示正式编译、服务或真机验收完成。
+[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md) / STATE-20261112-001-r6 / CE-20261112-T001-01—06 / D-036 / ADR-0029。真实Linux权限、runner DNS和完整编译仍待证，不将离线检查提升为运行PASS。

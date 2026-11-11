@@ -1,6 +1,6 @@
 # AGENTS.md — 开放世界 / OpenWorld v5.2.1
 
-T-2026-11-12-001正在test/bbebc74上续修Android CI：上次主源DNS仍失败，并有_apt目录权限警告；已改/tmp沙箱路径、三候选签名镜像和有界失败，13项离线回归通过。待按原授权提交推送test、重新触发双端常规编译，不监控。产品源码/三套服务器配置和版本5.2.1/5.2.1+59保持；真实runner验证待证。见[任务](docs/tasks/T-2026-11-12-001-build-fixes.md)与[当前状态](.codex/PROJECT_STATE.md)。
+T-2026-11-12-001续修源码c788e8d已推送test：APT改用/tmp沙箱路径、三候选Ubuntu签名镜像与有界失败，13项离线回归通过。Both/常规编译已HTTP204受理，按用户要求不监控，实际runner DNS、_apt权限和编译结果仍待证。产品源码、三套服务器配置及版本5.2.1/5.2.1+59保持。见[任务与回执](docs/tasks/T-2026-11-12-001-build-fixes.md)和[当前状态](.codex/PROJECT_STATE.md)。
 
 PC主窗口Ctrl+Shift+H双密码验证保持；成功后增加进程native模式，新建/重连携带角色。Android有已认证开发者连接时，普通连接暂停普通/截图/ADB画面及盲输入/采集控制，保留会话与ZEGO；最后开发者离开恢复。角色是协作声明而非抗伪造凭证，见ADR-0028。历史任务/基线只供追溯，不继承旧授权或构建结论；新会话先核对HEAD/status。
 
