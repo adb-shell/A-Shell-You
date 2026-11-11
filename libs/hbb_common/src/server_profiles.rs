@@ -1,7 +1,4 @@
-//! 服务器地址的唯一维护入口。修改后重新编译；PC切换只保存配置编号。
-//! Android始终使用ANDROID；桌面默认PC_1，可在空闲时选择PC_2。
-//! id/relay填写host:port（IPv6使用[host]:port）；API/Token填写完整URL。
-//! 这里只保存服务地址与服务器公钥，通话Token仍由服务端动态签发。
+//! 服务器地址的唯一维护入口
 
 use serde_derive::Serialize;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -29,7 +26,7 @@ pub struct ServerProfile {
     pub voice_token_url: &'static str,
 }
 
-// Android配置（与PC配置独立维护）。
+// Android配置
 pub const ANDROID: ServerProfile = ServerProfile {
     id: "android",
     name: "Android",
@@ -39,7 +36,7 @@ pub const ANDROID: ServerProfile = ServerProfile {
     voice_token_url: "http://43.255.158.17:10053",
 };
 
-// PC配置1（默认）。
+// PC配置1
 pub const PC_1: ServerProfile = ServerProfile {
     id: "pc_1",
     name: "服务器 1",
@@ -49,7 +46,7 @@ pub const PC_1: ServerProfile = ServerProfile {
     voice_token_url: "http://216.236.63.58:10053",
 };
 
-// PC配置2：填写四项后即可选择。空配置不可启用，也不会回退到其他服务器。
+// PC配置2
 pub const PC_2: ServerProfile = ServerProfile {
     id: "pc_2",
     name: "服务器 2",
@@ -106,7 +103,6 @@ impl ServerProfile {
         Some(value.to_owned())
     }
 
-    // 配置1兼容原安装数据；配置2与配置1完全分开。
     pub fn data_suffix(&self) -> &'static str {
         if self.id == PC_2.id { "_pc_2" } else { "" }
     }
