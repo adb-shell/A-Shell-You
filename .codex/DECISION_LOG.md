@@ -2,6 +2,8 @@
 
 ## D-036：集中服务器配置与空闲PC切换
 
+- 交付回执：源码cd21705推送test，Both/常规编译HTTP204；未监控、结果未知。CE-20261111-T002-05 / STATE、WORK-20261111-002-r5；不改变架构决策或提升运行验证等级。
+
 - 提交前状态：三套四项地址已有工作区编辑填齐，Android=PC1、PC2独立；保留这些编辑，不改变平台选择与缓存隔离决策。用户授权test提交推送与Both/常规编译且不监控，CE-20261111-T002-04。
 
 - accepted for implementation；2026-11-12；用户明确要求test实施，确认Android/PC1保持当前地址、PC2留空自行填写。详见[ADR-0029](../docs/ADR/0029-central-server-profiles.md)。

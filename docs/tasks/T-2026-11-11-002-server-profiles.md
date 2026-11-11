@@ -1,5 +1,12 @@
 # T-2026-11-11-002：集中服务器配置与 PC 双配置切换
 
+## 2026-11-12提交推送与双端编译回执 / CE-20261111-T002-05
+
+- 源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。
+- 提交前已保留三套配置和四份历史ZEGO文档的现有地址编辑；十二项地址本地语法、共享Key与运行源码唯一来源核对通过，暂存差异格式检查通过。原31/31检查是更新地址前的静态快照；实际服务与真机仍未验证。
+- T8/complete仅关闭本次源码、文档、test提交推送与构建触发交付；六项单测未执行，构建/native加载和A/B/Android/语音联调待证，不表示所有功能已验收。
+- STATE、WORK-20261111-002-r5。本次只补回执文档并提交推送，不再次dispatch；无main/版本/工作流/生产改动。
+
 ## 2026-11-12提交与双端编译授权 / CE-20261111-T002-04
 
 - 2026-11-12提交前续接：用户明确授权提交并推送test，再触发PC和Android常规编译，要求不监控。现有工作区三套四项地址均已填写；ANDROID与PC_1相同，PC_2四项均不同，且Android/PC1已不同于初次迁移值。本轮保留这些现有编辑；共享ID公钥保持，地址只做本地语法与集中来源核对，未连接实际服务。历史“PC2留空/原地址保持”是先前检查时的快照。
@@ -16,7 +23,7 @@
 - V0：31/31复查合同、diff通过；新旧四项地址及共享ID Key/既有broker鉴权保持。协议/generated/JNI/Kotlin/ADB/ZEGO媒体/开发者画面策略/版本/依赖/构建脚本未变。无工具链，六项相关单测、完整编译/真机/服务验证NOT_RUN，不能扩大为运行PASS。
 - STATE、WORK-20261111-002-r3；继续handoff/T7。test/51292c2工作区未提交；维护与验证命令见[15_SERVER_PROFILES](../AI_ENGINEERING/15_SERVER_PROFILES.md)。
 
-## Task Metadata / T0—T4
+## 初次实施记录 / Task Metadata / T0—T4
 
 - Owner：Codex / openworld-master；领域：Rust、Flutter、Android、Network、API；Security/Release为约束复核。
 - 当前授权：用户要求切换现有test并实施前述方案。已从干净main/5d2d2e9切至干净test/51292c2；只授权此次switch、代码与配套文档。无commit/push/merge、版本、编译/测试/codegen、设备/生产访问或发布授权。

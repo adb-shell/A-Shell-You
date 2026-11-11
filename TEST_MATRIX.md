@@ -8,7 +8,7 @@
 |---|---|---|---|
 | SCP-01 | 原地址/公钥保留、三配置字段/平台分支、独立缓存、revision/IPC/FRB合同、无版本/依赖/协议/generated更改、diff | V0 | PASS（当时快照）：首轮27/27、续接31/31；提交前现有地址编辑另做语法/唯一来源检查，原地址与空PC2条件不再适用 |
 | SCP-02 | server_profiles四项单测与websocket两项转换测试（14情形），不写真实配置 | V1 | NOT_RUN |
-| SCP-03 | Windows/Android完整构建与native加载；无需FRB/protobuf签名生成变更 | V2 | NOT_RUN |
+| SCP-03 | Windows/Android完整构建与native加载；无需FRB/protobuf签名生成变更 | V2 | cd21705 / Both / 常规编译，2026-11-11 15:47:44 UTC HTTP204受理；按用户要求不监控，结果未知，native加载待验 |
 | SCP-04 | 首启PC1；空PC2禁用；补齐B后A→B→A四项消费一致，重启记忆；Android不受PC选择影响 | V3/V4 | NOT_RUN |
 | SCP-05 | 远控/文件/终端/语音窗口及OIDC/账号/设备同步期间拒绝；无会话时完成切换 | V3/V4 | NOT_RUN |
 | SCP-06 | 相同peer ID的A/B密码/收藏/最近记录隔离；Ab/Group/搜索/输入栏/账号不串用；重新登录与重复切换 | V3/V4 | NOT_RUN |

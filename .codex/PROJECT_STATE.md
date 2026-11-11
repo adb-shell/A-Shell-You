@@ -1,15 +1,15 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261111-002-r4`
+State Revision：`STATE-20261111-002-r5`
 Last Updated / Observed At：2026-11-12（Asia/Tokyo）
-Evidence Scope：`repository-observed / V0`
+Evidence Scope：`repository-observed / V0 + dispatch-accepted (HTTP204)`
 
 ## 当前源码基线
 
-- 本轮从干净main/5d2d2e932cfb390a7b3d0278bea6a7e080746c95按用户要求切换已有test/51292c29a025ee3ad6a3915285b8f21e7e260ee8。当前test HEAD不变，工作区为T002实现，未提交。
+- 本轮从干净main/5d2d2e932cfb390a7b3d0278bea6a7e080746c95按用户要求切换已有test/51292c29a025ee3ad6a3915285b8f21e7e260ee8。本次实现已提交为cd2170512613291d48709bc5ec9e393c8feb42e8并推送origin/test；后续仅补回执文档。
 - 输入基线[Baseline26](../docs/BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)，test版本5.2.1/5.2.1+59保持；没有合入main的2.0.26版本更改。
-- 最新授权：提交推送test并触发Both/常规编译，不监控；执行回执另记。无main写入、版本变化或生产发布。
+- 最新授权已执行：test提交推送、Both/常规编译HTTP204，不监控且未查询结果。无main写入、版本变化或生产发布。
 
 ## 当前能力摘要
 
@@ -32,7 +32,7 @@ Evidence Scope：`repository-observed / V0`
 
 ## 本轮工作与验证
 
-- [T-2026-11-11-002](../docs/tasks/T-2026-11-11-002-server-profiles.md)，active/T7：集中配置与PC状态栏选择器已实现。提交前现有编辑已更新三套地址：Android与PC1相同，PC2独立且四项填齐；共享Key保持。
+- [T-2026-11-11-002](../docs/tasks/T-2026-11-11-002-server-profiles.md)，complete/T8（仅本次交付范围）：集中配置与PC状态栏选择器已实现。提交前现有编辑已更新三套地址：Android与PC1相同，PC2独立且四项填齐；共享Key保持。
 - 唯一维护文件`libs/hbb_common/src/server_profiles.rs`；独立账号/peer缓存、后台确认、真实注册状态、旧响应过滤与UI刷新。见[15_SERVER_PROFILES](../docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。
-- 首轮V0 27/27、续接31/31静态合同及diff通过；四项配置与两项WebSocket单测已维护未运行；本机无cargo/rustc/flutter/dart，双端构建/设备/语音/API联调NOT_RUN，不能声明所有功能验收通过。
-- WORK-20261111-002-r4 / CE-20261111-T002-01—04 / D-036 / ADR-0029。生成桥接/协议/版本/依赖/构建脚本保持，无真实服务访问或凭据变更。
+- 首轮V0 27/27、续接31/31静态合同及diff通过；四项配置与两项WebSocket单测已维护未运行；本机无cargo/rustc/flutter/dart，双端构建仅有HTTP204受理，未查询结果；设备/语音/API联调NOT_RUN，不能声明所有功能验收通过。
+- WORK-20261111-002-r5 / CE-20261111-T002-01—05 / D-036 / ADR-0029。生成桥接/协议/版本/依赖/构建脚本保持，无真实服务访问或凭据变更。

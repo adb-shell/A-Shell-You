@@ -1,5 +1,7 @@
 # OpenWorld 构建系统 / Build System
 
+2026-11-12 / T-2026-11-11-002：源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。 仅补回执文档，不二次dispatch；详见[任务](../tasks/T-2026-11-11-002-server-profiles.md)。
+
 ## 2026-11-12：服务器地址编译输入
 
 地址唯一输入改为`libs/hbb_common/src/server_profiles.rs`；`.info`保留为`build.cmd`兼容文件但不再含API/ID端点。旧环境变量/文件名端点覆盖不改变有效地址；修改配置需重新编译，构建脚本、版本、锁文件保持。当前仅V0，无本轮构建结果；命令和环境见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)。

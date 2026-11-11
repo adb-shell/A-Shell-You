@@ -1,5 +1,11 @@
 # OpenWorld Change Event Log
 
+## CE-20261111-T002-05：提交推送与不监控编译回执
+
+源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。
+
+本事件只补回执与当前状态文档；T8关闭指定交付范围，STATE、WORK-20261111-002-r5。补文档提交推送不二次dispatch。单测/真机未执行，未声称构建PASS或发布就绪；外部资产无新增部署证据。
+
 ## CE-20261111-T002-04：test提交推送与双端编译授权
 
 2026-11-12提交前续接：用户明确授权提交并推送test，再触发PC和Android常规编译，要求不监控。现有工作区三套四项地址均已填写；ANDROID与PC_1相同，PC_2四项均不同，且Android/PC1已不同于初次迁移值。本轮保留这些现有编辑；共享ID公钥保持，地址只做本地语法与集中来源核对，未连接实际服务。历史“PC2留空/原地址保持”是先前检查时的快照。

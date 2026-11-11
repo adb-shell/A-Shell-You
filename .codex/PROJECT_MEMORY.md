@@ -4,9 +4,9 @@
 
 ## 0. 当前恢复基线
 
-当前test HEAD51292c29a025ee3ad6a3915285b8f21e7e260ee8，T-2026-11-11-002工作区实现未提交；输入Baseline26，test版本5.2.1/5.2.1+59保持。服务器地址唯一入口`libs/hbb_common/src/server_profiles.rs`：现有编辑已填齐三套四项地址，Android与PC1相同、PC2独立，空闲经后台确认后切换，独立账号/peer缓存。见[15_SERVER_PROFILES](../docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。
+T-2026-11-11-002源码cd2170512613291d48709bc5ec9e393c8feb42e8已推送origin/test，后续仅补回执文档；输入Baseline26，test版本5.2.1/5.2.1+59保持。服务器地址唯一入口`libs/hbb_common/src/server_profiles.rs`：现有编辑已填齐三套四项地址，Android与PC1相同、PC2独立，空闲经后台确认后切换，独立账号/peer缓存。见[15_SERVER_PROFILES](../docs/AI_ENGINEERING/15_SERVER_PROFILES.md)。
 
-STATE、WORK-20261111-002-r4 / CE-20261111-T002-01—04 / D-036 / ADR-0029；首轮V0 27/27、续接31/31及diff通过，六项相关单测与双端编译/联调NOT_RUN，active/T7。用户最新授权提交推送test及双端常规编译，要求不监控；实际回执另记。历史任务和编译回执只供追溯。
+STATE、WORK-20261111-002-r5 / CE-20261111-T002-01—05 / D-036 / ADR-0029；首轮V0 27/27、续接31/31及diff通过，六项相关单测/联调NOT_RUN，complete/T8仅本次交付范围。已推送test并触发双端常规编译，HTTP204受理；用户要求不监控，未查询run/jobs/logs/artifacts，构建结果未知。历史任务和编译回执只供追溯。
 
 原PC双密码/开发者画面优先与Android采集/ADB/ZEGO合同保持，见ADR-0028；不把历史构建HTTP204当本轮证据。先核对HEAD/status与[PROJECT_STATE](PROJECT_STATE.md)、[CURRENT_WORK](CURRENT_WORK.md)。
 

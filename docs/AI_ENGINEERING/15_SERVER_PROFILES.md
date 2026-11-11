@@ -1,5 +1,7 @@
 # 集中服务器配置 / Server Profiles
 
+交付回执：源码cd21705已推送test，Both/常规编译HTTP204受理；用户要求不监控，结果未知，后续仅补回执文档。详细时间与范围见[任务](../tasks/T-2026-11-11-002-server-profiles.md)。
+
 2026-11-12，T-2026-11-11-002；输入test/51292c2，基线[Baseline26](../BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)。提交前已有三套地址更新；V0静态检查不能证明编译或服务联调通过。
 
 ## 1. 日常维护

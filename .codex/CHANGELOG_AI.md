@@ -1,5 +1,7 @@
 # OpenWorld AI Changelog
 
+2026-11-12 / T-2026-11-11-002交付回执：源码cd2170512613291d48709bc5ec9e393c8feb42e8已提交并推送origin/test，提交说明“集中服务器配置并支持PC双服务器切换”；dispatch前远端SHA与本地一致。2026-11-11 15:47:44 UTC（2026-11-12 00:47:44 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。遵从用户要求，未查询run/jobs/logs/artifacts，未启动监控；构建最终结果未知。 T8仅关闭源码/文档/Git/触发交付，正式验证待证。CE-20261111-T002-05 / STATE、WORK-20261111-002-r5；补回执文档不二次编排。
+
 2026-11-12 / T-2026-11-11-002续接提交：2026-11-12提交前续接：用户明确授权提交并推送test，再触发PC和Android常规编译，要求不监控。现有工作区三套四项地址均已填写；ANDROID与PC_1相同，PC_2四项均不同，且Android/PC1已不同于初次迁移值。本轮保留这些现有编辑；共享ID公钥保持，地址只做本地语法与集中来源核对，未连接实际服务。历史“PC2留空/原地址保持”是先前检查时的快照。 CE-20261111-T002-04 / STATE、WORK-20261111-002-r4，active/T7，Git与dispatch回执待记录。
 
 2026-11-12 / T-2026-11-11-002续接：用户要求四类端点和Android/原功能复查，已修正遗留ID/relay入口及桌面/移动调度边界；V0 31/31及diff通过，六项单测、双端编译和联调NOT_RUN。CE-20261111-T002-03 / STATE、WORK-20261111-002-r3；[详情](../docs/tasks/T-2026-11-11-002-server-profiles.md)。
