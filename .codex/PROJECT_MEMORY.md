@@ -1,5 +1,7 @@
 # OpenWorld Project Memory
 
+2026-11-13 / T-2026-11-13-001 / complete/T8：合并提交`a9c7e1027849c296e2b8ed48b0cb5fae026ce0f9`已推送origin/main，两个parents为main/990a4aa和test/d9d30eb；提交说明“增加ADB无障碍开关快捷键”。触发前本地/远端SHA一致。2026-11-12 15:32:41 UTC（2026-11-13 00:32:41 Asia/Tokyo）向Build-Clients-BT.yml发送ref=main、Platform=Both、BuildMode=常规编译，HTTP204受理。未查询run/jobs/logs/artifacts，不监控，最终结果未知。 AMG-01通过：7个ADB源码与test一致，其余912个非Markdown文件与main一致，173个本地文档链接有效，无冲突标记，diff检查通过。原test未提交配置字节未变且未纳入提交；test分支保持d9d30eb。正式构建/多PC及OEM真机仍待证。 STATE/WORK-20261113-001-r2 / CE-20261113-T001-02。N/A — no decision delta；后续仅文档回执提交推送main，不二次编排。下方active/T7为此前历史快照。
+
 2026-11-13当前恢复指针：[ADB无障碍合并main](../docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)，main/990a4aa + test/d9d30eb，active/T7。保留main产品版本/配置，纳入动态本应用服务控制、暂停恢复及状态续修；原test未提交配置保持在原工作区。待推送main并触发一次双端编排，不监控；STATE/WORK-20261113-001-r1 / CE-20261113-T001-01。下文为历史快照。
 
 最后更新：2026-11-12。用途：当前会话恢复入口，不替代源码。

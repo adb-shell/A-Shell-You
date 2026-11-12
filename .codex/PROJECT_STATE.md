@@ -1,11 +1,11 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261113-001-r1`
+State Revision：`STATE-20261113-001-r2`
 Last Updated / Observed At：2026-11-13（Asia/Tokyo）
 Evidence Scope：`repository-observed / merge V0; product/device NOT_RUN`
 
-当前T-2026-11-13-001 / active/T7：main/990a4aa合并test/d9d30eb；仅纳入已提交的ADB本应用无障碍控制及续检修复。使用独立main工作区，原test工作区未提交的server_profiles.rs不纳入。主分支2.0.26 / 2.0.26+59和既有配置保持。待提交推送并触发一次main双端常规编译，不监控。WORK-20261113-001-r1 / CE-20261113-T001-01，见[当前合并任务](../docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)。
+当前T-2026-11-13-001 / complete/T8：合并提交`a9c7e1027849c296e2b8ed48b0cb5fae026ce0f9`已推送origin/main，两个parents为main/990a4aa和test/d9d30eb；提交说明“增加ADB无障碍开关快捷键”。触发前本地/远端SHA一致。2026-11-12 15:32:41 UTC（2026-11-13 00:32:41 Asia/Tokyo）向Build-Clients-BT.yml发送ref=main、Platform=Both、BuildMode=常规编译，HTTP204受理。未查询run/jobs/logs/artifacts，不监控，最终结果未知。 AMG-01通过：7个ADB源码与test一致，其余912个非Markdown文件与main一致，173个本地文档链接有效，无冲突标记，diff检查通过。原test未提交配置字节未变且未纳入提交；test分支保持d9d30eb。正式构建/多PC及OEM真机仍待证。 STATE/WORK-20261113-001-r2 / CE-20261113-T001-02；仅补回执文档，不再次编排。见[合并任务](../docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)。
 
 以下为合并前的历史交付快照：
 

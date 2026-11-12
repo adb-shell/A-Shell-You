@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261113-001-r1`
+Registry Revision：`WORK-20261113-001-r2`
 Last Updated：2026-11-13
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-T-2026-11-13-001 / active / T7：main合并ADB无障碍快捷操作；独立工作区，待提交推送和一次Both/常规编译。
+none；T-2026-11-13-001合并main并触发双端编排交付完成；本次只补回执，不再次编排。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,8 @@ T-2026-11-13-001 / active / T7：main合并ADB无障碍快捷操作；独立工�
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+T-2026-11-13-001 / complete / T8：合并提交`a9c7e1027849c296e2b8ed48b0cb5fae026ce0f9`已推送origin/main，两个parents为main/990a4aa和test/d9d30eb；提交说明“增加ADB无障碍开关快捷键”。触发前本地/远端SHA一致。2026-11-12 15:32:41 UTC（2026-11-13 00:32:41 Asia/Tokyo）向Build-Clients-BT.yml发送ref=main、Platform=Both、BuildMode=常规编译，HTTP204受理。未查询run/jobs/logs/artifacts，不监控，最终结果未知。 STATE/WORK-20261113-001-r2 / CE-20261113-T001-02。AMG-01通过：7个ADB源码与test一致，其余912个非Markdown文件与main一致，173个本地文档链接有效，无冲突标记，diff检查通过。原test未提交配置字节未变且未纳入提交；test分支保持d9d30eb。正式构建/多PC及OEM真机仍待证。
 
 以下为合并前的历史交付记录：
 

@@ -4,7 +4,7 @@
 
 | Field | Value |
 |---|---|
-| Status / T-State | active / T7，待Git交付与编排受理 |
+| Status / T-State | complete / T8，本次合并推送与触发范围完成 |
 | Requester | 项目维护者 |
 | Primary Skill / Release Owner | openworld-release-engineer；同会话进行范围与安全复核 |
 | Source | main/990a4aa48a77d63aa42dd12ac5d9f9e03b936e8f + test/d9d30eb9d6dc5b40dc6f831375fe3c83fe3b623e |
@@ -15,7 +15,7 @@
 | ADR / Decision | ADR-0018、ADR-0028、D-037；N/A — no decision delta |
 | Tests | AMG-01；ADB-A01—A06真机NOT_RUN |
 | External Assets | N/A — 沿用既有依赖与CI，无新增资产 |
-| State / Work / Event | STATE/WORK-20261113-001-r1 / CE-20261113-T001-01 |
+| State / Work / Event | STATE/WORK-20261113-001-r2 / CE-20261113-T001-01/02 |
 
 ## T0—T1. Authority and Requirements
 
@@ -48,4 +48,8 @@
 
 ## T8. Handoff
 
-待本次合并提交SHA、远端一致性及编排HTTP回执。完成后仅补文档回执并推送main，不重复编排；正式构建及设备结果保持未知。
+合并提交`a9c7e1027849c296e2b8ed48b0cb5fae026ce0f9`已推送origin/main，两个parents为main/990a4aa和test/d9d30eb；提交说明“增加ADB无障碍开关快捷键”。触发前本地/远端SHA一致。2026-11-12 15:32:41 UTC（2026-11-13 00:32:41 Asia/Tokyo）向Build-Clients-BT.yml发送ref=main、Platform=Both、BuildMode=常规编译，HTTP204受理。未查询run/jobs/logs/artifacts，不监控，最终结果未知。
+
+AMG-01通过：7个ADB源码与test一致，其余912个非Markdown文件与main一致，173个本地文档链接有效，无冲突标记，diff检查通过。原test未提交配置字节未变且未纳入提交；test分支保持d9d30eb。正式构建/多PC及OEM真机仍待证。
+
+STATE/WORK-20261113-001-r2 / CE-20261113-T001-02。仅补本回执文档提交推送main，不再次编排；源码保持a9c7e10。独立main工作区保留供后续使用，原test工作区配置编辑仍由用户维护。无新增架构决定、版本/依赖变化或生产发布。
