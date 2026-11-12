@@ -2,12 +2,12 @@
 
 ## 0. Task Metadata
 
-- Status / T-State：verifying / T7（续检修复提交与编排）；2026-11-12（Asia/Tokyo）。
+- Status / T-State：complete / T8（续检修复交付）；2026-11-12（Asia/Tokyo）。
 - Requester：用户；Principal / Domain / Security / Release：Codex（openworld-master，Android/Flutter/Security/Release 技能约束审阅，不委派）。
 - Source Branch / HEAD：test / a8abdd4c04951f930ea240c9951378ee3b8c165f；初始 clean，无用户修改。
 - Baseline：OW-BL-2026-11-07-d9f1119-screen-priority-worktree（Baseline26，历史输入）；当前实现以 test/a8abdd4 源码为准。
 - Risk：medium；最高验证 V4（正式设备联调待证）；ADR-0018、ADR-0028；既有 ADB-R21/R22、ADB-M21/M32、NET-04、DSP-09。
-- External Asset：N/A，无新依赖；当前STATE / WORK-20261112-003-r6；CE-20261112-T003-01—06；D-037。首次交付回执保持历史事实。
+- External Asset：N/A，无新依赖；当前STATE / WORK-20261112-003-r7；CE-20261112-T003-01—07；D-037。首次交付回执保持历史事实。
 
 ## T0. Authority and Baseline
 
@@ -84,3 +84,9 @@ PC 菜单新增本应用无障碍开启、关闭、暂停/恢复。Android 从�
 ## 续检修复提交与编排授权
 
 用户随后明确要求“推送并提交，然后执行编排”，授权将上述五个ADB文件与相关记录提交推送test，并触发一次Build-Clients-BT.yml / ref=test / Platform=Both / BuildMode=常规编译，沿用不监控要求。执行前本地和origin/test均为b25b9aa，工作区仅上述已复检变更，git diff --check通过；无新增业务修改、main合并或版本变化。STATE/WORK-20261112-003-r6 / CE-20261112-T003-06，T7待准确交付回执。
+
+## 续检修复交付回执
+
+源码`0e5cc3dfe567ffe0617849cea25c0e0eb5276797`（修复ADB无障碍暂停记录与多PC状态同步）已提交推送origin/test，触发前本地/远端SHA一致。2026-11-12 14:50:21 UTC（23:50:21 Asia/Tokyo），向Build-Clients-BT.yml发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。未查询run/jobs/logs/artifacts，不监控，最终结果未知。
+
+STATE/WORK-20261112-003-r7 / CE-20261112-T003-07，T8关闭本次源码/记录/Git/触发交付；后续仅回执文档提交推送，不再编排。24项静态检查通过，正式编译及OEM/多PC真机仍待证；无main、版本、依赖、生产或设备操作。

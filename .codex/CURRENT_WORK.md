@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261112-003-r6`
+Registry Revision：`WORK-20261112-003-r7`
 Last Updated：2026-11-12
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-T003 / active / T7：用户已追加授权续检修复提交推送test并触发一次Both/常规编译，不监控。输入test/b25b9aa及上一轮五个ADB源码文件/记录变更，无新增业务修改。STATE/WORK-20261112-003-r6 / CE-20261112-T003-06。
+none；T003续检修复已推送test/0e5cc3d，Both/常规编译HTTP204，不监控且结果未知。STATE/WORK-20261112-003-r7 / CE-20261112-T003-07。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,10 @@ T003 / active / T7：用户已追加授权续检修复提交推送test并触发�
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+T003 / complete / T8续检修复交付：源码0e5cc3d已推送test；2026-11-12 14:50:21 UTC触发Build-Clients-BT.yml / Both / 常规编译，HTTP204。未查询运行进度/结果；回执文档续交不二次构建。24项静态检查通过，正式编译/真机待证。STATE/WORK-20261112-003-r7 / CE-20261112-T003-07。
+
+以下为前阶段历史指针：
 
 T003 / complete / T8本轮本地复检：修正未执行命令遗留暂停记录、PC查询快照合并及监听回写。24项静态与diff通过；仅五个ADB源码文件及相关记录变化。改动保留test工作区，未提交推送、未触发或查询编排，正式设备与构建待证。[任务](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md) / STATE/WORK-20261112-003-r5 / CE-20261112-T003-04/05。
 
