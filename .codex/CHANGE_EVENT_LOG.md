@@ -1,5 +1,11 @@
 # OpenWorld Change Event Log
 
+## CE-20261113-T001-01：main合并授权与来源保护
+
+2026-11-13 / T-2026-11-13-001：按用户授权将test/d9d30eb合入main/990a4aa，指定提交说明“增加ADB无障碍开关快捷键”，推送main并触发Both/常规编译一次、不监控。独立工作区保护原test的未提交服务器配置；业务自动合并，七份Markdown冲突保留双方记录，原版本/配置/采集/媒体/语音保持。当前T7，交付回执待补；[任务](../docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)。N/A — no decision delta，沿用D-037、ADR-0018/0028及Baseline28。
+
+文件范围：七个ADB Java/Dart源码路径、13_REMOTE_ADB.md、TEST_MATRIX.md、T003任务及.codex状态记录；新建T-2026-11-13-001合并任务。原test配置修改按字节保留且不纳入提交；不重写历史、不合入test旧版本、不修改构建脚本/依赖。STATE/WORK-20261113-001-r1。
+
 ## CE-20261112-T002-02：main推送回执
 
 合并提交`c30efd61449a0e02b5b0546a25ddf948c5ad5d4e`已推送origin/main，并核对远端SHA一致；两个parents分别为main/5d2d2e9、test/a8abdd4。test仍为a8abdd4，推送后工作区clean。提交说明“统一配置文件(大改造节点一)”。本次只补交付回执，不改变源码、不触发或监控编译。
@@ -9,6 +15,36 @@
 ## CE-20261112-T002-01：合并授权与来源保护
 
 用户授权test→main合并推送，提交说明“统一配置文件(大改造节点一)”。输入main/5d2d2e9与test/a8abdd4，起始clean；保留main版本2.0.26 / 2.0.26+59与test最新服务器配置，15份文档冲突按双方记录整合。当前active/T7，V0与Git交付回执见[任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)。本轮不编译、不监控；STATE、WORK-20261112-002-r1 / CE-20261112-T002-01 / Baseline28。
+
+## CE-20261112-T003-07：续检修复推送及双端编排回执
+
+源码0e5cc3dfe567ffe0617849cea25c0e0eb5276797已推送origin/test，触发前SHA一致。2026-11-12 14:50:21 UTC（23:50:21 Asia/Tokyo）向Build-Clients-BT.yml发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204。未查询run/jobs/logs/artifacts、不监控，构建结果未知。STATE/WORK-20261112-003-r7，T8关闭指定交付；后续仅回执文档提交推送，不再次触发。
+
+## CE-20261112-T003-06：续检修复交付授权
+
+用户明确授权提交推送并编排；目标test，Build-Clients-BT.yml / Both / 常规编译一次，不监控。核对本地与origin/test均b25b9aa，待提交为已复检的五个ADB源码文件和相关记录，git diff --check通过，无新增业务修改。STATE/WORK-20261112-003-r6，T7。
+
+## CE-20261112-T003-05：定向复检修复完成
+
+两项确认问题已局部修复：未执行权限命令的失败还原操作前暂停记录；查询/完成回执合入菜单快照，处理进度推送改变epoch与旧revision晚到，共享监听仅消费状态。五个ADB源码文件变化；原系统列表命令逐字不变、旧命令错误文本/默认failure行为保持，原Kotlin/媒体/触摸/语音/协议无修改。24项静态检查及diff通过；无产品编译或真机。STATE/WORK-20261112-003-r5，T8本地复检范围完成；test/b25b9aa上的改动未提交推送，未触发/查询编排。
+
+## CE-20261112-T003-04：交付后定向复检
+
+test/b25b9aa clean输入，用户要求仅修确认的问题。发现commands.submit前保存暂停记录，命令未执行的失败仍会残留；PC apply回执未合入菜单snapshot。限定四个ADB模块文件修复，原Kotlin/媒体/语音/协议保持；本轮本地复检，不重复Git/编排或监控。STATE/WORK-20261112-003-r4，T5。
+
+## CE-20261112-T003-03：test推送与双端编排回执
+
+源码115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42已推送origin/test，dispatch前本地/远端一致。2026-11-12 13:42:08 UTC（22:42:08 Asia/Tokyo）向Build-Clients-BT.yml发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204。按用户要求不查询run/jobs/logs/artifacts，不监控，构建结果未知。STATE/WORK-20261112-003-r3，T8关闭本次交付；后续仅提交推送回执文档，不再dispatch。
+
+## CE-20261112-T003-02：独立权限控制实现与复检
+
+新增LocalAdbAccessibility，Manager仅挂入口/状态/取消；PC菜单直接执行并按Android真实paused切换恢复，toolbar隐藏不取消。动态自身组件、保留他项列表、暂停记录独立持久化、同设备拒绝积压、设置与ctx绑定核实。已有Rust权限/开发者优先边界保持，原Kotlin/媒体/触摸/ZEGO/协议/构建文件未改。
+
+25项静态合同/范围/词法与git diff --check通过；提取实际Java命令表达式在Git Bash下运行13项settings命令桩检查通过，不操作Android。真实构建与设备NOT_RUN。相关合同/TEST_MATRIX/记忆已同步；STATE/WORK-20261112-003-r2，T7待已授权test提交推送与一次Both/常规编译，不监控。
+
+## CE-20261112-T003-01：本应用无障碍控制授权与基线
+
+2026-11-12，test/a8abdd4 clean；用户批准既定方案并要求实现后 test 提交推送、双端编排、不监控。范围限定独立 ADB 模块与 PC 菜单：动态自身组件、暂停恢复、保留其他服务配置；原投屏/远控/语音不改造。STATE/WORK-20261112-003-r1，T5；[任务](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md)。
 
 ## CE-20261112-T001-06：续修与双端编译受理
 

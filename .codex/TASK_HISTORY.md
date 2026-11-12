@@ -1,8 +1,18 @@
 # OpenWorld Task History
 
+2026-11-13 / T-2026-11-13-001：按用户授权将test/d9d30eb合入main/990a4aa，指定提交说明“增加ADB无障碍开关快捷键”，推送main并触发Both/常规编译一次、不监控。独立工作区保护原test的未提交服务器配置；业务自动合并，七份Markdown冲突保留双方记录，原版本/配置/采集/媒体/语音保持。当前T7，交付回执待补；[任务](../docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)。N/A — no decision delta，沿用D-037、ADR-0018/0028及Baseline28。
+
 ## T-2026-11-12-002：统一配置合并main
 
 用户授权test→main合并推送，提交说明“统一配置文件(大改造节点一)”。输入main/5d2d2e9与test/a8abdd4，起始clean；保留main版本2.0.26 / 2.0.26+59与test最新服务器配置，15份文档冲突按双方记录整合。现已complete/T8（合并交付）；合并提交`c30efd61449a0e02b5b0546a25ddf948c5ad5d4e`已推送origin/main，并核对远端SHA一致；两个parents分别为main/5d2d2e9、test/a8abdd4。test仍为a8abdd4，推送后工作区clean。提交说明“统一配置文件(大改造节点一)”。本次只补交付回执，不改变源码、不触发或监控编译。 V0与Git交付回执见[任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)。本轮不编译、不监控；STATE、WORK-20261112-002-r2 / CE-20261112-T002-01/02 / Baseline28。
+
+2026-11-12 / T003续检修复complete/T8交付：0e5cc3dfe567ffe0617849cea25c0e0eb5276797已提交推送test；14:50:21 UTC向Build-Clients-BT.yml触发ref=test / Both / 常规编译，HTTP204。未监控、不查询结果。回执文档随后续交，不二次编排；24项静态通过，正式编译与设备待证。STATE/WORK-20261112-003-r7 / CE-20261112-T003-07。
+
+2026-11-12 / T003本地复检complete/T8：未执行权限命令时还原暂停记录，PC查询快照即时合并且保留乱序/权限边界。24项V0检查和diff通过，原生命周期/投屏/触摸/语音未改造，正式构建/设备待证。test/b25b9aa工作区未提交；未执行Git写、编排或监控。STATE/WORK-20261112-003-r5 / CE-20261112-T003-05。
+
+2026-11-12 / T003 complete/T8交付：源码115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42已提交推送test；13:42:08 UTC触发Build-Clients-BT.yml / ref=test / Both / 常规编译，HTTP204。未监控或查询结果；后续仅回执文档，不二次构建。25项静态与13项离线Shell通过，正式构建/真机待证。STATE/WORK-20261112-003-r3 / CE-20261112-T003-03。
+
+2026-11-12 / [T-2026-11-12-003](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md)：ADB本应用无障碍开启/关闭/暂停恢复，T7待test交付。动态目标、仅自身列表项、设备暂停记录、多PC真实状态；原投屏/远控/语音源码保持。25项静态与13项离线Shell检查及diff通过，正式构建/设备NOT_RUN；用户授权推送test及双端编排且不监控。STATE/WORK-20261112-003-r2 / CE-20261112-T003-01/02 / D-037。
 
 2026-11-12 / T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 T8仅指定交付范围；13项离线检查通过，真实runner验证未取得。STATE、WORK-20261112-001-r6 / CE-20261112-T001-04—06；补回执不二次编排。
 

@@ -1,5 +1,7 @@
 # OpenWorld Project Memory
 
+2026-11-13当前恢复指针：[ADB无障碍合并main](../docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)，main/990a4aa + test/d9d30eb，active/T7。保留main产品版本/配置，纳入动态本应用服务控制、暂停恢复及状态续修；原test未提交配置保持在原工作区。待推送main并触发一次双端编排，不监控；STATE/WORK-20261113-001-r1 / CE-20261113-T001-01。下文为历史快照。
+
 最后更新：2026-11-12。用途：当前会话恢复入口，不替代源码。
 
 ## 0. 当前恢复基线
@@ -9,6 +11,12 @@
 当前[T002合并任务](../docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)已complete/T8，STATE、WORK-20261112-002-r2 / CE-20261112-T002-01/02。合并提交`c30efd61449a0e02b5b0546a25ddf948c5ad5d4e`已推送origin/main，并核对远端SHA一致；两个parents分别为main/5d2d2e9、test/a8abdd4。test仍为a8abdd4，推送后工作区clean。提交说明“统一配置文件(大改造节点一)”。本次只补交付回执，不改变源码、不触发或监控编译。只合并推送，不编译或监控；c788e8d双端编排结果未知，V0不能提升为运行PASS。优先核对HEAD/status、[PROJECT_STATE](PROJECT_STATE.md)及[CURRENT_WORK](CURRENT_WORK.md)。
 
 ### 历史恢复记录（按原观察时点保留）
+
+最新T003续检交付：源码test/0e5cc3d已推送；2026-11-12 14:50:21 UTC触发Both/常规编译，HTTP204，未查询运行进度/结果。此前未提交修复已纳入；后续回执仅文档，不再编排。24项静态通过，正式编译/真机待证。STATE/WORK-20261112-003-r7 / CE-20261112-T003-07。
+
+最新T003本地续检：test/b25b9aa上未提交修复，确定未执行的权限命令还原原暂停记录；PC查询回执也更新菜单快照，共享监听不回写旧权限。24项静态与diff通过；原系统列表命令及采集/媒体/触摸/语音保持，编译/真机待证。STATE/WORK-20261112-003-r5 / CE-20261112-T003-05；本轮无提交推送或编排/监控。
+
+2026-11-12 T003交付：源码test/115d0bb已推送；PC新增本应用无障碍开启/关闭/暂停恢复，动态自身组件、设备暂停记录、多PC真实状态，原采集/触摸/ZEGO源码保持。25项静态与13项离线Shell检查通过，真机待证；Both/常规编译于13:42:08 UTC获HTTP204，未查询新运行进度或结果。STATE/WORK-20261112-003-r3 / CE-20261112-T003-03；后续回执仅文档，不二次编排。
 
 2026-11-12 / T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 T8仅指定交付范围；13项离线检查通过，真实runner验证未取得。STATE、WORK-20261112-001-r6 / CE-20261112-T001-04—06；补回执不二次编排。
 
@@ -50,7 +58,7 @@ STATE、WORK-20261111-002-r5 / CE-20261111-T002-01—05 / D-036 / ADR-0029；首
 - ADB可用时全局优先触摸；普通键盘、Ctrl+V、远程输入和单向文本剪贴板同步均已实现，原无障碍/模拟输入链保持。
 - 黑屏为独立黑像素buffer层加App预绘白字PNG，排除自身采集；不能把静态代码当作所有ROM已验证。
 - 默认core连接服务运行期间静默常亮，无新增主页/齿轮/设置入口。ADB连接验证后尝试本应用电池优化豁免；Shell按钮“点亮屏”仅发送唤醒键。
-- PC没有无障碍权限控制或“进入开发者选项”菜单；Android本机ADB页原“打开开发者选项”入口仍在。不根据历史要求擅自补回PC菜单。
+- T-2026-11-12-003新增PC本应用无障碍开启/关闭/暂停恢复菜单：Android动态识别自身组件，仅改自身系统列表条目，暂停记录归设备并同步多PC。无“进入开发者选项”PC菜单；Android本机原入口仍在。详见13_REMOTE_ADB，原采集/触摸/语音未改造。
 
 完整合同：[本机ADB](../docs/AI_ENGINEERING/12_LOCAL_ADB.md)、[远程ADB](../docs/AI_ENGINEERING/13_REMOTE_ADB.md)、[媒体与输入](../docs/AI_ENGINEERING/14_ADB_MIRROR.md)。本轮编译回执与真机证据分开，不继承历史成功结论。旧任务细节保留在TASK_HISTORY和docs/tasks，不再混写到当前恢复快照。
 

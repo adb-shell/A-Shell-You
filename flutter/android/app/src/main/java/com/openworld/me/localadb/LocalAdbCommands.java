@@ -31,11 +31,11 @@ final class LocalAdbCommands {
 
     void submit(String owner, String requestId, int port, String command, LocalAdbManager.Reply reply) {
         if (!shellReady.get() || port <= 0) {
-            reply.failure("disconnected", "请先连接 ADB 并验证 Shell。");
+            reply.notExecuted("disconnected", "请先连接 ADB 并验证 Shell。");
             return;
         }
         if (running.size() + queued.size() >= 8) {
-            reply.failure("busy", "ADB 命令队列已满，请等待或取消已有命令。");
+            reply.notExecuted("busy", "ADB 命令队列已满，请等待或取消已有命令。");
             return;
         }
         queued.add(new Job(owner, requestId, port, command, reply));
@@ -50,7 +50,7 @@ final class LocalAdbCommands {
             if (!matches(job, owner, requestId)) continue;
             iterator.remove();
             job.command = "";
-            job.reply.failure("cancelled", "ADB 命令已取消。");
+            job.reply.notExecuted("cancelled", "ADB 命令已取消。");
         }
         for (Job job : running) if (matches(job, owner, requestId)) cancel(job, "cancelled");
         changed.run();
@@ -74,7 +74,7 @@ final class LocalAdbCommands {
             Job job = queued.remove();
             if (!shellReady.get()) {
                 job.command = "";
-                job.reply.failure("disconnected", "ADB 已断开，排队命令未执行。");
+                job.reply.notExecuted("disconnected", "ADB 已断开，排队命令未执行。");
                 continue;
             }
             running.add(job);
@@ -90,9 +90,11 @@ final class LocalAdbCommands {
     private void execute(Job job) {
         Object result = null;
         String failure = null;
+        boolean shellStarted = false;
         try {
             job.client.connect(job.port, job.cancelled);
             if (!shellReady.get() || job.cancelled.get()) throw new InterruptedException();
+            shellStarted = true;
             result = job.client.runShell(job.command, job.cancelled);
         } catch (Exception | LinkageError error) {
             failure = error instanceof LocalAdbClient.ConnectionFailure
@@ -105,15 +107,20 @@ final class LocalAdbCommands {
         }
         Object value = result;
         String error = failure;
+        boolean executed = shellStarted;
         main.post(() -> {
             main.removeCallbacks(job.timeout);
             running.remove(job);
             changed.run();
-            if (job.cancelled.get()) job.reply.failure(job.reason,
-                    "timeout".equals(job.reason) ? "ADB 命令超时，已关闭本次命令通道；其他 ADB 功能不受影响。"
-                            : "ADB 命令已取消。");
-            else if (error != null) job.reply.failure("adb_failed", error + " 命令不会自动重放。");
-            else job.reply.success(value);
+            if (job.cancelled.get() || error != null) {
+                String code = job.cancelled.get() ? job.reason : "adb_failed";
+                String message = job.cancelled.get()
+                        ? "timeout".equals(job.reason) ? "ADB 命令超时，已关闭本次命令通道；其他 ADB 功能不受影响。"
+                                : "ADB 命令已取消。"
+                        : error + " 命令不会自动重放。";
+                if (executed) job.reply.failure(code, message);
+                else job.reply.notExecuted(code, message);
+            } else job.reply.success(value);
             startNext();
         });
     }

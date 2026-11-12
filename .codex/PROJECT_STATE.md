@@ -1,9 +1,23 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261112-002-r2`
-Last Updated / Observed At：2026-11-12（Asia/Tokyo）
-Evidence Scope：`repository-observed / merge V0；历史CI结果单独记录`
+State Revision：`STATE-20261113-001-r1`
+Last Updated / Observed At：2026-11-13（Asia/Tokyo）
+Evidence Scope：`repository-observed / merge V0; product/device NOT_RUN`
+
+当前T-2026-11-13-001 / active/T7：main/990a4aa合并test/d9d30eb；仅纳入已提交的ADB本应用无障碍控制及续检修复。使用独立main工作区，原test工作区未提交的server_profiles.rs不纳入。主分支2.0.26 / 2.0.26+59和既有配置保持。待提交推送并触发一次main双端常规编译，不监控。WORK-20261113-001-r1 / CE-20261113-T001-01，见[当前合并任务](../docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)。
+
+以下为合并前的历史交付快照：
+
+当前T003 / complete/T8续检交付：源码0e5cc3dfe567ffe0617849cea25c0e0eb5276797已推送test，触发前本地/远端一致。2026-11-12 14:50:21 UTC触发Both/常规编译，HTTP204；未查询运行进度/结果。回执文档续交不再编排。24项静态与diff通过，正式编译/设备待证。WORK-20261112-003-r7 / CE-20261112-T003-07；以下保留前阶段证据，不再代表当前未提交。
+
+最新续接：T003 / complete/T8本轮本地复检，test/b25b9aa上有未提交修复。命令确定未执行时还原暂停记录；PC查询按revision/epoch合并菜单快照，共享监听不回写旧权限。24项静态与diff通过；只变五个ADB源码文件和相关记录，原Kotlin生命周期/采集/媒体/输入/语音及系统列表修改命令保持。无提交推送、无编排或进度查询；正式构建与设备NOT_RUN。WORK-20261112-003-r5 / CE-20261112-T003-04/05。下方为首次交付历史记录。
+
+当前 T-2026-11-12-003 / complete/T8（本次交付）：test/a8abdd4输入，源码115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42已推送test，实现ADB本应用无障碍开启/关闭/暂停恢复。动态自身组件、设备暂停记录与多PC状态，保留其他服务列表；原无障碍生命周期/采集/媒体/触摸/ZEGO源码不改。25项静态合同、13项离线Shell和diff通过，真机NOT_RUN。2026-11-12 13:42:08 UTC触发Both/常规编译，HTTP204；未查询运行进度或结果。回执仅文档续交、不再编排。WORK-20261112-003-r3 / CE-20261112-T003-01/02/03 / D-037。下方既有任务为历史记录，不继承构建结论。
+
+最新续接：T-2026-11-12-001 / complete/T8（续修交付），test/bbebc74 clean。f4a71c6的Android依赖步骤仍DNS失败，并出现_apt索引权限警告；此前7项命令桩不代表Linux/网络通过。已修正/tmp沙箱路径与有界三镜像选择，Bash语法/13项离线回归通过，Linux权限与runner DNS仍待CI证据。已推送test/c788e8d并触发Both/常规编译，HTTP204；不监控，未查询新结果。后续仅补回执文档。WORK-20261112-001-r6 / CE-20261112-T001-04—06。
+
+当前任务T-2026-11-12-001 / complete/T8（指定交付范围）：test/e0ea612 clean恢复；用户ZIP证实cd21705的Windows编译失败与Android依赖镜像DNS阻塞后取消。源码与CI修复已提交为f4a71c6e6d57ac41ca1ecf49aa50bb791ad8458b并推送test，Bash语法/离线流程7/7通过；保留PC2新地址。Both/常规编译已HTTP204受理，不监控，未查询新结果；后续只补回执文档。WORK-20261112-001-r3 / CE-20261112-T001-01—03；[详情](../docs/tasks/T-2026-11-12-001-build-fixes.md)。下方T002回执保留当时证据，不再代表最终结果未知。
 
 ## 当前源码基线
 

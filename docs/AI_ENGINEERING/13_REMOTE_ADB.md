@@ -8,7 +8,7 @@
 
 PC和Android都应更新安装包。普通远控顶栏的ADB图标与其他菜单样式一致，分别提供配对、命令、撤销、状态、断开弹窗；标题栏可拖动。配对窗口只处理配对和连接，不混入命令界面。
 
-PC菜单包含配对/连接、远程命令、远程输入、撤销、状态刷新和断开；没有“暂停/恢复无障碍”“授予/关闭无障碍”或“进入开发者选项”菜单。Android本机ADB页的设置入口仍在。不能依据历史聊天恢复当前源码不存在的菜单。弹窗位移由独立ValueNotifier/RepaintBoundary更新，拖动不重建整个表单。
+PC菜单包含配对/连接、远程命令、远程输入、本应用无障碍开启/关闭/暂停恢复、撤销、状态刷新和断开。无障碍控制由2026-11-12 T003新增，其余旧菜单保持；没有PC“进入开发者选项”菜单。Android本机ADB页的设置入口仍在。弹窗位移由独立ValueNotifier/RepaintBoundary更新，拖动不重建整个表单。
 
 | 模式 | 输入与执行 |
 |---|---|
@@ -23,6 +23,22 @@ PC菜单包含配对/连接、远程命令、远程输入、撤销、状态刷�
 配对成功只记为paired。连接须通过TLS/ADB握手，再执行 `id -u`，退出码0且输出为2000或0才置connected；不主动获取root。连接失败区分“握手未完成”和“Shell通道或UID验证未完成”。已配对但连接失败保留记录，可点击“我已配对”或手填当前连接端口；App记录不等于系统配对数据库仍认可该身份。
 
 自动连接在本次预算内最多尝试两次，首次/重试发现窗口为3.5秒/1.5秒，发现不到可尝试上次成功端口；多个本机候选要求人工选择。手动连接也最多两次，仍使用指定端口。仅重试连接和UID验证，不重放配对码或用户命令。固定libadb的OPEN竞态与Android编译修复见 [本机模块](12_LOCAL_ADB.md)。
+
+## 本应用无障碍控制（2026-11-12 T003）
+
+PC菜单直接执行“开启本应用无障碍”“关闭本应用无障碍”“暂停本应用无障碍”，暂停后第三项按Android推送切换为“恢复本应用无障碍”。不打开额外输入窗口、不传包名或组件；旧端缺少`accessibilityControlSupported`时禁用并标明不支持。按钮还受Shell可用、只读、连接变更、本地请求和设备权限操作忙状态约束；最终认证/控制/开发者优先仍由既有Rust入口执行。
+
+`LocalAdbAccessibility`使用`Context.getPackageName()`及本包`PackageManager.GET_SERVICES | GET_META_DATA`解析唯一声明`BIND_ACCESSIBILITY_SERVICE`与无障碍metadata的服务，支持applicationId更名后服务类仍保留原命名空间。实际绑定通过原服务`ctx`只读引用核实，不修改原服务生命周期。多个候选不猜测；托管资料以及API33+其他profile共享父用户配置时拒绝自动修改。目标系统用户从当前进程UID推导，不采用前台应用、PC配置或固定user0。二次改包仍须保证Manifest、类和原JNI本身有效，不能修复已损坏的重打包。
+
+操作只对`enabled_accessibility_services`增删自身ComponentName，兼容完整/缩写形式；不写全局`accessibility_enabled=0`，不`force-stop`、不`pm disable`、不操作其他应用。Shell执行时读取最新列表，保留其他条目与顺序，写前复读发现外部变更则返回75而不覆盖；Android Settings没有提供此列表的原子CAS，写前检查与实际put之间的外部写入仍属需真机验证的并发边界。系统自行管理全局无障碍状态。
+
+暂停只在本应用原来启用时，将自身组件保存到独立`local_adb_accessibility_v1/pausedComponent`，再请求关闭；原本关闭不建立新的恢复资格。暂停记录不保存整个系统服务列表，不随PC断开、应用重启、ADB断开或撤销自动恢复。开启/关闭/恢复在目标系统配置生效后清记录；命令已开始或结果不明时，取消/丢失回执保留恢复依据，仅在真实设置已关闭时上报paused。2026-11-12续检：队列满、排队取消、连接阶段失败等确定未执行权限命令的情况，`Reply.notExecuted`还原本次操作前的暂停记录，避免之后手动关闭被误标暂停；普通命令默认仍回调原failure。恢复时重新合并当前列表，不恢复旧的其他应用配置。
+
+设备一次只处理一个无障碍请求，重复请求返回busy，不积压权限动作。复用`LocalAdbCommands`独立socket及有界队列/20秒执行取消，随后最多5秒等待实际绑定/解绑；只有配置与运行状态均符合才报告完成。服务未绑定、OEM拒绝、命令退出码、取消、磁盘记录失败均明确报错，不把exit0等同权限可用。toolbar自动隐藏不取消菜单操作；断开/只读取消按既有owner/requestId机制生效，验证等待也可释放。
+
+新增状态：`accessibilityControlSupported`、`accessibilityComponent`、`accessibilityEnabled`（未知null）、`accessibilityRunning`、`accessibilityPaused`、`accessibilityBusy`、`accessibilityError`。沿用Android原有1秒health观察及状态变化revision推送，多PC共享设备事实，无PC三秒轮询。PC查询/操作回执也按instance/revision合入菜单快照；中途进度推送改变epoch后，仍可接纳同实例更高revision的设备状态，但不得恢复旧控制权限。共享快照监听者只消费，不回写旧控制权限。关闭/暂停会自然停止本应用无障碍依赖功能；本模块恢复时不额外发送原模式启停命令，服务生命周期仍按原实现处理。新增模块不调用原MediaProjection、ADB媒体/触摸或ZEGO启停。
+
+本轮V0与13项离线Shell命令桩检查通过；不是Android真机或正式编译通过。[任务](../tasks/T-2026-11-12-003-adb-accessibility-control.md)与TEST_MATRIX ADB-A01—A06记录后续验收，双端编排按授权触发后不监控。
 
 ## Shell栏
 
@@ -94,6 +110,7 @@ ADB的JSON不额外加密，沿用原peer stream认证/加密/relay策略，不�
 | connect | port0/省略自动发现；已在相同端口连接时复用 |
 | shell | command；独立命令通道，返回output/exitCode/truncated |
 | paste / clipboard | text；显式粘贴 / 仅同步Android剪贴板 |
+| accessibilityEnable / accessibilityDisable / accessibilityPause / accessibilityResume | 不接受参数；只控制当前Android App的服务，返回真实状态及完成/失败说明 |
 | disconnect / revoke | 全设备共享连接/身份操作 |
 | cancel | apiVersion3可传requestId，仅针对该owner的请求；不传则取消owner全部未完成请求 |
 

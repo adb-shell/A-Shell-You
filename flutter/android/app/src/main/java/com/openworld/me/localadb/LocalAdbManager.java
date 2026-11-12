@@ -22,6 +22,8 @@ public final class LocalAdbManager {
     interface Reply {
         void success(Object value);
         void failure(String code, String message);
+        // The command was rejected/cancelled before its user Shell command started.
+        default void notExecuted(String code, String message) { failure(code, message); }
     }
 
     private static LocalAdbManager instance;
@@ -38,6 +40,7 @@ public final class LocalAdbManager {
     private final LocalAdbPrivacy privacy;
     private final LocalAdbCommands commands;
     private final LocalAdbKeepAlive keepAlive;
+    private final LocalAdbAccessibility accessibility;
     private final SharedPreferences records;
     private final ExecutorService worker = Executors.newSingleThreadExecutor(
             task -> new Thread(task, "openworld-local-adb"));
@@ -78,6 +81,7 @@ public final class LocalAdbManager {
         privacy = new LocalAdbPrivacy(context, client::isConnected);
         commands = new LocalAdbCommands(context, main, client::isConnected, this::changed);
         keepAlive = new LocalAdbKeepAlive(context, commands, this::changed);
+        accessibility = new LocalAdbAccessibility(context, main, commands, this::changed);
         RemoteAdbNative.attach(this);
         mirror.attach(this);
         changed();
@@ -90,6 +94,7 @@ public final class LocalAdbManager {
             mirror.stop("ADB Shell 已断开，画面已停止。");
             privacy.stop();
             touch.stop();
+            accessibility.cancel(null, null);
             commands.cancel(null, null);
             nextRecoveryAt = SystemClock.elapsedRealtime() + 2000;
         }
@@ -155,6 +160,7 @@ public final class LocalAdbManager {
         value.put("phase", current == null ? "" : current.phase);
         value.put("discovery", discovered);
         keepAlive.addStatus(value);
+        accessibility.addStatus(value);
         return value;
     }
 
@@ -185,6 +191,16 @@ public final class LocalAdbManager {
         }
         if (Build.VERSION.SDK_INT < 30) {
             reply.failure("unsupported", "配对码无线调试需要 Android 11 或以上版本。");
+            return;
+        }
+        if (LocalAdbAccessibility.handles(kind)) {
+            if (!args.isEmpty()) {
+                reply.failure("invalid", "本应用无障碍操作不接受包名、组件或其他参数。"); return;
+            }
+            if (transportChanging() || !client.isConnected()) {
+                reply.failure("disconnected", "请先连接 ADB 并验证 Shell，等待连接操作完成。"); return;
+            }
+            accessibility.execute(owner, requestId, records.getInt("connectPort", 0), kind, reply);
             return;
         }
         if ("paste".equals(kind) || "clipboard".equals(kind)) {
@@ -287,6 +303,7 @@ public final class LocalAdbManager {
             touch.stop();
             privacy.stop();
             keepAlive.update(false, 0);
+            accessibility.cancel(null, null);
             commands.cancel(null, null);
         }
         current = operation;
@@ -483,6 +500,7 @@ public final class LocalAdbManager {
     }
 
     private void cancelOwner(String owner, String requestId) {
+        accessibility.cancel(owner, requestId);
         commands.cancel(owner, requestId);
         touch.cancelPaste(owner, requestId);
         Iterator<Operation> pending = queue.iterator();

@@ -12,6 +12,7 @@ class RemoteAdbSessionState extends ChangeNotifier {
   bool _viewOnly = false;
   bool _shellReady = false;
   bool _visible = false;
+  bool _accessibilityPending = false;
   int _epoch = 0;
   Map<String, dynamic>? _snapshot;
   Map<String, dynamic>? get snapshot => _snapshot;
@@ -19,6 +20,26 @@ class RemoteAdbSessionState extends ChangeNotifier {
   bool get available => _peerReady && !_viewOnly && _shellReady;
   bool get visible => available && _visible;
   int get epoch => _epoch;
+
+  bool get canControlAccessibility => available && !_accessibilityPending &&
+      _snapshot?['accessibilityControlSupported'] == true &&
+      _snapshot?['accessibilityBusy'] != true &&
+      _snapshot?['connectionBusy'] != true;
+
+  // Keep a direct menu request alive when the toolbar auto-hides. This is only
+  // local request activity; the actual permission/pause state always comes from Android.
+  bool beginAccessibilityOperation() {
+    if (_disposed || !canControlAccessibility) return false;
+    _accessibilityPending = true;
+    notifyListeners();
+    return true;
+  }
+
+  void endAccessibilityOperation() {
+    if (_disposed) return;
+    _accessibilityPending = false;
+    notifyListeners();
+  }
 
   void _update(VoidCallback change) {
     if (_disposed) return;
@@ -54,10 +75,29 @@ class RemoteAdbSessionState extends ChangeNotifier {
 
   void apply(Map<String, dynamic> state, bool controlAllowed,
       {int? expectedEpoch}) {
-    if (expectedEpoch != null && expectedEpoch != _epoch) return;
+    if (!_peerReady || state['supported'] is! bool || state['connected'] is! bool) return;
+    final revision = (state['revision'] as num?)?.toInt();
+    final currentRevision = (_snapshot?['revision'] as num?)?.toInt();
+    final sameInstance = _snapshot?['instance'] == state['instance'];
+    if (sameInstance && revision != null && currentRevision != null && revision < currentRevision) return;
+    final currentRequest = expectedEpoch == null || expectedEpoch == _epoch;
+    // A progress push advances epoch while a request is running. Its later reply
+    // can still carry a newer device state, but must not restore stale control rights.
+    if (!currentRequest && !(sameInstance && revision != null &&
+        currentRevision != null && revision > currentRevision)) return;
     _update(() {
-      _shellReady = state['supported'] == true &&
-          state['connected'] == true && controlAllowed;
+      // Replies and pushed updates share one device revision. A completed request
+      // must update the menu even while its asynchronous push is still in transit.
+      if (revision != null && (_snapshot == null || !sameInstance ||
+          currentRevision == null || revision > currentRevision)) {
+        _snapshot = Map<String, dynamic>.unmodifiable(state);
+      }
+      if (currentRequest) {
+        _shellReady = state['supported'] == true &&
+            state['connected'] == true && controlAllowed;
+      } else if (state['supported'] != true || state['connected'] != true) {
+        _shellReady = false;
+      }
     });
   }
 
