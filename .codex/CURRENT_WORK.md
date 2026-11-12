@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261112-003-r2`
+Registry Revision：`WORK-20261112-003-r3`
 Last Updated：2026-11-12
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-[T-2026-11-12-003](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md) / active / T7；test/a8abdd4输入，已实现ADB本应用无障碍开启/关闭/暂停恢复。25项静态合同、13项离线Shell检查与diff通过，设备/产品编译待证。待已授权test提交推送和一次Both编排，不监控。STATE-20261112-003-r2 / CE-20261112-T003-01/02 / D-037。
+none；T003本次源码与编排触发交付已完成，正式构建和设备结果待证。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,10 @@ Active Task Count：1
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+[T-2026-11-12-003](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md) / complete / T8：源码115d0bb已推送test，Both/常规编译于2026-11-12 13:42:08 UTC获HTTP204。未查询运行进度/结果；后续只补回执文档、不二次触发。25项静态与13项离线Shell检查通过，正式构建/设备待证。STATE/WORK-20261112-003-r3 / CE-20261112-T003-03 / D-037。
+
+以下为上一任务历史指针：
 
 T-2026-11-12-001 / complete / T8续修交付：test/c788e8d已推送，APT改/tmp沙箱路径与三候选签名镜像，13项离线回归通过；产品源码/配置无增量。Both/常规编译HTTP204受理，不监控且未查询新运行，结果未知；后续只补回执文档。
 

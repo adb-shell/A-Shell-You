@@ -2,12 +2,12 @@
 
 ## 0. Task Metadata
 
-- Status / T-State：verifying / T7；2026-11-12（Asia/Tokyo）。
+- Status / T-State：complete / T8（本次源码与触发交付范围）；2026-11-12（Asia/Tokyo）。
 - Requester：用户；Principal / Domain / Security / Release：Codex（openworld-master，Android/Flutter/Security/Release 技能约束审阅，不委派）。
 - Source Branch / HEAD：test / a8abdd4c04951f930ea240c9951378ee3b8c165f；初始 clean，无用户修改。
 - Baseline：OW-BL-2026-11-07-d9f1119-screen-priority-worktree（Baseline26，历史输入）；当前实现以 test/a8abdd4 源码为准。
 - Risk：medium；最高验证 V4（正式设备联调待证）；ADR-0018、ADR-0028；既有 ADB-R21/R22、ADB-M21/M32、NET-04、DSP-09。
-- External Asset：N/A，无新依赖；STATE / WORK-20261112-003-r2；CE-20261112-T003-01/02；D-037。
+- External Asset：N/A，无新依赖；STATE / WORK-20261112-003-r3；CE-20261112-T003-01/02/03；D-037。
 
 ## T0. Authority and Baseline
 
@@ -67,4 +67,6 @@ PC 菜单新增本应用无障碍开启、关闭、暂停/恢复。Android 从�
 
 ## T8. Handoff and Closure
 
-源码与文档复检完成；待test提交推送和一次双端dispatch。不监控编译；产品编译、OEM/多PC真机与原链联调NOT_RUN。不得将静态检查或dispatch等同运行/构建通过。待交付后记录准确SHA/HTTP回执，无main或生产操作。
+源码提交`115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42`（新增ADB本应用无障碍开启关闭与暂停恢复）已推送origin/test，dispatch前本地与远端SHA一致。2026-11-12 13:42:08 UTC / 22:42:08 Asia/Tokyo，向`Build-Clients-BT.yml`发送`ref=test / Platform=Both / BuildMode=常规编译`，HTTP204受理。未查询run/jobs/logs/artifacts，不监控；最终构建结果未知。
+
+最高证据为V0及离线命令桩，不表示Android/Windows编译或OEM、多PC、原链真机验收通过。回执文档随后单独提交推送test，不改源码且不再编排；无main合并、版本/依赖/签名变更、设备或生产操作。任务关闭仅代表本次已授权源码/文档/Git/触发交付完成。

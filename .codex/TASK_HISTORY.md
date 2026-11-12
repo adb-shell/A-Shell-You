@@ -1,5 +1,7 @@
 # OpenWorld Task History
 
+2026-11-12 / T003 complete/T8交付：源码115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42已提交推送test；13:42:08 UTC触发Build-Clients-BT.yml / ref=test / Both / 常规编译，HTTP204。未监控或查询结果；后续仅回执文档，不二次构建。25项静态与13项离线Shell通过，正式构建/真机待证。STATE/WORK-20261112-003-r3 / CE-20261112-T003-03。
+
 2026-11-12 / [T-2026-11-12-003](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md)：ADB本应用无障碍开启/关闭/暂停恢复，T7待test交付。动态目标、仅自身列表项、设备暂停记录、多PC真实状态；原投屏/远控/语音源码保持。25项静态与13项离线Shell检查及diff通过，正式构建/设备NOT_RUN；用户授权推送test及双端编排且不监控。STATE/WORK-20261112-003-r2 / CE-20261112-T003-01/02 / D-037。
 
 2026-11-12 / T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 T8仅指定交付范围；13项离线检查通过，真实runner验证未取得。STATE、WORK-20261112-001-r6 / CE-20261112-T001-04—06；补回执不二次编排。

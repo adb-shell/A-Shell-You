@@ -1,5 +1,7 @@
 # OpenWorld AI Changelog
 
+2026-11-12 / T003交付回执：源码115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42已推送test；Both/常规编译于13:42:08 UTC获HTTP204，未查询运行进度/结果。T8仅关闭本次源码/文档/Git/触发范围，正式构建与设备验收待证。STATE/WORK-20261112-003-r3 / CE-20261112-T003-03；仅补回执文档，不再编排。
+
 2026-11-12 / T-2026-11-12-003：新增独立LocalAdbAccessibility与PC三个菜单，暂停动态切恢复；动态本包/服务、只改自身启用项、保留其他服务、设备端暂停记录、多PC真实推送、独立命令/取消。原Kotlin生命周期/采集/触摸/语音和Rust协议不改。25项静态合同/范围/词法与13项离线Shell检查、diff通过；Java/Dart完整编译及真机NOT_RUN。T7待test提交推送和一次Both/常规编译，不监控。STATE/WORK-20261112-003-r2 / CE-20261112-T003-01/02 / D-037。
 
 2026-11-12 / T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 T8仅指定交付范围；13项离线检查通过，真实runner验证未取得。STATE、WORK-20261112-001-r6 / CE-20261112-T001-04—06；补回执不二次编排。

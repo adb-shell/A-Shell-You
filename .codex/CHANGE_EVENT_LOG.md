@@ -1,5 +1,9 @@
 # OpenWorld Change Event Log
 
+## CE-20261112-T003-03：test推送与双端编排回执
+
+源码115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42已推送origin/test，dispatch前本地/远端一致。2026-11-12 13:42:08 UTC（22:42:08 Asia/Tokyo）向Build-Clients-BT.yml发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204。按用户要求不查询run/jobs/logs/artifacts，不监控，构建结果未知。STATE/WORK-20261112-003-r3，T8关闭本次交付；后续仅提交推送回执文档，不再dispatch。
+
 ## CE-20261112-T003-02：独立权限控制实现与复检
 
 新增LocalAdbAccessibility，Manager仅挂入口/状态/取消；PC菜单直接执行并按Android真实paused切换恢复，toolbar隐藏不取消。动态自身组件、保留他项列表、暂停记录独立持久化、同设备拒绝积压、设置与ctx绑定核实。已有Rust权限/开发者优先边界保持，原Kotlin/媒体/触摸/ZEGO/协议/构建文件未改。

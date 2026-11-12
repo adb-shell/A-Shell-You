@@ -1,5 +1,7 @@
 # OpenWorld Project Memory
 
+2026-11-12 T003交付：源码test/115d0bb已推送；PC新增本应用无障碍开启/关闭/暂停恢复，动态自身组件、设备暂停记录、多PC真实状态，原采集/触摸/ZEGO源码保持。25项静态与13项离线Shell检查通过，真机待证；Both/常规编译于13:42:08 UTC获HTTP204，未查询新运行进度或结果。STATE/WORK-20261112-003-r3 / CE-20261112-T003-03；后续回执仅文档，不二次编排。
+
 2026-11-12 / T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 T8仅指定交付范围；13项离线检查通过，真实runner验证未取得。STATE、WORK-20261112-001-r6 / CE-20261112-T001-04—06；补回执不二次编排。
 
 2026-11-12 T001续修：f4a71c6的Android主源DNS仍失败且_apt无法穿过RUNNER_TEMP父路径。现改/tmp独立目录、root 0755父目录与_apt:root 0700 partial，实际以_apt检查目录/源文件/解析器配置访问；主源→kernel.org→MIT顺序探测完整Jammy三套索引，APT官方签名验证成功才使用。每候选索引隔离，全部失败禁止安装；索引更新每次3分钟、安装10分钟、步骤总限24分钟。 13项离线回归与Bash语法通过，实际runner权限/DNS/签名验证待证；当前T7待test提交推送及Both/常规编译，不监控。STATE、WORK-20261112-001-r5 / CE-20261112-T001-04/05；[任务](../docs/tasks/T-2026-11-12-001-build-fixes.md)。
