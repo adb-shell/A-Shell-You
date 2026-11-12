@@ -490,7 +490,7 @@ class _RemoteToolbarState extends State<RemoteToolbar> {
     }
     toolbarItems.add(_ChatMenu(id: widget.id, ffi: widget.ffi));
     if (!isWeb && widget.ffi.connType == ConnType.defaultConn) {
-      toolbarItems.add(_IconSubmenuButton(
+      toolbarItems.add(Consumer<RemoteAdbSessionState?>(builder: (context, adbState, _) => _IconSubmenuButton(
         key: ValueKey('adb-${widget.ffi.sessionId}'),
         tooltip: 'ADB',
         icon: const SizedBox(width: 32, height: 32,
@@ -498,11 +498,27 @@ class _RemoteToolbarState extends State<RemoteToolbar> {
         ffi: widget.ffi,
         color: _ToolbarTheme.blueColor,
         hoverColor: _ToolbarTheme.hoverBlueColor,
-        menuChildrenGetter: () => remoteAdbActions.entries.map((entry) => MenuButton(
-          child: Text(entry.value), ffi: widget.ffi,
-          onPressed: () => showRemoteAdbDialog(context, widget.ffi.sessionId, entry.key),
-        )).toList(),
-      ));
+        menuChildrenGetter: () => remoteAdbActions.entries.map((entry) {
+          if (entry.key.startsWith('accessibility')) {
+            final resume = entry.key == 'accessibilityPause' &&
+                adbState?.snapshot?['accessibilityPaused'] == true;
+            final unsupported = adbState?.snapshot != null &&
+                adbState?.snapshot?['accessibilityControlSupported'] != true;
+            final label = resume ? '恢复本应用无障碍' : entry.value;
+            return MenuButton(
+              child: Text(unsupported ? '$label（远端不支持）' : label), ffi: widget.ffi,
+              onPressed: adbState?.canControlAccessibility == true
+                  ? () => runRemoteAdbAccessibility(widget.ffi.sessionId, adbState!,
+                      resume ? 'accessibilityResume' : entry.key)
+                  : null,
+            );
+          }
+          return MenuButton(
+            child: Text(entry.value), ffi: widget.ffi,
+            onPressed: () => showRemoteAdbDialog(context, widget.ffi.sessionId, entry.key),
+          );
+        }).toList(),
+      )));
     }
     if (!isWeb) {
       toolbarItems.add(_VoiceCallMenu(id: widget.id, ffi: widget.ffi));

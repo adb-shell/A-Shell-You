@@ -219,6 +219,13 @@ class RemoteAdbController extends ChangeNotifier {
           break;
         case 'connect': output = result?.toString() ?? ''; message = 'ADB 已连接，Shell 验证成功。'; break;
         case 'paste': message = '手机已处理粘贴请求；请确认当前输入框中的内容。'; break;
+        case 'accessibilityEnable':
+        case 'accessibilityDisable':
+        case 'accessibilityPause':
+        case 'accessibilityResume':
+          message = result is Map && result['message'] is String
+              ? result['message'] as String : '请以 Android 返回的无障碍状态为准。';
+          break;
         case 'shell':
           final data = result is Map ? result : const {};
           output = data['output']?.toString() ?? '';

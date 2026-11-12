@@ -12,6 +12,7 @@ class RemoteAdbSessionState extends ChangeNotifier {
   bool _viewOnly = false;
   bool _shellReady = false;
   bool _visible = false;
+  bool _accessibilityPending = false;
   int _epoch = 0;
   Map<String, dynamic>? _snapshot;
   Map<String, dynamic>? get snapshot => _snapshot;
@@ -19,6 +20,26 @@ class RemoteAdbSessionState extends ChangeNotifier {
   bool get available => _peerReady && !_viewOnly && _shellReady;
   bool get visible => available && _visible;
   int get epoch => _epoch;
+
+  bool get canControlAccessibility => available && !_accessibilityPending &&
+      _snapshot?['accessibilityControlSupported'] == true &&
+      _snapshot?['accessibilityBusy'] != true &&
+      _snapshot?['connectionBusy'] != true;
+
+  // Keep a direct menu request alive when the toolbar auto-hides. This is only
+  // local request activity; the actual permission/pause state always comes from Android.
+  bool beginAccessibilityOperation() {
+    if (_disposed || !canControlAccessibility) return false;
+    _accessibilityPending = true;
+    notifyListeners();
+    return true;
+  }
+
+  void endAccessibilityOperation() {
+    if (_disposed) return;
+    _accessibilityPending = false;
+    notifyListeners();
+  }
 
   void _update(VoidCallback change) {
     if (_disposed) return;

@@ -12,10 +12,38 @@ const remoteAdbActions = <String, String>{
   'pair': '远程 ADB 连接配对',
   'shell': '远程 ADB 命令',
   'paste': '远程输入',
+  'accessibilityEnable': '开启本应用无障碍',
+  'accessibilityDisable': '关闭本应用无障碍',
+  'accessibilityPause': '暂停本应用无障碍',
   'revoke': '撤销 ADB 配对',
   'status': '刷新 ADB 状态',
   'disconnect': '断开 ADB 连接',
 };
+
+/// One-click operation, independent of the toolbar's mounted lifetime. No dialog,
+/// package name or component is sent: the remote Android app resolves its own service.
+Future<void> runRemoteAdbAccessibility(SessionID sessionId,
+    RemoteAdbSessionState sessionState, String action) async {
+  if (!sessionState.beginAccessibilityOperation()) return;
+  final adb = RemoteAdbController(sessionId, sessionState: sessionState);
+  try {
+    await adb.refresh();
+    if (adb.stale) {
+      showToast(adb.statusError);
+    } else if (adb.state['accessibilityControlSupported'] != true) {
+      final reason = adb.state['accessibilityError'];
+      showToast(reason is String && reason.isNotEmpty ? reason : '远端版本不支持本应用无障碍控制。');
+    } else if (!adb.connected) {
+      showToast('请先连接 ADB 并验证 Shell。');
+    } else {
+      await adb.run(action);
+      showToast(adb.message, timeout: const Duration(seconds: 5));
+    }
+  } finally {
+    adb.dispose();
+    sessionState.endAccessibilityOperation();
+  }
+}
 
 /// The route owns its controller because the toolbar unmounts when auto-hidden.
 Future<void> showRemoteAdbDialog(BuildContext context, SessionID sessionId, String action) {

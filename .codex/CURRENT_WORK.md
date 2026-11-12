@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261112-001-r6`
+Registry Revision：`WORK-20261112-003-r2`
 Last Updated：2026-11-12
-Active Task Count：0
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none；本次续修交付范围已关闭，真实runner验证和新构建结果待证。
+[T-2026-11-12-003](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md) / active / T7；test/a8abdd4输入，已实现ADB本应用无障碍开启/关闭/暂停恢复。25项静态合同、13项离线Shell检查与diff通过，设备/产品编译待证。待已授权test提交推送和一次Both编排，不监控。STATE-20261112-003-r2 / CE-20261112-T003-01/02 / D-037。
 
 ## 2. Concurrent Session Rules
 

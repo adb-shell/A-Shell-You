@@ -1,9 +1,11 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261112-001-r6`
+State Revision：`STATE-20261112-003-r2`
 Last Updated / Observed At：2026-11-12（Asia/Tokyo）
-Evidence Scope：`repository-observed / local checks + prior CI failure logs + new dispatch HTTP204`
+Evidence Scope：`repository-observed / static and offline shell checks; product/device NOT_RUN`
+
+当前 T-2026-11-12-003 / verifying/T7：test/a8abdd4输入，实现ADB本应用无障碍开启/关闭/暂停恢复。动态自身组件、设备暂停记录与多PC状态，保留其他服务列表；原无障碍生命周期/采集/媒体/触摸/ZEGO源码不改。25项静态合同、13项离线Shell和diff通过，本机无Java/Flutter工具链，真机NOT_RUN。待已授权test提交推送和一次Both编排、不监控。WORK-20261112-003-r2 / CE-20261112-T003-01/02 / D-037。下方既有任务为历史记录，不继承构建结论。
 
 最新续接：T-2026-11-12-001 / complete/T8（续修交付），test/bbebc74 clean。f4a71c6的Android依赖步骤仍DNS失败，并出现_apt索引权限警告；此前7项命令桩不代表Linux/网络通过。已修正/tmp沙箱路径与有界三镜像选择，Bash语法/13项离线回归通过，Linux权限与runner DNS仍待CI证据。已推送test/c788e8d并触发Both/常规编译，HTTP204；不监控，未查询新结果。后续仅补回执文档。WORK-20261112-001-r6 / CE-20261112-T001-04—06。
 

@@ -1,5 +1,15 @@
 # OpenWorld Change Event Log
 
+## CE-20261112-T003-02：独立权限控制实现与复检
+
+新增LocalAdbAccessibility，Manager仅挂入口/状态/取消；PC菜单直接执行并按Android真实paused切换恢复，toolbar隐藏不取消。动态自身组件、保留他项列表、暂停记录独立持久化、同设备拒绝积压、设置与ctx绑定核实。已有Rust权限/开发者优先边界保持，原Kotlin/媒体/触摸/ZEGO/协议/构建文件未改。
+
+25项静态合同/范围/词法与git diff --check通过；提取实际Java命令表达式在Git Bash下运行13项settings命令桩检查通过，不操作Android。真实构建与设备NOT_RUN。相关合同/TEST_MATRIX/记忆已同步；STATE/WORK-20261112-003-r2，T7待已授权test提交推送与一次Both/常规编译，不监控。
+
+## CE-20261112-T003-01：本应用无障碍控制授权与基线
+
+2026-11-12，test/a8abdd4 clean；用户批准既定方案并要求实现后 test 提交推送、双端编排、不监控。范围限定独立 ADB 模块与 PC 菜单：动态自身组件、暂停恢复、保留其他服务配置；原投屏/远控/语音不改造。STATE/WORK-20261112-003-r1，T5；[任务](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md)。
+
 ## CE-20261112-T001-06：续修与双端编译受理
 
 源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。
