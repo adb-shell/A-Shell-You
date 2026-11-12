@@ -75,10 +75,29 @@ class RemoteAdbSessionState extends ChangeNotifier {
 
   void apply(Map<String, dynamic> state, bool controlAllowed,
       {int? expectedEpoch}) {
-    if (expectedEpoch != null && expectedEpoch != _epoch) return;
+    if (!_peerReady || state['supported'] is! bool || state['connected'] is! bool) return;
+    final revision = (state['revision'] as num?)?.toInt();
+    final currentRevision = (_snapshot?['revision'] as num?)?.toInt();
+    final sameInstance = _snapshot?['instance'] == state['instance'];
+    if (sameInstance && revision != null && currentRevision != null && revision < currentRevision) return;
+    final currentRequest = expectedEpoch == null || expectedEpoch == _epoch;
+    // A progress push advances epoch while a request is running. Its later reply
+    // can still carry a newer device state, but must not restore stale control rights.
+    if (!currentRequest && !(sameInstance && revision != null &&
+        currentRevision != null && revision > currentRevision)) return;
     _update(() {
-      _shellReady = state['supported'] == true &&
-          state['connected'] == true && controlAllowed;
+      // Replies and pushed updates share one device revision. A completed request
+      // must update the menu even while its asynchronous push is still in transit.
+      if (revision != null && (_snapshot == null || !sameInstance ||
+          currentRevision == null || revision > currentRevision)) {
+        _snapshot = Map<String, dynamic>.unmodifiable(state);
+      }
+      if (currentRequest) {
+        _shellReady = state['supported'] == true &&
+            state['connected'] == true && controlAllowed;
+      } else if (state['supported'] != true || state['connected'] != true) {
+        _shellReady = false;
+      }
     });
   }
 

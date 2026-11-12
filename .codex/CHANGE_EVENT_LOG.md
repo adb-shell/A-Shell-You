@@ -1,5 +1,17 @@
 # OpenWorld Change Event Log
 
+## CE-20261112-T003-06：续检修复交付授权
+
+用户明确授权提交推送并编排；目标test，Build-Clients-BT.yml / Both / 常规编译一次，不监控。核对本地与origin/test均b25b9aa，待提交为已复检的五个ADB源码文件和相关记录，git diff --check通过，无新增业务修改。STATE/WORK-20261112-003-r6，T7。
+
+## CE-20261112-T003-05：定向复检修复完成
+
+两项确认问题已局部修复：未执行权限命令的失败还原操作前暂停记录；查询/完成回执合入菜单快照，处理进度推送改变epoch与旧revision晚到，共享监听仅消费状态。五个ADB源码文件变化；原系统列表命令逐字不变、旧命令错误文本/默认failure行为保持，原Kotlin/媒体/触摸/语音/协议无修改。24项静态检查及diff通过；无产品编译或真机。STATE/WORK-20261112-003-r5，T8本地复检范围完成；test/b25b9aa上的改动未提交推送，未触发/查询编排。
+
+## CE-20261112-T003-04：交付后定向复检
+
+test/b25b9aa clean输入，用户要求仅修确认的问题。发现commands.submit前保存暂停记录，命令未执行的失败仍会残留；PC apply回执未合入菜单snapshot。限定四个ADB模块文件修复，原Kotlin/媒体/语音/协议保持；本轮本地复检，不重复Git/编排或监控。STATE/WORK-20261112-003-r4，T5。
+
 ## CE-20261112-T003-03：test推送与双端编排回执
 
 源码115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42已推送origin/test，dispatch前本地/远端一致。2026-11-12 13:42:08 UTC（22:42:08 Asia/Tokyo）向Build-Clients-BT.yml发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204。按用户要求不查询run/jobs/logs/artifacts，不监控，构建结果未知。STATE/WORK-20261112-003-r3，T8关闭本次交付；后续仅提交推送回执文档，不再dispatch。

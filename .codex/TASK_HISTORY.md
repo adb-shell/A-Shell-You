@@ -1,5 +1,7 @@
 # OpenWorld Task History
 
+2026-11-12 / T003本地复检complete/T8：未执行权限命令时还原暂停记录，PC查询快照即时合并且保留乱序/权限边界。24项V0检查和diff通过，原生命周期/投屏/触摸/语音未改造，正式构建/设备待证。test/b25b9aa工作区未提交；未执行Git写、编排或监控。STATE/WORK-20261112-003-r5 / CE-20261112-T003-05。
+
 2026-11-12 / T003 complete/T8交付：源码115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42已提交推送test；13:42:08 UTC触发Build-Clients-BT.yml / ref=test / Both / 常规编译，HTTP204。未监控或查询结果；后续仅回执文档，不二次构建。25项静态与13项离线Shell通过，正式构建/真机待证。STATE/WORK-20261112-003-r3 / CE-20261112-T003-03。
 
 2026-11-12 / [T-2026-11-12-003](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md)：ADB本应用无障碍开启/关闭/暂停恢复，T7待test交付。动态目标、仅自身列表项、设备暂停记录、多PC真实状态；原投屏/远控/语音源码保持。25项静态与13项离线Shell检查及diff通过，正式构建/设备NOT_RUN；用户授权推送test及双端编排且不监控。STATE/WORK-20261112-003-r2 / CE-20261112-T003-01/02 / D-037。

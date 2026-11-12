@@ -1,9 +1,13 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261112-003-r3`
+State Revision：`STATE-20261112-003-r6`
 Last Updated / Observed At：2026-11-12（Asia/Tokyo）
 Evidence Scope：`repository-observed / static and offline shell checks; product/device NOT_RUN`
+
+当前T003 / T7：用户追加授权将已复检的本地修复提交推送test、触发一次Both/常规编译，不监控。输入本地/远端test/b25b9aa一致，工作区仅既有五个ADB源码文件及相关记录，diff检查通过；未新增业务代码变化。WORK-20261112-003-r6 / CE-20261112-T003-06；以下保留上一阶段证据。
+
+最新续接：T003 / complete/T8本轮本地复检，test/b25b9aa上有未提交修复。命令确定未执行时还原暂停记录；PC查询按revision/epoch合并菜单快照，共享监听不回写旧权限。24项静态与diff通过；只变五个ADB源码文件和相关记录，原Kotlin生命周期/采集/媒体/输入/语音及系统列表修改命令保持。无提交推送、无编排或进度查询；正式构建与设备NOT_RUN。WORK-20261112-003-r5 / CE-20261112-T003-04/05。下方为首次交付历史记录。
 
 当前 T-2026-11-12-003 / complete/T8（本次交付）：test/a8abdd4输入，源码115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42已推送test，实现ADB本应用无障碍开启/关闭/暂停恢复。动态自身组件、设备暂停记录与多PC状态，保留其他服务列表；原无障碍生命周期/采集/媒体/触摸/ZEGO源码不改。25项静态合同、13项离线Shell和diff通过，真机NOT_RUN。2026-11-12 13:42:08 UTC触发Both/常规编译，HTTP204；未查询运行进度或结果。回执仅文档续交、不再编排。WORK-20261112-003-r3 / CE-20261112-T003-01/02/03 / D-037。下方既有任务为历史记录，不继承构建结论。
 

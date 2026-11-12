@@ -22,6 +22,8 @@ public final class LocalAdbManager {
     interface Reply {
         void success(Object value);
         void failure(String code, String message);
+        // The command was rejected/cancelled before its user Shell command started.
+        default void notExecuted(String code, String message) { failure(code, message); }
     }
 
     private static LocalAdbManager instance;

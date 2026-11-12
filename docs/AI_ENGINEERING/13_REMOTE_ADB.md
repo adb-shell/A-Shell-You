@@ -32,11 +32,11 @@ PC菜单直接执行“开启本应用无障碍”“关闭本应用无障碍”
 
 操作只对`enabled_accessibility_services`增删自身ComponentName，兼容完整/缩写形式；不写全局`accessibility_enabled=0`，不`force-stop`、不`pm disable`、不操作其他应用。Shell执行时读取最新列表，保留其他条目与顺序，写前复读发现外部变更则返回75而不覆盖；Android Settings没有提供此列表的原子CAS，写前检查与实际put之间的外部写入仍属需真机验证的并发边界。系统自行管理全局无障碍状态。
 
-暂停只在本应用原来启用时，将自身组件保存到独立`local_adb_accessibility_v1/pausedComponent`，再请求关闭；原本关闭不建立新的恢复资格。暂停记录不保存整个系统服务列表，不随PC断开、应用重启、ADB断开或撤销自动恢复。开启/关闭/恢复在目标系统配置生效后清记录；取消或丢失回执保留恢复依据，仅在真实设置已关闭时上报paused。恢复时重新合并当前列表，不恢复旧的其他应用配置。
+暂停只在本应用原来启用时，将自身组件保存到独立`local_adb_accessibility_v1/pausedComponent`，再请求关闭；原本关闭不建立新的恢复资格。暂停记录不保存整个系统服务列表，不随PC断开、应用重启、ADB断开或撤销自动恢复。开启/关闭/恢复在目标系统配置生效后清记录；命令已开始或结果不明时，取消/丢失回执保留恢复依据，仅在真实设置已关闭时上报paused。2026-11-12续检：队列满、排队取消、连接阶段失败等确定未执行权限命令的情况，`Reply.notExecuted`还原本次操作前的暂停记录，避免之后手动关闭被误标暂停；普通命令默认仍回调原failure。恢复时重新合并当前列表，不恢复旧的其他应用配置。
 
 设备一次只处理一个无障碍请求，重复请求返回busy，不积压权限动作。复用`LocalAdbCommands`独立socket及有界队列/20秒执行取消，随后最多5秒等待实际绑定/解绑；只有配置与运行状态均符合才报告完成。服务未绑定、OEM拒绝、命令退出码、取消、磁盘记录失败均明确报错，不把exit0等同权限可用。toolbar自动隐藏不取消菜单操作；断开/只读取消按既有owner/requestId机制生效，验证等待也可释放。
 
-新增状态：`accessibilityControlSupported`、`accessibilityComponent`、`accessibilityEnabled`（未知null）、`accessibilityRunning`、`accessibilityPaused`、`accessibilityBusy`、`accessibilityError`。沿用Android原有1秒health观察及状态变化revision推送，多PC共享设备事实，无PC三秒轮询。关闭/暂停会自然停止本应用无障碍触摸/截图/绘图/遮罩，恢复只恢复服务，不主动重启这些模式；新增模块不调用原MediaProjection、ADB媒体/触摸或ZEGO启停。
+新增状态：`accessibilityControlSupported`、`accessibilityComponent`、`accessibilityEnabled`（未知null）、`accessibilityRunning`、`accessibilityPaused`、`accessibilityBusy`、`accessibilityError`。沿用Android原有1秒health观察及状态变化revision推送，多PC共享设备事实，无PC三秒轮询。PC查询/操作回执也按instance/revision合入菜单快照；中途进度推送改变epoch后，仍可接纳同实例更高revision的设备状态，但不得恢复旧控制权限。共享快照监听者只消费，不回写旧控制权限。关闭/暂停会自然停止本应用无障碍依赖功能；本模块恢复时不额外发送原模式启停命令，服务生命周期仍按原实现处理。新增模块不调用原MediaProjection、ADB媒体/触摸或ZEGO启停。
 
 本轮V0与13项离线Shell命令桩检查通过；不是Android真机或正式编译通过。[任务](../tasks/T-2026-11-12-003-adb-accessibility-control.md)与TEST_MATRIX ADB-A01—A06记录后续验收，双端编排按授权触发后不监控。
 

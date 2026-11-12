@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261112-003-r3`
+Registry Revision：`WORK-20261112-003-r6`
 Last Updated：2026-11-12
-Active Task Count：0
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none；T003本次源码与编排触发交付已完成，正式构建和设备结果待证。
+T003 / active / T7：用户已追加授权续检修复提交推送test并触发一次Both/常规编译，不监控。输入test/b25b9aa及上一轮五个ADB源码文件/记录变更，无新增业务修改。STATE/WORK-20261112-003-r6 / CE-20261112-T003-06。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,10 @@ none；T003本次源码与编排触发交付已完成，正式构建和设备结
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+T003 / complete / T8本轮本地复检：修正未执行命令遗留暂停记录、PC查询快照合并及监听回写。24项静态与diff通过；仅五个ADB源码文件及相关记录变化。改动保留test工作区，未提交推送、未触发或查询编排，正式设备与构建待证。[任务](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md) / STATE/WORK-20261112-003-r5 / CE-20261112-T003-04/05。
+
+以下为首次交付回执：
 
 [T-2026-11-12-003](../docs/tasks/T-2026-11-12-003-adb-accessibility-control.md) / complete / T8：源码115d0bb已推送test，Both/常规编译于2026-11-12 13:42:08 UTC获HTTP204。未查询运行进度/结果；后续只补回执文档、不二次触发。25项静态与13项离线Shell检查通过，正式构建/设备待证。STATE/WORK-20261112-003-r3 / CE-20261112-T003-03 / D-037。
 

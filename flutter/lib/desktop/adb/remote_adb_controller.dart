@@ -70,7 +70,7 @@ class RemoteAdbController extends ChangeNotifier {
       _refreshEpoch++;
       stale = true;
     } else {
-      _apply({'state': snapshot, 'controlAllowed': controlAllowed});
+      _apply({'state': snapshot, 'controlAllowed': controlAllowed}, fromSharedState: true);
       if (!busy && !_hasResult) message = summary;
     }
     _notify();
@@ -127,7 +127,7 @@ class RemoteAdbController extends ChangeNotifier {
         ? {'requestId': id} : const {});
   }
 
-  bool _apply(Map<String, dynamic> response, {int? expectedEpoch}) {
+  bool _apply(Map<String, dynamic> response, {int? expectedEpoch, bool fromSharedState = false}) {
     final snapshot = response['state'];
     if (snapshot is Map && snapshot['supported'] is bool && snapshot['connected'] is bool) {
       if (expectedEpoch != null && expectedEpoch != sessionState?.epoch && _sharedSnapshot != null
@@ -136,13 +136,15 @@ class RemoteAdbController extends ChangeNotifier {
       // A delayed reply must not overwrite a newer device-pushed connection state.
       if (!stale && snapshot['instance'] == state['instance']
           && (snapshot['revision'] as num? ?? 0) < (state['revision'] as num? ?? 0)) {
-        sessionState?.apply(state, controlAllowed, expectedEpoch: expectedEpoch);
+        if (!fromSharedState) sessionState?.apply(state, controlAllowed, expectedEpoch: expectedEpoch);
         return true;
       }
       state = Map<String, dynamic>.from(snapshot);
       stale = false;
       statusError = '';
-      sessionState?.apply(state, controlAllowed, expectedEpoch: expectedEpoch);
+      // A shared-state listener consumes the snapshot; only a real request reply
+      // writes it back. Other open controllers must not feed stale permissions back.
+      if (!fromSharedState) sessionState?.apply(state, controlAllowed, expectedEpoch: expectedEpoch);
       return true;
     }
     return false;

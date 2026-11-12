@@ -2,12 +2,12 @@
 
 ## 0. Task Metadata
 
-- Status / T-State：complete / T8（本次源码与触发交付范围）；2026-11-12（Asia/Tokyo）。
+- Status / T-State：verifying / T7（续检修复提交与编排）；2026-11-12（Asia/Tokyo）。
 - Requester：用户；Principal / Domain / Security / Release：Codex（openworld-master，Android/Flutter/Security/Release 技能约束审阅，不委派）。
 - Source Branch / HEAD：test / a8abdd4c04951f930ea240c9951378ee3b8c165f；初始 clean，无用户修改。
 - Baseline：OW-BL-2026-11-07-d9f1119-screen-priority-worktree（Baseline26，历史输入）；当前实现以 test/a8abdd4 源码为准。
 - Risk：medium；最高验证 V4（正式设备联调待证）；ADR-0018、ADR-0028；既有 ADB-R21/R22、ADB-M21/M32、NET-04、DSP-09。
-- External Asset：N/A，无新依赖；STATE / WORK-20261112-003-r3；CE-20261112-T003-01/02/03；D-037。
+- External Asset：N/A，无新依赖；当前STATE / WORK-20261112-003-r6；CE-20261112-T003-01—06；D-037。首次交付回执保持历史事实。
 
 ## T0. Authority and Baseline
 
@@ -70,3 +70,17 @@ PC 菜单新增本应用无障碍开启、关闭、暂停/恢复。Android 从�
 源码提交`115d0bb3b26e441aa1d13e0f8bcbd79ef69acc42`（新增ADB本应用无障碍开启关闭与暂停恢复）已推送origin/test，dispatch前本地与远端SHA一致。2026-11-12 13:42:08 UTC / 22:42:08 Asia/Tokyo，向`Build-Clients-BT.yml`发送`ref=test / Platform=Both / BuildMode=常规编译`，HTTP204受理。未查询run/jobs/logs/artifacts，不监控；最终构建结果未知。
 
 最高证据为V0及离线命令桩，不表示Android/Windows编译或OEM、多PC、原链真机验收通过。回执文档随后单独提交推送test，不改源码且不再编排；无main合并、版本/依赖/签名变更、设备或生产操作。任务关闭仅代表本次已授权源码/文档/Git/触发交付完成。
+
+## 2026-11-12 交付后定向复检
+
+- 新输入：test/b25b9aac3ca4a23dbae9db314caa667c21ffdec1，clean，无并行任务或用户修改；沿用Baseline26、D-037、ADR-0018/0028及ADB-A01—A06。
+- 当前授权：用户要求复检连续开关/暂停恢复、多PC及作用域，仅修实际问题。本次只实施本地代码和相关事实记录；不重复上次Git/编排，不查询既有构建。
+- 源码证据：暂停记录先于commands.submit保存，队列满、排队取消或连接失败均无区分地保留记录，即使权限命令未执行；RemoteAdbSessionState.apply只更新_shellReady、不合入_snapshot，菜单不能即时使用已查询到的新状态。
+- 最小方案：Reply增加兼容的notExecuted默认回调，仅在命令未交给Shell时调用；权限模块还原本次操作前的暂停记录，已执行/结果不明仍保留恢复依据。PC查询回执按instance/revision和现有epoch门合入菜单快照，不覆盖更高版本。
+- 实际范围：LocalAdbManager.Reply、LocalAdbCommands、LocalAdbAccessibility、remote_adb_session_state.dart及remote_adb_controller.dart。controller仅阻止共享监听者回写旧控制权限，避免合入查询快照时形成反馈；原Kotlin生命周期、媒体/输入/语音、Rust协议、构建和依赖不修改。回滚只需反向应用本次局部diff。
+- 验证：24项静态检查与git diff --check通过，覆盖未执行回调阶段/旧命令错误消息不变、暂停记录还原、真实状态/有界取消、菜单revision/epoch合并及监听无回写、五个ADB文件作用域/词法检查。实际settings命令表达式与HEAD逐字一致，无额外系统配置写入。V1/V2/V3/V4正式编译/真机NOT_RUN，本机无Java/Dart/Flutter工具链；未运行产品测试或编排。
+- 结论：两处源代码确认的问题已作局部修复，未发现还需扩大的修复项。更新13_REMOTE_ADB、TEST_MATRIX及任务/记忆；STATE/WORK-20261112-003-r5 / CE-20261112-T003-04/05。本轮改动留在test工作区、未暂存/提交/推送；未查询或重新触发编排，不影响已记录的首次交付SHA。
+
+## 续检修复提交与编排授权
+
+用户随后明确要求“推送并提交，然后执行编排”，授权将上述五个ADB文件与相关记录提交推送test，并触发一次Build-Clients-BT.yml / ref=test / Platform=Both / BuildMode=常规编译，沿用不监控要求。执行前本地和origin/test均为b25b9aa，工作区仅上述已复检变更，git diff --check通过；无新增业务修改、main合并或版本变化。STATE/WORK-20261112-003-r6 / CE-20261112-T003-06，T7待准确交付回执。

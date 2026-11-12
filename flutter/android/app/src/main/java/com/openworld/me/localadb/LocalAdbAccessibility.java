@@ -92,6 +92,13 @@ final class LocalAdbAccessibility {
         return component != null && component.flattenToString().equals(records.getString(PAUSED, ""));
     }
 
+    private boolean savePauseRecord(String value) {
+        SharedPreferences.Editor editor = records.edit();
+        if (value == null) editor.remove(PAUSED);
+        else editor.putString(PAUSED, value);
+        return editor.commit();
+    }
+
     void addStatus(Map<String, Object> value) {
         Boolean enabled = enabled();
         value.put("accessibilityControlSupported", component != null);
@@ -117,11 +124,13 @@ final class LocalAdbAccessibility {
             reply.success(result);
             return;
         }
-        if ("accessibilityPause".equals(method)
-                && !records.edit().putString(PAUSED, component.flattenToString()).commit()) {
+        String previousPause = records.getString(PAUSED, null);
+        if ("accessibilityPause".equals(method) && !savePauseRecord(component.flattenToString())) {
+            // SharedPreferences may update memory even when the disk commit fails.
+            savePauseRecord(previousPause);
             reply.failure("storage", "无法保存暂停记录，未修改无障碍配置。"); return;
         }
-        Pending job = new Pending(owner, requestId, method, reply);
+        Pending job = new Pending(owner, requestId, method, previousPause, reply);
         pending = job;
         lastError = "";
         changed.run();
@@ -144,6 +153,16 @@ final class LocalAdbAccessibility {
             }
             @Override public void failure(String code, String message) {
                 if (pending == job) finish(job, code, message);
+            }
+            @Override public void notExecuted(String code, String message) {
+                if (pending != job) return;
+                // No settings command ran: do not turn an unrelated later manual disable
+                // into a phantom pause. Preserve any pause record that predated this request.
+                if ("accessibilityPause".equals(job.method) && !savePauseRecord(job.previousPause)) {
+                    code = "storage";
+                    message += " 本次暂停记录还原失败，请刷新状态确认。";
+                }
+                finish(job, code, message);
             }
         });
     }
@@ -220,14 +239,15 @@ final class LocalAdbAccessibility {
     private static String quote(String value) { return "'" + value.replace("'", "'\\''") + "'"; }
 
     private static final class Pending {
-        final String owner, requestId, method;
+        final String owner, requestId, method, previousPause;
         final boolean enable;
         final LocalAdbManager.Reply reply;
         boolean cancelled;
         long deadline;
         Runnable verify;
-        Pending(String owner, String requestId, String method, LocalAdbManager.Reply reply) {
+        Pending(String owner, String requestId, String method, String previousPause, LocalAdbManager.Reply reply) {
             this.owner = owner; this.requestId = requestId; this.method = method; this.reply = reply;
+            this.previousPause = previousPause;
             enable = "accessibilityEnable".equals(method) || "accessibilityResume".equals(method);
         }
     }
