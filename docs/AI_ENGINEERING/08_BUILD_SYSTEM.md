@@ -1,5 +1,7 @@
 # OpenWorld 构建系统 / Build System
 
+2026-11-15 T001：UDID展示移除源码test/696a87b已推送；09:27:19 UTC / 18:27:19 Asia/Tokyo触发Both/常规编译，HTTP204受理。按用户要求不监控，不查询新运行/日志/产物，最终结果未知；只补回执文档、不二次编排。见[任务](../tasks/T-2026-11-15-001-hide-desktop-udid.md)。
+
 当前整合输入为main/5d2d2e9与test/a8abdd4，见[Baseline28](../BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)及[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。保留Rust/portable 2.0.26、Flutter 2.0.26+59与OpenWorld产品身份，纳入服务器配置、PC切换及编译/CI修复。本轮只合并推送；历史编排受理及离线检查不能证明合并后编译或运行通过。
 
 2026-11-12 T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 仅补文档回执，不二次编排；此前f4a71c6的Android失败已明确，不能沿用其受理记录推定成功。

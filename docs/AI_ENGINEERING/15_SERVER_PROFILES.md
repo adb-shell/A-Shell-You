@@ -1,5 +1,7 @@
 # 集中服务器配置 / Server Profiles
 
+2026-11-15 T002：用户明确选择main合并时使用test/609aec9的完整server_profiles.rs；三套四项均已填写，Android与PC1当前相同、PC2独立，服务器可用性未验证。仅本地合并，未推送/构建/部署；见[任务](../tasks/T-2026-11-15-002-accessibility-main-merge.md)。下方旧记录按原时点保留。
+
 2026-11-12 T002：本轮合并输入main/5d2d2e9与test/a8abdd4；三套四项地址均已填写，Android与PC1目前不同，完整保留用户在d3b3f54/a8abdd4的配置修改。主分支版本2.0.26 / 2.0.26+59；只合并推送，不编译或监控。见[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。以下旧回执保留原观察时点。
 
 2026-11-12修正：cd21705的Windows实际编译失败（三处client.rs错误），Android依赖安装发生镜像DNS失败后取消；上方/下方早期HTTP204不代表成功。修复与重新编译回执见[T001](../tasks/T-2026-11-12-001-build-fixes.md)，保留当前PC2四项地址编辑，Android/PC1与Key保持。
@@ -14,9 +16,9 @@
 
 | 配置 | 用途 | 当前内容 |
 |---|---|---|
-| `ANDROID` | Android固定配置；iOS沿用移动端分支 | 已填写；独立维护，当前Android与PC1地址不同 |
-| `PC_1` | PC首次启动默认配置 | 已填写；独立维护，当前Android与PC1地址不同 |
-| `PC_2` | PC可选配置2 | test/a8abdd4已填齐四项，独立于PC1；空配置仍禁用 |
+| `ANDROID` | Android固定配置；iOS沿用移动端分支 | 已填写；独立维护，当前Android与PC1地址相同 |
+| `PC_1` | PC首次启动默认配置 | 已填写；独立维护，当前Android与PC1地址相同 |
+| `PC_2` | PC可选配置2 | test/609aec9已填齐四项，独立于PC1；空配置仍禁用 |
 | `SERVER_PUBLIC_KEY` | 三套配置共用的ID服务器公钥 | 保留现有公钥；不是服务器私钥 |
 
 每套包含四个字段：

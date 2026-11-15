@@ -1,5 +1,7 @@
 # OpenWorld External Asset Registry
 
+2026-11-15 T002：本地main合并按用户选择采用test/609aec9已提交的完整服务器配置。仅客户端源码来源变化，无实际服务器部署、连接测试或凭据操作；外部资产状态不提升。见[任务](docs/tasks/T-2026-11-15-002-accessibility-main-merge.md)。
+
 2026-11-12 T001续修：Ubuntu依赖源增加kernel.org和MIT SIPB的HTTPS Ubuntu镜像作为固定后备，主源不可达/索引失败时顺序尝试；包与索引仍须通过系统Ubuntu archive keyring签名和有效期验证，不新增信任密钥。已只读核对服务归属及六套InRelease返回；这不证明GitHub runner网络恢复。产品服务、地址/凭据无变更。详见[续修](docs/tasks/T-2026-11-12-001-build-fixes.md)。
 
 2026-11-12 T-2026-11-12-001：Android Native CI的APT依赖下载由runner mirror+file列表改为Ubuntu官方archive/security HTTPS（jammy与updates/security），使用系统ubuntu-archive-keyring.gpg验证签名；独立源/新索引仅作用于该步骤，包清单及版本工具链不变。PC2四项现有地址编辑纳入源码，实际部署/连通性未验证；没有产品服务或凭据操作。见[构建修复](docs/tasks/T-2026-11-12-001-build-fixes.md)。

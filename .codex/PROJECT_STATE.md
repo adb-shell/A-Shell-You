@@ -1,9 +1,25 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261113-001-r2`
-Last Updated / Observed At：2026-11-13（Asia/Tokyo）
-Evidence Scope：`repository-observed / merge V0; product/device NOT_RUN`
+State Revision：`STATE-20261115-002-r2`
+Last Updated / Observed At：2026-11-15（Asia/Tokyo）
+Evidence Scope：`repository-observed / local merge V0；build/window unverified`
+
+2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。
+
+以下为两个分支的历史快照，不代表本轮授权或验证结果：
+
+2026-11-15 / T001交付回执：源码696a87bb294088a57f59d89fce3f3d266ca3dab5已提交并推送origin/test，提交说明“移除PC右下角UDID显示”，触发前本地/远端SHA一致且工作区clean。2026-11-15 09:27:19 UTC（18:27:19 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求不监控，未查询新run/jobs/logs/artifacts，最终编译结果未知。 complete/T8仅关闭本次提交推送与触发范围；STATE、WORK-20261115-001-r3 / CE-20261115-T001-03。补回执只改文档，不二次编排。
+
+以下续接与原编辑阶段为历史快照：
+
+2026-11-15 T001续接：用户明确授权提交并推送本次UDID显示移除到test，然后触发PC与Android常规编译，不监控。起点test/caf0702，远端一致；工作区仅本任务1份Dart源码和9份配套文档。使用Build-Clients-BT.yml（394791509，active），ref=test、Platform=Both、BuildMode=常规编译；先推送核对SHA再单次dispatch，不查询新run/jobs/logs/artifacts。当前active/T7，Git与触发回执待完成。STATE、WORK-20261115-001-r2 / CE-20261115-T001-02。
+
+以下为原编辑阶段快照：
+
+2026-11-15 / T-2026-11-15-001：在clean test/caf0702上移除PC右下角识别码/UUID显示与双击复制，唯一产品源码为connection_page.dart两块展示代码（53行）。状态/服务器切换、账号UUID、Rust桥接、Android与配置保持。V0精确差异及diff检查通过；未编译/运行、未提交推送，complete/T8仅源码编辑交付。 [任务](../docs/tasks/T-2026-11-15-001-hide-desktop-udid.md) / STATE、WORK-20261115-001-r1 / CE-20261115-T001-01；DECISION_LOG、ADR、Baseline和外部资产reviewed-no-change。
+
+当前源码观察为test/caf0702，版本5.2.1 / 5.2.1+59；下方为历史任务快照，不代表本轮分支、未提交状态或验证结果。
 
 当前T-2026-11-13-001 / complete/T8：合并提交`a9c7e1027849c296e2b8ed48b0cb5fae026ce0f9`已推送origin/main，两个parents为main/990a4aa和test/d9d30eb；提交说明“增加ADB无障碍开关快捷键”。触发前本地/远端SHA一致。2026-11-12 15:32:41 UTC（2026-11-13 00:32:41 Asia/Tokyo）向Build-Clients-BT.yml发送ref=main、Platform=Both、BuildMode=常规编译，HTTP204受理。未查询run/jobs/logs/artifacts，不监控，最终结果未知。 AMG-01通过：7个ADB源码与test一致，其余912个非Markdown文件与main一致，173个本地文档链接有效，无冲突标记，diff检查通过。原test未提交配置字节未变且未纳入提交；test分支保持d9d30eb。正式构建/多PC及OEM真机仍待证。 STATE/WORK-20261113-001-r2 / CE-20261113-T001-02；仅补回执文档，不再次编排。见[合并任务](../docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)。
 
@@ -41,7 +57,7 @@ Evidence Scope：`repository-observed / merge V0; product/device NOT_RUN`
 | ADB参数 | width/350整数缩放；4096边长/4Mi像素界限；只读普通VideoQoS，运行时更新；无视至少300ms，节点至少80ms |
 | ADB输入 | Shell可用时全局优先触摸，独立control-only连接；普通键盘、远程输入、Ctrl+V及PC→Android纯文本剪贴板同步 |
 | 黑屏 | 独立黑色buffer层及App预渲染白字PNG，排除自身采集；OEM表现待真机证据 |
-| PC界面 | 普通左/ADB右、单源居中；Shell栏无悬浮提示；状态分组；无障碍栏无视频/特殊/防触状态文字 |
+| PC界面 | 主窗口右下角不显示识别码/UUID，内部账号设备标识保持；普通左/ADB右、单源居中；Shell栏无悬浮提示；状态分组；无障碍栏无视频/特殊/防触状态文字 |
 | PC开发者入口 | Ctrl+Shift+H先弹密码框；两个可接受密码任一精确匹配后确认/回车启用内存免登录，取消/错误不启用，重启复位；V0/FLT-08待运行 |
 | 开发者画面优先 | 进程模式供新建/重连使用；Android认证后暂停普通画面/盲输入/采集控制，保留会话与ZEGO；多开发者可接收，最后退出恢复；协作角色可由修改版伪造，正式验证待证 |
 | 常亮与保活 | 默认连接服务运行期间静默常亮，无新增设置入口；ADB连接验证后尝试本应用电池优化豁免，不保证进程免杀 |

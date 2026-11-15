@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261113-001-r2`
-Last Updated：2026-11-13
+Registry Revision：`WORK-20261115-002-r2`
+Last Updated：2026-11-15
 Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none；T-2026-11-13-001合并main并触发双端编排交付完成；本次只补回执，不再次编排。
+none；T002按用户选择整合test配置与UDID改动，交付本地main合并；未推送或编译。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,20 @@ none；T-2026-11-13-001合并main并触发双端编排交付完成；本次只�
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。
+
+以下为双方历史指针：
+
+2026-11-15 / T001交付回执：源码696a87bb294088a57f59d89fce3f3d266ca3dab5已提交并推送origin/test，提交说明“移除PC右下角UDID显示”，触发前本地/远端SHA一致且工作区clean。2026-11-15 09:27:19 UTC（18:27:19 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求不监控，未查询新run/jobs/logs/artifacts，最终编译结果未知。 complete/T8仅关闭本次提交推送与触发范围；STATE、WORK-20261115-001-r3 / CE-20261115-T001-03。补回执只改文档，不二次编排。
+
+[任务](../docs/tasks/T-2026-11-15-001-hide-desktop-udid.md)。V0与交付完成不表示构建或设备验收通过。
+
+以下为原编辑阶段与前次任务历史指针：
+
+2026-11-15 / T-2026-11-15-001：在clean test/caf0702上移除PC右下角识别码/UUID显示与双击复制，唯一产品源码为connection_page.dart两块展示代码（53行）。状态/服务器切换、账号UUID、Rust桥接、Android与配置保持。V0精确差异及diff检查通过；未编译/运行、未提交推送，complete/T8仅源码编辑交付。 [任务](../docs/tasks/T-2026-11-15-001-hide-desktop-udid.md) / STATE、WORK-20261115-001-r1 / CE-20261115-T001-01；DECISION_LOG、ADR、Baseline和外部资产reviewed-no-change。
+
+以下为前次任务历史指针：
 
 T-2026-11-13-001 / complete / T8：合并提交`a9c7e1027849c296e2b8ed48b0cb5fae026ce0f9`已推送origin/main，两个parents为main/990a4aa和test/d9d30eb；提交说明“增加ADB无障碍开关快捷键”。触发前本地/远端SHA一致。2026-11-12 15:32:41 UTC（2026-11-13 00:32:41 Asia/Tokyo）向Build-Clients-BT.yml发送ref=main、Platform=Both、BuildMode=常规编译，HTTP204受理。未查询run/jobs/logs/artifacts，不监控，最终结果未知。 STATE/WORK-20261113-001-r2 / CE-20261113-T001-02。AMG-01通过：7个ADB源码与test一致，其余912个非Markdown文件与main一致，173个本地文档链接有效，无冲突标记，diff检查通过。原test未提交配置字节未变且未纳入提交；test分支保持d9d30eb。正式构建/多PC及OEM真机仍待证。
 

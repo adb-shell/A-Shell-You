@@ -1,5 +1,15 @@
 # OpenWorld AI Changelog
 
+2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。
+
+以下记录按原观察时点保留：
+
+2026-11-15 / T001交付回执：源码696a87bb294088a57f59d89fce3f3d266ca3dab5已提交并推送origin/test，提交说明“移除PC右下角UDID显示”，触发前本地/远端SHA一致且工作区clean。2026-11-15 09:27:19 UTC（18:27:19 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求不监控，未查询新run/jobs/logs/artifacts，最终编译结果未知。 complete/T8仅关闭本次提交推送与触发范围；STATE、WORK-20261115-001-r3 / CE-20261115-T001-03。补回执只改文档，不二次编排。
+
+2026-11-15 T001续接：用户明确授权提交并推送本次UDID显示移除到test，然后触发PC与Android常规编译，不监控。起点test/caf0702，远端一致；工作区仅本任务1份Dart源码和9份配套文档。使用Build-Clients-BT.yml（394791509，active），ref=test、Platform=Both、BuildMode=常规编译；先推送核对SHA再单次dispatch，不查询新run/jobs/logs/artifacts。当前active/T7，Git与触发回执待完成。STATE、WORK-20261115-001-r2 / CE-20261115-T001-02。
+
+2026-11-15 / T-2026-11-15-001：在clean test/caf0702上移除PC右下角识别码/UUID显示与双击复制，唯一产品源码为connection_page.dart两块展示代码（53行）。状态/服务器切换、账号UUID、Rust桥接、Android与配置保持。V0精确差异及diff检查通过；未编译/运行、未提交推送，complete/T8仅源码编辑交付。 [任务](../docs/tasks/T-2026-11-15-001-hide-desktop-udid.md) / STATE、WORK-20261115-001-r1 / CE-20261115-T001-01；DECISION_LOG、ADR、Baseline和外部资产reviewed-no-change。
+
 2026-11-13 / T-2026-11-13-001 / complete/T8：合并提交`a9c7e1027849c296e2b8ed48b0cb5fae026ce0f9`已推送origin/main，两个parents为main/990a4aa和test/d9d30eb；提交说明“增加ADB无障碍开关快捷键”。触发前本地/远端SHA一致。2026-11-12 15:32:41 UTC（2026-11-13 00:32:41 Asia/Tokyo）向Build-Clients-BT.yml发送ref=main、Platform=Both、BuildMode=常规编译，HTTP204受理。未查询run/jobs/logs/artifacts，不监控，最终结果未知。 AMG-01通过：7个ADB源码与test一致，其余912个非Markdown文件与main一致，173个本地文档链接有效，无冲突标记，diff检查通过。原test未提交配置字节未变且未纳入提交；test分支保持d9d30eb。正式构建/多PC及OEM真机仍待证。 STATE/WORK-20261113-001-r2 / CE-20261113-T001-02。N/A — no decision delta；后续仅文档回执提交推送main，不二次编排。下方active/T7为此前历史快照。
 
 2026-11-13 / T-2026-11-13-001：按用户授权将test/d9d30eb合入main/990a4aa，指定提交说明“增加ADB无障碍开关快捷键”，推送main并触发Both/常规编译一次、不监控。独立工作区保护原test的未提交服务器配置；业务自动合并，七份Markdown冲突保留双方记录，原版本/配置/采集/媒体/语音保持。当前T7，交付回执待补；[任务](../docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)。N/A — no decision delta，沿用D-037、ADR-0018/0028及Baseline28。

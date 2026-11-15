@@ -1,5 +1,27 @@
 # OpenWorld Change Event Log
 
+## CE-20261115-T002-02：配置选择与本地合并交付
+
+2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。
+
+10份Markdown冲突保留双方事件/任务历史；配置整文件采用test，不采用自动合并的混合结果。未写入原test工作区、未访问服务或查询CI运行。本记录随合并提交保存，最终提交状态由Git核对。
+
+## CE-20261115-T002-01：本地main合并授权与范围
+
+2026-11-15 / T-2026-11-15-002：按用户要求将test/609aec9合入main/d75a950，合并提交说明“增加无障碍”。主分支既有ADB本应用无障碍开关/暂停恢复保持，纳入PC右下角UDID显示移除；主分支版本2.0.26 / 2.0.26+59保持。当前active/T7，服务器配置取舍及最终V0/提交待记录。本轮只完成本地合并提交，不推送、不触发或监控编译。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r1 / CE-20261115-T002-01；Baseline28，N/A — no decision delta。
+
+## CE-20261115-T001-03：test提交与双端编译受理
+
+2026-11-15 / T001交付回执：源码696a87bb294088a57f59d89fce3f3d266ca3dab5已提交并推送origin/test，提交说明“移除PC右下角UDID显示”，触发前本地/远端SHA一致且工作区clean。2026-11-15 09:27:19 UTC（18:27:19 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求不监控，未查询新run/jobs/logs/artifacts，最终编译结果未知。 complete/T8仅关闭本次提交推送与触发范围；STATE、WORK-20261115-001-r3 / CE-20261115-T001-03。补回执只改文档，不二次编排。
+
+## CE-20261115-T001-02：test提交与双端编译授权
+
+2026-11-15 T001续接：用户明确授权提交并推送本次UDID显示移除到test，然后触发PC与Android常规编译，不监控。起点test/caf0702，远端一致；工作区仅本任务1份Dart源码和9份配套文档。使用Build-Clients-BT.yml（394791509，active），ref=test、Platform=Both、BuildMode=常规编译；先推送核对SHA再单次dispatch，不查询新run/jobs/logs/artifacts。当前active/T7，Git与触发回执待完成。STATE、WORK-20261115-001-r2 / CE-20261115-T001-02。
+
+## CE-20261115-T001-01：PC右下角标识展示移除
+
+2026-11-15 / T-2026-11-15-001：在clean test/caf0702上移除PC右下角识别码/UUID显示与双击复制，唯一产品源码为connection_page.dart两块展示代码（53行）。状态/服务器切换、账号UUID、Rust桥接、Android与配置保持。V0精确差异及diff检查通过；未编译/运行、未提交推送，complete/T8仅源码编辑交付。 [任务](../docs/tasks/T-2026-11-15-001-hide-desktop-udid.md) / STATE、WORK-20261115-001-r1 / CE-20261115-T001-01；DECISION_LOG、ADR、Baseline和外部资产reviewed-no-change。
+
 ## CE-20261113-T001-02：main推送及双端编排回执
 
 合并提交`a9c7e1027849c296e2b8ed48b0cb5fae026ce0f9`已推送origin/main，两个parents为main/990a4aa和test/d9d30eb；提交说明“增加ADB无障碍开关快捷键”。触发前本地/远端SHA一致。2026-11-12 15:32:41 UTC（2026-11-13 00:32:41 Asia/Tokyo）向Build-Clients-BT.yml发送ref=main、Platform=Both、BuildMode=常规编译，HTTP204受理。未查询run/jobs/logs/artifacts，不监控，最终结果未知。

@@ -180,48 +180,6 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
     }
   }
 
-  Widget _buildUserInfo(BuildContext context) {
-    return FutureBuilder<String>(
-      future: bind.mainGetUuid(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          );
-        } else if (snapshot.hasError) {
-          return Text('Error', style: TextStyle(fontSize: em));
-        } else {
-          String machineCode = snapshot.data ?? '';
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "识别码: ",
-                style: TextStyle(fontSize: em),
-              ),
-              GestureDetector(
-                onDoubleTap: () {
-                  Clipboard.setData(ClipboardData(text: machineCode));
-                  showToast(translate("Copied"));
-                },
-                child: Text(
-                  machineCode,
-                  style: TextStyle(
-                    fontSize: em * 0.9,
-                    fontFamily: 'Monospace',
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ],
-          );
-        }
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isIncomingOnly = bind.isIncomingOnly();
@@ -259,17 +217,6 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
             ),
             // stop
             if (!isIncomingOnly) startServiceWidget(),
-            
-            if (!isIncomingOnly)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 6.0, right: 12.0),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: _buildUserInfo(context),
-                  ),
-                ),
-              ),
           ],
         );
 

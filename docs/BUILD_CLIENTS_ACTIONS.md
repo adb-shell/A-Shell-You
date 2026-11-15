@@ -1,5 +1,7 @@
 # GitHub Actions 客户端编译
 
+2026-11-15 T001：UDID展示移除源码test/696a87b已推送；09:27:19 UTC / 18:27:19 Asia/Tokyo触发Both/常规编译，HTTP204受理。按用户要求不监控，不查询新运行/日志/产物，最终结果未知；只补回执文档、不二次编排。见[任务](tasks/T-2026-11-15-001-hide-desktop-udid.md)。
+
 2026-11-12 T002：本轮main/5d2d2e9合并test/a8abdd4，只执行Git交付，不触发或监控构建。版本2.0.26 / 2.0.26+59保持；[合并任务](tasks/T-2026-11-12-002-unified-config-main-merge.md)。以下回执属于历史提交。
 
 2026-11-12 T001续修回执：源码c788e8d224433fc0e149d741d25ac174f7cb56df已推送origin/test，dispatch前远端一致。2026-11-11 16:33:34 UTC（2026-11-12 01:33:34 Asia/Tokyo）向Build-Clients-BT.yml（394791509）提交ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按要求未查询新run/jobs/logs/artifacts，不监控；最终结果未知。 仅补文档回执，不二次编排；此前f4a71c6的Android失败已明确，不能沿用其受理记录推定成功。

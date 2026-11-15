@@ -1,5 +1,9 @@
 # OpenWorld Commercial Test Matrix
 
+2026-11-15 / T002 / AMG-02（V0）：UDID页面和服务器配置完整采用test/609aec9，其余917个非Markdown文件保持main/d75a950；文档冲突、历史保留、链接及diff检查通过。按用户选择采用test配置，保留main版本；仅本地合并，不推送/构建。见[任务](docs/tasks/T-2026-11-15-002-accessibility-main-merge.md)。
+
+2026-11-15 / T001：FLT-07的PC底栏标识显示移除完成V0：标签、UUID渲染/复制及专用请求无残留，状态/服务器切换保持；FLT-06账号UUID调用未改。V1/V3未运行，V2已于09:27:19 UTC触发test/696a87b的Both/常规编译并获HTTP204；不监控、结果未知，窄/宽窗口视觉验收待证。见[任务](docs/tasks/T-2026-11-15-001-hide-desktop-udid.md)。
+
 ## 2026-11-13 ADB无障碍合并main / T-2026-11-13-001
 
 AMG-01（V0）：核对七个ADB源码路径与test/d9d30eb一致、其余产品源码与main/990a4aa一致、无冲突标记和diff问题、原test未提交配置未改动。正式多PC/设备验证仍为ADB-A01—A06 NOT_RUN；本轮只触发main双端编译，不监控。记录见[合并任务](docs/tasks/T-2026-11-13-001-adb-accessibility-main-merge.md)。

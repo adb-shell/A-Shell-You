@@ -1,5 +1,13 @@
 # OpenWorld 模块设计 / Module Design
 
+2026-11-15 T002：main/d75a950整合test/609aec9，保留2.0.26 / 2.0.26+59及既有ADB本应用无障碍控制；本轮只做本地合并。见[任务](../tasks/T-2026-11-15-002-accessibility-main-merge.md)。
+
+2026-11-15：PC主窗口`OnlineStatusWidget`底栏不再显示右侧“识别码”/UUID及双击复制入口，移除该展示专用异步读取与加载/错误占位。左侧状态、服务器切换与启动服务保持；账号`user_model.dart`和Rust `main_get_uuid`仍使用原设备标识。仅改`connection_page.dart`展示层，Android/协议/配置无变化；V0通过、窗口视觉与构建结果待证，见[任务](../tasks/T-2026-11-15-001-hide-desktop-udid.md)。
+
+2026-11-07 T004当前增量：开发者密码成功后同时调用手写C ABI `openworld_enable_developer_mode()`，Rust进程标志供desktop各engine连接/重连使用；已有会话需重连。`screen_policy.rs`持有纯连接策略，`developer_mode.rs`负责Android注册与状态排队；`connection.rs`、service/video_qos/video_service与remote_adb_video过滤普通画面并保留语音。PC `io_loop.rs`串行化策略与解码发布，`FlutterHandler`缓存/重放状态并重新启用Texture首帧通知，`FfiModel`区分策略暂停与首帧等待，`RemoteAdbMirror`清旧图但保持订阅。暂停/恢复不关闭ZEGO、不改变录屏选择或MediaProjection。详见[ADR-0028](../ADR/0028-developer-screen-priority.md)；[Baseline26](../BASELINE/26_DEVELOPER_SCREEN_PRIORITY_BASELINE_2026-11-07.md)，V0，正式验证待证。下方源码基线陈述为历史快照。
+
+历史版本整合记录：
+
 当前主分支整合版本与功能：[Baseline27](../BASELINE/27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，main/9040c53的2.0.26版本配置与test/51292c2（功能源码25bc2ce）的开发者画面优先。Rust/portable 2.0.26、Flutter 2.0.26+59；产品身份“开放世界 / OpenWorld / openworld / com.openworld.me”。本轮仅文档与Git交付，历史双端编译只记录受理、结果未知；V0不等于编译或真机通过。准确回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。
 
 开发者密码成功后调用手写C ABI `openworld_enable_developer_mode()`，Rust进程标志供desktop各engine连接/重连使用；已有会话需重连。`screen_policy.rs`持有纯连接策略，`developer_mode.rs`负责Android注册与状态排队；`connection.rs`、service/video_qos/video_service与remote_adb_video过滤普通画面和操作，保留语音。PC `io_loop.rs`串行化策略与解码发布，`FlutterHandler`缓存/重放状态并重新启用Texture首帧通知，`FfiModel`区分策略暂停与首帧等待，`RemoteAdbMirror`清旧图但保持订阅。暂停/恢复不关闭ZEGO、不改变录屏选择或MediaProjection。详见[ADR-0028](../ADR/0028-developer-screen-priority.md)。
