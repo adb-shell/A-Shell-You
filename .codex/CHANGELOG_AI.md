@@ -1,5 +1,9 @@
 # OpenWorld AI Changelog
 
+2026-11-15 T001续接：用户明确授权提交并推送本次UDID显示移除到test，然后触发PC与Android常规编译，不监控。起点test/caf0702，远端一致；工作区仅本任务1份Dart源码和9份配套文档。使用Build-Clients-BT.yml（394791509，active），ref=test、Platform=Both、BuildMode=常规编译；先推送核对SHA再单次dispatch，不查询新run/jobs/logs/artifacts。当前active/T7，Git与触发回执待完成。STATE、WORK-20261115-001-r2 / CE-20261115-T001-02。
+
+2026-11-15 / T-2026-11-15-001：在clean test/caf0702上移除PC右下角识别码/UUID显示与双击复制，唯一产品源码为connection_page.dart两块展示代码（53行）。状态/服务器切换、账号UUID、Rust桥接、Android与配置保持。V0精确差异及diff检查通过；未编译/运行、未提交推送，complete/T8仅源码编辑交付。 [任务](../docs/tasks/T-2026-11-15-001-hide-desktop-udid.md) / STATE、WORK-20261115-001-r1 / CE-20261115-T001-01；DECISION_LOG、ADR、Baseline和外部资产reviewed-no-change。
+
 2026-11-12 / T003续检交付：源码0e5cc3dfe567ffe0617849cea25c0e0eb5276797已推送test；14:50:21 UTC触发Both/常规编译，HTTP204。未监控或查询结果，正式编译/设备待证；后续回执仅文档，不再次编排。STATE/WORK-20261112-003-r7 / CE-20261112-T003-07，T8。
 
 2026-11-12 / T003本地续检：仅修命令未执行时遗留新暂停记录、查询回执未合入菜单快照两处问题；合并快照时共享监听不回写旧权限。24项静态与diff通过，真实编译/设备NOT_RUN。五个ADB文件及相关记录变化，test/b25b9aa上未提交；无推送、编排或监控。STATE/WORK-20261112-003-r5 / CE-20261112-T003-04/05。

@@ -1,9 +1,17 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261112-003-r7`
-Last Updated / Observed At：2026-11-12（Asia/Tokyo）
-Evidence Scope：`repository-observed / static and offline shell checks; product/device NOT_RUN`
+State Revision：`STATE-20261115-001-r2`
+Last Updated / Observed At：2026-11-15（Asia/Tokyo）
+Evidence Scope：`repository-observed / V0 UI source diff; Git/build dispatch pending`
+
+2026-11-15 T001续接：用户明确授权提交并推送本次UDID显示移除到test，然后触发PC与Android常规编译，不监控。起点test/caf0702，远端一致；工作区仅本任务1份Dart源码和9份配套文档。使用Build-Clients-BT.yml（394791509，active），ref=test、Platform=Both、BuildMode=常规编译；先推送核对SHA再单次dispatch，不查询新run/jobs/logs/artifacts。当前active/T7，Git与触发回执待完成。STATE、WORK-20261115-001-r2 / CE-20261115-T001-02。
+
+以下为原编辑阶段快照：
+
+2026-11-15 / T-2026-11-15-001：在clean test/caf0702上移除PC右下角识别码/UUID显示与双击复制，唯一产品源码为connection_page.dart两块展示代码（53行）。状态/服务器切换、账号UUID、Rust桥接、Android与配置保持。V0精确差异及diff检查通过；未编译/运行、未提交推送，complete/T8仅源码编辑交付。 [任务](../docs/tasks/T-2026-11-15-001-hide-desktop-udid.md) / STATE、WORK-20261115-001-r1 / CE-20261115-T001-01；DECISION_LOG、ADR、Baseline和外部资产reviewed-no-change。
+
+当前源码观察为test/caf0702，版本5.2.1 / 5.2.1+59；下方为历史任务快照，不代表本轮分支、未提交状态或验证结果。
 
 当前T003 / complete/T8续检交付：源码0e5cc3dfe567ffe0617849cea25c0e0eb5276797已推送test，触发前本地/远端一致。2026-11-12 14:50:21 UTC触发Both/常规编译，HTTP204；未查询运行进度/结果。回执文档续交不再编排。24项静态与diff通过，正式编译/设备待证。WORK-20261112-003-r7 / CE-20261112-T003-07；以下保留前阶段证据，不再代表当前未提交。
 
@@ -33,7 +41,7 @@ Evidence Scope：`repository-observed / static and offline shell checks; product
 | ADB参数 | width/350整数缩放；4096边长/4Mi像素界限；只读普通VideoQoS，运行时更新；无视至少300ms，节点至少80ms |
 | ADB输入 | Shell可用时全局优先触摸，独立control-only连接；普通键盘、远程输入、Ctrl+V及PC→Android纯文本剪贴板同步 |
 | 黑屏 | 独立黑色buffer层及App预渲染白字PNG，排除自身采集；OEM表现待真机证据 |
-| PC界面 | 普通左/ADB右、单源居中；Shell栏无悬浮提示；状态分组；无障碍栏无视频/特殊/防触状态文字 |
+| PC界面 | 主窗口右下角不显示识别码/UUID，内部账号设备标识保持；普通左/ADB右、单源居中；Shell栏无悬浮提示；状态分组；无障碍栏无视频/特殊/防触状态文字 |
 | PC开发者入口 | Ctrl+Shift+H先弹密码框；两个可接受密码任一精确匹配后确认/回车启用内存免登录，取消/错误不启用，重启复位；V0/FLT-08待运行 |
 | 开发者画面优先 | 进程模式供新建/重连使用；Android认证后暂停普通画面/盲输入/采集控制，保留会话与ZEGO；多开发者可接收，最后退出恢复；协作角色可由修改版伪造，正式验证待证 |
 | 常亮与保活 | 默认连接服务运行期间静默常亮，无新增设置入口；ADB连接验证后尝试本应用电池优化豁免，不保证进程免杀 |

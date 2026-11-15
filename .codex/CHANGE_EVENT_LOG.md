@@ -1,5 +1,13 @@
 # OpenWorld Change Event Log
 
+## CE-20261115-T001-02：test提交与双端编译授权
+
+2026-11-15 T001续接：用户明确授权提交并推送本次UDID显示移除到test，然后触发PC与Android常规编译，不监控。起点test/caf0702，远端一致；工作区仅本任务1份Dart源码和9份配套文档。使用Build-Clients-BT.yml（394791509，active），ref=test、Platform=Both、BuildMode=常规编译；先推送核对SHA再单次dispatch，不查询新run/jobs/logs/artifacts。当前active/T7，Git与触发回执待完成。STATE、WORK-20261115-001-r2 / CE-20261115-T001-02。
+
+## CE-20261115-T001-01：PC右下角标识展示移除
+
+2026-11-15 / T-2026-11-15-001：在clean test/caf0702上移除PC右下角识别码/UUID显示与双击复制，唯一产品源码为connection_page.dart两块展示代码（53行）。状态/服务器切换、账号UUID、Rust桥接、Android与配置保持。V0精确差异及diff检查通过；未编译/运行、未提交推送，complete/T8仅源码编辑交付。 [任务](../docs/tasks/T-2026-11-15-001-hide-desktop-udid.md) / STATE、WORK-20261115-001-r1 / CE-20261115-T001-01；DECISION_LOG、ADR、Baseline和外部资产reviewed-no-change。
+
 ## CE-20261112-T003-07：续检修复推送及双端编排回执
 
 源码0e5cc3dfe567ffe0617849cea25c0e0eb5276797已推送origin/test，触发前SHA一致。2026-11-12 14:50:21 UTC（23:50:21 Asia/Tokyo）向Build-Clients-BT.yml发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204。未查询run/jobs/logs/artifacts、不监控，构建结果未知。STATE/WORK-20261112-003-r7，T8关闭指定交付；后续仅回执文档提交推送，不再次触发。

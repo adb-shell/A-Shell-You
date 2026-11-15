@@ -1,5 +1,9 @@
 # OpenWorld Project Memory
 
+2026-11-15 T001续接：用户明确授权提交并推送本次UDID显示移除到test，然后触发PC与Android常规编译，不监控。起点test/caf0702，远端一致；工作区仅本任务1份Dart源码和9份配套文档。使用Build-Clients-BT.yml（394791509，active），ref=test、Platform=Both、BuildMode=常规编译；先推送核对SHA再单次dispatch，不查询新run/jobs/logs/artifacts。当前active/T7，Git与触发回执待完成。STATE、WORK-20261115-001-r2 / CE-20261115-T001-02。
+
+2026-11-15 / T-2026-11-15-001：在clean test/caf0702上移除PC右下角识别码/UUID显示与双击复制，唯一产品源码为connection_page.dart两块展示代码（53行）。状态/服务器切换、账号UUID、Rust桥接、Android与配置保持。V0精确差异及diff检查通过；未编译/运行、未提交推送，complete/T8仅源码编辑交付。 [任务](../docs/tasks/T-2026-11-15-001-hide-desktop-udid.md) / STATE、WORK-20261115-001-r1 / CE-20261115-T001-01；DECISION_LOG、ADR、Baseline和外部资产reviewed-no-change。
+
 最新T003续检交付：源码test/0e5cc3d已推送；2026-11-12 14:50:21 UTC触发Both/常规编译，HTTP204，未查询运行进度/结果。此前未提交修复已纳入；后续回执仅文档，不再编排。24项静态通过，正式编译/真机待证。STATE/WORK-20261112-003-r7 / CE-20261112-T003-07。
 
 最新T003本地续检：test/b25b9aa上未提交修复，确定未执行的权限命令还原原暂停记录；PC查询回执也更新菜单快照，共享监听不回写旧权限。24项静态与diff通过；原系统列表命令及采集/媒体/触摸/语音保持，编译/真机待证。STATE/WORK-20261112-003-r5 / CE-20261112-T003-05；本轮无提交推送或编排/监控。
