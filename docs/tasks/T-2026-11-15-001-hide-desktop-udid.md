@@ -1,5 +1,11 @@
 # T-2026-11-15-001：移除PC右下角UDID显示
 
+## 最新交付回执
+
+源码696a87bb294088a57f59d89fce3f3d266ca3dab5已提交并推送origin/test，提交说明“移除PC右下角UDID显示”，触发前本地/远端SHA一致且工作区clean。2026-11-15 09:27:19 UTC（18:27:19 Asia/Tokyo）向Build-Clients-BT.yml（394791509）发送ref=test、Platform=Both、BuildMode=常规编译，HTTP204受理。按用户要求不监控，未查询新run/jobs/logs/artifacts，最终编译结果未知。
+
+Git执行add/commit/push，提交10个文件，唯一产品源码为53行展示删除。V0与staged diff检查通过；构建环境沿用既有CI（Windows x64、Android arm64-v8a），未取得run/job/artifact或真实窗口结果，不声明编译成功。仅补本回执文档并推送，不二次dispatch；以下阶段记录保留观察时点。
+
 ## 续接授权：test提交与双端编译
 
 2026-11-15 T001续接：用户明确授权提交并推送本次UDID显示移除到test，然后触发PC与Android常规编译，不监控。起点test/caf0702，远端一致；工作区仅本任务1份Dart源码和9份配套文档。使用Build-Clients-BT.yml（394791509，active），ref=test、Platform=Both、BuildMode=常规编译；先推送核对SHA再单次dispatch，不查询新run/jobs/logs/artifacts。当前active/T7，Git与触发回执待完成。STATE、WORK-20261115-001-r2 / CE-20261115-T001-02。
@@ -11,7 +17,7 @@ C3范围：本任务stage/commit/push、既有CI双端常规编译（沿用临�
 | Field | Value |
 |---|---|
 | Task ID / Title | T-2026-11-15-001 / 移除PC右下角UDID显示 |
-| Status / Current T-State | verifying / T7（提交与双端构建触发） |
+| Status / Current T-State | complete / T8（提交推送及双端触发交付） |
 | Requester / Product Owner | 用户 |
 | Principal Engineer / Primary Skill | Codex / openworld-flutter-engineer |
 | Domain Owners / Security Reviewer / Release Owner | Codex；仅Flutter展示层，无权限或发布动作 |
@@ -23,8 +29,8 @@ C3范围：本任务stage/commit/push、既有CI双端常规编译（沿用临�
 | Related ADR / D-ID | ADR-0028/0029与D-035/036保持；无新决策 |
 | Related TEST_MATRIX IDs | FLT-07展示/布局、FLT-06账号合同 |
 | Related External Asset IDs | N/A — 无外部资产变化或访问 |
-| Project State / Registry Revision | STATE-20261115-001-r2 / WORK-20261115-001-r2 |
-| Change Event IDs | CE-20261115-T001-01/02 |
+| Project State / Registry Revision | STATE-20261115-001-r3 / WORK-20261115-001-r3 |
+| Change Event IDs | CE-20261115-T001-01/02/03 |
 
 ## T0. Authority and Baseline
 

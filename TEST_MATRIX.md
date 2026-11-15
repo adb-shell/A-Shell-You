@@ -1,6 +1,6 @@
 # OpenWorld Commercial Test Matrix
 
-2026-11-15 / T001：FLT-07的PC底栏标识显示移除完成V0：标签、UUID渲染/复制及专用请求无残留，状态/服务器切换保持；FLT-06账号UUID调用未改。V1/V2/V3未运行，窄/宽窗口视觉验收待证。见[任务](docs/tasks/T-2026-11-15-001-hide-desktop-udid.md)。
+2026-11-15 / T001：FLT-07的PC底栏标识显示移除完成V0：标签、UUID渲染/复制及专用请求无残留，状态/服务器切换保持；FLT-06账号UUID调用未改。V1/V3未运行，V2已于09:27:19 UTC触发test/696a87b的Both/常规编译并获HTTP204；不监控、结果未知，窄/宽窗口视觉验收待证。见[任务](docs/tasks/T-2026-11-15-001-hide-desktop-udid.md)。
 
 ## 2026-11-12 本应用无障碍控制 / T-2026-11-12-003
 
