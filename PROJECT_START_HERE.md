@@ -1,5 +1,7 @@
 # OpenWorld Project Start Here
 
+2026-11-21 T002：test/e137d44工作区已完成内置ADB保活/重绑定续修，仅V0、未提交构建；旧双端成功结论不覆盖本批。并行T003单独负责双端文案排版，活动任务以[Current Work](.codex/CURRENT_WORK.md)为准。[保活任务](docs/tasks/T-2026-11-21-002-embedded-adb-resilience.md)记录具体变化、验证需求和权限边界；以下为前阶段。
+
 2026-11-21当前源码：test/febf7f0已提交推送[内置ADB服务](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)，版本2.0.26；双端常规编译run44883517881全部SUCCESS，设备验收仍待证，见[任务](docs/tasks/T-2026-11-21-001-embedded-adb.md)/[STATE](.codex/PROJECT_STATE.md)。无线调试仅用于显式激活，日常Binder/FD执行；服务死亡/重启需重新激活。main仍956ecf4；以后每次test合main后、返回test作业前先对齐最新main，详见[开发流程](DEVELOPMENT_WORKFLOW.md)。下方为历史。
 
 当前主分支合并输入为main/5d2d2e9与test/a8abdd4：保留Rust/portable 2.0.26、Flutter 2.0.26+59，纳入集中服务器配置、PC空闲切换、Windows编译修复与Android APT续修。三套地址以test最新源码为准，Android与PC1分别配置，共用ID公钥。见[Baseline28](docs/BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)、[当前任务](docs/tasks/T-2026-11-12-002-unified-config-main-merge.md)及[当前状态](.codex/PROJECT_STATE.md)。本轮仅合并推送，不触发或监控编译；此前c788e8d双端编排仅有HTTP204受理，最终结果未知。

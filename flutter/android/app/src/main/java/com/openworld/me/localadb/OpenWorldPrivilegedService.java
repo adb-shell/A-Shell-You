@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -43,6 +45,14 @@ public final class OpenWorldPrivilegedService extends Binder {
     private final Handler main;
     private final Set<Channel> channels = new HashSet<>();
     private final AtomicBoolean stopping = new AtomicBoolean();
+    private final AtomicBoolean maintenancePending = new AtomicBoolean();
+    private final ExecutorService maintenance = Executors.newSingleThreadExecutor(task -> {
+        Thread thread = new Thread(task, "openworld-privileged-maintenance");
+        thread.setDaemon(true);
+        return thread;
+    });
+    private IBinder appLease;
+    private IBinder.DeathRecipient appDeath;
     // Uniqueness guard only: no commands/data are accepted over this socket.
     private final LocalServerSocket singleton;
 
@@ -87,37 +97,104 @@ public final class OpenWorldPrivilegedService extends Binder {
     }
 
     private void start() {
-        try { system.observe(() -> main.post(this::deliver)); } catch (Exception ignored) { }
-        main.post(this::deliver);
+        // Provider/system Binder calls can stall while the app or system is being recreated.
+        // Coalesce all triggers into one worker so the main looper can always process STOP.
+        // Registration is best-effort and happens once. A stuck optional observer registration
+        // must not block the mandatory periodic handoff/authorization worker.
+        thread("openworld-privileged-observers", () -> system.observe(this::requestMaintenance));
+        requestMaintenance();
         main.postDelayed(new Runnable() {
             @Override public void run() {
                 if (stopping.get()) return;
-                try { system.verifyInstallation(); }
-                catch (Exception changed) { shutdown(); return; }
-                // Also covers ROMs without UID observers. Never start a stopped/non-running app.
-                if (system.isRunning()) deliver();
+                requestMaintenance();
                 main.postDelayed(this, 5000);
             }
         }, 5000);
+    }
+
+    private void requestMaintenance() {
+        if (stopping.get() || !maintenancePending.compareAndSet(false, true)) return;
+        try {
+            maintenance.execute(() -> {
+                try {
+                    if (stopping.get()) return;
+                    system.verifyInstallation();
+                    IBinder lease = currentClient();
+                    if (lease == null) deliver();
+                    else {
+                        try {
+                            if (!PrivilegedProtocol.checkLease(lease, generation)) main.post(this::shutdown);
+                        } catch (Exception | LinkageError unavailable) {
+                            // Retrying handoff is safe; an absent reply alone is not revocation.
+                            forgetClient();
+                            deliver();
+                        }
+                    }
+                } catch (PrivilegedSystem.InstallationChanged changed) {
+                    main.post(this::shutdown);
+                } catch (Exception | LinkageError unavailable) {
+                    // A failed system query cannot prove uninstall/replacement. Refuse individual
+                    // OPENs until identity can be checked, but preserve the existing shell process.
+                } finally { maintenancePending.set(false); }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException closed) {
+            maintenancePending.set(false);
+        }
     }
 
     private void deliver() {
         if (stopping.get() || !system.isRunning()) return;
         try {
             Bundle reply = system.send(this, generation);
-            if (reply != null && !reply.getBoolean("accepted", false)) shutdown();
-        } catch (Exception ignored) { /* Rebind later; a transient app restart is not revocation. */ }
+            if (reply != null && !reply.getBoolean("accepted", false)) main.post(this::shutdown);
+            else if (reply != null && reply.getBoolean("ready", false)) rememberClient(reply.getBinder("lease"));
+        } catch (PrivilegedSystem.InstallationChanged changed) { main.post(this::shutdown); }
+        catch (Exception | LinkageError ignored) { /* A transient app restart is not revocation. */ }
+    }
+
+    private synchronized IBinder currentClient() {
+        return appLease != null && appLease.isBinderAlive() ? appLease : null;
+    }
+
+    private synchronized void rememberClient(IBinder lease) throws RemoteException {
+        if (lease == null || stopping.get() || lease.equals(appLease)) return;
+        forgetClient();
+        IBinder.DeathRecipient death = () -> {
+            synchronized (OpenWorldPrivilegedService.this) {
+                if (!lease.equals(appLease)) return;
+                appLease = null; appDeath = null;
+            }
+            requestMaintenance();
+        };
+        lease.linkToDeath(death, 0);
+        appLease = lease; appDeath = death;
+    }
+
+    private synchronized void forgetClient() {
+        if (appLease != null && appDeath != null) try { appLease.unlinkToDeath(appDeath, 0); }
+        catch (RuntimeException ignored) { }
+        appLease = null; appDeath = null;
     }
 
     private void enforceOwner() {
         if (Binder.getCallingUid() != ownerUid || stopping.get()) throw new SecurityException("Caller denied");
         try { system.verifyInstallation(); }
-        catch (Exception error) { throw new SecurityException("Installation changed"); }
+        catch (PrivilegedSystem.InstallationChanged changed) {
+            main.post(this::shutdown);
+            throw changed;
+        } catch (Exception unavailable) { throw new IllegalStateException("Installation verification unavailable"); }
     }
 
     @Override protected boolean onTransact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
         if (code == INTERFACE_TRANSACTION) return super.onTransact(code, data, reply, flags);
         data.enforceInterface(PrivilegedProtocol.SERVICE);
+        // Revocation only reduces privileges. The owning full UID can always STOP even when
+        // PackageManager is temporarily unavailable; execution still requires installation proof.
+        if (code == PrivilegedProtocol.STOP) {
+            if (Binder.getCallingUid() != ownerUid) throw new SecurityException("Caller denied");
+            main.post(this::shutdown);
+            return true;
+        }
         enforceOwner();
         if (code == PrivilegedProtocol.INFO) {
             reply.writeNoException();
@@ -129,7 +206,6 @@ public final class OpenWorldPrivilegedService extends Binder {
             reply.writeString(generation);
             return true;
         }
-        if (code == PrivilegedProtocol.STOP) { main.post(this::shutdown); return true; }
         if (code != PrivilegedProtocol.OPEN) return super.onTransact(code, data, reply, flags);
         String destination = data.readString();
         IBinder lease = data.readStrongBinder();
@@ -159,6 +235,8 @@ public final class OpenWorldPrivilegedService extends Binder {
 
     private void shutdown() {
         if (!stopping.compareAndSet(false, true)) return;
+        maintenance.shutdownNow();
+        forgetClient();
         Channel[] current;
         synchronized (channels) { current = channels.toArray(new Channel[0]); }
         for (Channel channel : current) channel.close();

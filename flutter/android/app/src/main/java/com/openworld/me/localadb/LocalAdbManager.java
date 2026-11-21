@@ -131,7 +131,7 @@ public final class LocalAdbManager {
     Map<String, Object> status() {
         Map<String, Object> value = new HashMap<>();
         value.put("supported", Build.VERSION.SDK_INT >= 30);
-        value.put("apiVersion", 5);
+        value.put("apiVersion", 6);
         value.put("textInputSupported", true);
         value.put("clipboardSyncSupported", true);
         value.put("mirrorVersion", 2);
@@ -143,7 +143,7 @@ public final class LocalAdbManager {
         value.put("connectionBusy", transportChanging());
         value.put("queued", queue.size() + commands.queued());
         value.put("runningCommands", commands.running());
-        value.put("recovering", false);
+        // PrivilegedBridge publishes recovering for a live-service rebind, never for adbd scans.
         value.put("wirelessConnected", client.isConnected());
         privileged.addStatus(value);
         value.put("operation", current == null ? commands.running() == 0 ? "" : "shell" : current.kind);
@@ -404,10 +404,17 @@ public final class LocalAdbManager {
 
     private String connect(Operation operation, int port) throws Exception {
         if (privileged.ready()) return "内置 ADB 能力已激活，已复用现有服务。";
+        if (privileged.reconnecting()) {
+            operation.phase = "正在恢复已有内置服务，无需开启无线调试";
+            if (privileged.awaitRecovery(operation.cancelled, operation.deadline - 250))
+                return "已恢复原有 ADB 能力，无需重新激活。";
+            throw new AdbFailure("暂未恢复原有服务。请稍候刷新状态；确认服务已停止时，再开启无线调试并点击激活。");
+        }
         final boolean automatic = port == 0;
         Exception last = null;
         for (int attempt = 0; attempt < 2; attempt++) {
             if (operation.cancelled.get() || Thread.currentThread().isInterrupted()) throw new InterruptedException();
+            if (privileged.ready()) return "已恢复原有 ADB 能力，无需重新激活。";
             long remaining = operation.deadline - SystemClock.elapsedRealtime();
             if (remaining < 1000) break;
             if (automatic) {
@@ -417,6 +424,7 @@ public final class LocalAdbManager {
                 port = ports.connectPort;
                 if (port == 0) port = records.getInt("connectPort", 0);
             }
+            if (privileged.ready()) return "已恢复原有 ADB 能力，无需重新激活。";
             if (port > 0) {
                 operation.phase = "正在连接并验证 Shell";
                 operation.claimTransport();
@@ -427,8 +435,8 @@ public final class LocalAdbManager {
                     client.connectAdb(port, operation.cancelled, Math.min(7000, remaining - 8500));
                     if (!operation.cancelled.get()) records.edit().putInt("connectPort", port).putBoolean("paired", true).apply();
                     operation.phase = "正在激活内置服务并验证权限";
-                    operation.activating = true;
-                    try { privileged.activate(client, operation.cancelled, operation.deadline - 250); }
+                    try { privileged.activate(client, operation.cancelled, operation.deadline - 250,
+                            () -> operation.activating = true); }
                     finally { client.disconnect(); }
                     return "内置 ADB 能力已激活，后续执行无需无线调试连接。";
                 } catch (Exception error) {

@@ -27,6 +27,11 @@ final class PrivilegedSystem {
     private final int ownerUid;
     private final String apk;
     private IBinder observer;
+    private IBinder processObserver;
+
+    static final class InstallationChanged extends SecurityException {
+        InstallationChanged() { super("Application installation changed"); }
+    }
 
     PrivilegedSystem(String packageName, int ownerUid, String apk) throws Exception {
         this.packageName = packageName; this.authority = packageName + PrivilegedProtocol.PROVIDER_SUFFIX;
@@ -57,7 +62,7 @@ final class PrivilegedSystem {
         ApplicationInfo info = application();
         if (info == null || ownerUid % 100000 < 10000 || ownerUid % 100000 >= 20000
                 || info.uid != ownerUid || !apk.equals(info.sourceDir))
-            throw new SecurityException("Application installation changed");
+            throw new InstallationChanged();
     }
 
     boolean isRunning() {
@@ -109,7 +114,14 @@ final class PrivilegedSystem {
         }
     }
 
-    void observe(Runnable active) throws Exception {
+    void observe(Runnable active) {
+        // Either observer may be unavailable on an OEM build. The service's single periodic
+        // maintenance task remains the fallback; a registration failure does not disable the other.
+        try { observeUid(active); } catch (Exception | LinkageError ignored) { }
+        try { observeProcess(active); } catch (Exception | LinkageError ignored) { }
+    }
+
+    private void observeUid(Runnable active) throws Exception {
         Class<?> api = Class.forName("android.app.IUidObserver");
         Class<?> stub = Class.forName("android.app.IUidObserver$Stub");
         int activeCode = transaction(stub, "onUidActive");
@@ -135,6 +147,33 @@ final class PrivilegedSystem {
                 (proxy, method, args) -> "asBinder".equals(method.getName()) ? observer : null);
         managerInterface.getMethod("registerUidObserver", api, int.class, int.class, String.class)
                 .invoke(activityManager, callback, 8 | 16, -1, null); // ACTIVE | CACHED
+    }
+
+    private void observeProcess(Runnable active) throws Exception {
+        Class<?> api = Class.forName("android.app.IProcessObserver");
+        int foregroundCode = transaction(Class.forName("android.app.IProcessObserver$Stub"),
+                "onForegroundActivitiesChanged");
+        processObserver = new Binder() {
+            @Override protected boolean onTransact(int code, Parcel data, Parcel reply, int flags)
+                    throws android.os.RemoteException {
+                if (code == INTERFACE_TRANSACTION) {
+                    if (reply != null) reply.writeString("android.app.IProcessObserver");
+                    return true;
+                }
+                if (code == foregroundCode) {
+                    data.enforceInterface("android.app.IProcessObserver");
+                    data.readInt(); // pid
+                    int uid = data.readInt();
+                    boolean foreground = data.readInt() != 0;
+                    if (uid == ownerUid && foreground) active.run();
+                    return true;
+                }
+                return super.onTransact(code, data, reply, flags);
+            }
+        };
+        Object callback = Proxy.newProxyInstance(api.getClassLoader(), new Class<?>[]{api},
+                (proxy, method, args) -> "asBinder".equals(method.getName()) ? processObserver : null);
+        managerInterface.getMethod("registerProcessObserver", api).invoke(activityManager, callback);
     }
 
     private static int transaction(Class<?> stub, String method) throws Exception {

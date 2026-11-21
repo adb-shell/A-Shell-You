@@ -1,5 +1,7 @@
 # OpenWorld Project Memory
 
+2026-11-21 T002：test/e137d44上已完成未提交的内置ADB保活/重绑定完善：暂时异常不误停，App重开先恢复原服务，真实重启/死亡如实失效；lease必须仍有授权，停用不因维护查询阻塞；有限验证与电池豁免重试，不重放用户命令。V0，正式构建/设备待证，旧CI不覆盖。四份Dart后续文案与布局属于并行T003，当前活动任务看CURRENT_WORK；T002源码交付关闭，STATE/WORK-r2 / CE-T002-02。保持main基线对齐开发流程及版本2.0.26。
+
 2026-11-21源码与编译交付：test/febf7f0f20460a0bfffbc0ee0a2581828a30d7c0已推送内置ADB改造；main仍956ecf4，test新增提交属于对齐后的正常开发。Both/常规编译run44883517881精确head_sha匹配，17:46:24 Asia/Tokyo以SUCCESS结束，Android Native/APK、Windows EXE全部通过。使用说明包含首次激活、已有配对复用、切网络/重连、重启再激活及临时签名安装边界。回执仅文档补交，不再次编译；正式设备验收仍待证。STATE/WORK-r5 / CE-07；下方0/0与未提交是前阶段快照。
 
 2026-11-21最新回执：按用户后续明确要求，test已快进到main/956ecf4并推送；远端main/test同SHA、0/0差距。当前test在main最新2.0.26基线上恢复完整ADB改造，29份源码/清单/许可内容保全，16份文档冲突已解决，新实现仍未提交/编译。长期流程：每次test合main后，返回test开发前先对齐最新main并保护未提交工作，见DEVELOPMENT_WORKFLOW.md。Baseline29 / CE-20261121-T001-04 / STATE、WORK-20261121-001-r2；下方为同步前及更早时点记录。

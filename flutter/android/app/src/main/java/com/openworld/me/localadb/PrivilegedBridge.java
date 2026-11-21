@@ -3,12 +3,14 @@ package com.openworld.me.localadb;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Process;
 import android.os.SystemClock;
+import android.provider.Settings;
 
 import java.io.IOException;
 import java.util.Map;
@@ -22,6 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Process-owned Binder capability, independently recoverable from a still-running shell server. */
 final class PrivilegedBridge {
+    private static final long RECOVERY_WINDOW_MS = 20000;
+    private static final long VERIFY_TIMEOUT_MS = 8000;
     private static PrivilegedBridge instance;
     static synchronized PrivilegedBridge get(Context context) {
         if (instance == null) instance = new PrivilegedBridge(context.getApplicationContext());
@@ -40,6 +44,27 @@ final class PrivilegedBridge {
 
     private final Context context;
     private final SharedPreferences records;
+    // Dies with the app process, not with a Flutter page or a remote-control session.
+    private final IBinder appLease = new Binder() {
+        @Override protected boolean onTransact(int code, Parcel data, Parcel reply, int flags)
+                throws android.os.RemoteException {
+            if (code == INTERFACE_TRANSACTION) {
+                if (reply != null) reply.writeString(PrivilegedProtocol.APP_LEASE);
+                return true;
+            }
+            data.enforceInterface(PrivilegedProtocol.APP_LEASE);
+            int caller = Binder.getCallingUid();
+            if (caller != 2000 && caller != 0) throw new SecurityException("Lease caller denied");
+            if (code != PrivilegedProtocol.CHECK_LEASE) return false;
+            String expectedGeneration = data.readString();
+            reply.writeNoException();
+            // Pure memory check: even a failed one-way STOP is followed by explicit revocation
+            // on the next maintenance tick; keeping the app process alive is not authorization.
+            reply.writeInt(allowed && generation.equals(expectedGeneration) && ready() ? 1 : 0);
+            return true;
+        }
+    };
+    private final int bootCount;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final ThreadPoolExecutor verifier = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
             new ArrayBlockingQueue<>(1), task -> { Thread t = new Thread(task, "openworld-privileged-verify"); t.setDaemon(true); return t; });
@@ -48,15 +73,31 @@ final class PrivilegedBridge {
     });
     private volatile Binding binding;
     private Check checking;
+    private IBinder pendingService;
     private volatile boolean allowed, starting;
+    private boolean restartRequired, identityRejected;
+    private long recoveryUntil, retryAfter;
+    private int verificationFailures;
     private volatile String generation, error = "";
     private volatile Runnable listener = () -> { };
 
     private PrivilegedBridge(Context context) {
         this.context = context;
         records = context.getSharedPreferences("openworld_privileged_v1", Context.MODE_PRIVATE);
+        bootCount = readBootCount(context);
         allowed = records.getBoolean("enabled", false);
         generation = records.getString("generation", "");
+        int activatedBoot = records.getInt("bootCount", -1);
+        if (allowed) {
+            restartRequired = activatedBoot >= 0 && bootCount >= 0 && activatedBoot != bootCount;
+            if (restartRequired) error = "手机已重启，需要重新激活；已有配对记录仍可复用。";
+            else recoveryUntil = SystemClock.elapsedRealtime() + RECOVERY_WINDOW_MS;
+        }
+    }
+
+    private static int readBootCount(Context context) {
+        try { return Settings.Global.getInt(context.getContentResolver(), Settings.Global.BOOT_COUNT, -1); }
+        catch (RuntimeException unavailable) { return -1; }
     }
 
     void listen(Runnable listener) { this.listener = listener; changed(); }
@@ -70,32 +111,63 @@ final class PrivilegedBridge {
 
     boolean ready() { return current() != null; }
 
+    synchronized boolean reconnecting() {
+        return allowed && !starting && !ready() && !restartRequired && !identityRejected
+                && SystemClock.elapsedRealtime() < recoveryUntil;
+    }
+
+    synchronized boolean awaitRecovery(AtomicBoolean cancelled, long deadline) throws InterruptedException {
+        while (!ready() && reconnecting() && !cancelled.get()) {
+            long remaining = Math.min(deadline, recoveryUntil) - SystemClock.elapsedRealtime();
+            if (remaining <= 0) break;
+            wait(Math.min(remaining, 100));
+        }
+        if (cancelled.get() || Thread.currentThread().isInterrupted()) throw new InterruptedException();
+        return ready();
+    }
+
     synchronized void addStatus(Map<String, Object> state) {
         Binding value = current();
         state.put("connected", value != null);
         state.put("activationSupported", true);
         state.put("executionBackend", "embedded");
-        state.put("activationState", value != null ? "ready" : starting ? "starting"
+        state.put("activationState", value != null ? "ready" : starting ? "starting" : reconnecting() ? "reconnecting"
                 : allowed ? "activation_required" : "inactive");
+        state.put("recovering", reconnecting());
         state.put("serviceUid", value == null ? null : value.uid);
         state.put("activationError", error);
     }
 
-    synchronized boolean accept(IBinder service, String candidateGeneration, int sourceUid) {
+    synchronized Bundle accept(IBinder service, String candidateGeneration, int sourceUid) {
         if ((sourceUid != 2000 && sourceUid != 0) || service == null || !allowed
-                || !generation.equals(candidateGeneration)) return false;
+                || restartRequired || identityRejected || !generation.equals(candidateGeneration)) return handoff(false, false);
         Binding value = current();
-        if (value != null) return value.service.equals(service);
-        if (checking != null) return checking.service.equals(service);
-        if (!starting && !error.isEmpty()) return false;
+        if (value != null) return handoff(value.service.equals(service), value.service.equals(service));
+        if (checking != null) return handoff(checking.service.equals(service), false);
+        if (pendingService != null && pendingService.isBinderAlive() && !pendingService.equals(service))
+            return handoff(false, false);
+        pendingService = service;
+        long now = SystemClock.elapsedRealtime();
+        // A temporary verification failure is not revocation. Keep the server alive and retry
+        // at a bounded rate, including after the initial visible recovery window has elapsed.
+        if (now < retryAfter) return handoff(true, false);
+        if (!starting) recoveryUntil = Math.max(recoveryUntil, now + VERIFY_TIMEOUT_MS);
         Check check = new Check(service, candidateGeneration, sourceUid);
         checking = check;
-        starting = true;
         changed();
-        check.timeout = deadlines.schedule(() -> failed(check, "特权服务验证超时，请重新激活。"), 8, TimeUnit.SECONDS);
+        check.timeout = deadlines.schedule(() -> failed(check, "内置服务验证暂时超时，正在等待恢复。", false),
+                VERIFY_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         try { verifier.execute(() -> verify(check)); }
-        catch (java.util.concurrent.RejectedExecutionException busy) { failed(check, "特权服务验证忙，请稍后重试。"); }
-        return true;
+        catch (java.util.concurrent.RejectedExecutionException busy) { failed(check, "内置服务验证暂忙，正在等待恢复。", false); }
+        return handoff(true, false);
+    }
+
+    private Bundle handoff(boolean accepted, boolean verified) {
+        Bundle reply = new Bundle();
+        reply.putBoolean("accepted", accepted);
+        reply.putBoolean("ready", accepted && verified);
+        if (accepted && verified) reply.putBinder("lease", appLease);
+        return reply;
     }
 
     private void verify(Check check) {
@@ -103,8 +175,9 @@ final class PrivilegedBridge {
         Binding verified = null;
         boolean installed = false;
         try {
+            if (check.cancelled.get()) return;
             data.writeInterfaceToken(PrivilegedProtocol.SERVICE);
-            if (!check.service.transact(PrivilegedProtocol.INFO, data, reply, 0)) throw new IOException();
+            if (!check.service.transact(PrivilegedProtocol.INFO, data, reply, 0)) throw new SecurityException("Unsupported identity protocol");
             reply.readException();
             int version = reply.readInt(), uid = reply.readInt(), owner = reply.readInt();
             String packageName = reply.readString(), apk = reply.readString(), actualGeneration = reply.readString();
@@ -116,8 +189,8 @@ final class PrivilegedBridge {
             check.stream = PrivilegedProtocol.open(check.service, check.lease, "shell,v2,raw:id -u");
             if (check.cancelled.get()) { check.stream.close(); return; }
             Map<String, Object> probe = AdbShell.execute(check.stream, check.cancelled);
-            if (!Integer.valueOf(0).equals(probe.get("exitCode"))
-                    || !Integer.toString(uid).equals(String.valueOf(probe.get("output")).trim())) throw new IOException();
+            if (!Integer.valueOf(0).equals(probe.get("exitCode"))) throw new IOException("Identity probe unavailable");
+            if (!Integer.toString(uid).equals(String.valueOf(probe.get("output")).trim())) throw new SecurityException("Identity mismatch");
             verified = new Binding(check.service, uid, check.generation);
             Binding candidate = verified;
             verified.death = () -> lost(candidate);
@@ -125,12 +198,17 @@ final class PrivilegedBridge {
             synchronized (this) {
                 if (checking != check || check.cancelled.get() || !allowed || !generation.equals(check.generation)) return;
                 if (!check.service.isBinderAlive()) throw new IOException("Service died during verification");
-                binding = verified; checking = null; starting = false; error = "";
+                binding = verified; pendingService = null; checking = null; starting = false; error = "";
+                recoveryUntil = 0; retryAfter = 0; verificationFailures = 0;
                 installed = true;
                 notifyAll();
             }
             changed();
-        } catch (Exception | LinkageError failure) { failed(check, "内置特权服务身份或 Shell 验证失败，请重新激活。"); }
+        } catch (SecurityException rejected) {
+            failed(check, "内置服务身份验证被拒绝，请重新激活。", true);
+        } catch (Exception | LinkageError failure) {
+            failed(check, "暂未完成内置服务验证，正在等待恢复。", false);
+        }
         finally {
             if (!installed && verified != null) unlink(verified);
             check.timeout.cancel(false);
@@ -139,30 +217,44 @@ final class PrivilegedBridge {
         }
     }
 
-    private synchronized void failed(Check check, String message) {
+    private synchronized void failed(Check check, String message, boolean fatal) {
         check.cancelled.set(true);
         if (check.stream != null) try { check.stream.close(); } catch (IOException ignored) { }
         if (checking != check) return;
-        checking = null; starting = false; error = message;
-        PrivilegedProtocol.stop(check.service);
+        checking = null; error = message;
+        if (fatal) {
+            identityRejected = true; starting = false; recoveryUntil = 0;
+            pendingService = null;
+            PrivilegedProtocol.stop(check.service);
+        } else {
+            verificationFailures = Math.min(verificationFailures + 1, 3);
+            retryAfter = SystemClock.elapsedRealtime() + (verificationFailures == 1 ? 1000
+                    : verificationFailures == 2 ? 3000 : 30000);
+            // Keep the candidate reference for immediate user STOP, even while no check is active.
+        }
         notifyAll(); changed();
     }
 
     private synchronized void lost(Binding expected) {
         if (binding != expected) return;
         binding = null; starting = false;
+        restartRequired = true; recoveryUntil = 0;
         error = "特权服务已停止，需要重新激活；已有配对记录仍可复用。";
         notifyAll(); changed();
     }
 
-    private synchronized String begin(AtomicBoolean cancelled) throws IOException {
+    private synchronized String begin(AtomicBoolean cancelled, Runnable onStarting) throws IOException {
         if (cancelled.get() || Thread.currentThread().isInterrupted())
             throw new java.io.InterruptedIOException("Activation cancelled");
+        // A delayed connect/discovery request must not replace a service that has just rebound.
+        if (ready()) return null;
         disable();
         String next = UUID.randomUUID().toString();
-        if (!records.edit().putBoolean("enabled", true).putString("generation", next).commit())
+        if (!records.edit().putBoolean("enabled", true).putString("generation", next).putInt("bootCount", bootCount).commit())
             throw new IOException("Activation record unavailable");
         generation = next; allowed = true; starting = true; error = "";
+        restartRequired = false; identityRejected = false; verificationFailures = 0; retryAfter = 0;
+        onStarting.run();
         if (cancelled.get() || Thread.currentThread().isInterrupted()) {
             disable();
             throw new java.io.InterruptedIOException("Activation cancelled");
@@ -173,8 +265,10 @@ final class PrivilegedBridge {
 
     synchronized void block() {
         allowed = false; starting = false;
+        recoveryUntil = 0; retryAfter = 0;
         Binding old = binding; binding = null;
         Check check = checking; checking = null;
+        IBinder pending = pendingService; pendingService = null;
         if (check != null) {
             check.cancelled.set(true);
             check.timeout.cancel(false);
@@ -185,21 +279,24 @@ final class PrivilegedBridge {
             unlink(old);
             PrivilegedProtocol.stop(old.service);
         }
+        if (pending != null && (check == null || !pending.equals(check.service))
+                && (old == null || !pending.equals(old.service))) PrivilegedProtocol.stop(pending);
         notifyAll(); changed();
     }
 
     synchronized void disable() throws IOException {
         block();
         generation = "";
-        if (!records.edit().putBoolean("enabled", false).remove("generation").commit()) {
+        if (!records.edit().putBoolean("enabled", false).remove("generation").remove("bootCount").commit()) {
             error = "停用记录保存失败，请保持应用打开并重试停用。";
             throw new IOException("Revocation record unavailable");
         }
         error = "";
     }
 
-    void activate(LocalAdbClient bootstrap, AtomicBoolean cancelled, long deadline) throws Exception {
-        String activation = begin(cancelled);
+    void activate(LocalAdbClient bootstrap, AtomicBoolean cancelled, long deadline, Runnable onStarting) throws Exception {
+        String activation = begin(cancelled, onStarting);
+        if (activation == null) return;
         boolean success = false;
         try {
             String apk = context.getApplicationInfo().sourceDir;

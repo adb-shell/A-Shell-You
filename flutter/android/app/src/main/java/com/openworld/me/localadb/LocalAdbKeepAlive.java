@@ -3,16 +3,19 @@ package com.openworld.me.localadb;
 import android.content.Context;
 import android.os.Build;
 import android.os.PowerManager;
+import android.os.SystemClock;
 
 import java.util.Map;
 
-/** Main-looper owned, one battery-exemption attempt per verified ADB connection. */
+/** Main-looper owned, at most three idempotent battery-exemption attempts per verified connection. */
 final class LocalAdbKeepAlive {
     private final PowerManager power;
     private final String packageName;
     private final LocalAdbCommands commands;
     private final Runnable changed;
-    private boolean attempted, busy;
+    private boolean completed, busy;
+    private int attempts;
+    private long retryAt;
     private String error = "";
 
     LocalAdbKeepAlive(Context context, LocalAdbCommands commands, Runnable changed) {
@@ -24,15 +27,16 @@ final class LocalAdbKeepAlive {
 
     void update(boolean ready) {
         if (!ready) {
-            attempted = false;
+            // Do not let an old in-flight callback grant a fresh set of retries to a new session.
+            if (!busy) { completed = false; attempts = 0; retryAt = 0; }
             return;
         }
         // A cancelled old command must finish releasing its private connection first.
         // The manager's existing health loop can then handle the new connection.
-        if (attempted || busy) return;
-        attempted = true;
+        if (completed || busy || attempts >= 3 || SystemClock.elapsedRealtime() < retryAt) return;
+        if (Boolean.TRUE.equals(isExempt())) { completed = true; error = ""; return; }
+        attempts++;
         error = "";
-        if (Boolean.TRUE.equals(isExempt())) return;
         busy = true;
         String argument = "'+" + packageName.replace("'", "'\\''") + "'";
         commands.submit("adb-keep-alive", "",
@@ -51,7 +55,11 @@ final class LocalAdbKeepAlive {
 
     private void finish(String failure) {
         busy = false;
-        error = Boolean.TRUE.equals(isExempt()) ? "" : failure;
+        completed = Boolean.TRUE.equals(isExempt());
+        if (!completed && attempts < 3) {
+            retryAt = SystemClock.elapsedRealtime() + (attempts == 1 ? 5000 : 30000);
+            error = "暂未取得电池优化豁免，将自动重试。";
+        } else error = completed ? "" : failure;
         changed.run();
     }
 

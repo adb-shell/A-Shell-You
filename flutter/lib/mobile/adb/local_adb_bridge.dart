@@ -51,18 +51,21 @@ class LocalAdbStatus {
       );
 
   String get keepAliveSummary {
-    if (keepAliveExempt == true) return '已豁免电池优化';
-    if (keepAliveBusy) return '正在设置电池优化豁免…';
-    final state = keepAliveExempt == null ? '状态未确认' : '未豁免电池优化';
+    if (keepAliveExempt == true) return '已豁免';
+    if (keepAliveBusy) return '正在设置豁免…';
+    final state = keepAliveExempt == null ? '状态未确认' : '未豁免';
     return keepAliveError.isEmpty ? state : '$state：$keepAliveError';
   }
 
   String get activationSummary {
-    if (connected) return activationSupported ? '已激活 · ADB 能力可用' : '已连接 · Shell 已验证';
-    if (activationState == 'starting') return '正在激活并验证内置服务';
-    if (activationState == 'activation_required') return '服务已停止 · 需要重新激活';
+    if (connected) return activationSupported ? 'ADB 已激活' : '已连接 · Shell 已验证';
+    if (activationState == 'starting') return '正在激活 ADB…';
+    if (reconnecting) return '正在恢复 ADB…';
+    if (activationState == 'activation_required') return '服务暂不可用 · 可重新激活';
     return paired ? '已配对 · 尚未激活' : '尚未配对';
   }
+
+  bool get reconnecting => activationState == 'reconnecting';
 }
 
 class LocalAdbOutput {

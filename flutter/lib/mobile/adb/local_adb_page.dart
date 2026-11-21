@@ -53,8 +53,8 @@ class _LocalAdbPageState extends State<LocalAdbPage>
         final changed = _status.paired != status.paired || _status.connected != status.connected;
         if (!_loaded) {
           _message = status.supported
-              ? '首次开启无线调试并配对，激活内置 ADB 能力。服务存活期间无需重复连接无线调试。'
-              : '无线配对需要 Android 11 或以上版本。';
+              ? ''
+              : '无线配对需要 Android 11 及以上。';
           _error = false;
         } else if (!_busy && (changed || _stale) && (!_error || _stale)) {
           _message = status.activationSummary;
@@ -110,10 +110,10 @@ class _LocalAdbPageState extends State<LocalAdbPage>
       _pairPort.text = (ports['pairPort'] ?? 0) == 0 ? '' : ports['pairPort'].toString();
       _connectPort.text = (ports['connectPort'] ?? 0) == 0 ? '' : ports['connectPort'].toString();
     }
-    if (ports['ambiguous'] == true) return '发现多个本机端口，请核对系统显示的端口并手动填写。';
+    if (ports['ambiguous'] == true) return '发现多个端口，请按手机显示手动填写。';
     if ((ports['pairPort'] ?? 0) == 0 && (ports['connectPort'] ?? 0) == 0)
-      return '未发现端口。请开启无线调试，并保持系统配对窗口打开；也可手动输入端口。';
-    return '已填入扫描结果，请核对后操作。系统配对窗口或无线调试开关变化后，请重新扫描。';
+      return '未发现端口，请保持无线调试和配对码窗口打开，或手动填写。';
+    return '端口已填入；重新打开无线调试或配对窗口后请再扫描。';
   });
 
   void _pair() {
@@ -125,20 +125,20 @@ class _LocalAdbPageState extends State<LocalAdbPage>
       _showError('请输入系统显示的 6 位配对码。'); return;
     }
     _pairCode.clear();
-    _perform('正在配对，成功后将激活内置服务…', () async {
+    _perform('正在配对并激活…', () async {
       final identity = await _bridge.pairAndConnect(port, code, connection);
       if (mounted) setState(() => _output = identity);
-      return '配对成功，内置 ADB 能力已激活。PC 会自动更新状态，也可手动刷新。';
+      return '配对成功，ADB 已激活。';
     });
   }
 
   void _connect() {
     final port = _automatic ? 0 : _port(_connectPort);
     if (port == null) return;
-    _perform('正在激活并验证内置服务…', () async {
+    _perform('正在激活 ADB…', () async {
       final identity = await _bridge.connect(port);
       if (mounted) setState(() => _output = identity);
-      return '内置 ADB 能力已激活。';
+      return 'ADB 已激活';
     });
   }
 
@@ -172,15 +172,24 @@ class _LocalAdbPageState extends State<LocalAdbPage>
     super.dispose();
   }
 
-  Widget _card(String title, List<Widget> children) => Card(
+  Widget _card(String title, List<Widget> children, {Widget? trailing}) => Card(
     margin: const EdgeInsets.only(bottom: 16),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
     child: Padding(padding: const EdgeInsets.all(16), child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
+        Row(children: [
+          Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium)),
+          if (trailing != null) trailing,
+        ]),
         const SizedBox(height: 12), ...children,
       ],
     )),
   );
+
+  Widget _hint(String text) => Text(text,
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          height: 1.5));
 
   Widget _portField(TextEditingController controller, String label, bool enabled) => TextField(
     key: ObjectKey(controller), controller: controller, enabled: enabled,
@@ -194,41 +203,40 @@ class _LocalAdbPageState extends State<LocalAdbPage>
     final busy = _busy || _status.busy;
     final enabled = _loaded && !_stale && _status.supported && !_busy && !_status.connectionBusy;
     return ListView(padding: const EdgeInsets.all(16), children: [
-      Row(children: [
-        const Icon(Icons.adb, size: 28), const SizedBox(width: 10),
-        Expanded(child: Text('ADB 能力', style: Theme.of(context).textTheme.titleLarge)),
-        IconButton(tooltip: '刷新状态', onPressed: _polling ? null : _refresh, icon: const Icon(Icons.refresh)),
-      ]),
-      const SizedBox(height: 10),
       _card(_stale ? '状态未确认' : _status.activationSummary, [
-        const Text('配对记录和激活状态由本手机管理，所有 PC 共用。本页每 3 秒查询状态；新版 PC 会接收状态变化，也可手动刷新。'),
-        if (_status.connectPort != 0) Text('上次激活使用的无线端口：' + _status.connectPort.toString()),
+        if (_status.reconnecting)
+          _hint('恢复期间无需重新配对。'),
         if (_status.keepAliveSupported) ...[
-          const SizedBox(height: 8),
-          Text('ADB 辅助保活：${_stale ? '状态未确认' : _status.keepAliveSummary}'),
-          const Text('ADB 激活后自动为本应用设置电池优化豁免，减少息屏后的后台限制；不保证进程永不被结束。可在系统电池设置中恢复，停用 ADB 不撤销已有豁免。'),
+          Text('电池优化：${_stale ? '状态未确认' : _status.keepAliveSummary}'),
+          const SizedBox(height: 4),
+          _hint('激活后自动申请豁免；停用 ADB 后保留，可在系统电池设置中调整。'),
         ],
-        const SizedBox(height: 8),
-        if (_status.activationError.isNotEmpty)
+        if (_status.activationError.isNotEmpty) ...[
+          const SizedBox(height: 8),
           Text(_status.activationError, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-        Text(_message, style: TextStyle(color: _error ? Theme.of(context).colorScheme.error : null)),
+        ],
+        if (_message.isNotEmpty && (_error || _message != _status.activationSummary)
+            && _message != _status.activationError) ...[
+          const SizedBox(height: 8),
+          Text(_message, style: TextStyle(color: _error ? Theme.of(context).colorScheme.error : null)),
+        ],
         if (busy) ...[
           const SizedBox(height: 8), const LinearProgressIndicator(),
           Text(_status.phase.isNotEmpty ? _status.phase
-              : _status.keepAliveBusy ? '正在设置 ADB 辅助保活…' : '正在处理 ADB 请求…'),
+              : _status.keepAliveBusy ? '正在设置电池豁免…' : '正在处理…'),
           if (_busy) Align(alignment: Alignment.centerRight,
-              child: TextButton(onPressed: _cancel, child: const Text('取消本页请求')))
-          else if (!_status.keepAliveBusy) const Text('其他 PC 正在操作共享 ADB。'),
+              child: TextButton(onPressed: _cancel, child: const Text('取消请求')))
+          else if (!_status.keepAliveBusy) _hint('其他 PC 正在操作。'),
         ],
-      ]),
+      ], trailing: IconButton(tooltip: '刷新状态', onPressed: _polling ? null : _refresh,
+          icon: const Icon(Icons.refresh))),
       _card('配对与激活', [
-        const Text('首次激活需要 Wi-Fi 和无线调试。激活成功后，服务存活期间可关闭无线调试、切换移动数据继续使用。'),
-        const Text('请保留开发者选项和 USB 调试开启。手机重启或系统终止服务后需要重新激活；部分 ROM 的存活限制需以实际设备为准。'),
-        const SizedBox(height: 12),
-        const Text('首次配对：开启无线调试，选择“使用配对码配对设备”。请用分屏或小窗保持系统配对码窗口与本页同时打开。'),
+        const Text('连接 Wi-Fi，打开“无线调试 → 使用配对码配对设备”。'),
+        const SizedBox(height: 4),
+        _hint('用分屏或小窗保持配对码窗口打开。'),
         Align(alignment: Alignment.centerLeft, child: TextButton.icon(
             onPressed: _openSettings, icon: const Icon(Icons.settings), label: const Text('打开开发者选项'))),
-        Wrap(spacing: 8, children: [
+        Wrap(spacing: 8, runSpacing: 8, children: [
           ChoiceChip(label: const Text('只填配对码'), selected: _automatic,
               onSelected: busy ? null : (_) {
                 FocusScope.of(context).unfocus();
@@ -242,47 +250,49 @@ class _LocalAdbPageState extends State<LocalAdbPage>
         ]),
         const SizedBox(height: 12),
         if (_automatic)
-          const Text('输入 6 位配对码后点击“配对并激活 ADB”。手机会自动发现端口、配对并激活；发现失败时可切换“手动端口”。')
+          _hint('自动查找端口；失败时可切换“手动端口”。')
         else ...[
-          const Text('配对端口见系统配对码窗口，连接端口见无线调试首页。填写的端口会直接使用，留空则自动发现；也可扫描填充后核对。'),
+          _hint('配对端口在配对码窗口，连接端口在无线调试首页；留空自动查找。'),
           const SizedBox(height: 12),
-          _portField(_pairPort, '配对端口（留空自动）', !busy),
+          _portField(_pairPort, '配对端口', !busy),
           const SizedBox(height: 12),
-          _portField(_connectPort, '连接端口（留空自动）', !busy),
+          _portField(_connectPort, '连接端口', !busy),
           Align(alignment: Alignment.centerRight, child: TextButton.icon(
               onPressed: enabled ? _scan : null, icon: const Icon(Icons.radar, size: 18),
-              label: const Text('扫描并填充端口'))),
+              label: const Text('扫描端口'))),
         ],
         const SizedBox(height: 12),
         TextField(key: const ValueKey('pairCode'), controller: _pairCode,
             enabled: !busy, keyboardType: TextInputType.number,
             obscureText: true, maxLength: 6, autocorrect: false, enableSuggestions: false,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            onSubmitted: (_) { if (enabled && !_status.connected) _pair(); },
+            onSubmitted: (_) { if (enabled && !_status.connected && !_status.reconnecting) _pair(); },
             decoration: const InputDecoration(labelText: '6 位配对码', border: OutlineInputBorder())),
-        ElevatedButton.icon(onPressed: enabled && !_status.connected ? _pair : null, icon: const Icon(Icons.link),
-            label: const Text('配对并激活 ADB')),
+        ElevatedButton.icon(onPressed: enabled && !_status.connected && !_status.reconnecting ? _pair : null, icon: const Icon(Icons.link),
+            label: const Text('配对并激活')),
+        const Divider(height: 28),
+        Text('已有配对', style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 6),
+        _hint('需重新激活时，开启无线调试即可，无需配对码。'),
         const SizedBox(height: 8),
-        const Text('能力可用时无需再配对。服务停止后，开启无线调试并点击下方激活；已有配对身份无需重新输入配对码。'),
-        OutlinedButton(onPressed: enabled ? _connect : null, child: Text(_status.connected ? '复用已激活能力' : '我已配对，激活 ADB 能力')),
+        OutlinedButton(onPressed: enabled && !_status.reconnecting ? _connect : null,
+            child: Text(_status.reconnecting ? '正在恢复…' : _status.connected ? '验证 ADB' : '激活 ADB')),
+        const SizedBox(height: 12),
+        _hint('激活后可关闭无线调试、切换网络；保持开发者选项与 USB 调试开启。重启或服务停止后需再激活。'),
       ]),
       _card('ADB Shell', [
         TextField(controller: _command, enabled: !busy, minLines: 2, maxLines: 5,
             maxLength: 4096, autocorrect: false, enableSuggestions: false,
-            decoration: const InputDecoration(labelText: 'Shell 命令（不加 adb shell）', border: OutlineInputBorder())),
+            decoration: const InputDecoration(labelText: 'Shell 命令', hintText: '无需 adb shell 前缀', border: OutlineInputBorder())),
         ElevatedButton.icon(onPressed: enabled && _status.connected ? _runCommand : null,
             icon: const Icon(Icons.play_arrow), label: const Text('执行命令')),
-        const Text('最长执行 20 秒；输出最多 64 KiB。'),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         Container(padding: const EdgeInsets.all(12),
             constraints: const BoxConstraints(minHeight: 90, maxHeight: 300),
             decoration: BoxDecoration(border: Border.all(color: Theme.of(context).dividerColor),
                 borderRadius: BorderRadius.circular(8)),
             child: SingleChildScrollView(child: SelectableText(_output.isEmpty ? '等待输出…' : _output,
                 style: const TextStyle(fontFamily: 'monospace')))),
-        TextButton(onPressed: enabled && (_status.connected || _status.activationState != 'inactive') ? () => _perform('正在停用设备 ADB 能力…', () async {
-          await _bridge.disconnect(); return 'ADB 能力已停用，配对记录保留；下次需要重新激活。';
-        }) : null, child: const Text('停用设备 ADB 能力（所有 PC）')),
       ]),
     ]);
   }

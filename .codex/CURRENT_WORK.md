@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261121-001-r5`
+Registry Revision：`WORK-20261121-004-r1`
 Last Updated：2026-11-21
-Active Task Count：0
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none。T-2026-11-21-001源码、提交推送及双端编译范围已完成，回执见下方；设备验收不记为已通过。
+T-2026-11-21-004 / active T5：用户明确授权将T002保活与T003文案一并提交推送test并执行Both常规编译、等待结果。起点test/e137d44，31个已有路径完整保留；无其他active任务。范围为Git交付、CI及证据文档，不改main/版本或新增产品方案。STATE/WORK-20261121-004-r1 / CE-20261121-T004-01；[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,10 @@ none。T-2026-11-21-001源码、提交推送及双端编译范围已完成，回
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+2026-11-21 / T-2026-11-21-002 / complete T8（源码范围）：test/e137d44工作区完成暂时异常不误停、恢复窗口/退避/boot-count、授权lease与独立维护/双observer、激活复用取消竞态、有限电池豁免重试。7份Java与4份Dart恢复语义，11文件初次/7份Java最终词法检查、diff及文档链接V0通过；正式构建/真机NOT_RUN，旧CI不覆盖。本轮未提交推送或触发CI；T003独立文案/布局已保留，手机停用按钮由其按用户要求移除，PC停用可用。全部历史/状态同步后关闭T002，保留下方T003关闭记录。STATE/WORK-20261121-002-r2 / CE-T002-01/02 / D-038、ADR0030 / [任务](../docs/tasks/T-2026-11-21-002-embedded-adb-resilience.md)。
+
+2026-11-21 / T-2026-11-21-003 / complete T8（源码/V0）：双端ADB文案精简和排版完成；按补充移除Android标题图标及停用按钮、刷新内嵌状态卡、圆角对齐主页13、删除双端Shell常驻限制说明。用户允许跨聊天协调，T002 Java及Dart恢复逻辑保留；PC仍可停用。静态差异/词法/回调守卫比较通过，未编译/真机/提交推送。任务、12/13领域文档、Task History/Changelog/State/Event已同步后关闭本任务；STATE/WORK-20261121-003-r2 / CE-01/02，N/A — no decision delta。[任务](../docs/tasks/T-2026-11-21-003-adb-ui-copy.md)。T002独立活动状态保持。
 
 2026-11-21 / T-2026-11-21-001 / complete T8：源码febf7f0f20460a0bfffbc0ee0a2581828a30d7c0已推送test；Both/常规编译run44883517881精确匹配，于17:46:24 Asia/Tokyo全部SUCCESS，Android Native/APK和Windows EXE及既有包校验/上传均通过。产物链接、使用步骤、临时测试签名及设备待验边界已记录；STATE、TASK_HISTORY、CHANGELOG、Decision/ADR证据和Change Event同步后关闭本 registry。本批仅回执文档补交、不二次编译；main仍956ecf4，版本2.0.26保持。STATE/WORK-20261121-001-r5 / CE-05—07；设备/蜂窝/OEM/安全负例NOT_RUN。[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)。下方为前阶段历史。
 

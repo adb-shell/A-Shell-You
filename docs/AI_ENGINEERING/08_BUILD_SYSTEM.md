@@ -1,5 +1,7 @@
 # OpenWorld 构建系统 / Build System
 
+2026-11-21 T002保活续修：7份Java与4份Dart恢复语义在test/e137d44工作区完成，无工具链/Manifest/依赖/版本变更；本批未提交或构建，旧run44883517881不覆盖。正式入口和ADB-P01—P18验证需求见[任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)。并行T003的界面文案以其独立记录为准。
+
 2026-11-21 T001：内置ADB源码test/febf7f0已推送，17:09:13 Asia/Tokyo触发Build-Clients-BT.yml / Both / 常规编译，HTTP204。[run44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)精确head_sha匹配，17:46:24以SUCCESS结束；Android Native/APK与Windows EXE全部通过。Android arm64、Windows x64 EXE/ZIP及build-info已上传，沿用临时测试签名，不代表生产发布或设备验收。最终回执见[任务](../tasks/T-2026-11-21-001-embedded-adb.md)，下方为实施阶段快照。
 
 2026-11-21 T001：内置ADB服务新增Java入口/provider、Manifest和R8规则，以及Shizuku Apache-2.0 LICENSE/NOTICE资产；无Gradle/Maven/native工具链或二进制升级，无FRB/JNI签名生成。正式Release必须验证app_process入口可加载、provider身份核对、Android30/31/33+隐藏接口适配及APK许可打包。当前test未提交实现，仅V0，未编译或触发CI；[任务与验证需求](../tasks/T-2026-11-21-001-embedded-adb.md)。此前构建结果不覆盖此改造。

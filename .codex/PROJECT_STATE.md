@@ -1,11 +1,15 @@
 # OpenWorld Project State
 
-Schema Version：`1.0`
-State Revision：`STATE-20261121-001-r5`
-Last Updated / Observed At：2026-11-21（Asia/Tokyo）
-Evidence Scope：`V0 + test source pushed + exact-head dual CI SUCCESS; device unverified`
+当前交付任务T004（2026-11-21，STATE-20261121-004-r1）：test/e137d44与远端一致，T002/T003的31个路径尚未提交。用户已明确授权一并提交推送test、Both常规编译并等待结果；active/T5，CE-20261121-T004-01，详见[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。main/956ecf4、版本2.0.26保持；下方为已关闭源码任务的时点记录。
 
-最新交付：T001 complete/T8（源码、推送及双端编译范围），源码febf7f0f20460a0bfffbc0ee0a2581828a30d7c0已推送test，main仍956ecf4；这是对齐后新增开发提交，未合main。Build-Clients-BT.yml / Both / 常规编译run44883517881精确head_sha匹配，于2026-11-21 17:46:24 Asia/Tokyo以SUCCESS结束，Android Native/APK与Windows EXE全部通过。正式设备/蜂窝/OEM/安全负例仍NOT_RUN。本批仅回执与使用说明文档补交，不二次编译，最终Git状态以本批提交为准。STATE/WORK-20261121-001-r5 / CE-20261121-T001-07；以下为前阶段时点。
+T003交付快照（2026-11-21，STATE-20261121-003-r2）：test/e137d44，双端ADB文案/排版精简complete T8（源码/V0）；Android独立标题图标和停用按钮移除、刷新内嵌、13圆角对齐主页，双端Shell常驻限制说明移除。与T002已按用户授权发消息协调，保留其Java及Dart恢复逻辑。CE-20261121-T003-01/02 / [任务](../docs/tasks/T-2026-11-21-003-adb-ui-copy.md)。本任务改动未提交/编译/设备验证；下方T002快照独立保持。
+
+Schema Version：`1.0`
+State Revision：`STATE-20261121-002-r2`
+Last Updated / Observed At：2026-11-21（Asia/Tokyo）
+Evidence Scope：`resilience source handoff on test/e137d44; V0 only; previous CI covers febf7f0 only`
+
+T002 complete/T8（源码范围）：基于clean test/e137d44完成内置ADB保活/重绑定续修，7份Java及4份Dart恢复语义；暂时失败不误停、恢复窗口/退避/boot-count、授权lease/双observer/独立维护、激活复用取消竞态及有限电池豁免重试。V0结构/差异与权限路径复核，未提交推送、未构建或操作设备；旧run44883517881不覆盖。并行T003单独负责四份Dart文案/排版，保留其修改与活动指针；main仍956ecf4，版本2.0.26不变。STATE/WORK-20261121-002-r2 / CE-T002-01/02；[任务](../docs/tasks/T-2026-11-21-002-embedded-adb-resilience.md)。下方为前阶段时点。
 
 当前快照：T-2026-11-21-001 / complete T8（源码/Git范围）；当前test/956ecf482ac173af710aa7b6ea0b9de2bc3b4d60，内置ADB权限服务及配套文档未提交。无线调试仅显式配对/激活，正常命令与媒体用Binder/FD，服务存活时可跨网络继续调用；死亡/重启需重新激活。实际Release/OEM/蜂窝/双PC验证NOT_RUN。沿用main的Rust/portable2.0.26、Flutter2.0.26+59，原Rust/JNI/FRB/Kotlin运行时与服务器配置无本任务业务增量。
 

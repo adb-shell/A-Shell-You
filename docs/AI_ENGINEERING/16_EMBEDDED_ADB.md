@@ -1,5 +1,7 @@
 # OpenWorld 内置 ADB 权限服务 / Embedded Privileged Backend
 
+2026-11-21 T002保活续修：基于test/e137d44的未提交实现，新增App重建恢复窗口、验证退避、应用进程lease/授权检查、双observer及独立维护线程，修正暂时异常导致服务误停。仅V0，前轮CI不覆盖本批；[续修任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)。下方T001编译是输入版本的历史证据；实际界面文字由并行T003精简，状态语义保持。
+
 2026-11-21交付：源码test/febf7f0f20460a0bfffbc0ee0a2581828a30d7c0已推送；[双端常规编译44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)于17:46:24 Asia/Tokyo以SUCCESS结束，Android Native/APK和Windows EXE全部通过。产物链接与来源见任务回执；构建不替代真机验收。
 
 2026-11-21 / [T-2026-11-21-001](../tasks/T-2026-11-21-001-embedded-adb.md) / [ADR-0030](../ADR/0030-app-private-privileged-service.md)。源码在与main对齐的test/956ecf4上完成，提交为febf7f0，版本2.0.26 / 2.0.26+59。本文取代 12/13/14 中“日常操作持续连接无线 adbd、健康循环自动恢复无线连接”的旧合同；其他业务、权限和媒体协议沿用。构建证据见任务回执，真机验收仍NOT_RUN。
@@ -10,11 +12,11 @@
 
 1. 安装本次Android APK和PC版本。现有CI每次使用临时测试签名，Android可能无法覆盖旧包；保留数据需同一稳定签名，卸载会清除应用数据及配对身份。不要把本次测试包当作可无损覆盖的正式升级包。
 2. Android 11+手机连接Wi-Fi，开启开发者选项、USB调试、无线调试。PC通过开放世界正常连接手机；PC不必与手机处于同一Wi-Fi，仍通过现有已认证relay会话操作。
-3. 首次激活：手机打开“无线调试 → 使用配对码配对设备”，保持窗口打开；PC打开“远程 ADB 配对与激活”，输入6位码并点“首次配对并激活”。也可使用手机ADB页“配对并激活 ADB”。自动发现失败时按系统页面填写配对端口和连接端口，二者不能混用。
-4. 若本应用配对记录仍在，直接点“我已配对，激活 ADB 能力”，无需再输入配对码。等状态明确显示“内置 ADB 能力已激活”后再操作；不能把“已配对”当成激活成功。
+3. 首次激活：手机打开“无线调试 → 使用配对码配对设备”，保持窗口打开；PC打开“配对与激活”，输入6位码并点“配对并激活”。也可使用手机ADB页同名按钮。自动发现失败时按系统页面填写配对端口和连接端口，二者不能混用。
+4. App重开后若显示正在恢复已有ADB服务，先等待恢复，不必开启无线调试或重复配对。恢复失败且确需重新激活时，若配对记录仍在，选择已有配对的激活入口即可，无需再输入配对码。等状态明确显示已激活后再操作；不能把已配对或正在恢复当成可用。
 5. 服务存活期间可关闭无线调试、切换蜂窝或Wi-Fi，PC重新连接后直接使用原ADB Shell、投屏/截图/节点、黑屏、触摸/键盘/文本输入和本应用权限功能。Shell输入如`id -u`即可，不加`adb shell`前缀。
-6. 平时退出远控窗口即可；不要为普通断开点击“停用设备 ADB 能力”或“撤销ADB配对”，这两个按钮分别停止共享服务、清除本应用身份。
-7. 重启或服务被系统终止后，重新连接Wi-Fi并开启无线调试，点“我已配对，激活 ADB 能力”；只有配对记录被系统忘记、数据清除或身份重建后才需要重新配对。保留开发者选项/USB调试开启。
+6. 平时退出远控窗口即可；PC ADB菜单的“停用 / 断开 ADB”和“撤销配对”分别停止共享服务、清除本应用身份，不用于普通断开。T003按用户要求移除了手机页面的停用按钮；明确停用请用PC菜单。
+7. 重启或服务被系统终止后，重新连接Wi-Fi并开启无线调试，点“激活 ADB”；只有配对记录被系统忘记、数据清除或身份重建后才需要重新配对。保留开发者选项/USB调试开启。
 
 首次设备验收建议：ready后执行`id -u`，再关闭无线调试、切蜂窝、重连PC，重复命令并分别验证媒体/输入。预期shell UID为2000（既有root adbd为0）；若状态变为需激活，应记录机型/Android版本及操作顺序，不能把配对成功视为存活测试通过。
 
@@ -38,11 +40,15 @@
   → shell-v2 / scrcpy 本机 socket / 固定资产 sync → 原有结果与媒体链
 ```
 
-- `PrivilegedBridge` 为 App 进程单例。`openworld_privileged_v1` 保存 enabled/generation；它只保存授权意图，不代表服务存活。配对身份及原 `local_adb_record_v1` 不迁移、不导出。
+- `PrivilegedBridge` 为 App 进程单例。`openworld_privileged_v1` 保存 enabled/generation/bootCount；只保存授权意图，不代表服务存活。配对身份及原 `local_adb_record_v1` 不迁移、不导出。bootCount读取[Settings.Global.BOOT_COUNT](https://developer.android.com/reference/android/provider/Settings.Global#BOOT_COUNT)，仅在新旧计数均可读且不等时判定重启；缺失/不可读时尝试恢复，不能猜测已重启。
 - 明确激活才创建新 generation、启动后台进程。后台脱离启动 Shell 会话、重定向标准输入输出；不保持 adbd 连接，不改变 USB/无线调试系统设置。
-- Provider 仅接收 shell/root 调用的 attach；异步验证协议、UID、owner UID、包名、当前 APK 路径、generation 和真实 `id -u` 的退出码及输出。验证上限 8s；失败关闭候选服务。不能用持久化标记伪造 ready。
+- Provider仅接收shell/root的attach；异步验证协议、UID、owner UID、包名、当前APK路径、generation和真实`id -u`。每次上限8s，错身份/协议/UID拒绝并停止候选；暂时的系统或探测失败取消本次探测，保留候选供再绑定。失败退避1s、3s、随后至少30s，且只在服务主动递送时触发；验证线程1个、队列1项，已取消的排队任务不再发起Binder调用。未验证不能ready。
 - 服务经 framework Binder 查询 IPackageManager/IActivityManager，按完整 owner UID 对应 Android user 查询；不调用 `ActivityThread.systemMain()` 或初始化 HWUI。SDK 30/31 的 ContentProvider 调用签名及 33 的 flags 宽度分别处理。
-- UID observer 及每 5s 的服务侧检查只向已经运行、未 force-stop 的 App 重新递送 Binder；不自动启动停止的 App，不自动发现 adbd。App 重建后重新验证仍存活的服务。
+- UID/process observer与每5s维护回退只向已经运行、未force-stop的App递送Binder；不启动停止的App、不自动发现adbd。App重建先进入20s恢复窗口，窗口内收到的8s验证可延长到该次探测结束；超时显示暂不可用，晚到合法服务仍可验证恢复。恢复期间暂不允许重复配对/激活，PC菜单的停用仍可执行。
+- 验证成功才返回App进程lease。daemon保存death recipient；App死亡后重新递送，正常存活时每5s用仅shell/root可调用的lease核对generation及实际ready，避免反复获取Provider。lease存活不替代授权：明确拒绝即停止，暂时Binder错误则重试递送；直接STOP失败后也可通过lease/Provider拒绝结束服务。
+- 系统查询、Provider和lease调用在单独维护线程，观察事件合并、最多一个维护任务在途，不占用daemon主Looper。observer仅在一次性注册线程中安装，注册阻塞不影响周期维护。PackageManager暂时异常保留daemon，但INFO/OPEN仍拒绝未经确认的安装身份；确认卸载/UID或APK变化才退出。STOP只要求原完整owner UID，在安装查询不可用时也能停用；它不执行特权命令。
+- 延迟connect在恢复窗口等待原服务，并在发现/启动阶段再次检查ready。最终begin在同一锁内决定复用或新建；只有真正新激活才标记请求拥有该生命周期，取消复用请求不能停掉恢复好的服务。
+- 本应用电池豁免仍是原包名限定的幂等命令，失败最多三次、间隔5s/30s；不重放用户Shell、不永久持有WakeLock、不调整全局进程限制。独立shell进程被强制终止后，普通App不能自行重建权限。
 - 单例 abstract socket `openworld.privileged.<uid>` 仅占名防重，无 accept/命令处理。旧实例退出等待上限 6s；它不是对外端口。安装身份变化或 App 拒绝 generation 时服务停止。
 
 ## 通道、并发和清理
@@ -51,7 +57,7 @@
 
 | 项目 | 约束 |
 |---|---|
-| 服务入口 | Binder 每次事务核对完整调用 UID 与当前安装身份；不接受客户端指定任意 app/user |
+| 服务入口 | INFO/OPEN核对完整调用UID与当前安装身份；STOP仅允许原完整owner UID减少权限；不接受任意app/user |
 | 并发 | 服务最多 24 个通道；原命令队列 8 / 并发 2 / 20s，配对激活 35s、连接激活 20s 保持 |
 | Shell | `/system/bin/sh -c`，stdout/stderr/真实退出码封装为 shell-v2；stdin 单包最多 65536 字节；命令输出原 64KiB 截断规则保持 |
 | 媒体 | FD 传输数据，Binder 只传小型控制和描述符；scrcpy 只允许 `localabstract:scrcpy_[0-9a-f]{8}` |
@@ -60,21 +66,21 @@
 | 服务停止 | 立即拒绝新调用、关闭全部 FD、销毁拥有的子进程，最多 1s 清理后退出；不重放命令 |
 | 异常后代 | 不合作的进程管道占用通道名额，不无限创建线程；取消不能撤销已经生效的系统修改或保证任意命令自行启动的后台后代全部退出 |
 
-手机或任意有控制权 PC 的 `disconnect` 是设备级“停用”，保留配对；`revoke` 另清配对记录与身份。两者立即在内存中拒绝 Binder，随后串行持久化撤销，迟到启动不能恢复权限。普通 PC 断开、取消 owner、关闭 Shell 栏不调用服务 STOP；若关闭会话时其激活仍未完成，该次激活按 owner 取消。
+任意有控制权PC菜单的`disconnect`是设备级“停用”，保留配对；`revoke`另清配对记录与身份。两者立即在内存中拒绝Binder，随后串行持久化撤销，迟到启动不能恢复权限。手机MethodChannel保留既有方法兼容，但页面不再展示停用按钮。普通PC断开、取消owner、关闭Shell栏不调用服务STOP；若关闭会话时其激活仍未完成，该次激活按owner取消。
 
 ## 状态与版本兼容
 
-状态 JSON `apiVersion=5`，字段40/41、FRB、JNI签名及 `pair/pairConnect/connect/disconnect/revoke` 名称不变。`connected` 现在表示已验证且存活的 Binder 服务；`connectPort` 只表示最后激活端口。追加：
+状态JSON `apiVersion=6`，字段40/41、FRB、JNI签名及`pair/pairConnect/connect/disconnect/revoke`名称不变。`connected`表示已验证且存活的Binder；`connectPort`只表示最后激活端口。字段：
 
 | 字段 | 含义 |
 |---|---|
 | activationSupported | 新执行后端能力标志；旧端缺失时 PC 保留旧连接文案 |
 | executionBackend | embedded |
-| activationState | inactive / starting / ready / activation_required |
+| activationState | inactive / starting / reconnecting / ready / activation_required；后者表示未恢复或已知失效，不笼统断言进程已停止 |
 | activationError | 验证、死亡或记录错误；不含配对码/命令/身份密钥 |
 | serviceUid | ready 时实际 shell/root UID，否则 null |
 | wirelessConnected | 激活临时 adbd 状态；不能作为业务可用判断 |
-| recovering | false；不再后台恢复无线端口 |
+| recovering | 仅已有权限服务的重新绑定窗口为true，不是无线端口恢复 |
 
 原 revision/instance 推送、owner 请求ID、过期响应过滤、多PC共享状态保持。旧PC可照常调用新Android的方法；旧PC显示“断开ADB”实际会停用服务，新PC明确解释。新PC连接旧Android按旧能力标志运行。仅更新PC无法获得手机端新能力。新旧双方和旧APK回退均需验证，不能把字段兼容视为运行验收。
 
@@ -92,6 +98,6 @@ Manifest 注册专用 provider；`local-adb.pro` 保留 app_process 入口和 pr
 - 命令：正式 Linux 根目录 `./build.sh 1`、`./build.sh 2`；正式 Windows 根目录 `build.cmd`。
 - 环境：仓库规定工具链与签名/SDK；Android 11+真实设备及双PC已认证relay环境，至少一台可切换蜂窝数据。
 - 执行目录：对应正式构建机仓库根。
-- 目标：Release app_process/provider可加载；激活/关闭无线调试/蜂窝/重连/App重建/服务死亡/重启；多PC隔离与拒绝第三方UID；见 TEST_MATRIX 的 ADB-P01—P12，并回归 ADB-R/M/A、NET-04、DSP-09。
+- 目标：Release app_process/provider可加载；激活/关闭无线调试/蜂窝/重连/App重建/服务死亡/重启；多PC隔离与拒绝第三方UID；见 TEST_MATRIX 的 ADB-P01—P18，并回归 ADB-R/M/A、NET-04、DSP-09。
 
-本轮按用户授权执行GitHub Actions双端常规编译，未在本机执行以上构建入口，也未执行安装、设备操作或生产发布。CI是独立hosted-runner环境，其构建结果不能代替真机验收。回退前显式停用，再恢复旧APK和源码；配对密钥格式不变，但回退不会撤销用户已经执行的系统命令。
+T001按当时授权执行GitHub Actions双端常规编译；T002保活续修尚未构建或安装，不能沿用T001通过结论。CI是独立hosted-runner环境，其结果不能代替真机验收。回退前显式停用，再恢复旧APK和源码；配对密钥格式不变，但回退不会撤销用户已经执行的系统命令。

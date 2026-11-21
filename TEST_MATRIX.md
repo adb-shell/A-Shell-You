@@ -1,5 +1,18 @@
 # OpenWorld Commercial Test Matrix
 
+## 2026-11-21 内置 ADB 保活续修 / T002
+
+输入test/e137d44，当前未提交实现；只有V0源码与词法结构检查，没有本批编译/设备证据。前轮run44883517881不覆盖本批。除回归ADB-P01—P12、ADB-R/M/A、NET-04/DSP-09外，新增：
+
+| ID | 验收场景与通过条件 | 等级 | 结果 |
+|---|---|---|---|
+| ADB-P13 | 已激活后PackageManager暂时异常：daemon PID保持，无法确认安装时INFO/OPEN拒绝；查询恢复后可继续使用；确认安装变化退出；owner STOP不依赖该查询，其他UID拒绝 | V3/V4 | NOT_RUN |
+| ADB-P14 | 重绑定探测超时、失败/忙与恢复：单次8s、1s/3s/30s退避，不误STOP存活服务；真实错UID/身份拒绝；队列和线程有界，取消排队探测不再发起Binder | V3/V4 | NOT_RUN |
+| ADB-P15 | 无无线调试/仅蜂窝时App重开：20s恢复状态，不自动发现端口；同一daemon恢复后才ready；迟到服务可再验证恢复；boot-count缺失/不可读不误判重启，确认计数改变要求激活 | V3 | NOT_RUN |
+| ADB-P16 | 恢复/退避时停用立即失效；迟到验证/observer不能重新启用；直接STOP失败后lease/Provider拒绝停止服务；Provider阻塞不占主Looper；force-stop期间不拉起App | V3/V4 | NOT_RUN |
+| ADB-P17 | connect发现端口期间原服务恢复，最终begin原子复用；取消该请求不停止原服务；真正新激活的取消仍撤销；不同PC请求和代际不串扰 | V3/V4 | NOT_RUN |
+| ADB-P18 | 电池豁免首次失败后仅本包5s/30s重试、每次可用周期最多3次且并发1；成功停止重试；断开/取消/旧回调无重复命令；用户Shell从不自动重放 | V3 | NOT_RUN |
+
 ## 2026-11-21 内置 ADB 权限服务 / T001
 
 源码test/febf7f0已提交推送，[run44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)于2026-11-21 08:46:24 UTC以SUCCESS结束，Android Native/APK、Windows EXE全部SUCCESS。V0核对和V2编译不替代以下设备/安全验收；合同见[16_EMBEDDED_ADB](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)。

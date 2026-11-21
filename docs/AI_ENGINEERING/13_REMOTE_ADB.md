@@ -1,5 +1,7 @@
 # OpenWorld 远程 ADB / Remote ADB
 
+2026-11-21 T003界面：`remote_adb_menu.dart`精简菜单、配对/Shell/输入/停用/撤销说明；首次配对与已有配对分组，说明使用次级样式，手动端口在内容宽度小于420时纵向排列。状态页改为对齐信息行，同一状态/错误不重复显示；移除Shell时间/输出上限的常驻说明，真实超限/退出码仍显示。按钮文字与controller结果提示同步，协议、回调、只读/恢复守卫及T002改动保留；全设备停用/撤销影响仍明确。仅V0，窗口/大字体视觉待验证，见[任务](../tasks/T-2026-11-21-003-adb-ui-copy.md)。
+
 2026-11-21当前执行合同：[内置权限服务](16_EMBEDDED_ADB.md)。PC字段40/41、鉴权、owner和方法名保持，Android status apiVersion5追加activation状态；connect是显式激活或复用，disconnect是设备级停用，PC会话断开仅取消owner。正常命令/媒体通过本机Binder/FD执行，不随无线端口失效而重配；服务死亡如实失效。旧PC方法可用、新PC保留旧端字段回退；混合版本运行NOT_RUN。下文常态adbd恢复部分由新合同替代。
 
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。

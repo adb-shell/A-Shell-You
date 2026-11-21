@@ -1,5 +1,29 @@
 # OpenWorld Change Event Log
 
+## CE-20261121-T004-01：合并两批修改的Git与双端构建授权
+
+用户本轮明确要求T002保活与T003界面文案一起提交推送test并双编译、等待结果。只读核实test/e137d44与远端一致、31个既有改动路径及两个任务均已关闭；diff检查通过。新增docs/tasks/T-2026-11-21-004-adb-resilience-build.md并更新.codex/CURRENT_WORK.md、PROJECT_STATE.md及本事件；STATE/WORK-T004-r1、active/T5。采用既有Build-Clients-BT/Both/常规编译和临时测试产物流程；未改产品/版本/CI/依赖/资产，不涉及main或生产发布。Git与CI结果待后续事件，历史run不复用为本批证据。
+
+## CE-20261121-T003-02：文案精简及Android卡片调整交付
+
+按原请求及补充完成四份Dart：flutter/lib/mobile/adb/local_adb_page.dart、local_adb_bridge.dart、flutter/lib/desktop/adb/remote_adb_menu.dart、remote_adb_controller.dart。精简说明/按钮/结果，重复状态/错误去重、PC配对分组与窄端口布局；Android标题图标移除，刷新内嵌状态卡，圆角对齐主页13，移除Android停用按钮及双端Shell限制说明，原生错误/实际限制保持。与编辑前T002快照比较，bridge/controller仅文案变化，动作/回调/守卫保持（除用户要求移除的按钮）。词法/差异V0通过，V1—V3未运行。
+
+本事件配套路径：docs/AI_ENGINEERING/12_LOCAL_ADB.md、13_REMOTE_ADB.md、docs/tasks/T-2026-11-21-003-adb-ui-copy.md、.codex/TASK_HISTORY.md、CHANGELOG_AI.md、PROJECT_STATE.md、CURRENT_WORK.md、CHANGE_EVENT_LOG.md。STATE/WORK-20261121-003-r2 / complete T8仅源码交付；T002并行内容保留，未Git写入/build/device/delete/version/release；N/A — no decision delta，Baseline/ADR/External Registry reviewed-no-change。
+
+## CE-20261121-T002-02：保活恢复实现与源码交付
+
+基于test/e137d44完成7份Java与4份Dart恢复语义：暂时系统/探测异常不误STOP，20s恢复/8s验证及退避，boot-count辅助识别、App lease授权/死亡检查、双observer/单维护任务与一次性注册线程，最终begin原子复用及取消所有权，本包电池豁免最多3次。未验证不connected，明确撤销/错身份拒绝，force-stop不拉起、无自动adbd激活或用户命令重放。11文件词法括号、差异与调用路径V0复核；正式构建/设备NOT_RUN。
+
+同步16/08/09/10、TEST_MATRIX的ADB-P13—P18、D-038/ADR0030实施证据、入口与任务/全局记忆，STATE/WORK-20261121-002-r2，T8仅本轮源码交付。无新决策、依赖或资产，Baseline29与External Registry reviewed-no-change。四份Dart后续文案/布局由用户另行授权的T003负责，保留其活动段与全部修改；本批未提交推送或编译，旧run44883517881不覆盖。
+
+## CE-20261121-T003-01：双端ADB文案精简与并发协调
+
+用户明确授权精简Android/PC ADB说明与排版，并批准向T002聊天发送协调消息。test/e137d44存在T002 Java/四份Dart/文档修改；已发送展示与运行时分工，保留全部既有改动。本事件覆盖docs/tasks/T-2026-11-21-003-adb-ui-copy.md、.codex/CURRENT_WORK.md、.codex/PROJECT_STATE.md、.codex/CHANGE_EVENT_LOG.md任务激活。仅C2及配套文档，无Git/build/device/release，沿用Baseline29、D-038/ADR0030。
+
+## CE-20261121-T002-01：保活续修授权与任务激活
+
+用户明确继续完善关闭无线调试/切网/App退出重开后的内置ADB持续能力；clean test/e137d44，无其他活动任务。创建T002任务及STATE/WORK-r1，C2授权Android/Flutter与配套记录；本轮不自动Git写入、构建、设备操作或发布。静态定位验证异常STOP、系统查询异常退出、主Looper递送及恢复状态/豁免重试缺口；沿用D-038/ADR0030，上一轮CI不覆盖本轮。
+
 ## CE-20261121-T001-07：双端成功、使用说明与交付关闭
 
 run44883517881于2026-11-21 08:46:24 UTC / 17:46:24 Asia/Tokyo以SUCCESS结束，源码febf7f0；Android Native/APK、Windows EXE全部成功，APK/EXE/ZIP与build-info已上传。同步任务产物链接/Actions digest、16_EMBEDDED_ADB操作步骤和实际边界、TEST_MATRIX的V2结果、08/09/BUILD_CLIENTS_ACTIONS、D-038/ADR0030实施证据、Baseline索引和入口/全局记忆；STATE/WORK-r5，T8关闭源码与编译交付范围。仅文档补交，不二次dispatch、不合main或改号。设备与安全验收仍NOT_RUN，现有临时签名不作为生产升级保证。没有新决策、依赖或外部资产，相关记录reviewed-no-change。

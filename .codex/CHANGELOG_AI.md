@@ -1,5 +1,9 @@
 # OpenWorld AI Changelog
 
+2026-11-21 / T003：双端ADB短文案、状态去重与配对分组完成；Android移除标题图标和停用按钮，刷新内嵌状态卡、三卡圆角13与主页一致；双端移除Shell限制常驻说明，PC状态行对齐、窄窗口端口纵排。用户已授权跨聊天协调，T002恢复/运行时保留。V0通过，未编译/真机，未提交推送。STATE/WORK-20261121-003-r2 / CE-01/02 / complete T8仅源码交付；N/A — no decision delta，相关ADR/Baseline/外部资产reviewed-no-change。[任务](../docs/tasks/T-2026-11-21-003-adb-ui-copy.md)。
+
+2026-11-21 / T002保活续修源码交付：test/e137d44工作区完成暂时异常不误停、App重建恢复/boot-count、lease授权及死亡检测、维护线程/双observer、激活复用取消竞态和有限电池豁免重试。7份Java、4份Dart恢复语义，V0结构/差异/权限与竞态复核；ADB-P13—P18正式NOT_RUN，旧CI不覆盖，未提交推送或构建。T003并行负责四份Dart文案排版，保留其工作；STATE/WORK-T002-r2 / CE-T002-01/02，complete T8仅源码范围。沿用D-038/ADR0030，N/A — no new decision；Baseline29/外部资产reviewed-no-change。[任务](../docs/tasks/T-2026-11-21-002-embedded-adb-resilience.md)。
+
 2026-11-21 / T001提交与双编译交付：源码febf7f0已推送test，单次Both/常规编译run44883517881精确匹配，于17:46:24 Asia/Tokyo以SUCCESS结束；Android Native/APK、Windows EXE及包校验/上传全部成功。补使用步骤、产物链接/Actions digest及临时签名边界；设备激活/切网/OEM与安全负例仍NOT_RUN。回执文档同轮补交，不二次编译、不合main、不改版本。STATE/WORK-r5 / CE-05—07 / complete T8；D-038/ADR0030仅补证据，N/A — no decision delta，Baseline29冻结及外部资产reviewed-no-change。详见[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)；下方为前阶段。
 
 2026-11-21 / T001最终交付：用户补充要求先对齐main再test开发，已保存改造、快进并推送test至956ecf4；远端main/test同SHA、0/0。恢复29份代码/许可内容无变化，16份文档冲突合并保全，主分支版本2.0.26继承，分支流程写入长期规则。内置ADB源码和配套文档在test工作区完成，未提交/编译；ADB-P01—P12正式验收NOT_RUN。Baseline29 / CE-20261121-T001-04 / STATE、WORK-20261121-001-r2，complete/T8仅已授权源码/Git范围；下方为同步前及更早记录。

@@ -1,5 +1,7 @@
 # OpenWorld 安全模型 / Security Model
 
+2026-11-21 T002：恢复仍须INFO/真实UID探测通过才connected；暂时查询失败拒绝本次执行但不销毁daemon，确认安装变化才退出。新增App lease仅shell/root能查询，核对generation及实际ready；lease存活不替代授权，明确拒绝停止服务。STOP只需原完整owner UID，不依赖PackageManager查询；它只减少权限。单维护线程合并事件，验证线程/队列有界、失败退避；无互相拉起进程、force-stop绕过、自动adbd激活或用户命令重放。V0自审，ADB-P13—P18负例NOT_RUN，详见[合同](16_EMBEDDED_ADB.md)。
+
 ## 2026-11-21：本应用专属 Shell 服务
 
 远程仍由既有已认证relay、键盘/只读和developer-priority端点控制。新增信任边界为App→Binder→独立shell：每次事务核对完整UID和当前包/APK安装身份；exported Provider仅接受shell/root递送，随后校验generation/协议/身份并执行真实UID probe。generation用于撤销/迟到回调隔离，不是防已有shell/root攻击者的秘密。没有第三方授权、通用Binder转发或对外adb TCP；单例abstract socket不accept请求。

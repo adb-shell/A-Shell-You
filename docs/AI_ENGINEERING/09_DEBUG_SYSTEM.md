@@ -1,5 +1,7 @@
 # OpenWorld 调试与验证体系 / Debug System
 
+2026-11-21 T002：排障区分reconnecting与activation_required、暂时系统查询/探测失败与确认服务死亡。记录恢复前后服务PID/实际UID、状态时序和重启计数是否可读即可，不记录generation、配对码或完整命令。ADB-P13—P18覆盖误停、退避、lease撤销、App重建及激活取消竞态；当前仅V0，旧CI不覆盖本批。[任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)。
+
 2026-11-21 ADB排障先分离 paired / wirelessConnected / activationState / connected：端口只用于激活，能力是否可用以验证后的Binder存活为准。激活失败检查Release入口/provider、SDK隐藏API、包/完整UID/APK/generation、真实id -u；运行期失效检查服务死亡，不自动扫描无线调试或重放命令。诊断不得记录配对码、身份密钥、完整命令或设备标识。[16_EMBEDDED_ADB](16_EMBEDDED_ADB.md)列正式Linux/Windows命令；test/febf7f0的CI run44883517881已通过Android arm64与Windows x64 V2构建及既有包校验，TEST_MATRIX的设备与安全验收仍NOT_RUN。不得将编译成功当作激活/切网存活证明。
 
 2026-11-12 T001续修：f4a71c6的Android主源DNS仍失败且_apt无法穿过RUNNER_TEMP父路径。现改/tmp独立目录、root 0755父目录与_apt:root 0700 partial，实际以_apt检查目录/源文件/解析器配置访问；主源→kernel.org→MIT顺序探测完整Jammy三套索引，APT官方签名验证成功才使用。每候选索引隔离，全部失败禁止安装；索引更新每次3分钟、安装10分钟、步骤总限24分钟。 curl探测以_apt身份进行，连接5秒/总10秒（外层15秒）；固定三候选失败后退出，无无限重试。离线检查13/13通过，真实runner DNS/文件权限仍待新构建。较早5分钟/17分钟及RUNNER_TEMP描述为上一版快照。

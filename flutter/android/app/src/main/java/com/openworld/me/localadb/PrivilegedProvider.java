@@ -15,10 +15,8 @@ public final class PrivilegedProvider extends ContentProvider {
         int uid = Binder.getCallingUid();
         if ((uid != 2000 && uid != 0) || !"attach".equals(method) || extras == null)
             throw new SecurityException("Privileged handoff denied");
-        Bundle reply = new Bundle();
-        reply.putBoolean("accepted", PrivilegedBridge.get(getContext()).accept(
-                extras.getBinder("service"), extras.getString("generation", ""), uid));
-        return reply;
+        return PrivilegedBridge.get(getContext()).accept(
+                extras.getBinder("service"), extras.getString("generation", ""), uid);
     }
 
     @Override public Cursor query(Uri uri, String[] projection, String selection, String[] args, String order) { throw new SecurityException(); }

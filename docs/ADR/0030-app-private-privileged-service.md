@@ -7,13 +7,13 @@
 - Decision Owner / Approvers：用户（本任务明确批准“只服务开放世界”及“完成这个方案”）
 - Security Reviewer / Release Reviewer：Codex 依据对应领域 Skill 静态自审；独立审查 unknown — release owner required
 - Scope：Android localadb、Flutter本机/PC状态及激活交互
-- Related Task：[T-2026-11-21-001](../tasks/T-2026-11-21-001-embedded-adb.md)
+- Related Task：[T001](../tasks/T-2026-11-21-001-embedded-adb.md)、[T002保活续修](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)
 - Related Decision Log：D-038
-- Baseline / Test / Asset：OW-BL-2026-11-21-956ecf4-embedded-adb-worktree（同步前初稿609aec9另存） / ADB-P01—P12 / EXT-REF-SHIZUKU-001
+- Baseline / Test / Asset：OW-BL-2026-11-21-956ecf4-embedded-adb-worktree（同步前初稿609aec9另存） / ADB-P01—P18 / EXT-REF-SHIZUKU-001
 - Supersedes：0018/0025 的常态 adbd 连接与自动无线恢复部分；其他授权和独立通道决策保持
 - Superseded By：none
-- Implementation State：test/febf7f0已推送，双端常规编译run44883517881全部SUCCESS
-- Evidence / Verification：V0与Android arm64/Windows x64 V2构建通过；设备/安全验收及独立产物审查NOT_RUN，不是发布批准
+- Implementation State：T001源码febf7f0已推送且双编译成功；T002基于test/e137d44的保活续修未提交、未构建
+- Evidence / Verification：T002仅V0，旧run44883517881不覆盖新修改；设备/安全验收及独立产物审查NOT_RUN，不是发布批准
 
 ## Context / Drivers
 
@@ -24,6 +24,8 @@
 采用 Shizuku 风格独立 app_process shell 服务，使用本应用专属 Binder 验证和 FD 数据通道；无线配对/连接仅作为显式 bootstrap。服务存活即可复用；不承诺非root全ROM永不退出。App UID不提权，无新公网监听、root获取、通用第三方Binder代理或独立Shizuku APK依赖。
 
 保留现有remote relay鉴权/只读/developer-priority、协议字段40/41、方法名与媒体helper行为。应用恢复只绑定存活服务，服务死亡必须如实失效，不自动激活或重放Shell。
+
+T002实施补充：暂时系统查询/验证故障拒绝未验证执行但不销毁daemon；确认身份变化或明确撤销才停止。App重建先恢复已有服务，有限探测/退避；进程lease须同时验证generation及真实ready，不能以进程存活代替授权。STOP只允许原完整owner UID且不依赖安装查询；只有INFO/OPEN需要安装证明。单独维护线程与一次性observer注册线程避免阻塞停止路径；不引入进程互拉或绕过系统强停。
 
 ## Alternatives
 
@@ -36,21 +38,21 @@
 
 ## Consequences / Security / License
 
-设备所有有权限PC共享一次激活；单请求取消仅关闭自身FD。明确停用使全部能力停止，配对记录保留。Binder逐次核对完整UID和安装路径；Provider只收shell/root且验证generation/身份/真实UID。24通道上限、保留命令预算、撤销拒绝迟到回调。generation不是对抗已有shell/root攻击者的秘密凭证。现有远控端点鉴权强度及用户任意Shell副作用仍是既有风险。
+设备所有有权限PC共享一次激活；单请求取消仅关闭自身FD。明确停用使全部能力停止，配对记录保留。INFO/OPEN逐次核对完整UID和安装路径；STOP仅允许原完整UID以减少权限。Provider只收shell/root且验证generation/身份/真实UID。24通道上限、保留命令预算、撤销拒绝迟到回调。generation不是对抗已有shell/root攻击者的秘密凭证。现有远控端点鉴权强度及用户任意Shell副作用仍是既有风险。
 
 独立进程仍受系统/OEM/SELinux影响，更新/重装/重启可能需激活；不存在“永久授予App shell权限”。Shizuku固定来源Apache-2.0和NOTICE随包交付，无新增二进制依赖。完整技术合同见[16_EMBEDDED_ADB](../AI_ENGINEERING/16_EMBEDDED_ADB.md)。
 
 ## Compatibility / Migration / Operations
 
-apiVersion5追加状态，旧connected映射为服务ready；旧PC方法继续有效，新PC缺能力标志回退旧语义。原配对密钥格式不变；新增本机enabled/generation记录仅授权意图。首次升级必须显式激活，不能沿用旧连接假定服务已存在。旧PC断开会停用服务，需在混合版本验收中告知。没有服务器或版本调整、没有发布/部署；构建owner为OpenWorld维护者，正式结果未知。
+apiVersion6增加reconnecting语义，connected仍映射为服务ready；旧PC方法继续有效，新PC缺能力标志回退旧语义。原配对密钥格式不变；本机enabled/generation/bootCount仅为授权意图和重启辅助信息。首次升级必须显式激活，不能沿用旧连接假定服务已存在。旧PC断开会停用服务，需在混合版本验收中告知。没有服务器或版本调整、没有发布/部署；T002构建结果未知。
 
 ## Verification
 
-V0：调用点/差异、Manifest、固定资产、来源与权限链审查；V1—V4：ADB-P01—P12，关联ADB-R/M/A、NET-04/DSP-09，全部NOT_RUN。正式Linux/Windows命令与停止边界见领域文档。独立安全审查及Release产物证明仍待维护者提供。
+V0：调用点/差异、来源与权限链、恢复/取消/撤销审查；T002的V1—V4：ADB-P01—P18，关联ADB-R/M/A、NET-04/DSP-09，全部NOT_RUN。正式命令与停止边界见领域文档和T002任务。独立安全审查及Release产物证明仍待维护者提供。
 
 ## Rollback / Kill Switch
 
-手机或有控制权PC明确停用，立刻拒绝新Binder并清理通道；配对身份保留。恢复本任务改动或安装旧APK前先停用。删除配对另用revoke；已执行系统命令/电池豁免/无障碍配置不自动回滚。验证回退到旧无线连接合同及无孤留媒体/遮罩；不得用全局kill其他Shell任务回滚。
+有控制权PC通过ADB菜单明确停用，立刻拒绝新Binder并清理通道；配对身份保留。手机页面停用按钮由用户另行授权的T003移除，既有MethodChannel方法仍兼容。恢复本任务改动或安装旧APK前先停用。删除配对另用revoke；已执行系统命令/电池豁免/无障碍配置不自动回滚。验证回退到旧无线连接合同及无孤留媒体/遮罩；不得用全局kill其他Shell任务回滚。
 
 ## Approval / Amendment
 

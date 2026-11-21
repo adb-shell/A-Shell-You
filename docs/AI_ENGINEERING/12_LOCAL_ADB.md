@@ -1,5 +1,7 @@
 # OpenWorld 本机 ADB / Local ADB
 
+2026-11-21 T003界面：`local_adb_page.dart`移除独立ADB标题/图标，刷新位于状态卡片右上角；三张卡片圆角与主页`PaddingCard`统一为13。配对说明、按钮及状态文字精简，重复状态只显示一次；移除Android底部停用按钮与Shell时间/输出上限常驻说明，实际执行限制和错误回执保持，PC仍可显式停用。保留T002恢复状态与操作条件。仅V0，未编译/真机视觉验证，见[任务](../tasks/T-2026-11-21-003-adb-ui-copy.md)。下方历史按钮名称不代表当前界面。
+
 2026-11-21当前执行合同：[内置权限服务](16_EMBEDDED_ADB.md)。无线调试只用于显式配对/激活；`connected` 表示经验证且存活的本应用专属Binder服务，普通执行无无线端口参数。App重建重绑定，停止/重启需重新激活；下文持续adbd连接和自动恢复描述为旧实现。test工作区V0，尚未构建/真机验证。
 
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。

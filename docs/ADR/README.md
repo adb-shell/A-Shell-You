@@ -1,6 +1,6 @@
 # OpenWorld Architecture Decision Records
 
-2026-11-21新增 [ADR-0030：App-private Privileged Service](0030-app-private-privileged-service.md)，accepted for implementation / D-038；替代0018/0025中常态adbd依赖和自动无线恢复部分。实现test/febf7f0已推送，V0与CI run44883517881双端V2构建通过；设备与安全验收仍待证。
+2026-11-21新增 [ADR-0030：App-private Privileged Service](0030-app-private-privileged-service.md)，accepted for implementation / D-038；替代0018/0025中常态adbd依赖和自动无线恢复部分。T001实现febf7f0已推送且双编译通过；T002在test/e137d44上继续完善保活/恢复，仅V0、未提交构建，旧run44883517881不覆盖；设备与安全验收仍待证。
 
 当前：[ADR-0029：集中端点与PC服务器配置切换](0029-central-server-profiles.md)，D-036；实现与编译修复来自test/a8abdd4，本轮纳入main，正式运行验证待证。
 
