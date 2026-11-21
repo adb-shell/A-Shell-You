@@ -1,5 +1,15 @@
 # OpenWorld Change Event Log
 
+## CE-20261121-T004-03：按用户补充停止监控并交付回执
+
+用户补充“不进行监控”，立即停止后续run/jobs/logs/artifacts查询，不取消已启动构建。最后读取09:40:22 UTC时Android Native/Windows EXE均in_progress，最终V2结论unknown；无本次日志/产物下载或设备操作。源码b12cbdb已推送test，单次dispatch run44890553076精确匹配；本批只补交文档，不二次编排。
+
+同步docs/tasks/T-2026-11-21-004-adb-resilience-build.md及T002/T003交付链接、docs/AI_ENGINEERING/08_BUILD_SYSTEM.md、09_DEBUG_SYSTEM.md、16_EMBEDDED_ADB.md、docs/BUILD_CLIENTS_ACTIONS.md、TEST_MATRIX.md、AGENTS.md、PROJECT_START_HERE.md、.codex/PROJECT_MEMORY.md、PROJECT_STATE.md、TASK_HISTORY.md、CHANGELOG_AI.md、CURRENT_WORK.md及本事件。STATE/WORK-T004-r3、complete/T8仅用户调整后的交付范围；Decision/ADR/External Registry reviewed-no-change，无新决策/资产，Baseline29冻结不改，main/版本不变。
+
+## CE-20261121-T004-02：源码推送与双编译受理
+
+T002/T003及T004启动记录一并提交为b12cbdb8f216cc27491cae478d9accfb1898ab24（32文件757增/224删），push origin test成功，远端SHA一致。2026-11-21 09:38:40 UTC / 18:38:40 Asia/Tokyo单次dispatch Build-Clients-BT、Both/常规编译，HTTP204；run44890553076/attempt1精确head_sha匹配。同步docs/tasks/T-2026-11-21-004-adb-resilience-build.md、.codex/PROJECT_STATE.md、CURRENT_WORK.md及本事件；STATE/WORK-T004-r2、active/T6，实际编译结果待证。无main/版本/生产操作。
+
 ## CE-20261121-T004-01：合并两批修改的Git与双端构建授权
 
 用户本轮明确要求T002保活与T003界面文案一起提交推送test并双编译、等待结果。只读核实test/e137d44与远端一致、31个既有改动路径及两个任务均已关闭；diff检查通过。新增docs/tasks/T-2026-11-21-004-adb-resilience-build.md并更新.codex/CURRENT_WORK.md、PROJECT_STATE.md及本事件；STATE/WORK-T004-r1、active/T5。采用既有Build-Clients-BT/Both/常规编译和临时测试产物流程；未改产品/版本/CI/依赖/资产，不涉及main或生产发布。Git与CI结果待后续事件，历史run不复用为本批证据。

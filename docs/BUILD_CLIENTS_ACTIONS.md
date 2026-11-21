@@ -1,5 +1,7 @@
 # GitHub Actions 客户端编译
 
+2026-11-21 T004：保活与界面文案源码test/b12cbdb已推送，18:38:40 Asia/Tokyo单次Both/常规编译获HTTP204；[run44890553076](https://github.com/adb-shell/A-Shell-You/actions/runs/44890553076)精确匹配源码。用户补充不监控后停止查询，不取消构建；最终编译/产物结果未知。回执文档补交不再dispatch，见[任务](tasks/T-2026-11-21-004-adb-resilience-build.md)。
+
 2026-11-21 T001：test/febf7f0已推送，17:09:13 Asia/Tokyo单次触发Both/常规编译；[run44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)精确匹配源码，于17:46:24以SUCCESS结束，Android Native/APK和Windows EXE全部通过。APK、EXE、Release ZIP和build-info已上传，成品有效期至2026-12-05；临时测试签名不保证覆盖旧安装，不是生产发布。下载/哈希及未执行的设备验收见[任务](tasks/T-2026-11-21-001-embedded-adb.md)。本批回执只改文档，不二次dispatch；下方历史结论保持原观察时点。
 
 2026-11-15 T001：UDID展示移除源码test/696a87b已推送；09:27:19 UTC / 18:27:19 Asia/Tokyo触发Both/常规编译，HTTP204受理。按用户要求不监控，不查询新运行/日志/产物，最终结果未知；只补回执文档、不二次编排。见[任务](tasks/T-2026-11-15-001-hide-desktop-udid.md)。

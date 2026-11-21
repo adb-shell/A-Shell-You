@@ -1,6 +1,6 @@
 # OpenWorld 内置 ADB 权限服务 / Embedded Privileged Backend
 
-2026-11-21 T002保活续修：基于test/e137d44的未提交实现，新增App重建恢复窗口、验证退避、应用进程lease/授权检查、双observer及独立维护线程，修正暂时异常导致服务误停。仅V0，前轮CI不覆盖本批；[续修任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)。下方T001编译是输入版本的历史证据；实际界面文字由并行T003精简，状态语义保持。
+2026-11-21 T002保活与T003文案已合为test/b12cbdb并推送：新增App重建恢复窗口、验证退避、应用进程lease/授权检查、双observer及独立维护线程，修正暂时异常误停；界面精简且恢复语义保持。Both/常规编译run44890553076已启动，用户随后要求不监控，最终结果未知；[续修任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)/[交付回执](../tasks/T-2026-11-21-004-adb-resilience-build.md)。下方T001成功编译仅覆盖输入版本，设备验收仍待证。
 
 2026-11-21交付：源码test/febf7f0f20460a0bfffbc0ee0a2581828a30d7c0已推送；[双端常规编译44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)于17:46:24 Asia/Tokyo以SUCCESS结束，Android Native/APK和Windows EXE全部通过。产物链接与来源见任务回执；构建不替代真机验收。
 

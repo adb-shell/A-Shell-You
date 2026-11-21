@@ -1,5 +1,7 @@
 # OpenWorld 调试与验证体系 / Debug System
 
+2026-11-21 T004：保活与界面源码test/b12cbdb已推送并启动Both/常规编译run44890553076。用户随后要求不监控，停止查询；最终V2结果unknown，设备与视觉用例NOT_RUN，不能把旧成功run或本次HTTP204当作PASS。[回执](../tasks/T-2026-11-21-004-adb-resilience-build.md)。
+
 2026-11-21 T002：排障区分reconnecting与activation_required、暂时系统查询/探测失败与确认服务死亡。记录恢复前后服务PID/实际UID、状态时序和重启计数是否可读即可，不记录generation、配对码或完整命令。ADB-P13—P18覆盖误停、退避、lease撤销、App重建及激活取消竞态；当前仅V0，旧CI不覆盖本批。[任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)。
 
 2026-11-21 ADB排障先分离 paired / wirelessConnected / activationState / connected：端口只用于激活，能力是否可用以验证后的Binder存活为准。激活失败检查Release入口/provider、SDK隐藏API、包/完整UID/APK/generation、真实id -u；运行期失效检查服务死亡，不自动扫描无线调试或重放命令。诊断不得记录配对码、身份密钥、完整命令或设备标识。[16_EMBEDDED_ADB](16_EMBEDDED_ADB.md)列正式Linux/Windows命令；test/febf7f0的CI run44883517881已通过Android arm64与Windows x64 V2构建及既有包校验，TEST_MATRIX的设备与安全验收仍NOT_RUN。不得将编译成功当作激活/切网存活证明。

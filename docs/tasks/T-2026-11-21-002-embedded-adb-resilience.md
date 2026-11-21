@@ -1,5 +1,7 @@
 # T-2026-11-21-002：内置 ADB 服务保活与重新绑定
 
+后续交付：本任务与T003一起固化为test/b12cbdb并推送；[T004回执](T-2026-11-21-004-adb-resilience-build.md)记录Both/常规编译run44890553076。用户随后要求不监控，最终结果未知；下方保留本任务源码阶段的授权和V0结论。
+
 ## T0 / Metadata / Authority
 
 - Status：complete / T8（本轮源码交付）；2026-11-21 Asia/Tokyo；Owner：Codex / openworld-master，Android实现、Flutter状态、Security静态自审；无独立代理。正式构建与设备待验。

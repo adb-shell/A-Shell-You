@@ -1,5 +1,7 @@
 # OpenWorld Task History
 
+2026-11-21 / T-2026-11-21-004 / complete T8（Git交付与触发）：用户授权保活/界面文案一起提交推送test并双编译，执行为b12cbdb8f216cc27491cae478d9accfb1898ab24、远端一致；18:38:40 Asia/Tokyo向Build-Clients-BT提交Both/常规编译，HTTP204，run44890553076精确head_sha。用户随后补充“不进行监控”，停止所有后续运行/日志/产物查询，不取消、不重触发；18:40:22最后观察两平台in_progress，最终构建结果未知。32文件757增/224删，V0差异通过，设备未运行；本批只补文档并推送，不改main/版本/产品方案。STATE/WORK-T004-r3 / CE-01—03；Decision/ADR/External Registry reviewed-no-change。[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。
+
 2026-11-21 / T-2026-11-21-003 / complete T8（源码/V0）：按用户要求精简Android/PC ADB文案与排版；后续补充移除Android独立标题/图标、刷新内嵌、13圆角对齐主页、移除Android停用按钮和Shell限制说明，均已完成。用户允许跨聊天协调，四份Dart保留T002恢复逻辑，Java不改；bridge/controller仅显示字符串变化，其他操作守卫/回调与编辑前T002快照一致。V0词法/调用条件/差异检查通过，未编译或实际视觉验收；无Git写入/设备/发布。STATE/WORK-20261121-003-r2 / CE-01/02；任务及12/13领域文档、全局记忆同步，N/A — no decision delta，ADR/Baseline/External Registry reviewed-no-change。[任务](../docs/tasks/T-2026-11-21-003-adb-ui-copy.md)。
 
 2026-11-21 / T-2026-11-21-002 / complete T8（源码交付）：用户要求尽量减少关闭无线调试、切网、App重开后的重新激活。基于clean test/e137d44修正系统查询/探测误停，增加20s恢复、8s验证和退避、boot-count辅助识别、带授权检查的App lease、独立维护/observer注册、最终激活原子复用与取消所有权、本包电池豁免3次上限。V0词法结构/差异及权限/竞态路径复核，真实设备与新构建NOT_RUN；不保证系统彻底杀掉shell进程后能无权限重建。改动留工作区，未Git写入/编译/设备操作。并行T003获用户授权接手四份Dart文案/排版，本任务保留其记录和修改；STATE/WORK-T002-r2 / CE-T002-01/02，D-038/ADR0030无新增决策。[任务](../docs/tasks/T-2026-11-21-002-embedded-adb-resilience.md)。

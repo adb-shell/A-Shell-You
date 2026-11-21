@@ -1,5 +1,7 @@
 # OpenWorld 构建系统 / Build System
 
+2026-11-21 T004：ADB保活T002与文案T003已一起推送test/b12cbdb；18:38:40 Asia/Tokyo单次Build-Clients-BT/Both/常规编译HTTP204，run44890553076精确匹配。用户补充不监控后停止查询，不取消构建，最终结果未知；没有本批成品/签名/hash结果。回执只改文档、不再编排，[交付任务](../tasks/T-2026-11-21-004-adb-resilience-build.md)；下方为历史时点。
+
 2026-11-21 T002保活续修：7份Java与4份Dart恢复语义在test/e137d44工作区完成，无工具链/Manifest/依赖/版本变更；本批未提交或构建，旧run44883517881不覆盖。正式入口和ADB-P01—P18验证需求见[任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)。并行T003的界面文案以其独立记录为准。
 
 2026-11-21 T001：内置ADB源码test/febf7f0已推送，17:09:13 Asia/Tokyo触发Build-Clients-BT.yml / Both / 常规编译，HTTP204。[run44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)精确head_sha匹配，17:46:24以SUCCESS结束；Android Native/APK与Windows EXE全部通过。Android arm64、Windows x64 EXE/ZIP及build-info已上传，沿用临时测试签名，不代表生产发布或设备验收。最终回执见[任务](../tasks/T-2026-11-21-001-embedded-adb.md)，下方为实施阶段快照。

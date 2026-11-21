@@ -1,5 +1,7 @@
 # OpenWorld AI Changelog
 
+2026-11-21 / T004：T002保活与T003文案一并提交推送test/b12cbdb8f216cc27491cae478d9accfb1898ab24，32文件757增/224删，远端SHA一致。18:38:40 Asia/Tokyo单次Both/常规编译HTTP204，run44890553076精确匹配。用户随后要求不监控，立即停止查询；最后观察两平台准备环境中，最终结果unknown，不取消构建。回执只改文档并补交、不二次编排；main/版本保持，设备NOT_RUN。STATE/WORK-T004-r3 / CE-01—03 / complete T8仅调整后的交付范围；N/A — no decision delta。[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。
+
 2026-11-21 / T003：双端ADB短文案、状态去重与配对分组完成；Android移除标题图标和停用按钮，刷新内嵌状态卡、三卡圆角13与主页一致；双端移除Shell限制常驻说明，PC状态行对齐、窄窗口端口纵排。用户已授权跨聊天协调，T002恢复/运行时保留。V0通过，未编译/真机，未提交推送。STATE/WORK-20261121-003-r2 / CE-01/02 / complete T8仅源码交付；N/A — no decision delta，相关ADR/Baseline/外部资产reviewed-no-change。[任务](../docs/tasks/T-2026-11-21-003-adb-ui-copy.md)。
 
 2026-11-21 / T002保活续修源码交付：test/e137d44工作区完成暂时异常不误停、App重建恢复/boot-count、lease授权及死亡检测、维护线程/双observer、激活复用取消竞态和有限电池豁免重试。7份Java、4份Dart恢复语义，V0结构/差异/权限与竞态复核；ADB-P13—P18正式NOT_RUN，旧CI不覆盖，未提交推送或构建。T003并行负责四份Dart文案排版，保留其工作；STATE/WORK-T002-r2 / CE-T002-01/02，complete T8仅源码范围。沿用D-038/ADR0030，N/A — no new decision；Baseline29/外部资产reviewed-no-change。[任务](../docs/tasks/T-2026-11-21-002-embedded-adb-resilience.md)。

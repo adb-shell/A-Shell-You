@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261121-004-r1`
+Registry Revision：`WORK-20261121-004-r3`
 Last Updated：2026-11-21
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-T-2026-11-21-004 / active T5：用户明确授权将T002保活与T003文案一并提交推送test并执行Both常规编译、等待结果。起点test/e137d44，31个已有路径完整保留；无其他active任务。范围为Git交付、CI及证据文档，不改main/版本或新增产品方案。STATE/WORK-20261121-004-r1 / CE-20261121-T004-01；[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。
+none。T004按用户补充“不进行监控”停止后续查询；构建继续由GitHub执行，最终结果未知。Git交付与单次触发已完成，回执文档补交后不再编排。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,8 @@ T-2026-11-21-004 / active T5：用户明确授权将T002保活与T003文案一�
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+2026-11-21 / T-2026-11-21-004 / complete T8（调整后的Git交付与触发范围）：T002保活与T003文案已一并提交推送test/b12cbdb，32文件757增/224删，远端SHA一致；18:38:40 Asia/Tokyo单次Both/常规编译HTTP204，run44890553076精确head_sha。用户随后要求不监控，已停止所有后续运行/日志/产物查询，不取消或重触发，最终结果unknown；最后18:40:22两平台准备环境中。任务与Build/Debug/Matrix/全局记忆同步后关闭，回执仅文档补交；main/版本保持，设备NOT_RUN。STATE/WORK-T004-r3 / CE-01—03 / N/A — no decision delta。[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。
 
 2026-11-21 / T-2026-11-21-002 / complete T8（源码范围）：test/e137d44工作区完成暂时异常不误停、恢复窗口/退避/boot-count、授权lease与独立维护/双observer、激活复用取消竞态、有限电池豁免重试。7份Java与4份Dart恢复语义，11文件初次/7份Java最终词法检查、diff及文档链接V0通过；正式构建/真机NOT_RUN，旧CI不覆盖。本轮未提交推送或触发CI；T003独立文案/布局已保留，手机停用按钮由其按用户要求移除，PC停用可用。全部历史/状态同步后关闭T002，保留下方T003关闭记录。STATE/WORK-20261121-002-r2 / CE-T002-01/02 / D-038、ADR0030 / [任务](../docs/tasks/T-2026-11-21-002-embedded-adb-resilience.md)。
 
