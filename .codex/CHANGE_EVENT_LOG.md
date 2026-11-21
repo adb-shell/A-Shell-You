@@ -1,5 +1,15 @@
 # OpenWorld Change Event Log
 
+## CE-20261121-T005-02：main快进推送与两支对齐回执
+
+现有main worktree从956ecf4快进合入test/e82f8df，无冲突且完整tree与test一致；push main成功，远端main/test均e82f8dfdc0a743c51e15be49ccd89ae38fc3ad05，本地0/0。主工作区保留test，64文件既有源码/文档合入；版本/CI保持，不触发或查询编译。
+
+本批只改docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md、docs/AI_ENGINEERING/16_EMBEDDED_ADB.md、AGENTS.md、PROJECT_START_HERE.md、.codex/PROJECT_STATE.md、CURRENT_WORK.md、PROJECT_MEMORY.md、TASK_HISTORY.md、CHANGELOG_AI.md及本事件；回执补交两支并保持相同SHA，STATE/WORK-T005-r2、complete/T8。Decision/ADR/Baseline/External Registry/Build/Debug/TEST_MATRIX reviewed-no-change，无新增业务、外部资产或验证结论。
+
+## CE-20261121-T005-01：main合并推送与test对齐启动
+
+用户当前要求合并到main并推送GitHub；同会话合并后test保持最新main的要求仍有效。只读核实两个工作区clean、本地远端一致、main/956ecf4是test/e82f8df祖先（0/4），无版本/CI增量。新增docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md，更新.codex/PROJECT_STATE.md、CURRENT_WORK.md及本事件，STATE/WORK-T005-r1、active/T5；后续只快进合并、推送与回执，不编译/监控/发布，无新产品或依赖改动。
+
 ## CE-20261121-T004-03：按用户补充停止监控并交付回执
 
 用户补充“不进行监控”，立即停止后续run/jobs/logs/artifacts查询，不取消已启动构建。最后读取09:40:22 UTC时Android Native/Windows EXE均in_progress，最终V2结论unknown；无本次日志/产物下载或设备操作。源码b12cbdb已推送test，单次dispatch run44890553076精确匹配；本批只补交文档，不二次编排。

@@ -1,5 +1,7 @@
 # OpenWorld Project Memory
 
+2026-11-21 T005：内置ADB、保活与双端文案已随test完整快进合入main并推送。首轮核对main/test本地远端同为e82f8df、0/0，回执纯文档补交两支保持相同SHA，主工作区保留test供继续修改。版本2.0.26 / 2.0.26+59保持；不触发或监控CI，b12cbdb结果unknown。STATE/WORK-T005-r2 / CE-01/02 / [任务](../docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。下方“main未合入”仅为旧快照。
+
 2026-11-21 T004：保活T002与文案T003已一起提交推送test/b12cbdb；18:38:40 Asia/Tokyo单次Both/常规编译获HTTP204，run44890553076精确匹配。用户随后要求不监控，已停止后续查询，不取消构建，最终结果未知；不能沿用旧成功run。回执文档补交、不再次编排，设备验收NOT_RUN，main/版本保持。STATE/WORK-T004-r3 / CE-01—03 / [任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)；以下未提交描述为历史时点。
 
 2026-11-21 T002：test/e137d44上已完成未提交的内置ADB保活/重绑定完善：暂时异常不误停，App重开先恢复原服务，真实重启/死亡如实失效；lease必须仍有授权，停用不因维护查询阻塞；有限验证与电池豁免重试，不重放用户命令。V0，正式构建/设备待证，旧CI不覆盖。四份Dart后续文案与布局属于并行T003，当前活动任务看CURRENT_WORK；T002源码交付关闭，STATE/WORK-r2 / CE-T002-02。保持main基线对齐开发流程及版本2.0.26。

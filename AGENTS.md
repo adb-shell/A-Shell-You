@@ -1,5 +1,7 @@
 # AGENTS.md — 开放世界 / OpenWorld v2.0.26
 
+2026-11-21 T005：test的内置ADB、保活和界面文案已完整快进合入main并推送，首轮远端两支同e82f8df、本地0/0；本批回执仅文档补交两支并保持对齐，主工作区保留test。版本不变，不触发/监控编译，b12cbdb最终结果仍unknown。见[main合并任务](docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。以下“尚未合main”等为历史时点。
+
 2026-11-21 T004：T002内置ADB保活续修与T003界面文案已一并提交推送test/b12cbdb；Both/常规编译run44890553076已启动、精确匹配源码。用户补充不监控，已停止查询，最终结果未知；旧成功CI不覆盖本批。回执只改文档、不二次编排；见[交付任务](docs/tasks/T-2026-11-21-004-adb-resilience-build.md)/[当前工作](.codex/CURRENT_WORK.md)。下方为历史回执。
 
 2026-11-21当前源码：test/febf7f0已推送本应用专属[内置ADB服务](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)，无线调试只用于显式激活，运行时Binder/FD执行；版本2.0.26。main仍956ecf4，本次新功能尚未合main；双端常规编译run44883517881全部SUCCESS，设备/蜂窝/OEM存活仍待验，产物与使用步骤见[任务](docs/tasks/T-2026-11-21-001-embedded-adb.md)/[STATE](.codex/PROJECT_STATE.md)。用户长期要求：每次test合main后，返回test作业前先对齐最新main并保全未完成改动，不能只切分支；详见[开发流程](DEVELOPMENT_WORKFLOW.md)。下方为历史。

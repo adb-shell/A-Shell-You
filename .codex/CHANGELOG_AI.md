@@ -1,5 +1,7 @@
 # OpenWorld AI Changelog
 
+2026-11-21 / T005：按用户要求将test完整合入main并推送；main/956ecf4快进到e82f8df，保留内置ADB、保活恢复和界面文案全部4提交，无冲突/产品增改。远端main/test均e82f8df，本地0/0、完整tree一致；回执纯文档补交两支，主工作区保留test。版本不变，无本轮构建/监控或设备操作，b12cbdb构建结果unknown。STATE/WORK-T005-r2 / CE-01/02 / complete T8，N/A — no decision delta。[任务](../docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。
+
 2026-11-21 / T004：T002保活与T003文案一并提交推送test/b12cbdb8f216cc27491cae478d9accfb1898ab24，32文件757增/224删，远端SHA一致。18:38:40 Asia/Tokyo单次Both/常规编译HTTP204，run44890553076精确匹配。用户随后要求不监控，立即停止查询；最后观察两平台准备环境中，最终结果unknown，不取消构建。回执只改文档并补交、不二次编排；main/版本保持，设备NOT_RUN。STATE/WORK-T004-r3 / CE-01—03 / complete T8仅调整后的交付范围；N/A — no decision delta。[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。
 
 2026-11-21 / T003：双端ADB短文案、状态去重与配对分组完成；Android移除标题图标和停用按钮，刷新内嵌状态卡、三卡圆角13与主页一致；双端移除Shell限制常驻说明，PC状态行对齐、窄窗口端口纵排。用户已授权跨聊天协调，T002恢复/运行时保留。V0通过，未编译/真机，未提交推送。STATE/WORK-20261121-003-r2 / CE-01/02 / complete T8仅源码交付；N/A — no decision delta，相关ADR/Baseline/外部资产reviewed-no-change。[任务](../docs/tasks/T-2026-11-21-003-adb-ui-copy.md)。

@@ -1,5 +1,7 @@
 # OpenWorld Project Start Here
 
+2026-11-21 T005：test内置ADB、保活及双端文案已快进合入main并推送；首轮main/test本地远端均e82f8df、0/0，纯文档回执补交两支保持对齐，主工作区继续test。无新版本或构建/监控动作，b12cbdb编译最终结果unknown。[合并回执](docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。以下为历史观察时点。
+
 2026-11-21 T004：ADB保活T002与界面文案T003已一并提交推送test/b12cbdb；Both/常规编译run44890553076已启动、源码匹配。用户随后要求不监控，停止查询且不取消构建，最终结果未知；旧成功run不覆盖本批。回执仅文档、不二次编排，见[交付任务](docs/tasks/T-2026-11-21-004-adb-resilience-build.md)/[Current Work](.codex/CURRENT_WORK.md)。以下为前阶段。
 
 2026-11-21当前源码：test/febf7f0已提交推送[内置ADB服务](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)，版本2.0.26；双端常规编译run44883517881全部SUCCESS，设备验收仍待证，见[任务](docs/tasks/T-2026-11-21-001-embedded-adb.md)/[STATE](.codex/PROJECT_STATE.md)。无线调试仅用于显式激活，日常Binder/FD执行；服务死亡/重启需重新激活。main仍956ecf4；以后每次test合main后、返回test作业前先对齐最新main，详见[开发流程](DEVELOPMENT_WORKFLOW.md)。下方为历史。

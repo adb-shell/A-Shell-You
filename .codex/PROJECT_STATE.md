@@ -1,5 +1,7 @@
 # OpenWorld Project State
 
+当前T005交付快照（2026-11-21，STATE-20261121-005-r2）：main已从956ecf4快进到test/e82f8dfdc0a743c51e15be49ccd89ae38fc3ad05并推送；远端main/test完整SHA相同，本地0/0、完整tree一致。内置ADB、保活与文案已进入main，主工作区保留test。本回执纯文档补入两支并保持同SHA，不改版本或产品；本轮不触发/监控CI，b12cbdb构建结果unknown。complete/T8，CE-20261121-T005-01/02，[任务](../docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。以下均为历史观察时点。
+
 当前交付任务T004（2026-11-21，STATE-20261121-004-r3）：T002/T003已合为test/b12cbdb8f216cc27491cae478d9accfb1898ab24并推送，远端一致，触发前clean。18:38:40 Asia/Tokyo单次Both/常规编译HTTP204，run44890553076精确匹配源码；18:40:22最后观察两平台准备环境中。用户随后要求“不进行监控”，立即停止查询，不取消构建，最终结果未知。complete/T8只关闭调整后的Git交付/触发范围，CE-20261121-T004-01—03，详见[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。回执仅文档补交、不再次dispatch；main/956ecf4、版本2.0.26保持；下方为历史时点记录。
 
 T003交付快照（2026-11-21，STATE-20261121-003-r2）：test/e137d44，双端ADB文案/排版精简complete T8（源码/V0）；Android独立标题图标和停用按钮移除、刷新内嵌、13圆角对齐主页，双端Shell常驻限制说明移除。与T002已按用户授权发消息协调，保留其Java及Dart恢复逻辑。CE-20261121-T003-01/02 / [任务](../docs/tasks/T-2026-11-21-003-adb-ui-copy.md)。本任务改动未提交/编译/设备验证；下方T002快照独立保持。

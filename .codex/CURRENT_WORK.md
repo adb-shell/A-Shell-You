@@ -1,7 +1,7 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261121-004-r3`
+Registry Revision：`WORK-20261121-005-r2`
 Last Updated：2026-11-21
 Active Task Count：0
 
@@ -9,7 +9,7 @@ Active Task Count：0
 
 ## 1. Active Tasks
 
-none。T004按用户补充“不进行监控”停止后续查询；构建继续由GitHub执行，最终结果未知。Git交付与单次触发已完成，回执文档补交后不再编排。
+none。T005已完成main快进合并推送及两支对齐；回执仅文档补交，主工作区保留test。未触发/监控CI，现有构建结果unknown。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,8 @@ none。T004按用户补充“不进行监控”停止后续查询；构建继续
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+2026-11-21 / T-2026-11-21-005 / complete T8：main/956ecf4快进合入test/e82f8df并push成功，四个既有提交完整保留、无冲突；完整tree一致，远端main/test均e82f8df、本地0/0。入口/任务/全局记忆与内置ADB文档同步后关闭；本回执只补Markdown，两支保持相同SHA，主工作区保留test。版本不变，不新增构建/监控/设备或发布动作。STATE/WORK-T005-r2 / CE-01/02 / N/A — no decision delta。[任务](../docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。
 
 2026-11-21 / T-2026-11-21-004 / complete T8（调整后的Git交付与触发范围）：T002保活与T003文案已一并提交推送test/b12cbdb，32文件757增/224删，远端SHA一致；18:38:40 Asia/Tokyo单次Both/常规编译HTTP204，run44890553076精确head_sha。用户随后要求不监控，已停止所有后续运行/日志/产物查询，不取消或重触发，最终结果unknown；最后18:40:22两平台准备环境中。任务与Build/Debug/Matrix/全局记忆同步后关闭，回执仅文档补交；main/版本保持，设备NOT_RUN。STATE/WORK-T004-r3 / CE-01—03 / N/A — no decision delta。[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。
 
