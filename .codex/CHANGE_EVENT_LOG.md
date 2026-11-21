@@ -1,5 +1,27 @@
 # OpenWorld Change Event Log
 
+## CE-20261121-T001-05：test提交与双端编译授权
+
+用户要求先提交推送、执行双编译、说明修改和使用。重新核对test/956ecf4、远端main/test一致、工作区完整任务文件和diff。授权stage/commit/push本任务到test、Build-Clients-BT.yml / Both / 常规编译以及结果核对；既有临时签名和Actions测试产物，不是生产发布。更新任务、STATE/WORK-r3，T7等待精确提交与运行回执，不自动合main或改号。
+
+## CE-20261121-T001-04：按用户要求对齐 main/test 后继续开发
+
+用户明确要求先同步对齐再test修改，并要求以后每次合test到main后、回test开发前先对齐最新main。已fetch核对两远端，保存58份任务文件至stash 3bd0f1e6f63a2d89c5f4b26aa7c8cf1da6f10aca，test由609aec9快进956ecf4并推送。ls-remote证实main/test均956ecf482ac173af710aa7b6ea0b9de2bc3b4d60，ahead/behind0/0，test02不存在。恢复改造：29份Java/Dart/Manifest/R8/许可文本Git规范化blob相同，16份文档顶部冲突保留主分支历史并合入本任务记录，索引无未合并或暂存。stash保留供恢复，不自动删除。
+
+新增docs/BASELINE/29_EMBEDDED_ADB_ALIGNED_BASELINE_2026-11-21.md，保留同步前初稿快照；同步任务/ADR/领域文档当前基点、DEVELOPMENT_WORKFLOW.md/AGENTS.md分支流程及全局记忆。版本沿用main2.0.26/2.0.26+59、无额外改号。源码交付完成T8，STATE/WORK-20261121-001-r2；新ADB实现仍仅test工作区，未提交推送、未构建/设备/CI/发布。此事件后同步收尾属于同一事件。
+
+## CE-20261121-T001-03：合同与源码交付
+
+同步docs/AI_ENGINEERING的00/01/02、08/09/10/11、12/13/14及新增16_EMBEDDED_ADB.md，docs/ADR/0030及0018/0025/README、docs/BASELINE/27及索引、TEST_MATRIX.md、EXTERNAL_ASSET_REGISTRY.md、任务记录和全局记忆/入口指针。D-038 / STATE、WORK-20261121-001-r1；T8仅源码和已授权Git操作交付。新增ADB-P01—P12均NOT_RUN；没有构建/设备/CI/发布证据，不自动提交推送改造。分支追问核实test...main为0/14，基点功能源码无差异；main版本/文档未反向合入test。
+
+## CE-20261121-T001-02：内置执行后端与双端状态
+
+用户C2批准范围：flutter/android/app/src/main/java/com/openworld/me/localadb/新增AdbChannel、PrivilegedProtocol、PrivilegedSystem、OpenWorldPrivilegedService、PrivilegedBridge、PrivilegedProvider；既有AdbShell/AdbStreamCompat、LocalAdbClient/Manager/Commands/KeepAlive/Accessibility/Mirror/Touch/Privacy/Screenshot/ScreenshotSession/Layout/Paste/Keyboard改用独立FD，无线端口仅显式bootstrap。flutter/android/app/src/main/AndroidManifest.xml、local-adb.pro注册保留；assets/adb-privileged新增Apache-2.0 LICENSE/NOTICE。Flutter的mobile/adb/local_adb_bridge.dart、local_adb_page.dart和desktop/adb/remote_adb_controller.dart、remote_adb_menu.dart区分配对/激活/停用，旧端兼容。正常执行不自动adbd恢复，保留原relay认证/owner/只读/developer-priority/媒体和原Kotlin生命周期。21份Java括号、Manifest、资产hash/许可、调用点及diff审查；修正取消/死亡/旧服务退出/固定touch资产路径等边界。V0，不含编译或真机；新源码未提交/推送。
+
+## CE-20261121-T001-01
+
+2026-11-21 / T-2026-11-21-001：用户C3授权删除test02、合并test到main并推送、返回test；C2授权实施本应用专用内置特权服务。test02=609aec9无独有提交，仅本地存在，已安全删除。main既有merge956ecf4已包含test/609aec9，merge无新增提交；推送origin/main由d75a950至956ecf4并核实。当前test/609aec9。新增docs/tasks/T-2026-11-21-001-embedded-adb.md并登记.codex/CURRENT_WORK.md；本日志同事件。未构建/测试/设备操作，未提交推送新实现。
+
 ## CE-20261115-T002-02：配置选择与本地合并交付
 
 2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。

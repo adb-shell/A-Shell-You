@@ -29,16 +29,16 @@ final class LocalAdbCommands {
     int running() { return running.size(); }
     int queued() { return queued.size(); }
 
-    void submit(String owner, String requestId, int port, String command, LocalAdbManager.Reply reply) {
-        if (!shellReady.get() || port <= 0) {
-            reply.notExecuted("disconnected", "请先连接 ADB 并验证 Shell。");
+    void submit(String owner, String requestId, String command, LocalAdbManager.Reply reply) {
+        if (!shellReady.get()) {
+            reply.notExecuted("disconnected", "请先激活内置 ADB 能力。");
             return;
         }
         if (running.size() + queued.size() >= 8) {
             reply.notExecuted("busy", "ADB 命令队列已满，请等待或取消已有命令。");
             return;
         }
-        queued.add(new Job(owner, requestId, port, command, reply));
+        queued.add(new Job(owner, requestId, command, reply));
         changed.run();
         startNext();
     }
@@ -92,7 +92,7 @@ final class LocalAdbCommands {
         String failure = null;
         boolean shellStarted = false;
         try {
-            job.client.connect(job.port, job.cancelled);
+            job.client.connect(job.cancelled);
             if (!shellReady.get() || job.cancelled.get()) throw new InterruptedException();
             shellStarted = true;
             result = job.client.runShell(job.command, job.cancelled);
@@ -127,7 +127,6 @@ final class LocalAdbCommands {
 
     private final class Job {
         final String owner, requestId;
-        final int port;
         final LocalAdbManager.Reply reply;
         final LocalAdbClient client = new LocalAdbClient(context);
         final AtomicBoolean cancelled = new AtomicBoolean();
@@ -136,8 +135,8 @@ final class LocalAdbCommands {
         Runnable timeout;
         Thread thread;
 
-        Job(String owner, String requestId, int port, String command, LocalAdbManager.Reply reply) {
-            this.owner = owner; this.requestId = requestId; this.port = port;
+        Job(String owner, String requestId, String command, LocalAdbManager.Reply reply) {
+            this.owner = owner; this.requestId = requestId;
             this.command = command; this.reply = reply;
         }
     }

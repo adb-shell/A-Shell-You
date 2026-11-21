@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261115-002-r2`
-Last Updated：2026-11-15
-Active Task Count：0
+Registry Revision：`WORK-20261121-001-r3`
+Last Updated：2026-11-21
+Active Task Count：1
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-none；T002按用户选择整合test配置与UDID改动，交付本地main合并；未推送或编译。
+T-2026-11-21-001 / active T7：用户授权将完整ADB改造提交推送test并执行双端常规编译，随后说明改动及用法。基点956ecf4，版本2.0.26保持；Build-Clients-BT.yml / Both / 常规编译，先推送核对SHA再dispatch并核对结果。无main合并/生产发布；CE-20261121-T001-05。下方旧关闭记录为前阶段。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,8 @@ none；T002按用户选择整合test配置与UDID改动，交付本地main合并
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+2026-11-21 / T-2026-11-21-001 / complete T8：test02删除，main已有合并推送；按用户后续要求test快进同步并推送956ecf4，远端main/test同SHA、0/0。保全并恢复29份代码/清单/许可，16份文档冲突已解决；当前test工作区内置ADB方案源码完成、未提交，版本沿用2.0.26。无线调试仅用于显式激活，常态Binder/FD执行，服务失效需重新激活；V0检查完成，正式V1—V4全部NOT_RUN。无新改造提交推送/构建/CI/发布。用户分支对齐流程已记录；stash 3bd0f1e保留恢复点。STATE/WORK-20261121-001-r2 / CE-20261121-T001-01—04 / D-038 / ADR-0030 / Baseline29。[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)。下方保留此前关闭记录。
 
 2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。
 

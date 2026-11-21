@@ -19,7 +19,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.github.muntashirakon.adb.AdbStream;
 
 /** One device-owned video or screenshot source, isolated from shared shell and product capture. */
 final class LocalAdbMirror {
@@ -35,7 +34,7 @@ final class LocalAdbMirror {
     private long generation;
     private boolean nativeReady;
     private String mode = "h264";
-    private int pendingPort;
+    private boolean pendingStart;
     private String pendingMode;
     private String phase = "idle";
 
@@ -58,15 +57,15 @@ final class LocalAdbMirror {
     }
 
     synchronized void unavailable() {
-        publish(active == null ? "error" : phase, "请先完成 ADB 连接并验证 Shell，等待当前 ADB 操作结束。");
+        publish(active == null ? "error" : phase, "请先激活内置 ADB 能力，等待当前 ADB 操作结束。");
     }
 
-    synchronized void start(int port, String mode) {
+    synchronized void start(String mode) {
         if (!nativeReady) return;
-        if (!shellReady.get() || port <= 0 || port > 65535) { unavailable(); return; }
+        if (!shellReady.get()) { unavailable(); return; }
         if (active != null) {
             if (!active.cancelled.get() && active.mode.equals(mode)) { publish(phase, ""); return; }
-            pendingPort = port;
+            pendingStart = true;
             pendingMode = mode;
             stopCurrent("");
             return;
@@ -74,7 +73,7 @@ final class LocalAdbMirror {
         this.mode = mode;
         generation++;
         Run run;
-        try { run = new Run(generation, port, mode); }
+        try { run = new Run(generation, mode); }
         catch (RuntimeException e) { publish("error", "无法读取安卓屏幕尺寸，请稍后重试。"); return; }
         active = run;
         publish("starting", "");
@@ -85,14 +84,14 @@ final class LocalAdbMirror {
     }
 
     synchronized void stop(String reason) {
-        pendingPort = 0;
+        pendingStart = false;
         stopCurrent(reason);
     }
 
     synchronized void stopMode(String target) {
         // A delayed close from another PC must not tear down a different source.
         // Preserve a replacement mode already requested while the old one exits.
-        if (pendingPort > 0 && target.equals(pendingMode)) pendingPort = 0;
+        if (pendingStart && target.equals(pendingMode)) pendingStart = false;
         if (active != null && target.equals(active.mode)) stopCurrent("");
         else publish(phase, "");
     }
@@ -123,7 +122,7 @@ final class LocalAdbMirror {
             try {
                 if (run.profile.maxSize() != AdbCaptureProfile.current(context).maxSize()) {
                     // Ordinary capture recalculates its integer divisor on rotation; do the same independently.
-                    pendingPort = run.port; pendingMode = run.mode; stopCurrent("");
+                    pendingStart = true; pendingMode = run.mode; stopCurrent("");
                 }
             } catch (RuntimeException e) { stop("屏幕尺寸读取失败，请重新开启 ADB 画面。"); }
         }
@@ -139,17 +138,16 @@ final class LocalAdbMirror {
         if (active != run) return;
         active = null;
         publish(run.failure.isEmpty() ? "idle" : "error", run.failure);
-        if (pendingPort > 0) {
-            int port = pendingPort;
+        if (pendingStart) {
             String mode = pendingMode;
-            pendingPort = 0;
-            start(port, mode);
+            pendingStart = false;
+            start(mode);
         }
     }
 
     private void capture(Run run) {
         try {
-            run.client.connect(run.port, run.cancelled);
+            run.client.connect(run.cancelled);
             if (!"h264".equals(run.mode)) { captureScreenshots(run); return; }
             int[] encoding = run.profile.encoding();
             String scid = String.format(Locale.US, "%08x", new SecureRandom().nextInt() & 0x7fffffff);
@@ -164,18 +162,18 @@ final class LocalAdbMirror {
                     + " video_bit_rate=" + encoding[0]
                     + " send_device_meta=false send_dummy_byte=false power_on=false"
                     + " cleanup=true log_level=error";
-            try (AdbStream process = run.client.openMirrorStream("shell,v2,raw:" + command)) {
+            try (AdbChannel process = run.client.openMirrorStream("shell,v2,raw:" + command)) {
                 Thread output = new Thread(() -> drainProcess(run, process), "openworld-scrcpy-output");
                 output.setDaemon(true);
                 output.start();
-                AdbStream video = null;
+                AdbChannel video = null;
                 long deadline = SystemClock.elapsedRealtime() + 10000;
                 while (!run.cancelled.get() && SystemClock.elapsedRealtime() < deadline) {
                     try { video = run.client.openMirrorStream("localabstract:scrcpy_" + scid); break; }
                     catch (IOException e) { Thread.sleep(150); }
                 }
                 if (video == null) throw new IOException("Server socket unavailable");
-                try (AdbStream stream = video) {
+                try (AdbChannel stream = video) {
                     run.profileThread = new Thread(() -> updateProfile(run, stream), "openworld-adb-video-profile");
                     run.profileThread.setDaemon(true); run.profileThread.start();
                     readVideo(run, stream);
@@ -185,9 +183,9 @@ final class LocalAdbMirror {
         } catch (Exception | LinkageError e) {
             if (!run.cancelled.get()) run.failure = e instanceof LocalAdbLayout.Failure || e instanceof LocalAdbScreenshot.Failure
                     ? e.getMessage() : "layout".equals(run.mode)
-                    ? "ADB 穿透独立 Shell 通道建立失败，请确认无线调试及 ADB Shell 连接后重试。"
-                    : "jpeg".equals(run.mode) ? "ADB 系统截图失败，请确认无线调试及 Shell 连接。系统保护内容仍受截图限制。"
-                    : "ADB 投屏失败，请确认无线调试仍开启并重新连接。设备编码器可能不支持当前采集。";
+                    ? "ADB 穿透独立 Shell 通道建立失败，请确认内置 ADB 能力已激活后重试。"
+                    : "jpeg".equals(run.mode) ? "ADB 系统截图失败，请确认内置 ADB 能力已激活。系统保护内容仍受截图限制。"
+                    : "ADB 投屏失败，请确认内置 ADB 能力已激活。设备编码器可能不支持当前采集。";
         } catch (OutOfMemoryError e) {
             run.failure = "ADB 画面内存不足，已停止本次采集。";
         } finally {
@@ -204,7 +202,7 @@ final class LocalAdbMirror {
         }
     }
 
-    private void updateProfile(Run run, AdbStream video) {
+    private void updateProfile(Run run, AdbChannel video) {
         try {
             while (!run.cancelled.get() && !run.profileClosed) {
                 int[] encoding = AdbCaptureProfile.current(context).encoding();
@@ -225,7 +223,7 @@ final class LocalAdbMirror {
         boolean streaming = false;
         byte[] previous = null;
         long lastSent = 0;
-        try (LocalAdbScreenshot capture = new LocalAdbScreenshot(context, run.port);
+        try (LocalAdbScreenshot capture = new LocalAdbScreenshot(context);
              LocalAdbLayout layout = "layout".equals(run.mode) ? new LocalAdbLayout(context, run.client, run.cancelled) : null) {
           while (!run.cancelled.get()) {
             long started = SystemClock.elapsedRealtime();
@@ -250,7 +248,7 @@ final class LocalAdbMirror {
         }
     }
 
-    private void drainProcess(Run run, AdbStream stream) {
+    private void drainProcess(Run run, AdbChannel stream) {
         ByteArrayOutputStream diagnostics = new ByteArrayOutputStream();
         Integer exitCode = null;
         try {
@@ -282,7 +280,7 @@ final class LocalAdbMirror {
         }
     }
 
-    private void readVideo(Run run, AdbStream stream) throws Exception {
+    private void readVideo(Run run, AdbChannel stream) throws Exception {
         byte[] codec = new byte[4];
         readFully(run, stream, codec);
         if (ByteBuffer.wrap(codec).getInt() != 0x68323634) throw new IOException("Expected H264");
@@ -328,7 +326,7 @@ final class LocalAdbMirror {
         StringBuilder hex = new StringBuilder();
         for (byte b : hash.digest()) hex.append(String.format(Locale.US, "%02x", b & 255));
         if (!HASH.contentEquals(hex)) throw new IOException("Server checksum mismatch");
-        try (AdbStream sync = client.openMirrorStream("sync:"); InputStream in = context.getAssets().open(ASSET)) {
+        try (AdbChannel sync = client.openMirrorStream("sync:"); InputStream in = context.getAssets().open(ASSET)) {
             byte[] destination = (path + ",33152").getBytes(StandardCharsets.US_ASCII); // regular file 0600
             writeSync(sync, "SEND", destination, destination.length);
             byte[] chunk = new byte[32768];
@@ -353,13 +351,13 @@ final class LocalAdbMirror {
         }
     }
 
-    private static void writeSync(AdbStream stream, String id, byte[] data, int size) throws IOException {
+    private static void writeSync(AdbChannel stream, String id, byte[] data, int size) throws IOException {
         byte[] packet = ByteBuffer.allocate(size + 8).order(ByteOrder.LITTLE_ENDIAN)
                 .put(id.getBytes(StandardCharsets.US_ASCII)).putInt(size).put(data, 0, size).array();
         AdbStreamCompat.write(stream, packet);
     }
 
-    private static void readFully(Run run, AdbStream stream, byte[] bytes) throws IOException {
+    private static void readFully(Run run, AdbChannel stream, byte[] bytes) throws IOException {
         int offset = 0;
         while (offset < bytes.length) {
             if (run.cancelled.get() || Thread.currentThread().isInterrupted()) throw new IOException("Stopped");
@@ -371,7 +369,6 @@ final class LocalAdbMirror {
 
     private final class Run {
         final long id;
-        final int port;
         final String mode;
         final AdbCaptureProfile profile = AdbCaptureProfile.current(context);
         final LocalAdbClient client = new LocalAdbClient(context, true);
@@ -383,6 +380,6 @@ final class LocalAdbMirror {
         long stopAt;
         Thread thread;
         ScheduledFuture<?> watchdog;
-        Run(long id, int port, String mode) { this.id = id; this.port = port; this.mode = mode; }
+        Run(long id, String mode) { this.id = id; this.mode = mode; }
     }
 }

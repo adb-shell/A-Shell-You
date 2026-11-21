@@ -10,7 +10,6 @@ import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.github.muntashirakon.adb.AdbStream;
 
 /** Unicode clipboard/paste over the existing scrcpy control socket, never a shell script. */
 final class LocalAdbPaste {
@@ -46,7 +45,7 @@ final class LocalAdbPaste {
         return request;
     }
 
-    void writeNext(AdbStream stream) throws IOException {
+    void writeNext(AdbChannel stream) throws IOException {
         byte[] packet;
         synchronized (this) {
             Request request = pending.peek();
@@ -71,7 +70,7 @@ final class LocalAdbPaste {
         }
     }
 
-    void readAcks(AdbStream stream, AtomicBoolean cancelled) throws IOException {
+    void readAcks(AdbChannel stream, AtomicBoolean cancelled) throws IOException {
         byte[] packet = new byte[9];
         while (!cancelled.get()) {
             int offset = 0;

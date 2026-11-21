@@ -1,5 +1,7 @@
 # ADR-0025: ADB执行通道隔离与设备状态推送
 
+2026-11-21 amendment：[ADR-0030](0030-app-private-privileged-service.md)替代各通道独立连接adbd及健康循环自动无线恢复；独立通道改为Binder授予的FD，状态推送/owner隔离和禁止命令重放保持。下文保留原决策时点事实。
+
 - Date / Status：2026-10-14 / accepted implementation，retrospective backfill；D-030 / T-2026-10-14-005。
 - Source：80887c1、f7bcb70、ee4c99b；当前7607349。用户此前要求多PC同步、并发执行、独立关停及故障修复，本轮授权补齐文档；没有新增产品实现。
 - 补充ADR-0018/0021—0024；替代ADR-0020中“没有状态推送、所有变化需查询”的描述，保留无QR和无PC周期status的决定。

@@ -1,5 +1,9 @@
 # OpenWorld Project Memory
 
+2026-11-21最新回执：按用户后续明确要求，test已快进到main/956ecf4并推送；远端main/test同SHA、0/0差距。当前test在main最新2.0.26基线上恢复完整ADB改造，29份源码/清单/许可内容保全，16份文档冲突已解决，新实现仍未提交/编译。长期流程：每次test合main后，返回test开发前先对齐最新main并保护未提交工作，见DEVELOPMENT_WORKFLOW.md。Baseline29 / CE-20261121-T001-04 / STATE、WORK-20261121-001-r2；下方为同步前及更早时点记录。
+
+2026-11-21 / T-2026-11-21-001：在test/609aec9完成本应用专属内置ADB服务源码；无线调试只用于显式激活，日常Shell/媒体/输入通过Binder/FD，服务死亡必须重新激活。只服务开放世界，无独立Shizuku依赖；来源Apache-2.0固定revision。配对/激活/停用UI、权限/取消/重绑定及12项正式用例已登记，只有V0，无构建/设备结果，新源码未提交。test02已删除，已有main合并956ecf4已推送；test仍在原基点，main多14个历史提交但基点功能源码相同，主要版本/文档差异未反合入。当前状态/授权以STATE、WORK-20261121-001-r1及[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)为准，D-038/ADR-0030；下方旧授权不延续。
+
 2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。
 
 以下记录按原观察时点保留：

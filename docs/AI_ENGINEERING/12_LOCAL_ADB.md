@@ -1,5 +1,7 @@
 # OpenWorld 本机 ADB / Local ADB
 
+2026-11-21当前执行合同：[内置权限服务](16_EMBEDDED_ADB.md)。无线调试只用于显式配对/激活；`connected` 表示经验证且存活的本应用专属Binder服务，普通执行无无线端口参数。App重建重绑定，停止/重启需重新激活；下文持续adbd连接和自动恢复描述为旧实现。test工作区V0，尚未构建/真机验证。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 当前实现基线：0dbe202，2026-10-19源码复核，见[Baseline22](../BASELINE/22_RESTORED_SOURCE_BASELINE_2026-10-19.md)。配对/UID连接验证、独立命令、进程状态推送、有限断链恢复和本应用电池优化豁免均在此源码内。[13_REMOTE_ADB](13_REMOTE_ADB.md)和[14_ADB_MIRROR](14_ADB_MIRROR.md)分别记录PC控制与媒体/输入；本轮只同步文档，未构建或真机验证。

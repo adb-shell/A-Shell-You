@@ -1,5 +1,7 @@
 # OpenWorld 构建系统 / Build System
 
+2026-11-21 T001：内置ADB服务新增Java入口/provider、Manifest和R8规则，以及Shizuku Apache-2.0 LICENSE/NOTICE资产；无Gradle/Maven/native工具链或二进制升级，无FRB/JNI签名生成。正式Release必须验证app_process入口可加载、provider身份核对、Android30/31/33+隐藏接口适配及APK许可打包。当前test未提交实现，仅V0，未编译或触发CI；[任务与验证需求](../tasks/T-2026-11-21-001-embedded-adb.md)。此前构建结果不覆盖此改造。
+
 2026-11-15 T001：UDID展示移除源码test/696a87b已推送；09:27:19 UTC / 18:27:19 Asia/Tokyo触发Both/常规编译，HTTP204受理。按用户要求不监控，不查询新运行/日志/产物，最终结果未知；只补回执文档、不二次编排。见[任务](../tasks/T-2026-11-15-001-hide-desktop-udid.md)。
 
 当前整合输入为main/5d2d2e9与test/a8abdd4，见[Baseline28](../BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)及[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。保留Rust/portable 2.0.26、Flutter 2.0.26+59与OpenWorld产品身份，纳入服务器配置、PC切换及编译/CI修复。本轮只合并推送；历史编排受理及离线检查不能证明合并后编译或运行通过。

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.github.muntashirakon.adb.AdbStream;
 
 /** scrcpy control-only server: ADB touch works with ANY existing frame source or no video. */
 final class LocalAdbTouch {
@@ -28,7 +27,7 @@ final class LocalAdbTouch {
     private final ArrayDeque<Event> queue = new ArrayDeque<>();
     private Run active;
     private boolean priority;
-    private int port;
+    private boolean enabled;
     private long retryAfter;
     private long revision;
     private int failures;
@@ -39,9 +38,13 @@ final class LocalAdbTouch {
         this.context = context.getApplicationContext(); this.shellReady = shellReady;
     }
 
-    synchronized void enable(int port) {
-        this.port = port;
-        if (!shellReady.get() || port <= 0 || active != null || SystemClock.elapsedRealtime() < retryAfter) return;
+    synchronized void enable() {
+        enabled = true;
+        startIfReady();
+    }
+
+    private synchronized void startIfReady() {
+        if (!shellReady.get() || !enabled || active != null || SystemClock.elapsedRealtime() < retryAfter) return;
         if (!priority) { priority = true; AdbTouchCoordinates.releaseAccessibilityTouch(); }
         publish(false, "");
         Run run = new Run();
@@ -76,7 +79,7 @@ final class LocalAdbTouch {
     }
 
     synchronized void stop() {
-        port = 0;
+        enabled = false;
         priority = false;
         queue.clear();
         if (active != null) {
@@ -104,10 +107,10 @@ final class LocalAdbTouch {
     }
 
     private synchronized void text(String owner, String requestId, byte[] text, boolean paste, LocalAdbManager.Reply reply) {
-        if (!shellReady.get() || port <= 0) {
-            reply.failure("disconnected", "请先连接并验证 ADB Shell。"); return;
+        if (!shellReady.get() || !enabled) {
+            reply.failure("disconnected", "请先激活内置 ADB 能力。"); return;
         }
-        enable(port);
+        startIfReady();
         if (active == null || active.cancelled.get()) {
             reply.failure("busy", "ADB 输入连接正在恢复，请稍后重试。"); return;
         }
@@ -128,7 +131,7 @@ final class LocalAdbTouch {
         if (!shellReady.get()) { if (priority) stop(); return active != null; }
         if (!allowed) { release(owner); return true; }
         if (event.length > 20 * 1024) return true;
-        enable(port);
+        startIfReady();
         if (active != null && !active.cancelled.get()) {
             active.keyboard.offer(owner, event);
             notifyAll();
@@ -150,7 +153,7 @@ final class LocalAdbTouch {
         } else if (mask == 0 || mask == 8 || mask == 16) { cursor[0] = x * scale; cursor[1] = y * scale; }
         if (!shellReady.get()) { if (priority) stop(); return active != null; }
         if (!allowed) { release(owner); return true; }
-        enable(port);
+        startIfReady();
         if (kind == 0) {
             if (mask == 4) offer(new Event(owner, 0, cursor[0], cursor[1]));
             else if (mask == 5) offer(new Event(owner, 2, cursor[0], cursor[1]));
@@ -174,7 +177,7 @@ final class LocalAdbTouch {
         if ((width > height) != (metrics.widthPixels > metrics.heightPixels)) { release(owner); return; }
         int px = (int) ((long) Math.max(0, Math.min(x, width - 1)) * metrics.widthPixels / width);
         int py = (int) ((long) Math.max(0, Math.min(y, height - 1)) * metrics.heightPixels / height);
-        enable(port);
+        startIfReady();
         offer(new Event(owner, action, px, py));
     }
 
@@ -210,11 +213,11 @@ final class LocalAdbTouch {
     private void control(Run run) {
         String failure = "";
         try {
-            run.client.connect(run.port, run.cancelled);
+            run.client.connect(run.cancelled);
             String path = "/data/local/tmp/openworld-scrcpy-touch-5.0.1.jar";
             LocalAdbMirror.push(context, run.client, run.cancelled, path);
             String scid = String.format(Locale.US, "%08x", new SecureRandom().nextInt() & 0x7fffffff);
-            try (AdbStream process = run.client.openMirrorStream("shell,v2,raw:sh")) {
+            try (AdbChannel process = run.client.openMirrorStream("shell,v2,raw:sh")) {
                 // Keep a bounded module cache: an old process must not unlink its replacement.
                 String command = "CLASSPATH=" + path
                         + " app_process / com.genymobile.scrcpy.Server 5.0.1 scid=" + scid
@@ -239,14 +242,14 @@ final class LocalAdbTouch {
                 }, "openworld-adb-touch-output");
                 output.setDaemon(true);
                 output.start();
-                AdbStream control = null;
+                AdbChannel control = null;
                 long deadline = SystemClock.elapsedRealtime() + 10000;
                 while (!run.cancelled.get() && SystemClock.elapsedRealtime() < deadline) {
                     try { control = run.client.openMirrorStream("localabstract:scrcpy_" + scid); break; }
                     catch (IOException e) { Thread.sleep(100); }
                 }
                 if (control == null) throw new IOException("Input socket unavailable");
-                try (AdbStream stream = control) {
+                try (AdbChannel stream = control) {
                   try {
                     Thread replies = new Thread(() -> {
                         try { run.paste.readAcks(stream, run.cancelled); }
@@ -342,16 +345,16 @@ final class LocalAdbTouch {
         failures = Math.min(5, failures + 1);
         int delay = 1000 * failures;
         retryAfter = SystemClock.elapsedRealtime() + delay;
-        priority = port > 0 && shellReady.get();
+        priority = enabled && shellReady.get();
         publish(false, run.failure.isEmpty() ? failure : run.failure);
         if (priority) main.postDelayed(() -> {
             synchronized (LocalAdbTouch.this) {
-                if (revision == run.id && active == null && port > 0 && shellReady.get()) enable(port);
+                if (revision == run.id && active == null && enabled && shellReady.get()) startIfReady();
             }
         }, delay + 100);
     }
 
-    private static void writeTouch(AdbStream stream, int action, int x, int y, int width, int height) throws IOException {
+    private static void writeTouch(AdbChannel stream, int action, int x, int y, int width, int height) throws IOException {
         byte[] packet = ByteBuffer.allocate(32).put((byte) 2).put((byte) action).putLong(0)
                 .putInt(x).putInt(y).putShort((short) width).putShort((short) height)
                 .putShort((short) (action == 1 ? 0 : 65535)).putInt(0).putInt(0).array();
@@ -360,7 +363,6 @@ final class LocalAdbTouch {
 
     private final class Run {
         final long id = ++revision;
-        final int port = LocalAdbTouch.this.port;
         final AtomicBoolean cancelled = new AtomicBoolean();
         final LocalAdbPaste paste = new LocalAdbPaste();
         final LocalAdbKeyboard keyboard = new LocalAdbKeyboard();

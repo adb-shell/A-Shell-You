@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.github.muntashirakon.adb.AdbConnection;
-import io.github.muntashirakon.adb.AdbStream;
 
 /** Android shell-v2 framing: channel byte, little-endian length, payload; exit is channel 3. */
 final class AdbShell {
@@ -18,12 +17,16 @@ final class AdbShell {
 
     static Map<String, Object> execute(AdbConnection connection, String command,
                                       AtomicBoolean cancelled) throws Exception {
+        return execute(new AdbChannel(AdbStreamCompat.open(connection, "shell,v2,raw:" + command)), cancelled);
+    }
+
+    static Map<String, Object> execute(AdbChannel transport, AtomicBoolean cancelled) throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Integer exitCode = null;
         boolean truncated = false;
         // Read to the explicit exit packet. libadb 3.1.1's legacy shell EOF path may wait
         // indefinitely or discard buffered bytes when CLSE races with the final output.
-        try (AdbStream stream = AdbStreamCompat.open(connection, "shell,v2,raw:" + command)) {
+        try (AdbChannel stream = transport) {
             // AdbStreamCompat already encodes OPEN by UTF-8 byte length. Execute like
             // adb shell <command>, rather than feeding a nested sh via command stdin:
             // child commands must not consume the remaining lines of the script.
@@ -64,7 +67,7 @@ final class AdbShell {
         return result;
     }
 
-    private static void readFully(AdbStream stream, byte[] buffer, int length,
+    private static void readFully(AdbChannel stream, byte[] buffer, int length,
                                   AtomicBoolean cancelled) throws IOException {
         int offset = 0;
         while (offset < length) {

@@ -1,5 +1,26 @@
 # OpenWorld Commercial Test Matrix
 
+## 2026-11-21 内置 ADB 权限服务 / T001
+
+test工作区实现，源码V0核对；以下产品验收均NOT_RUN，历史ADB/CI结果不能替代。合同见[16_EMBEDDED_ADB](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)。
+
+| Case | 验证目标 / 判据 | Level | Result |
+|---|---|---|---|
+| ADB-P01 | 正式Android各ABI/Release/R8与PC构建；app_process/provider入口及NOTICE/LICENSE在APK中，真实id -u后才ready | V2/V3 | NOT_RUN |
+| ADB-P02 | 首次配对激活、已有密钥免配对激活、错误端口/码/超时、取消与迟到Binder、重复激活旧服务退出；失败无假ready | V3 | NOT_RUN |
+| ADB-P03 | ready后关闭无线调试，再关闭Wi-Fi改蜂窝；Shell、投屏/无视/节点/黑屏、触摸/键盘/中文粘贴/剪贴板、本应用无障碍与电池豁免可调用；无adbd扫描或命令重放 | V3/V4 | NOT_RUN |
+| ADB-P04 | Wi-Fi↔蜂窝断网后恢复、同PC/另一PC远控重连；服务仍活时无需重新配对激活，原relay认证和密码流程保持 | V3/V4 | NOT_RUN |
+| ADB-P05 | App进程被回收后用户重新打开，绑定存活服务；force-stop期间不被服务拉起；媒体helper/触点/遮罩无孤留 | V3 | NOT_RUN |
+| ADB-P06 | 服务被系统杀/设备重启/USB调试或开发者选项关闭：真实失效，不能用paired伪造ready；再开启无线调试用旧身份显式激活 | V3 | NOT_RUN |
+| ADB-P07 | 两PC命令/媒体并发，单owner取消和普通断开仅释放自身通道；明确disconnect/revoke使全局能力停止，落盘失败如实报错 | V3/V4 | NOT_RUN |
+| ADB-P08 | 普通第三方UID向provider/泄漏Binder事务、错generation/安装路径/owner、无认证/只读/被开发者暂停PC全部拒绝；合法请求仍可用 | V4 | NOT_RUN |
+| ADB-P09 | 超长/畸形shell-v2、异常FD/EOF/输出超限、24通道耗尽、阻塞子进程/连续取消；资源有界、无自动命令重放 | V3/V4 | NOT_RUN |
+| ADB-P10 | 错scrcpy路径/长度/hash、目标符号链接/并行上传、更新/卸载重装后旧服务；无任意文件覆盖、无旧安装授权沿用 | V3/V4 | NOT_RUN |
+| ADB-P11 | 新PC↔旧Android、旧PC↔新Android、双端新版本；状态revision/instance乱序、旧disconnect语义、旧APK回退及R8 | V3/V4 | NOT_RUN |
+| ADB-P12 | Android11—16及主要OEM、工作资料/次用户、锁屏/息屏/电池限制；记录关闭无线调试后服务存活时间及SELinux异常 | V3/V4 | NOT_RUN |
+
+同时回归ADB-R20—R25、ADB-M21—M32、ADB-A01—A06、NET-04、DSP-09、原普通采集和ZEGO。V0差异/调用点/Manifest/许可检查与以上运行用例分开记录；无本轮编排或产物结果。
+
 2026-11-15 / T002 / AMG-02（V0）：UDID页面和服务器配置完整采用test/609aec9，其余917个非Markdown文件保持main/d75a950；文档冲突、历史保留、链接及diff检查通过。按用户选择采用test配置，保留main版本；仅本地合并，不推送/构建。见[任务](docs/tasks/T-2026-11-15-002-accessibility-main-merge.md)。
 
 2026-11-15 / T001：FLT-07的PC底栏标识显示移除完成V0：标签、UUID渲染/复制及专用请求无残留，状态/服务器切换保持；FLT-06账号UUID调用未改。V1/V3未运行，V2已于09:27:19 UTC触发test/696a87b的Both/常规编译并获HTTP204；不监控、结果未知，窄/宽窗口视觉验收待证。见[任务](docs/tasks/T-2026-11-15-001-hide-desktop-udid.md)。

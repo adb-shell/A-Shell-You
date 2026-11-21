@@ -1,9 +1,17 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261115-002-r2`
-Last Updated / Observed At：2026-11-15（Asia/Tokyo）
-Evidence Scope：`repository-observed / local merge V0；build/window unverified`
+State Revision：`STATE-20261121-001-r3`
+Last Updated / Observed At：2026-11-21（Asia/Tokyo）
+Evidence Scope：`repository-observed / V0 + authorized main/test alignment and push; new implementation unbuilt`
+
+最新续接：T001 active/T7，用户授权本任务test提交推送及Android/Windows双编译，参数Build-Clients-BT.yml / Both / 常规编译；基点test/main956ecf4，版本2.0.26保持。当前V0通过，提交SHA/运行回执待补，正式设备仍NOT_RUN。STATE/WORK-20261121-001-r3 / CE-20261121-T001-05；以下源码交付记录保留前阶段时点。
+
+当前快照：T-2026-11-21-001 / complete T8（源码/Git范围）；当前test/956ecf482ac173af710aa7b6ea0b9de2bc3b4d60，内置ADB权限服务及配套文档未提交。无线调试仅显式配对/激活，正常命令与媒体用Binder/FD，服务存活时可跨网络继续调用；死亡/重启需重新激活。实际Release/OEM/蜂窝/双PC验证NOT_RUN。沿用main的Rust/portable2.0.26、Flutter2.0.26+59，原Rust/JNI/FRB/Kotlin运行时与服务器配置无本任务业务增量。
+
+Git回执：test02本地删除（无独有提交、远端无此分支），main既有合并956ecf4已推送。用户随后明确授权先对齐再test开发；保存改造后将test快进到最新main并推送，远端main/test均956ecf4，ahead/behind为0/0。恢复29份代码/清单/许可文件内容全部一致，16份文档顶部冲突已保留双方历史并解决；索引无冲突/暂存。stash 3bd0f1e保留恢复点，新ADB代码未提交推送。用户长期要求合test到main后、回test作业前先对齐最新main，已写入DEVELOPMENT_WORKFLOW/AGENTS。
+
+Latest：D-038 / ADR-0030 / OW-BL-2026-11-21-956ecf4-embedded-adb-worktree / CE-20261121-T001-01—04 / WORK-20261121-001-r2；[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)、[执行合同](../docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)。后续正式构建、设备矩阵及新源码提交需另按当前授权推进；无本轮CI触发/监控。下方均为历史时点，不代表当前分支或验证结论。
 
 2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。
 

@@ -1,5 +1,9 @@
 # OpenWorld Task History
 
+2026-11-21 / T001续接最终回执：按用户明确“先同步对齐，再test基于main最新源码修改”，保全当前任务至stash后将test快进并推送到main/956ecf4，远端SHA一致。恢复29份代码/清单/许可Git内容一致，16份文档冲突保留双方历史；当前test工作区仅本任务新实现和记录，索引清洁、stash恢复点保留。继承2.0.26版本并记录今后合并后回test前先对齐的流程。源码完成，正式构建/运行未授权未执行，新ADB未提交推送。Baseline29 / CE-20261121-T001-04 / STATE、WORK-20261121-001-r2 / complete T8；此前未同步描述为历史时点。
+
+2026-11-21 / [T-2026-11-21-001](../docs/tasks/T-2026-11-21-001-embedded-adb.md)：用户先确认本应用专属内置Shizuku式能力，再授权删除test02、合test到main推送、回test实施。test02无独有提交已删除；main已包含test，推送956ecf4完成，工作区回test/609aec9。新增6个Java组件/15份既有Java适配、Manifest/R8、4份Dart状态交互及许可文档；原relay/owner/只读/developer-priority、媒体协议、Kotlin采集/ZEGO保持。日常执行不再连adbd，显式停用/服务死亡失效关闭。V0调用/结构/Manifest/hash/diff审查完成；V1—V4、ABI/R8/OEM/蜂窝/多PC未执行。新实现未提交推送，无构建/CI/发布授权。分支追问核实main多14历史提交、功能源码基点相同，未批准反向同步。D-038/ADR-0030/Baseline27，STATE/WORK-20261121-001-r1，CE-20261121-T001-01—03；complete/T8仅已授权源码/Git交付。
+
 2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。
 
 以下记录按原观察时点保留：

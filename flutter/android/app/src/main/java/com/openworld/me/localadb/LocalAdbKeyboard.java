@@ -13,7 +13,6 @@ import java.util.Map;
 
 import hbb.KeyEventConverter;
 import hbb.MessageOuterClass;
-import io.github.muntashirakon.adb.AdbStream;
 
 /** Typing on the existing control socket; never holds a device key between PC events. */
 final class LocalAdbKeyboard {
@@ -95,7 +94,7 @@ final class LocalAdbKeyboard {
 
     synchronized boolean hasPending() { return !pending.isEmpty(); }
 
-    void writeNext(AdbStream stream) throws IOException {
+    void writeNext(AdbChannel stream) throws IOException {
         Stroke next;
         synchronized (this) { next = pending.poll(); }
         if (next == null) return;

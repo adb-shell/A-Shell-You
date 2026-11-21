@@ -1,5 +1,7 @@
 # OpenWorld 完整架构 / Architecture
 
+2026-11-21 ADB执行层更新：`LocalAdbManager → LocalAdbClient → PrivilegedBridge → OpenWorldPrivilegedService`。`connectAdb`只在显式激活时使用；命令/媒体各自绑定服务并持有FD。App UID、独立shell进程、PC owner权限分层，配对身份/服务存活/远控连接分别判断。[完整合同](16_EMBEDDED_ADB.md) / ADR-0030；源码V0，未构建。
+
 当前整合输入为main/5d2d2e9与test/a8abdd4，见[Baseline28](../BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)及[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。保留Rust/portable 2.0.26、Flutter 2.0.26+59与OpenWorld产品身份，纳入服务器配置、PC切换及编译/CI修复。本轮只合并推送；历史编排受理及离线检查不能证明合并后编译或运行通过。
 
 ## 2026-11-12：Server Profiles

@@ -23,7 +23,7 @@ import io.github.muntashirakon.adb.AdbStream;
  * Member names below are pinned in local-adb.pro; never silently fall back to open().
  */
 final class AdbStreamCompat {
-    static void write(AdbStream stream, byte[] bytes) throws IOException {
+    static void write(AdbChannel stream, byte[] bytes) throws IOException {
         // libadb only waits for OKAY once per write(), not once per internal fragment.
         // Keep writes within the minimum negotiated ADB payload on every device.
         for (int offset = 0; offset < bytes.length;) {

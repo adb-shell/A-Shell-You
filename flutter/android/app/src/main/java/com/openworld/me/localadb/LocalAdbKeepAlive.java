@@ -22,7 +22,7 @@ final class LocalAdbKeepAlive {
         this.changed = changed;
     }
 
-    void update(boolean ready, int port) {
+    void update(boolean ready) {
         if (!ready) {
             attempted = false;
             return;
@@ -35,7 +35,7 @@ final class LocalAdbKeepAlive {
         if (Boolean.TRUE.equals(isExempt())) return;
         busy = true;
         String argument = "'+" + packageName.replace("'", "'\\''") + "'";
-        commands.submit("adb-keep-alive", "", port,
+        commands.submit("adb-keep-alive", "",
                 "dumpsys deviceidle whitelist " + argument, new LocalAdbManager.Reply() {
                     @Override public void success(Object value) {
                         boolean commandOk = value instanceof Map

@@ -1,5 +1,7 @@
 # OpenWorld 工程路线图 / Roadmap
 
+2026-11-21优先验收项：[内置ADB权限服务](16_EMBEDDED_ADB.md)源码已实现，仍需Release/R8及Android11—16/OEM/SELinux、关闭无线调试/蜂窝持续使用、App重建、撤销与多PC负例证据（ADB-P01—P12）。在正式证据取得前不宣称全ROM“一次激活直到重启必定有效”；第三方App授权管理不在当前计划。
+
 2026-11-07当前身份：开放世界 / OpenWorld / openworld / com.openworld.me。原功能合同保持，ADB及构建引用同步；实施起点为main/7361d39，已交付test；准确源码SHA、编译run与验收结果以本次迁移回执为准。见[本次迁移](OPENWORLD_IDENTITY_MIGRATION_2026-11-07.md)。下文旧日期记录为功能沿革，产品术语/路径按当前名称映射；冻结原文以对应Task/Baseline为准。
 
 接管基线：2026-07-12  

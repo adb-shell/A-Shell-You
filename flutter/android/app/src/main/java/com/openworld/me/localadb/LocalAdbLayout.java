@@ -14,12 +14,11 @@ import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicBoolean;
-import io.github.muntashirakon.adb.AdbStream;
 
 /** One private shell reader plus app-side drawing; no dumps on disk or dependency on ADB video. */
 final class LocalAdbLayout implements AutoCloseable {
     private final Context context;
-    private final AdbStream stream;
+    private final AdbChannel stream;
     private final LocalAdbClient client;
     private final AtomicBoolean cancelled;
     private final AtomicBoolean closed = new AtomicBoolean();
@@ -94,7 +93,7 @@ final class LocalAdbLayout implements AutoCloseable {
             throw new InterruptedIOException("Stopped");
         } catch (IOException error) {
             if (appStage == 5) throw new Failure("ADB 穿透节点已收到，但 App 画面编码失败。");
-            throw new Failure(receivedFrame ? "ADB 穿透节点数据流已中断，请确认无线调试连接后重试。"
+            throw new Failure(receivedFrame ? "ADB 穿透节点数据流已中断，请确认内置 ADB 能力已激活后重试。"
                     : "ADB 穿透首帧前数据流中断（阶段：" + Failure.phase(helperStage) + " / API " + helperApi + "）。");
         } catch (RuntimeException | LinkageError error) {
             throw new Failure(appStage, Build.VERSION.SDK_INT, error.getClass().getSimpleName());
@@ -159,11 +158,11 @@ final class LocalAdbLayout implements AutoCloseable {
     }
 
     private static final class Stdout extends InputStream {
-        private final AdbStream stream;
+        private final AdbChannel stream;
         private final AtomicBoolean cancelled;
         private final byte[] header = new byte[5], discard = new byte[4096];
         private int remaining;
-        Stdout(AdbStream stream, AtomicBoolean cancelled) { this.stream = stream; this.cancelled = cancelled; }
+        Stdout(AdbChannel stream, AtomicBoolean cancelled) { this.stream = stream; this.cancelled = cancelled; }
         private void fully(byte[] bytes) throws IOException {
             int offset = 0;
             while (offset < bytes.length) {

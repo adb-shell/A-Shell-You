@@ -14,7 +14,6 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.github.muntashirakon.adb.AdbStream;
 
 /** Bounded, binary shell-v2 screenshots. No Accessibility, MediaProjection or disk files. */
 final class LocalAdbScreenshot implements AutoCloseable {
@@ -30,9 +29,8 @@ final class LocalAdbScreenshot implements AutoCloseable {
     private LocalAdbScreenshotSession session;
     private boolean screencapFallback;
     private final Context context;
-    private final int port;
 
-    LocalAdbScreenshot(Context context, int port) { this.context = context; this.port = port; }
+    LocalAdbScreenshot(Context context) { this.context = context; }
 
     static final class Frame {
         final int width, height, sourceWidth, sourceHeight;
@@ -54,7 +52,7 @@ final class LocalAdbScreenshot implements AutoCloseable {
                 // Probe only once per run. OEMs lacking UiAutomation screenshot support
                 // retain the existing independent system screencap implementation.
                 screencapFallback = true;
-                client.connect(port, cancelled);
+                client.connect(cancelled);
             }
         }
         if (!pngFallback) {
@@ -74,7 +72,7 @@ final class LocalAdbScreenshot implements AutoCloseable {
 
     private static void readScreenshot(LocalAdbClient client, AtomicBoolean cancelled, boolean png,
                                        OutputStream output, int limit) throws Exception {
-        try (AdbStream stream = client.openMirrorStream("shell,v2,raw:screencap" + (png ? " -p" : ""))) {
+        try (AdbChannel stream = client.openMirrorStream("shell,v2,raw:screencap" + (png ? " -p" : ""))) {
             byte[] header = new byte[5];
             byte[] buffer = new byte[32768];
             int stderr = 0;
@@ -215,7 +213,7 @@ final class LocalAdbScreenshot implements AutoCloseable {
         }
     }
 
-    private static void readFully(AdbStream stream, byte[] buffer, int size, AtomicBoolean cancelled) throws IOException {
+    private static void readFully(AdbChannel stream, byte[] buffer, int size, AtomicBoolean cancelled) throws IOException {
         int offset = 0;
         while (offset < size) {
             if (cancelled.get() || Thread.currentThread().isInterrupted()) throw new IOException("Stopped");

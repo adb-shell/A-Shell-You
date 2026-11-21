@@ -1,5 +1,7 @@
 # OpenWorld External Asset Registry
 
+2026-11-21 / `EXT-REF-SHIZUKU-001`：SOURCE-ADAPTED / RikkaApps Shizuku，固定revision `b844bc491f1790c72328e1a8e5b2349f8978f0ea`，Apache-2.0。使用BinderSender/ShizukuService/IContentProviderUtils的递送/UID观察机制及starter.cpp的会话脱离思路，改写为本应用专属Java服务；不是引入上游APK、Maven库、native starter或第三方App授权。上游owner Shizuku contributors，集成owner OpenWorld维护者；修改说明和原许可位于`flutter/android/app/src/main/assets/adb-privileged/NOTICE.md`及`LICENSE.Shizuku`，源码`PrivilegedSystem`/`OpenWorldPrivilegedService`。完整[来源](https://github.com/RikkaApps/Shizuku/tree/b844bc491f1790c72328e1a8e5b2349f8978f0ea)和[执行合同](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)。许可/provenance源码核对，Release打包/SBOM/真机待证；既有EXT-LIB-ADB-004—007与EXT-BIN-SCRCPY-001保持，无新外部服务或下载二进制。
+
 2026-11-15 T002：本地main合并按用户选择采用test/609aec9已提交的完整服务器配置。仅客户端源码来源变化，无实际服务器部署、连接测试或凭据操作；外部资产状态不提升。见[任务](docs/tasks/T-2026-11-15-002-accessibility-main-merge.md)。
 
 2026-11-12 T001续修：Ubuntu依赖源增加kernel.org和MIT SIPB的HTTPS Ubuntu镜像作为固定后备，主源不可达/索引失败时顺序尝试；包与索引仍须通过系统Ubuntu archive keyring签名和有效期验证，不新增信任密钥。已只读核对服务归属及六套InRelease返回；这不证明GitHub runner网络恢复。产品服务、地址/凭据无变更。详见[续修](docs/tasks/T-2026-11-12-001-build-fixes.md)。

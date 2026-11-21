@@ -1,5 +1,7 @@
 # OpenWorld Engineering Baseline Index
 
+2026-11-21当前工作区：[Baseline29：对齐main后的内置ADB](29_EMBEDDED_ADB_ALIGNED_BASELINE_2026-11-21.md)，ID `OW-BL-2026-11-21-956ecf4-embedded-adb-worktree`。main/test本地远端均956ecf4，test恢复未提交改造，版本2.0.26 / 2.0.26+59；V0，构建/设备NOT_RUN。此前[609aec9上的实现初稿](27_EMBEDDED_ADB_BASELINE_2026-11-21.md)冻结保留，不再是当前基点；下方历史交付不覆盖新改造。
+
 当前合并基线：[Baseline28：统一配置合并main](28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)，`OW-BL-2026-11-12-unified-config-main`；main/5d2d2e9与test/a8abdd4，版本2.0.26 / 2.0.26+59保持，当前任务为[T002](../tasks/T-2026-11-12-002-unified-config-main-merge.md)，仅Git交付和V0，无本轮编译。
 
 此前合并基线：[Baseline27：main版本与开发者画面优先](27_MAIN_DEVELOPER_PRIORITY_BASELINE_2026-11-11.md)，`OW-BL-2026-11-11-main-developer-priority-merge`。输入main/9040c53与test/51292c2，保留Rust/portable 2.0.26、Flutter 2.0.26+59，并纳入开发者画面优先源码25bc2ce；准确提交/推送回执见[当前任务](../tasks/T-2026-11-11-001-docs-main-merge.md)。本轮仅V0，不触发或监控构建。

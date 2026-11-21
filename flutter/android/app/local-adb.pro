@@ -1,6 +1,9 @@
 # libadb accesses Conscrypt reflectively; SPAKE2 and Conscrypt contain JNI entrypoints.
 -keep class org.conscrypt.** { *; }
 -keep class io.github.muntashirakon.crypto.spake2.** { *; }
+# app_process entry and shell-to-app provider must survive Release shrinking/renaming.
+-keep class com.openworld.me.localadb.OpenWorldPrivilegedService { *; }
+-keep class com.openworld.me.localadb.PrivilegedProvider { *; }
 # Independent JNI bridge and the pinned libadb TLS identity-cache reset.
 -keep class com.openworld.me.localadb.RemoteAdbNative { *; }
 -keep class com.openworld.me.localadb.LocalAdbMirror { native <methods>; }

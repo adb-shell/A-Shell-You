@@ -1,5 +1,7 @@
 # OpenWorld 项目总览 / Project Overview
 
+2026-11-21：[ADB内置权限服务](16_EMBEDDED_ADB.md)已在test工作区实现；无线调试仅显式激活，后续命令/媒体通过本机专属Binder和FD运行。仅供开放世界，无独立Shizuku App依赖；PC仍走既有已认证relay。服务死亡/重启需重新激活，V2/V3未验。
+
 当前整合输入为main/5d2d2e9与test/a8abdd4，见[Baseline28](../BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)及[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。保留Rust/portable 2.0.26、Flutter 2.0.26+59与OpenWorld产品身份，纳入服务器配置、PC切换及编译/CI修复。本轮只合并推送；历史编排受理及离线检查不能证明合并后编译或运行通过。
 
 ## 2026-11-12：集中服务器配置

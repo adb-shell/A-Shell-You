@@ -1,5 +1,7 @@
 # ADR-0018: Device-owned ADB with Remote Session Requests
 
+2026-11-21 amendment：[ADR-0030](0030-app-private-privileged-service.md)替代常态无线adbd执行，改为显式激活本应用专属shell/Binder服务；本记录的设备归属、已认证PC调用、owner取消和协议边界保持。下文保留原决策时点事实。
+
 T006更新：本文保留T004决策历史；keyboard gate、发现范围、UI和时限由 [ADR-0019](0019-adb-discovery-and-independent-control.md) 更新，当前合同见13_REMOTE_ADB。
 
 - Status：accepted for implementation；V0 only，V2/V3/V4 待验证。

@@ -1,5 +1,9 @@
 # OpenWorld AI Changelog
 
+2026-11-21 / T001最终交付：用户补充要求先对齐main再test开发，已保存改造、快进并推送test至956ecf4；远端main/test同SHA、0/0。恢复29份代码/许可内容无变化，16份文档冲突合并保全，主分支版本2.0.26继承，分支流程写入长期规则。内置ADB源码和配套文档在test工作区完成，未提交/编译；ADB-P01—P12正式验收NOT_RUN。Baseline29 / CE-20261121-T001-04 / STATE、WORK-20261121-001-r2，complete/T8仅已授权源码/Git范围；下方为同步前及更早记录。
+
+2026-11-21 / T-2026-11-21-001：完成test02删除、已有main merge956ecf4推送及返回test。内置本应用专属shell服务、Binder验证/FD通道、正常执行去除无线端口、双端配对/激活/停用语义和合同文档已在test/609aec9工作区实现。21份Java词法括号、Manifest、固定资产hash、调用点/身份/取消/死亡/旧版本边界及diff检查完成；V0不是编译或设备PASS。新增ADB-P01—P12全部NOT_RUN，未触发CI/提交推送改造。用户询问behind14，核实功能源码基点相同，main版本与历史独有，未反向合并。D-038、ADR-0030、Baseline27；STATE/WORK-20261121-001-r1、CE-20261121-T001-01—03，T8仅指定源码/Git范围交付。
+
 2026-11-15 / T-2026-11-15-002：main/d75a950合入test/609aec9，提交说明“增加无障碍”。按用户明确选择采用test完整服务器配置，Android/PC1当前相同、PC2独立；UDID显示移除来自test，既有ADB无障碍功能及其余917个非Markdown文件保持main，版本2.0.26 / 2.0.26+59。AMG-02来源与文档冲突检查通过；complete/T8仅本地合并提交交付，具体SHA以Git为准。本轮未推送、未编译或监控，test工作区与分支保持。 [任务](../docs/tasks/T-2026-11-15-002-accessibility-main-merge.md) / STATE、WORK-20261115-002-r2 / CE-20261115-T002-01/02；Baseline28，沿用既有ADR。
 
 以下记录按原观察时点保留：

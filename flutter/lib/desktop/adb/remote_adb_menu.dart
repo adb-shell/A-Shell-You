@@ -9,7 +9,7 @@ import 'remote_adb_controller.dart';
 import 'remote_adb_session_state.dart';
 
 const remoteAdbActions = <String, String>{
-  'pair': '远程 ADB 连接配对',
+  'pair': '远程 ADB 配对与激活',
   'shell': '远程 ADB 命令',
   'paste': '远程输入',
   'accessibilityEnable': '开启本应用无障碍',
@@ -17,7 +17,7 @@ const remoteAdbActions = <String, String>{
   'accessibilityPause': '暂停本应用无障碍',
   'revoke': '撤销 ADB 配对',
   'status': '刷新 ADB 状态',
-  'disconnect': '断开 ADB 连接',
+  'disconnect': '停用 / 断开 ADB',
 };
 
 /// One-click operation, independent of the toolbar's mounted lifetime. No dialog,
@@ -34,7 +34,7 @@ Future<void> runRemoteAdbAccessibility(SessionID sessionId,
       final reason = adb.state['accessibilityError'];
       showToast(reason is String && reason.isNotEmpty ? reason : '远端版本不支持本应用无障碍控制。');
     } else if (!adb.connected) {
-      showToast('请先连接 ADB 并验证 Shell。');
+      showToast(adb.activationSupported ? '请先激活手机的 ADB 能力。' : '请先连接 ADB 并验证 Shell。');
     } else {
       await adb.run(action);
       showToast(adb.message, timeout: const Duration(seconds: 5));
@@ -130,6 +130,12 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
   );
 
   List<Widget> _pairing() => [
+    if (adb.activationSupported) ...[
+      Text(adb.connected ? '本机能力已激活，无需再次配对或开启无线调试。'
+          : '无线调试用于启动内置服务。激活后，服务存活期间可使用 Wi-Fi 或移动数据远程操作。'),
+      const Text('请保留开发者选项和 USB 调试开启。手机重启或系统终止服务后需要重新激活，通常无需重新配对。'),
+      const SizedBox(height: 12),
+    ],
     const Text('首次配对：手机开启“无线调试”，选择“使用配对码配对设备”，并保持系统配对码窗口打开。'),
     const SizedBox(height: 10),
     Wrap(spacing: 8, runSpacing: 8, children: [
@@ -144,7 +150,9 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
     if (!adb.stale && !adb.discoverySupported)
       const Text('手机 ADB 模块版本较旧，请先更新 Android 安装包以使用端口扫描和一键配对。'),
     if (mode == 'auto')
-      const Text('输入 6 位配对码后点击“配对并连接 ADB”。手机会自动发现端口、配对并连接；发现失败时可切换“手动端口”。')
+      Text(adb.activationSupported
+          ? '首次输入 6 位配对码后点击“首次配对并激活”。手机会自动发现端口并启动内置服务；发现失败时可切换“手动端口”。'
+          : '输入 6 位配对码后点击“配对并连接 ADB”。手机会自动发现端口、配对并连接；发现失败时可切换“手动端口”。')
     else ...[
       const Text('配对端口见系统配对码窗口，连接端口见无线调试首页。填写的端口会直接使用，留空则自动发现；也可扫描填充后核对。'),
       const SizedBox(height: 12),
@@ -162,13 +170,15 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
         enabled: !adb.busy, obscureText: true, maxLength: 6,
         autocorrect: false, enableSuggestions: false, keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onSubmitted: (_) { if (adb.ready && adb.discoverySupported) _pair(); },
+        onSubmitted: (_) { if (adb.ready && adb.discoverySupported && !adb.connected) _pair(); },
         decoration: const InputDecoration(labelText: '6 位配对码', border: OutlineInputBorder())),
-    ElevatedButton.icon(onPressed: adb.ready && adb.discoverySupported ? _pair : null,
-        icon: const Icon(Icons.link), label: const Text('配对并连接 ADB')),
+    ElevatedButton.icon(onPressed: adb.ready && adb.discoverySupported && !adb.connected ? _pair : null,
+        icon: const Icon(Icons.link), label: Text(adb.activationSupported ? '首次配对并激活' : '配对并连接 ADB')),
     const SizedBox(height: 12),
     const Divider(),
     Text(adb.stale ? '手机配对状态尚未确认，请点击刷新按钮查询。'
+        : adb.activationSupported && adb.connected ? '内置服务正在运行，后续 PC 重连可直接使用。'
+        : adb.activationSupported && adb.paired ? '已有配对记录。需要重新激活时开启无线调试，点击下方按钮，无需重新输入配对码。'
         : adb.paired ? '手机已有本应用配对记录。保持无线调试开启即可直接连接，无需填写配对码或打开配对码窗口。'
         : '以前已配对过？可以尝试直接连接，无需重复输入配对码。'),
     const SizedBox(height: 8),
@@ -176,14 +186,15 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
       final port = mode == 'manual' ? _port(connectPort) : 0;
       if (port != null) adb.run('connect', {'port': port});
     } : null, icon: const Icon(Icons.check_circle_outline),
-        label: const Text('我已配对，连接并验证 Shell')),
+        label: Text(adb.activationSupported ? adb.connected ? '复用已激活能力' : '我已配对，激活 ADB 能力' : '我已配对，连接并验证 Shell')),
   ];
 
   List<Widget> _shell() => [
     if (!adb.connected) ...[
-      const Text('当前 ADB 尚未连接。已有配对记录时，可直接连接后执行命令。'),
+      Text(adb.activationSupported ? '当前 ADB 能力尚未激活。已有配对记录时，开启无线调试后可直接激活。'
+          : '当前 ADB 尚未连接。已有配对记录时，可直接连接后执行命令。'),
       OutlinedButton(onPressed: adb.ready ? () => adb.run('connect', {'port': 0}) : null,
-          child: const Text('连接已配对的 ADB')),
+          child: Text(adb.activationSupported ? '激活已配对的 ADB' : '连接已配对的 ADB')),
     ],
     TextField(controller: command, enabled: !adb.busy, minLines: 2, maxLines: 5,
         maxLength: 4096, autocorrect: false, enableSuggestions: false,
@@ -255,7 +266,7 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
       const Text('手机版本尚不支持远程输入，请更新 Android 客户端。'),
     if (!adb.connected)
       OutlinedButton(onPressed: adb.ready ? () => adb.run('connect', {'port': 0}) : null,
-          child: const Text('连接已配对的 ADB')),
+          child: Text(adb.activationSupported ? '激活已配对的 ADB' : '连接已配对的 ADB')),
     Focus(canRequestFocus: false, onKeyEvent: _inputKey, child: TextField(
         controller: inputText, focusNode: inputFocus, autofocus: true,
         readOnly: adb.busy, minLines: 4, maxLines: 8,
@@ -286,15 +297,17 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
             child: const Text('确认撤销本应用 ADB 配对')),
       ];
       case 'disconnect': return [
-        const Text('断开所有 PC 共用的 ADB 连接，保留配对记录，之后可以直接重连。'),
+        Text(adb.activationSupported
+            ? '停止手机上的内置特权服务，所有 PC 的 ADB 功能都会停用；保留配对记录。下次需开启无线调试并重新激活。仅关闭远控窗口不会停用服务。'
+            : '断开所有 PC 共用的 ADB 连接，保留配对记录，之后可以直接重连。'),
         const SizedBox(height: 16),
-        ElevatedButton(onPressed: adb.ready && adb.connected ? () => adb.run('disconnect') : null,
-            child: const Text('确认断开 ADB')),
+        ElevatedButton(onPressed: adb.ready && (adb.connected || adb.activationSupported) ? () => adb.run('disconnect') : null,
+            child: Text(adb.activationSupported ? '确认停用设备 ADB 能力' : '确认断开 ADB')),
       ];
       default: return [
         Text('配对记录：' + (adb.stale ? '状态未确认' : adb.paired ? '已保存' : '无记录')),
-        Text('Shell 状态：' + (adb.connected ? '连接并验证成功' : '尚未连接或状态失效')),
-        Text('上次成功连接端口：' + (adb.state['connectPort'] ?? 0).toString()),
+        Text('Shell 状态：' + (adb.connected ? '能力可用，身份验证成功' : '尚未就绪或状态失效')),
+        Text((adb.activationSupported ? '上次激活使用的无线端口：' : '上次成功连接端口：') + (adb.state['connectPort'] ?? 0).toString()),
         if (adb.state['keepAliveSupported'] == true) ...[
           const SizedBox(height: 12),
           Text('ADB 辅助保活：${adb.keepAliveSummary}'),
@@ -351,6 +364,9 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
                   Text((adb.state['phase'] ?? adb.state['operation'] ?? '处理中').toString()
                       + ' · 排队 ' + (adb.state['queued'] ?? 0).toString()),
                 SelectableText(adb.message),
+                if (adb.activationSupported && (adb.state['activationError'] ?? '').toString().isNotEmpty)
+                  Text(adb.state['activationError'].toString(),
+                      style: TextStyle(color: Theme.of(context).colorScheme.error)),
                 if (adb.statusError.isNotEmpty) SelectableText(adb.statusError,
                     style: TextStyle(color: Theme.of(context).colorScheme.error)),
                 if (validation.isNotEmpty) Text(validation, style: TextStyle(color: Theme.of(context).colorScheme.error)),

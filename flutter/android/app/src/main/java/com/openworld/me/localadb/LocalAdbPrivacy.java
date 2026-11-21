@@ -10,7 +10,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.github.muntashirakon.adb.AdbStream;
 
 /** Independent ADB-owned overlay. No Accessibility, screen power or capture service changes. */
 final class LocalAdbPrivacy {
@@ -19,7 +18,7 @@ final class LocalAdbPrivacy {
     private Run active;
     private String phase = "idle";
     private String error = "";
-    private int pendingPort;
+    private boolean pendingStart;
     private static native void state(String phase, String error);
 
     LocalAdbPrivacy(Context context, LocalAdbMirror.ShellReady shellReady) {
@@ -27,16 +26,16 @@ final class LocalAdbPrivacy {
         this.shellReady = shellReady;
     }
 
-    synchronized void start(int port) {
+    synchronized void start() {
         if (active != null) {
-            if (active.cancelled.get()) pendingPort = port;
+            if (active.cancelled.get()) pendingStart = true;
             publish(phase, error);
             return;
         }
-        if (!shellReady.get() || port <= 0 || port > 65535) {
-            publish("error", "请先连接 ADB 并验证 Shell。"); return;
+        if (!shellReady.get()) {
+            publish("error", "请先激活内置 ADB 能力。"); return;
         }
-        Run run = new Run(port);
+        Run run = new Run();
         active = run;
         publish("starting", "");
         run.thread = new Thread(() -> control(run), "openworld-adb-privacy");
@@ -70,7 +69,7 @@ final class LocalAdbPrivacy {
     }
 
     synchronized void stop() {
-        pendingPort = 0;
+        pendingStart = false;
         stopCurrent();
     }
 
@@ -93,9 +92,9 @@ final class LocalAdbPrivacy {
         if (run.guard != null) run.guard.interrupt();
         active = null;
         publish(run.failure.isEmpty() ? "idle" : "error", run.failure);
-        int port = pendingPort;
-        pendingPort = 0;
-        if (port > 0 && shellReady.get()) start(port);
+        boolean restart = pendingStart;
+        pendingStart = false;
+        if (restart && shellReady.get()) start();
     }
 
     private void control(Run run) {
@@ -105,13 +104,13 @@ final class LocalAdbPrivacy {
             byte[] hint = AdbPrivacyHint.render(context);
             if (run.cancelled.get()) return;
             operation = "ADB 连接";
-            run.client.connect(run.port, run.cancelled);
+            run.client.connect(run.cancelled);
             // This is the installed, signed base APK, not peer-supplied code or a downloaded binary.
             String apk = "'" + context.getApplicationInfo().sourceDir.replace("'", "'\"'\"'") + "'";
             String command = "shell,v2,raw:CLASSPATH=" + apk
                     + " exec app_process / com.openworld.me.localadb.AdbPrivacyOverlay";
             operation = "遮罩启动";
-            try (AdbStream process = run.client.openMirrorStream(command)) {
+            try (AdbChannel process = run.client.openMirrorStream(command)) {
               try {
                 writer = new Thread(() -> {
                     try {
@@ -177,7 +176,7 @@ final class LocalAdbPrivacy {
                         stopCurrent();
                     }
                 }
-                run.client.abort(); // unblock AdbStream.close before leaving the resource scope
+                run.client.abort(); // unblock AdbChannel.close before leaving the resource scope
               }
             }
         } catch (Exception | LinkageError failure) {
@@ -224,7 +223,7 @@ final class LocalAdbPrivacy {
         }
     }
 
-    private static void writeStartup(AdbStream stream, byte[] bytes, AtomicBoolean cancelled) throws IOException {
+    private static void writeStartup(AdbChannel stream, byte[] bytes, AtomicBoolean cancelled) throws IOException {
         // Keep each write within the minimum ADB payload; libadb 3.1.1 cannot safely
         // split arbitrary large writes. The inner length is big-endian, shell-v2 is LE.
         for (int offset = 0; offset < bytes.length;) {
@@ -237,7 +236,7 @@ final class LocalAdbPrivacy {
         }
     }
 
-    private static void readFully(AdbStream stream, byte[] buffer, int length) throws IOException {
+    private static void readFully(AdbChannel stream, byte[] buffer, int length) throws IOException {
         int offset = 0;
         while (offset < length) {
             int count = stream.read(buffer, offset, length - offset);
@@ -247,7 +246,6 @@ final class LocalAdbPrivacy {
     }
 
     private final class Run {
-        final int port;
         final long started = SystemClock.elapsedRealtime();
         final LocalAdbClient client = new LocalAdbClient(context, true);
         final AtomicBoolean cancelled = new AtomicBoolean();
@@ -259,6 +257,5 @@ final class LocalAdbPrivacy {
         long stopAt;
         Thread thread, guard;
         volatile Thread writer;
-        Run(int port) { this.port = port; }
     }
 }

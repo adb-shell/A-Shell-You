@@ -1,5 +1,11 @@
 # OpenWorld 安全模型 / Security Model
 
+## 2026-11-21：本应用专属 Shell 服务
+
+远程仍由既有已认证relay、键盘/只读和developer-priority端点控制。新增信任边界为App→Binder→独立shell：每次事务核对完整UID和当前包/APK安装身份；exported Provider仅接受shell/root递送，随后校验generation/协议/身份并执行真实UID probe。generation用于撤销/迟到回调隔离，不是防已有shell/root攻击者的秘密。没有第三方授权、通用Binder转发或对外adb TCP；单例abstract socket不accept请求。
+
+24通道上限、有限命令队列、FD关闭唤醒、owner取消及进程死亡lease保持资源边界；固定scrcpy资产sync核验路径/长度/SHA、随机独占临时文件。显式停用先内存拒绝，再持久化并停止服务；写盘失败如实报错，不能声称完成撤销。App重建只重绑定存活服务；force-stop不被自动拉起。Shell是任意命令既有高权限功能，取消不回滚系统副作用，已有远控鉴权强度风险不消失。详见[威胁与生命周期合同](16_EMBEDDED_ADB.md)、ADR-0030；UID拒绝、描述符耗尽、OEM/SELinux、重启/更新等攻击与运行验证均NOT_RUN。
+
 ## 2026-11-12：配置切换隔离
 
 PC1/PC2为独立信任环境；共用ID公钥不共享API Bearer授权。空闲切换、旧响应revision过滤、账号/设备/保存密码分区，未知/不完整配置拒绝。端点源码属于公开客户端配置，不能放服务私钥或固定RTC Token；现有broker凭据未修改/验证，旧HTTP部署保持既有风险。详见[15_SERVER_PROFILES](15_SERVER_PROFILES.md)与[ADR-0029](../ADR/0029-central-server-profiles.md)。

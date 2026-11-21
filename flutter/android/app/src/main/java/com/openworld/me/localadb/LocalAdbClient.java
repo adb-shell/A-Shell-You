@@ -2,6 +2,8 @@ package com.openworld.me.localadb;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Binder;
+import android.os.IBinder;
 
 import java.io.InterruptedIOException;
 import java.io.IOException;
@@ -14,10 +16,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.github.muntashirakon.adb.AdbConnection;
-import io.github.muntashirakon.adb.AdbStream;
 import io.github.muntashirakon.adb.PairingConnectionCtx;
 
-/** Worker-thread owner of a local ADB connection. No product JNI, services or peer protocol. */
+/** Worker-owned channel lease; normal calls use verified Binder, explicit activation uses adbd. */
 final class LocalAdbClient {
     static final class ConnectionFailure extends IOException {
         ConnectionFailure(boolean handshakeComplete) {
@@ -36,6 +37,10 @@ final class LocalAdbClient {
     private volatile AdbLocalSocket socket;
     private volatile AdbConnection connection;
     private volatile boolean shellVerified;
+    private volatile PrivilegedBridge.Binding binding;
+    private final IBinder lease = new Binder();
+    private final java.util.Set<AdbChannel> channels = new java.util.HashSet<>();
+    private long epoch;
 
     LocalAdbClient(Context context) {
         this(context, true);
@@ -47,6 +52,8 @@ final class LocalAdbClient {
     }
 
     boolean isConnected() {
+        PrivilegedBridge.Binding attached = binding;
+        if (attached != null) return attached == PrivilegedBridge.get(context).current();
         AdbConnection value = connection;
         AdbLocalSocket transport = socket;
         return shellVerified && value != null && transport != null && !transport.isClosed()
@@ -75,11 +82,22 @@ final class LocalAdbClient {
         }
     }
 
-    String connect(int port, AtomicBoolean cancelled) throws Exception {
-        return connect(port, cancelled, 10000);
+    String connect(AtomicBoolean cancelled) throws Exception {
+        // Wireless ports are activation hints only. Every normal execution lane
+        // binds to the already verified service, even when Wi-Fi/adbd are completely unavailable.
+        disconnect();
+        check(cancelled);
+        PrivilegedBridge.Binding value = PrivilegedBridge.get(context).current();
+        if (value == null) throw new IOException("ADB 能力尚未激活或已失效，请先激活内置服务。");
+        synchronized (channels) {
+            check(cancelled);
+            binding = value;
+        }
+        return "uid=" + value.uid;
     }
 
-    String connect(int port, AtomicBoolean cancelled, long timeoutMillis) throws Exception {
+    /** Only an explicit manager activation can open an adbd transport. */
+    String connectAdb(int port, AtomicBoolean cancelled, long timeoutMillis) throws Exception {
         disconnect();
         check(cancelled);
         // Bound TLS AND the first shell OPEN/read. libadb's OPEN wait has no deadline.
@@ -135,6 +153,7 @@ final class LocalAdbClient {
     Map<String, Object> runShell(String command, AtomicBoolean cancelled) throws Exception {
         if (!isConnected()) throw new IllegalStateException("Not connected");
         check(cancelled);
+        if (binding != null) return AdbShell.execute(openMirrorStream("shell,v2,raw:" + command), cancelled);
         AdbConnection value = connection;
         if (value == null) throw new IllegalStateException("Not connected");
         Map<String, Object> result = AdbShell.execute(value, command, cancelled);
@@ -142,11 +161,24 @@ final class LocalAdbClient {
         return result;
     }
 
-    // Used only by the mirror's private LocalAdbClient, never by the shared shell client.
-    AdbStream openMirrorStream(String destination) throws Exception {
+    // Each execution lane owns its own client and descriptors; no shared data stream.
+    AdbChannel openMirrorStream(String destination) throws Exception {
+        PrivilegedBridge.Binding attached;
+        long expected;
+        synchronized (channels) { attached = binding; expected = epoch; }
+        if (attached != null) {
+            if (attached != PrivilegedBridge.get(context).current()) throw new IOException("Service stopped");
+            AdbChannel stream = PrivilegedProtocol.open(attached.service, lease, destination);
+            synchronized (channels) {
+                if (epoch != expected || binding != attached) { stream.close(); throw new IOException("Cancelled"); }
+                channels.add(stream);
+                stream.onClose(() -> { synchronized (channels) { channels.remove(stream); } });
+            }
+            return stream;
+        }
         AdbConnection value = connection;
         if (!isConnected() || value == null) throw new IllegalStateException("ADB disconnected");
-        return AdbStreamCompat.open(value, destination);
+        return new AdbChannel(AdbStreamCompat.open(value, destination));
     }
 
     private AdbLocalSocket newTransport(int port, AtomicBoolean cancelled) throws Exception {
@@ -167,6 +199,14 @@ final class LocalAdbClient {
 
     /** Nonblocking cancellation, callable from the main thread while a worker is in native I/O. */
     void abort() {
+        AdbChannel[] current;
+        synchronized (channels) {
+            epoch++;
+            binding = null;
+            current = channels.toArray(new AdbChannel[0]);
+            channels.clear();
+        }
+        for (AdbChannel stream : current) try { stream.close(); } catch (IOException ignored) { }
         shellVerified = false;
         AdbLocalSocket value = socket;
         if (value != null) value.close();

@@ -1,5 +1,7 @@
 # OpenWorld 源码地图 / Source Map
 
+2026-11-21 ADB新增入口：`flutter/android/app/src/main/java/com/openworld/me/localadb/` 下 `OpenWorldPrivilegedService.java` 为app_process入口，`PrivilegedSystem.java`适配framework Binder，`PrivilegedProvider.java`递送服务，`PrivilegedBridge.java`验证/激活/撤销，`PrivilegedProtocol.java`与`AdbChannel.java`定义私有IPC及FD。原LocalAdbClient分离激活与正常执行；Manifest/local-adb.pro注册保留，assets/adb-privileged记录来源许可。见[16_EMBEDDED_ADB](16_EMBEDDED_ADB.md)。
+
 当前整合输入为main/5d2d2e9与test/a8abdd4，见[Baseline28](../BASELINE/28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)及[合并任务](../tasks/T-2026-11-12-002-unified-config-main-merge.md)。保留Rust/portable 2.0.26、Flutter 2.0.26+59与OpenWorld产品身份，纳入服务器配置、PC切换及编译/CI修复。本轮只合并推送；历史编排受理及离线检查不能证明合并后编译或运行通过。
 
 ## 服务器配置维护入口

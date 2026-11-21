@@ -40,6 +40,13 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true">
 
+        <!-- Only shell/root can hand off a Binder; all other callers are rejected in call(). -->
+        <provider
+            android:name="com.openworld.me.localadb.PrivilegedProvider"
+            android:authorities="${applicationId}.openworld.privileged"
+            android:exported="true"
+            android:grantUriPermissions="false" />
+
 
         <service
             android:name=".nZW99cdXQ0COhB2o"

@@ -10,12 +10,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.github.muntashirakon.adb.AdbStream;
 
 /** One outstanding screenshot request, with a private lease and bounded binary frames. */
 final class LocalAdbScreenshotSession implements AutoCloseable {
     private final LocalAdbClient client;
-    private final AdbStream stream;
+    private final AdbChannel stream;
     private final DataInputStream input;
     private final AtomicBoolean cancelled;
     private final AtomicBoolean closed = new AtomicBoolean();
@@ -67,11 +66,11 @@ final class LocalAdbScreenshotSession implements AutoCloseable {
     }
 
     private static final class Stdout extends InputStream {
-        private final AdbStream stream;
+        private final AdbChannel stream;
         private final AtomicBoolean cancelled;
         private final byte[] header = new byte[5], discard = new byte[4096];
         private int remaining;
-        Stdout(AdbStream stream, AtomicBoolean cancelled) { this.stream = stream; this.cancelled = cancelled; }
+        Stdout(AdbChannel stream, AtomicBoolean cancelled) { this.stream = stream; this.cancelled = cancelled; }
         private void fully(byte[] bytes) throws IOException {
             for (int offset = 0; offset < bytes.length;) {
                 if (cancelled.get()) throw new EOFException("Stopped");

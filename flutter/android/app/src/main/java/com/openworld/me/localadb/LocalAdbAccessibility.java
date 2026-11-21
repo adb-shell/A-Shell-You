@@ -110,7 +110,7 @@ final class LocalAdbAccessibility {
         value.put("accessibilityError", component == null ? unavailable : lastError);
     }
 
-    void execute(String owner, String requestId, int port, String method, LocalAdbManager.Reply reply) {
+    void execute(String owner, String requestId, String method, LocalAdbManager.Reply reply) {
         if (component == null) { reply.failure("unsupported", unavailable); return; }
         if (pending != null) { reply.failure("busy", "本应用无障碍操作正在执行，请稍后重试。"); return; }
         Boolean enabled = enabled();
@@ -135,7 +135,7 @@ final class LocalAdbAccessibility {
         lastError = "";
         changed.run();
         // A separate command socket; media, touch, identity and voice are not stopped.
-        commands.submit(owner, requestId, port, command(job.enable), new LocalAdbManager.Reply() {
+        commands.submit(owner, requestId, command(job.enable), new LocalAdbManager.Reply() {
             @Override public void success(Object value) {
                 if (pending != job) return;
                 if (job.cancelled) { finish(job, "cancelled", "操作已取消，请以当前无障碍状态为准。"); return; }
