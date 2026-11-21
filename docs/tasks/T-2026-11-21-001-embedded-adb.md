@@ -1,5 +1,29 @@
 # T-2026-11-21-001：内置本应用专用 Shell 权限服务
 
+## 源码与编译回执 / 2026-11-21
+
+最终结果：2026-11-21 08:46:24 UTC / 17:46:24 Asia/Tokyo，run44883517881以SUCCESS结束。Android Native job136783757028、Android APK job136785077063、Windows EXE job136783757208全部SUCCESS。Android arm64 Release、Windows x64客户端/portable构建，以及工作流既有包内容、临时测试签名校验和上传均通过。Android日志确认生成38.9MB APK；设备激活、关闭无线调试、蜂窝切换及OEM存活仍NOT_RUN。
+
+源码`febf7f0f20460a0bfffbc0ee0a2581828a30d7c0`（内置ADB权限服务，支持一次激活持续执行）已提交并推送origin/test；60文件、1811新增/222删除，staged diff检查通过，触发前本地/远端SHA一致且工作区clean。2026-11-21 08:09:13 UTC / 17:09:13 Asia/Tokyo提交Build-Clients-BT.yml（394791509）/ ref=test / Platform=Both / BuildMode=常规编译，HTTP204受理。[run44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)于08:09:15 UTC创建，head_sha与源码一致；仅此一次dispatch。
+
+使用步骤已补入[16_EMBEDDED_ADB](../AI_ENGINEERING/16_EMBEDDED_ADB.md)：更新测试包、首次配对激活/已有记录直接激活、确认ready后切网络、普通断开与全局停用区别、重启后重新激活。现有CI临时测试签名不能保证覆盖旧安装，卸载会清数据；真机验证仍NOT_RUN。
+
+产物均关联源码febf7f0，成品及build-info保留到2026-12-05；以下SHA256为GitHub Actions artifact digest，不能当作未经独立读取的内部文件hash。
+
+| 产物 | Artifact ID / 下载 | 字节 | Actions artifact SHA256 |
+|---|---|---|---|
+| Android arm64 APK | [14698978959](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881/artifacts/14698978959) | 38859826 | `083b8e833dbf41bcb4da86c48942f29a64583dc1400963ab3ad0d93e4579ad61` |
+| Windows x64 EXE | [14700455877](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881/artifacts/14700455877) | 41681816 | `2537975c403d34d8a6dd5c64eee2f17a032d12a5d5bfd9953cb4aca9565ba04e` |
+| Windows x64 Release ZIP | [14699743976](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881/artifacts/14699743976) | 49513995 | `e8a806b5fa5fec85a36316042269d0df5556c1f4beaf58509a1456754028820f` |
+
+Android build-info artifact14699043581、Windows build-info artifact14700366415提供CI的来源、哈希与测试签名记录。CI已执行包校验，不等于独立安装、运行或正式签名验收。
+
+## 本次交付关闭 / T8
+
+源码、提交推送、单次双端编译及结果核对已完成；后续本批仅提交推送回执和使用文档，不再次dispatch。仍在test，main保持956ecf4；版本2.0.26 / 2.0.26+59保持。源码与CI一一对应，文档补交不改变构建输入或产品行为。
+
+Memory Sync：STATE/WORK-20261121-001-r5；CE-20261121-T001-05—07记录续接授权、源码推送与最终编译。同步任务/TEST_MATRIX、08/09/16、BUILD_CLIENTS_ACTIONS、入口与全局记忆；D-038/ADR0030只补实施证据，N/A — no decision delta。Baseline29冻结不改，索引关联源码交付；External Asset Registry reviewed-no-change，无新增依赖、外部资产或版本。正式设备ADB-P02—P12和其他回归仍NOT_RUN；不宣称release-ready。Current Work在以上记录完成后最后关闭。
+
 ## 2026-11-21 交付续接授权 / T7
 
 用户本轮明确要求先提交推送、执行双编译，再说明改动和使用。当前test/956ecf4，工作区为上一阶段完整ADB改造及文档；远端test/main均956ecf4，diff检查通过，无他人新增工作。授权本任务stage/commit/push至test、既有Build-Clients-BT.yml / Platform=Both / BuildMode=常规编译及结果核对；沿用工作流临时测试签名和Actions测试产物，无main合并、生产签名、发布或额外改号。本节覆盖下方此前“未授权提交/构建”的历史边界。

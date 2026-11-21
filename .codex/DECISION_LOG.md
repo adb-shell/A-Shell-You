@@ -2,6 +2,8 @@
 
 ## D-038：无线调试只用于激活本应用专属 Shell 服务
 
+2026-11-21交付证据：实现已推送test/febf7f0，CI run44883517881的Android arm64及Windows x64构建全部SUCCESS。设备生命周期、切网存活与安全负例仍NOT_RUN；无新增决策、无生产发布批准。CE-20261121-T001-07；以下为实施时点。
+
 2026-11-21 / 用户明确“只服务开放世界，不依赖另装Shizuku”并批准“完成这个方案”，accepted for implementation。日常ADB命令/媒体转为独立app_process服务的Binder/FD执行，保持已认证relay、owner/只读/developer-priority；配对身份、服务存活与远控连接分别处理。显式停用撤销本设备能力，PC断开不撤销已完成激活，服务死亡不自动重配或重放。不是永久提权或第三方App授权框架。来源Apache-2.0固定revision/NOTICE、SDK隐藏接口和OEM存活验收见[ADR-0030](../docs/ADR/0030-app-private-privileged-service.md)及[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)。工作区源码V0，正式构建/设备/独立安全审查待证；无发布批准。
 
 ## D-037：ADB只控制当前远端应用的无障碍服务

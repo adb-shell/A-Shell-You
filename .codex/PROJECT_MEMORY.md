@@ -1,5 +1,7 @@
 # OpenWorld Project Memory
 
+2026-11-21源码与编译交付：test/febf7f0f20460a0bfffbc0ee0a2581828a30d7c0已推送内置ADB改造；main仍956ecf4，test新增提交属于对齐后的正常开发。Both/常规编译run44883517881精确head_sha匹配，17:46:24 Asia/Tokyo以SUCCESS结束，Android Native/APK、Windows EXE全部通过。使用说明包含首次激活、已有配对复用、切网络/重连、重启再激活及临时签名安装边界。回执仅文档补交，不再次编译；正式设备验收仍待证。STATE/WORK-r5 / CE-07；下方0/0与未提交是前阶段快照。
+
 2026-11-21最新回执：按用户后续明确要求，test已快进到main/956ecf4并推送；远端main/test同SHA、0/0差距。当前test在main最新2.0.26基线上恢复完整ADB改造，29份源码/清单/许可内容保全，16份文档冲突已解决，新实现仍未提交/编译。长期流程：每次test合main后，返回test开发前先对齐最新main并保护未提交工作，见DEVELOPMENT_WORKFLOW.md。Baseline29 / CE-20261121-T001-04 / STATE、WORK-20261121-001-r2；下方为同步前及更早时点记录。
 
 2026-11-21 / T-2026-11-21-001：在test/609aec9完成本应用专属内置ADB服务源码；无线调试只用于显式激活，日常Shell/媒体/输入通过Binder/FD，服务死亡必须重新激活。只服务开放世界，无独立Shizuku依赖；来源Apache-2.0固定revision。配对/激活/停用UI、权限/取消/重绑定及12项正式用例已登记，只有V0，无构建/设备结果，新源码未提交。test02已删除，已有main合并956ecf4已推送；test仍在原基点，main多14个历史提交但基点功能源码相同，主要版本/文档差异未反合入。当前状态/授权以STATE、WORK-20261121-001-r1及[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)为准，D-038/ADR-0030；下方旧授权不延续。

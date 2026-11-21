@@ -3,7 +3,7 @@
 - Status：accepted for implementation
 - Record Type：contemporaneous
 - Decision Date / Recorded Date / Last Reviewed：2026-11-21
-- Next Review：首次正式双端构建与设备验证
+- Next Review：首次设备激活、切网存活与安全负例验证
 - Decision Owner / Approvers：用户（本任务明确批准“只服务开放世界”及“完成这个方案”）
 - Security Reviewer / Release Reviewer：Codex 依据对应领域 Skill 静态自审；独立审查 unknown — release owner required
 - Scope：Android localadb、Flutter本机/PC状态及激活交互
@@ -12,8 +12,8 @@
 - Baseline / Test / Asset：OW-BL-2026-11-21-956ecf4-embedded-adb-worktree（同步前初稿609aec9另存） / ADB-P01—P12 / EXT-REF-SHIZUKU-001
 - Supersedes：0018/0025 的常态 adbd 连接与自动无线恢复部分；其他授权和独立通道决策保持
 - Superseded By：none
-- Implementation State：test工作区源码完成，未提交/构建
-- Evidence / Verification：V0；V1—V4 NOT_RUN，不是发布批准
+- Implementation State：test/febf7f0已推送，双端常规编译run44883517881全部SUCCESS
+- Evidence / Verification：V0与Android arm64/Windows x64 V2构建通过；设备/安全验收及独立产物审查NOT_RUN，不是发布批准
 
 ## Context / Drivers
 

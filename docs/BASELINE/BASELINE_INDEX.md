@@ -1,5 +1,7 @@
 # OpenWorld Engineering Baseline Index
 
+2026-11-21交付关联：Baseline29中的内置ADB实现已固化为test/febf7f0并推送；CI run44883517881精确匹配，Android arm64和Windows x64构建全部SUCCESS，设备仍NOT_RUN。源码/版本/依赖在本批回执中无新增变化，冻结的Baseline29不覆写；产物与使用步骤见[任务](../tasks/T-2026-11-21-001-embedded-adb.md)。下方“工作区未提交”是冻结时点。
+
 2026-11-21当前工作区：[Baseline29：对齐main后的内置ADB](29_EMBEDDED_ADB_ALIGNED_BASELINE_2026-11-21.md)，ID `OW-BL-2026-11-21-956ecf4-embedded-adb-worktree`。main/test本地远端均956ecf4，test恢复未提交改造，版本2.0.26 / 2.0.26+59；V0，构建/设备NOT_RUN。此前[609aec9上的实现初稿](27_EMBEDDED_ADB_BASELINE_2026-11-21.md)冻结保留，不再是当前基点；下方历史交付不覆盖新改造。
 
 当前合并基线：[Baseline28：统一配置合并main](28_UNIFIED_CONFIG_MAIN_BASELINE_2026-11-12.md)，`OW-BL-2026-11-12-unified-config-main`；main/5d2d2e9与test/a8abdd4，版本2.0.26 / 2.0.26+59保持，当前任务为[T002](../tasks/T-2026-11-12-002-unified-config-main-merge.md)，仅Git交付和V0，无本轮编译。

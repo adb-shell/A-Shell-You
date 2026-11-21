@@ -1,5 +1,13 @@
 # OpenWorld Change Event Log
 
+## CE-20261121-T001-07：双端成功、使用说明与交付关闭
+
+run44883517881于2026-11-21 08:46:24 UTC / 17:46:24 Asia/Tokyo以SUCCESS结束，源码febf7f0；Android Native/APK、Windows EXE全部成功，APK/EXE/ZIP与build-info已上传。同步任务产物链接/Actions digest、16_EMBEDDED_ADB操作步骤和实际边界、TEST_MATRIX的V2结果、08/09/BUILD_CLIENTS_ACTIONS、D-038/ADR0030实施证据、Baseline索引和入口/全局记忆；STATE/WORK-r5，T8关闭源码与编译交付范围。仅文档补交，不二次dispatch、不合main或改号。设备与安全验收仍NOT_RUN，现有临时签名不作为生产升级保证。没有新决策、依赖或外部资产，相关记录reviewed-no-change。
+
+## CE-20261121-T001-06：源码推送与双端编译启动
+
+test/febf7f0f20460a0bfffbc0ee0a2581828a30d7c0已提交推送，源码60文件，推送后HEAD与远端一致且clean。2026-11-21 08:09:13 UTC / 17:09:13 Asia/Tokyo提交394791509 / Build-Clients-BT.yml，ref=test、Platform=Both、BuildMode=常规编译，HTTP204；run44883517881精确head_sha匹配且Android Native、Windows EXE已启动，最终结论待核对。更新任务/16_EMBEDDED_ADB使用步骤与后续构建状态回执；不二次dispatch、不合main、不发布。代码语义不变，当前变化只属文档。
+
 ## CE-20261121-T001-05：test提交与双端编译授权
 
 用户要求先提交推送、执行双编译、说明修改和使用。重新核对test/956ecf4、远端main/test一致、工作区完整任务文件和diff。授权stage/commit/push本任务到test、Build-Clients-BT.yml / Both / 常规编译以及结果核对；既有临时签名和Actions测试产物，不是生产发布。更新任务、STATE/WORK-r3，T7等待精确提交与运行回执，不自动合main或改号。

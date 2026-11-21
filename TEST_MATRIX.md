@@ -2,11 +2,11 @@
 
 ## 2026-11-21 内置 ADB 权限服务 / T001
 
-test工作区实现，源码V0核对；以下产品验收均NOT_RUN，历史ADB/CI结果不能替代。合同见[16_EMBEDDED_ADB](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)。
+源码test/febf7f0已提交推送，[run44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)于2026-11-21 08:46:24 UTC以SUCCESS结束，Android Native/APK、Windows EXE全部SUCCESS。V0核对和V2编译不替代以下设备/安全验收；合同见[16_EMBEDDED_ADB](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)。
 
 | Case | 验证目标 / 判据 | Level | Result |
 |---|---|---|---|
-| ADB-P01 | 正式Android各ABI/Release/R8与PC构建；app_process/provider入口及NOTICE/LICENSE在APK中，真实id -u后才ready | V2/V3 | NOT_RUN |
+| ADB-P01 | 正式Android各ABI/Release/R8与PC构建；app_process/provider入口及NOTICE/LICENSE在APK中，真实id -u后才ready | V2/V3 | Android arm64与Windows x64 V2 PASS（run44883517881）；其他ABI、新增入口/许可的独立产物审查及真实激活V3 NOT_RUN |
 | ADB-P02 | 首次配对激活、已有密钥免配对激活、错误端口/码/超时、取消与迟到Binder、重复激活旧服务退出；失败无假ready | V3 | NOT_RUN |
 | ADB-P03 | ready后关闭无线调试，再关闭Wi-Fi改蜂窝；Shell、投屏/无视/节点/黑屏、触摸/键盘/中文粘贴/剪贴板、本应用无障碍与电池豁免可调用；无adbd扫描或命令重放 | V3/V4 | NOT_RUN |
 | ADB-P04 | Wi-Fi↔蜂窝断网后恢复、同PC/另一PC远控重连；服务仍活时无需重新配对激活，原relay认证和密码流程保持 | V3/V4 | NOT_RUN |

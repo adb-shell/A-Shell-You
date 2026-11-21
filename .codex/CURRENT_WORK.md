@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261121-001-r3`
+Registry Revision：`WORK-20261121-001-r5`
 Last Updated：2026-11-21
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-T-2026-11-21-001 / active T7：用户授权将完整ADB改造提交推送test并执行双端常规编译，随后说明改动及用法。基点956ecf4，版本2.0.26保持；Build-Clients-BT.yml / Both / 常规编译，先推送核对SHA再dispatch并核对结果。无main合并/生产发布；CE-20261121-T001-05。下方旧关闭记录为前阶段。
+none。T-2026-11-21-001源码、提交推送及双端编译范围已完成，回执见下方；设备验收不记为已通过。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,8 @@ T-2026-11-21-001 / active T7：用户授权将完整ADB改造提交推送test并
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+2026-11-21 / T-2026-11-21-001 / complete T8：源码febf7f0f20460a0bfffbc0ee0a2581828a30d7c0已推送test；Both/常规编译run44883517881精确匹配，于17:46:24 Asia/Tokyo全部SUCCESS，Android Native/APK和Windows EXE及既有包校验/上传均通过。产物链接、使用步骤、临时测试签名及设备待验边界已记录；STATE、TASK_HISTORY、CHANGELOG、Decision/ADR证据和Change Event同步后关闭本 registry。本批仅回执文档补交、不二次编译；main仍956ecf4，版本2.0.26保持。STATE/WORK-20261121-001-r5 / CE-05—07；设备/蜂窝/OEM/安全负例NOT_RUN。[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)。下方为前阶段历史。
 
 2026-11-21 / T-2026-11-21-001 / complete T8：test02删除，main已有合并推送；按用户后续要求test快进同步并推送956ecf4，远端main/test同SHA、0/0。保全并恢复29份代码/清单/许可，16份文档冲突已解决；当前test工作区内置ADB方案源码完成、未提交，版本沿用2.0.26。无线调试仅用于显式激活，常态Binder/FD执行，服务失效需重新激活；V0检查完成，正式V1—V4全部NOT_RUN。无新改造提交推送/构建/CI/发布。用户分支对齐流程已记录；stash 3bd0f1e保留恢复点。STATE/WORK-20261121-001-r2 / CE-20261121-T001-01—04 / D-038 / ADR-0030 / Baseline29。[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)。下方保留此前关闭记录。
 

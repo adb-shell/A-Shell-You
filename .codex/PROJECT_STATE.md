@@ -1,11 +1,11 @@
 # OpenWorld Project State
 
 Schema Version：`1.0`
-State Revision：`STATE-20261121-001-r3`
+State Revision：`STATE-20261121-001-r5`
 Last Updated / Observed At：2026-11-21（Asia/Tokyo）
-Evidence Scope：`repository-observed / V0 + authorized main/test alignment and push; new implementation unbuilt`
+Evidence Scope：`V0 + test source pushed + exact-head dual CI SUCCESS; device unverified`
 
-最新续接：T001 active/T7，用户授权本任务test提交推送及Android/Windows双编译，参数Build-Clients-BT.yml / Both / 常规编译；基点test/main956ecf4，版本2.0.26保持。当前V0通过，提交SHA/运行回执待补，正式设备仍NOT_RUN。STATE/WORK-20261121-001-r3 / CE-20261121-T001-05；以下源码交付记录保留前阶段时点。
+最新交付：T001 complete/T8（源码、推送及双端编译范围），源码febf7f0f20460a0bfffbc0ee0a2581828a30d7c0已推送test，main仍956ecf4；这是对齐后新增开发提交，未合main。Build-Clients-BT.yml / Both / 常规编译run44883517881精确head_sha匹配，于2026-11-21 17:46:24 Asia/Tokyo以SUCCESS结束，Android Native/APK与Windows EXE全部通过。正式设备/蜂窝/OEM/安全负例仍NOT_RUN。本批仅回执与使用说明文档补交，不二次编译，最终Git状态以本批提交为准。STATE/WORK-20261121-001-r5 / CE-20261121-T001-07；以下为前阶段时点。
 
 当前快照：T-2026-11-21-001 / complete T8（源码/Git范围）；当前test/956ecf482ac173af710aa7b6ea0b9de2bc3b4d60，内置ADB权限服务及配套文档未提交。无线调试仅显式配对/激活，正常命令与媒体用Binder/FD，服务存活时可跨网络继续调用；死亡/重启需重新激活。实际Release/OEM/蜂窝/双PC验证NOT_RUN。沿用main的Rust/portable2.0.26、Flutter2.0.26+59，原Rust/JNI/FRB/Kotlin运行时与服务器配置无本任务业务增量。
 
@@ -59,8 +59,8 @@ Latest：D-038 / ADR-0030 / OW-BL-2026-11-21-956ecf4-embedded-adb-worktree / CE-
 |---|---|
 | 产品身份 | 显示“开放世界”；内部 OpenWorld/openworld、com.openworld.me；flutter_hbb保持；Rust 2.0.26 / Flutter 2.0.26+59 |
 | Android 原链 | core连接服务、MediaProjection、无障碍输入/无视/穿透/黑屏保持各自原入口；服务运行不等于屏幕共享或首帧 |
-| ADB身份 | Android进程持有配对身份；双NSD发现，pairConnect后以真实 id -u 验证；配对记录不代表Shell已可用 |
-| ADB执行 | 2路独立命令、设备共享状态变化推送、有限意外断链恢复；PC无三秒远程status |
+| ADB身份 | Android进程持有配对身份；无线NSD/连接仅供显式激活，以Binder身份及真实 id -u 验证ready；配对记录不代表权限服务存活 |
+| ADB执行 | 内置独立Shell服务通过Binder/FD支持2路独立命令及媒体/输入，设备共享状态推送；服务死亡如实要求再激活，不自动恢复无线端口；PC无三秒远程status |
 | ADB画面 | scrcpy ScreenCapture + 独立GPU/H.264；常驻截图JPEG及raw/PNG兼容回退；Shell取节点、App绘穿透 |
 | ADB参数 | width/350整数缩放；4096边长/4Mi像素界限；只读普通VideoQoS，运行时更新；无视至少300ms，节点至少80ms |
 | ADB输入 | Shell可用时全局优先触摸，独立control-only连接；普通键盘、远程输入、Ctrl+V及PC→Android纯文本剪贴板同步 |

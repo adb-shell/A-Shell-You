@@ -1,5 +1,7 @@
 # OpenWorld 构建系统 / Build System
 
+2026-11-21 T001：内置ADB源码test/febf7f0已推送，17:09:13 Asia/Tokyo触发Build-Clients-BT.yml / Both / 常规编译，HTTP204。[run44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)精确head_sha匹配，17:46:24以SUCCESS结束；Android Native/APK与Windows EXE全部通过。Android arm64、Windows x64 EXE/ZIP及build-info已上传，沿用临时测试签名，不代表生产发布或设备验收。最终回执见[任务](../tasks/T-2026-11-21-001-embedded-adb.md)，下方为实施阶段快照。
+
 2026-11-21 T001：内置ADB服务新增Java入口/provider、Manifest和R8规则，以及Shizuku Apache-2.0 LICENSE/NOTICE资产；无Gradle/Maven/native工具链或二进制升级，无FRB/JNI签名生成。正式Release必须验证app_process入口可加载、provider身份核对、Android30/31/33+隐藏接口适配及APK许可打包。当前test未提交实现，仅V0，未编译或触发CI；[任务与验证需求](../tasks/T-2026-11-21-001-embedded-adb.md)。此前构建结果不覆盖此改造。
 
 2026-11-15 T001：UDID展示移除源码test/696a87b已推送；09:27:19 UTC / 18:27:19 Asia/Tokyo触发Both/常规编译，HTTP204受理。按用户要求不监控，不查询新运行/日志/产物，最终结果未知；只补回执文档、不二次编排。见[任务](../tasks/T-2026-11-15-001-hide-desktop-udid.md)。

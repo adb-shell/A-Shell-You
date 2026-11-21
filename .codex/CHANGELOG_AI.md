@@ -1,5 +1,7 @@
 # OpenWorld AI Changelog
 
+2026-11-21 / T001提交与双编译交付：源码febf7f0已推送test，单次Both/常规编译run44883517881精确匹配，于17:46:24 Asia/Tokyo以SUCCESS结束；Android Native/APK、Windows EXE及包校验/上传全部成功。补使用步骤、产物链接/Actions digest及临时签名边界；设备激活/切网/OEM与安全负例仍NOT_RUN。回执文档同轮补交，不二次编译、不合main、不改版本。STATE/WORK-r5 / CE-05—07 / complete T8；D-038/ADR0030仅补证据，N/A — no decision delta，Baseline29冻结及外部资产reviewed-no-change。详见[任务](../docs/tasks/T-2026-11-21-001-embedded-adb.md)；下方为前阶段。
+
 2026-11-21 / T001最终交付：用户补充要求先对齐main再test开发，已保存改造、快进并推送test至956ecf4；远端main/test同SHA、0/0。恢复29份代码/许可内容无变化，16份文档冲突合并保全，主分支版本2.0.26继承，分支流程写入长期规则。内置ADB源码和配套文档在test工作区完成，未提交/编译；ADB-P01—P12正式验收NOT_RUN。Baseline29 / CE-20261121-T001-04 / STATE、WORK-20261121-001-r2，complete/T8仅已授权源码/Git范围；下方为同步前及更早记录。
 
 2026-11-21 / T-2026-11-21-001：完成test02删除、已有main merge956ecf4推送及返回test。内置本应用专属shell服务、Binder验证/FD通道、正常执行去除无线端口、双端配对/激活/停用语义和合同文档已在test/609aec9工作区实现。21份Java词法括号、Manifest、固定资产hash、调用点/身份/取消/死亡/旧版本边界及diff检查完成；V0不是编译或设备PASS。新增ADB-P01—P12全部NOT_RUN，未触发CI/提交推送改造。用户询问behind14，核实功能源码基点相同，main版本与历史独有，未反向合并。D-038、ADR-0030、Baseline27；STATE/WORK-20261121-001-r1、CE-20261121-T001-01—03，T8仅指定源码/Git范围交付。
