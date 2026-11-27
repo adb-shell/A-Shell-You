@@ -1,5 +1,7 @@
 # ADR-0030: App-private Privileged Service After Wireless Activation
 
+2026-11-27 实施补充：test/e3fd784 工作区按实际安装 ProviderInfo/类引用解析组件、private Binder v2双向身份校验；取消仅影响同generation未ready的激活，ready提交是请求所有权转交给App的边界。分阶段错误与两端停止/重启显示已补齐。沿用既有决定与授权边界；源码/V0，不代表设备或发布验收，见[T001](../tasks/T-2026-11-27-001-adb-package-reconnect.md)。下方实施状态为2026-11-21历史记录。
+
 - Status：accepted for implementation
 - Record Type：contemporaneous
 - Decision Date / Recorded Date / Last Reviewed：2026-11-21

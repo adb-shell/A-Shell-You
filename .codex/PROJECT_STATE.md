@@ -1,5 +1,11 @@
 # OpenWorld Project State
 
+2026-11-28 / STATE-20261128-001-r1：T001 active/T5，当前授权test/a736146完整合入main/e3fd784，生成说明“修复ADB的包名问题”的no-ff合并提交并推送，再同步本地/远端test。两个工作区初始clean、本地远端一致、0/2；合并无冲突，版本/CI不变，无编译或监控。CE-20261128-T001-01 / [任务](../docs/tasks/T-2026-11-28-001-adb-package-main-merge.md)。
+
+2026-11-27 / STATE-20261127-002-r2：T001改包/切网取消修复已提交推送test/e1526fa2a6fa2b688d965bb56ba6b422f5ac9a07，远端SHA一致；23:21:49 Asia/Tokyo单次Build-Clients-BT/Both/常规编译HTTP204。按要求不监控、未查询新运行，最终结果unknown；回执仅文档补交、不二次编排。T002 complete/T8仅Git交付与编排请求，main/e3fd784、版本保持，设备NOT_RUN。CE-20261127-T002-01/02 / [任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。
+
+2026-11-27 / STATE-20261127-001-r2：test/e3fd784 起点clean且与main对齐；T-2026-11-27-001 complete/T8（源码/V0）。工作区完成实际ProviderInfo/authority和类入口、private Binder v2身份校验、generation/ready限定取消、分阶段错误及双端提示。7Java、4Dart、local-adb.pro；词法/diff/源码安全与生命周期/新增链接检查通过。未提交/推送/编译/设备/监控，main/版本不变；现场蜂窝失效未复现，系统杀服务及任意APK工具破坏ABI不作已解决承诺。CE-20261127-T001-01/02 / [任务](../docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)。
+
 当前T005交付快照（2026-11-21，STATE-20261121-005-r2）：main已从956ecf4快进到test/e82f8dfdc0a743c51e15be49ccd89ae38fc3ad05并推送；远端main/test完整SHA相同，本地0/0、完整tree一致。内置ADB、保活与文案已进入main，主工作区保留test。本回执纯文档补入两支并保持同SHA，不改版本或产品；本轮不触发/监控CI，b12cbdb构建结果unknown。complete/T8，CE-20261121-T005-01/02，[任务](../docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。以下均为历史观察时点。
 
 当前交付任务T004（2026-11-21，STATE-20261121-004-r3）：T002/T003已合为test/b12cbdb8f216cc27491cae478d9accfb1898ab24并推送，远端一致，触发前clean。18:38:40 Asia/Tokyo单次Both/常规编译HTTP204，run44890553076精确匹配源码；18:40:22最后观察两平台准备环境中。用户随后要求“不进行监控”，立即停止查询，不取消构建，最终结果未知。complete/T8只关闭调整后的Git交付/触发范围，CE-20261121-T004-01—03，详见[任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。回执仅文档补交、不再次dispatch；main/956ecf4、版本2.0.26保持；下方为历史时点记录。

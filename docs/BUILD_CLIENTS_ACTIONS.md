@@ -1,5 +1,7 @@
 # GitHub Actions 客户端编译
 
+2026-11-27 T002：test/e1526fa2a6fa2b688d965bb56ba6b422f5ac9a07已推送，远端一致；14:21:49 UTC / 23:21:49 Asia/Tokyo单次Build-Clients-BT/Both/常规编译HTTP204。不监控，未查询新run/jobs/logs/artifacts，最终结果unknown。[工作流入口](https://github.com/adb-shell/A-Shell-You/actions/workflows/Build-Clients-BT.yml) / [交付任务](tasks/T-2026-11-27-002-adb-package-build.md)。回执仅文档补交，不二次编排；版本/CI配置保持。
+
 2026-11-21 T004：保活与界面文案源码test/b12cbdb已推送，18:38:40 Asia/Tokyo单次Both/常规编译获HTTP204；[run44890553076](https://github.com/adb-shell/A-Shell-You/actions/runs/44890553076)精确匹配源码。用户补充不监控后停止查询，不取消构建；最终编译/产物结果未知。回执文档补交不再dispatch，见[任务](tasks/T-2026-11-21-004-adb-resilience-build.md)。
 
 2026-11-21 T001：test/febf7f0已推送，17:09:13 Asia/Tokyo单次触发Both/常规编译；[run44883517881](https://github.com/adb-shell/A-Shell-You/actions/runs/44883517881)精确匹配源码，于17:46:24以SUCCESS结束，Android Native/APK和Windows EXE全部通过。APK、EXE、Release ZIP和build-info已上传，成品有效期至2026-12-05；临时测试签名不保证覆盖旧安装，不是生产发布。下载/哈希及未执行的设备验收见[任务](tasks/T-2026-11-21-001-embedded-adb.md)。本批回执只改文档，不二次dispatch；下方历史结论保持原观察时点。

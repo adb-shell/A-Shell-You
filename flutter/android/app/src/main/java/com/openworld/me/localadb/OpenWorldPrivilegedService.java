@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class OpenWorldPrivilegedService extends Binder {
     private final int ownerUid;
-    private final String packageName, apk, generation;
+    private final String packageName, apk, generation, component, authority;
     private final PrivilegedSystem system;
     private final Handler main;
     private final Set<Channel> channels = new HashSet<>();
@@ -58,12 +58,12 @@ public final class OpenWorldPrivilegedService extends Binder {
 
     public static void main(String[] args) {
         try {
-            if (args.length != 4 || (Process.myUid() != 2000 && Process.myUid() != 0)) return;
+            if (args.length != 6 || (Process.myUid() != 2000 && Process.myUid() != 0)) return;
             if (!args[3].matches("[a-f0-9-]{36}")) return;
             try { Os.setsid(); } catch (Exception ignored) { }
             Looper.prepareMainLooper();
             OpenWorldPrivilegedService service = new OpenWorldPrivilegedService(
-                    args[0], Integer.parseInt(args[1]), args[2], args[3]);
+                    args[0], Integer.parseInt(args[1]), args[2], args[3], args[4], args[5]);
             service.start();
             Looper.loop();
         } catch (Throwable ignored) {
@@ -74,10 +74,11 @@ public final class OpenWorldPrivilegedService extends Binder {
     }
 
     private OpenWorldPrivilegedService(String packageName, int ownerUid, String apk,
-                                       String generation) throws Exception {
+                                       String generation, String component, String authority) throws Exception {
         this.packageName = packageName; this.ownerUid = ownerUid;
         this.apk = apk; this.generation = generation;
-        system = new PrivilegedSystem(packageName, ownerUid, apk);
+        this.component = component; this.authority = authority;
+        system = new PrivilegedSystem(packageName, ownerUid, apk, component, authority);
         main = new Handler(Looper.getMainLooper());
         singleton = acquireSingleton(ownerUid);
         attachInterface(null, PrivilegedProtocol.SERVICE);
@@ -204,6 +205,8 @@ public final class OpenWorldPrivilegedService extends Binder {
             reply.writeString(packageName);
             reply.writeString(apk);
             reply.writeString(generation);
+            reply.writeString(component);
+            reply.writeString(authority);
             return true;
         }
         if (code != PrivilegedProtocol.OPEN) return super.onTransact(code, data, reply, flags);

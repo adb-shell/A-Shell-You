@@ -11,6 +11,7 @@ class LocalAdbStatus {
   final bool activationSupported;
   final String activationState;
   final String activationError;
+  final String activationErrorCode;
   final bool keepAliveSupported;
   final bool? keepAliveExempt;
   final bool keepAliveBusy;
@@ -27,6 +28,7 @@ class LocalAdbStatus {
     this.activationSupported = false,
     this.activationState = '',
     this.activationError = '',
+    this.activationErrorCode = '',
     this.keepAliveSupported = false,
     this.keepAliveExempt,
     this.keepAliveBusy = false,
@@ -44,6 +46,7 @@ class LocalAdbStatus {
         activationSupported: value['activationSupported'] == true,
         activationState: value['activationState'] as String? ?? '',
         activationError: value['activationError'] as String? ?? '',
+        activationErrorCode: value['activationErrorCode'] as String? ?? '',
         keepAliveSupported: value['keepAliveSupported'] == true,
         keepAliveExempt: value['keepAliveExempt'] as bool?,
         keepAliveBusy: value['keepAliveBusy'] == true,
@@ -61,6 +64,8 @@ class LocalAdbStatus {
     if (connected) return activationSupported ? 'ADB 已激活' : '已连接 · Shell 已验证';
     if (activationState == 'starting') return '正在激活 ADB…';
     if (reconnecting) return '正在恢复 ADB…';
+    if (activationErrorCode == 'service_stopped') return 'ADB 服务已停止 · 需重新激活';
+    if (activationErrorCode == 'device_rebooted') return '手机已重启 · 需重新激活';
     if (activationState == 'activation_required') return '服务暂不可用 · 可重新激活';
     return paired ? '已配对 · 尚未激活' : '尚未配对';
   }

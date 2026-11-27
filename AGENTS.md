@@ -1,5 +1,9 @@
 # AGENTS.md — 开放世界 / OpenWorld v2.0.26
 
+2026-11-27 T002：T001改包/切网取消修复已提交推送test/e1526fa；23:21:49 Asia/Tokyo单次Both/常规编译HTTP204，按要求不监控，最终结果unknown。回执仅文档补交，不二次编排；main/版本不变，真机待验。见[交付任务](docs/tasks/T-2026-11-27-002-adb-package-build.md)。以下为历史观察时点。
+
+2026-11-27 T001：test/e3fd784工作区完成内置ADB真实ProviderInfo/component/authority及类入口适配、激活ready后取消免误停、分阶段错误与双端提示。private Binder v2 / status apiVersion7；源码/V0，未提交/编译/监控，改包/蜂窝/OEM待真机。main/版本保持，详见[修复任务](docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)与[执行合同](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)。以下为历史回执。
+
 2026-11-21 T005：test的内置ADB、保活和界面文案已完整快进合入main并推送，首轮远端两支同e82f8df、本地0/0；本批回执仅文档补交两支并保持对齐，主工作区保留test。版本不变，不触发/监控编译，b12cbdb最终结果仍unknown。见[main合并任务](docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。以下“尚未合main”等为历史时点。
 
 2026-11-21 T004：T002内置ADB保活续修与T003界面文案已一并提交推送test/b12cbdb；Both/常规编译run44890553076已启动、精确匹配源码。用户补充不监控，已停止查询，最终结果未知；旧成功CI不覆盖本批。回执只改文档、不二次编排；见[交付任务](docs/tasks/T-2026-11-21-004-adb-resilience-build.md)/[当前工作](.codex/CURRENT_WORK.md)。下方为历史回执。

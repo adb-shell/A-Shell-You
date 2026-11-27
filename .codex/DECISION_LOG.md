@@ -2,6 +2,8 @@
 
 ## D-038：无线调试只用于激活本应用专属 Shell 服务
 
+2026-11-27 T001实施补充：以安装 ProviderInfo 的真实组件与 authority 路由，App/daemon双方核对完整UID/package/APK，入口用类引用；不把安装package视为Java/JNI命名空间。新激活提交ready后即归App所有，普通取消仅撤销同generation未ready的激活，显式停用保持。仅细化原决定，不新增D-ID；test/e3fd784工作区V0，改包/蜂窝/OEM仍待真机。[任务](../docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)。
+
 2026-11-21 T002实施完善：暂时系统/验证故障不误STOP，恢复窗口/退避与boot-count辅助识别，App lease仍需generation/ready证明，明确撤销停止；维护调用不占主Looper，STOP仅允许原完整UID减少权限。原单独shell进程、真实权限门和无自动adbd激活决定保持，不新增D-ID。test/e137d44上未提交源码，仅V0；[任务](../docs/tasks/T-2026-11-21-002-embedded-adb-resilience.md)，CE-T002-02。
 
 2026-11-21交付证据：实现已推送test/febf7f0，CI run44883517881的Android arm64及Windows x64构建全部SUCCESS。设备生命周期、切网存活与安全负例仍NOT_RUN；无新增决策、无生产发布批准。CE-20261121-T001-07；以下为实施时点。

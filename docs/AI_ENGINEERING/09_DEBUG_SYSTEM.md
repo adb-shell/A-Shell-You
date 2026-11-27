@@ -1,5 +1,7 @@
 # OpenWorld 调试与验证体系 / Debug System
 
+2026-11-27 T002：test/e1526fa已推送并单次触发Both/常规编译HTTP204；不监控、未读取新运行/日志/产物，V2结果unknown，ADB-P19—P22与既有真机回归NOT_RUN。HTTP204不等于编译通过；详见[回执](../tasks/T-2026-11-27-002-adb-package-build.md)。
+
 2026-11-21 T004：保活与界面源码test/b12cbdb已推送并启动Both/常规编译run44890553076。用户随后要求不监控，停止查询；最终V2结果unknown，设备与视觉用例NOT_RUN，不能把旧成功run或本次HTTP204当作PASS。[回执](../tasks/T-2026-11-21-004-adb-resilience-build.md)。
 
 2026-11-21 T002：排障区分reconnecting与activation_required、暂时系统查询/探测失败与确认服务死亡。记录恢复前后服务PID/实际UID、状态时序和重启计数是否可读即可，不记录generation、配对码或完整命令。ADB-P13—P18覆盖误停、退避、lease撤销、App重建及激活取消竞态；当前仅V0，旧CI不覆盖本批。[任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)。

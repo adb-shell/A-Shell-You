@@ -1,5 +1,9 @@
 # OpenWorld Project Memory
 
+2026-11-27 T002：改包与切网取消修复已推送test/e1526fa；23:21:49 Asia/Tokyo触发Both/常规编译HTTP204。不监控，最终编译结果unknown；回执纯文档补交、不再次dispatch，main/版本保持。[交付任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。下方未提交说明为源码阶段。
+
+2026-11-27 T001：test/e3fd784工作区完成内置ADB改包组件解析、ready后PC取消免误停与阶段错误修复；私有Binder v2，状态apiVersion7，实际安装package/ProviderInfo为准，不批量替换Java/JNI名称。源码/V0 complete，未提交/构建/设备/监控，main/版本保持；现场切蜂窝与任意APK工具兼容仍待验。[任务](../docs/tasks/T-2026-11-27-001-adb-package-reconnect.md) / STATE/WORK-20261127-001-r2 / CE-01/02。
+
 2026-11-21 T005：内置ADB、保活与双端文案已随test完整快进合入main并推送。首轮核对main/test本地远端同为e82f8df、0/0，回执纯文档补交两支保持相同SHA，主工作区保留test供继续修改。版本2.0.26 / 2.0.26+59保持；不触发或监控CI，b12cbdb结果unknown。STATE/WORK-T005-r2 / CE-01/02 / [任务](../docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。下方“main未合入”仅为旧快照。
 
 2026-11-21 T004：保活T002与文案T003已一起提交推送test/b12cbdb；18:38:40 Asia/Tokyo单次Both/常规编译获HTTP204，run44890553076精确匹配。用户随后要求不监控，已停止后续查询，不取消构建，最终结果未知；不能沿用旧成功run。回执文档补交、不再次编排，设备验收NOT_RUN，main/版本保持。STATE/WORK-T004-r3 / CE-01—03 / [任务](../docs/tasks/T-2026-11-21-004-adb-resilience-build.md)；以下未提交描述为历史时点。
