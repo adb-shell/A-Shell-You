@@ -1,5 +1,7 @@
 # OpenWorld 构建系统 / Build System
 
+2026-11-27 T002：ADB改包/切网取消修复test/e1526fa已推送；23:21:49 Asia/Tokyo单次Build-Clients-BT/test/Both/常规编译HTTP204，准确源码SHA已核对。按要求不监控、未查询run/jobs/logs/artifacts，最终结果unknown；回执只改文档、不二次编排。旧CI不覆盖，工具链/版本保持，[交付任务](../tasks/T-2026-11-27-002-adb-package-build.md)。
+
 2026-11-21 T004：ADB保活T002与文案T003已一起推送test/b12cbdb；18:38:40 Asia/Tokyo单次Build-Clients-BT/Both/常规编译HTTP204，run44890553076精确匹配。用户补充不监控后停止查询，不取消构建，最终结果未知；没有本批成品/签名/hash结果。回执只改文档、不再编排，[交付任务](../tasks/T-2026-11-21-004-adb-resilience-build.md)；下方为历史时点。
 
 2026-11-21 T002保活续修：7份Java与4份Dart恢复语义在test/e137d44工作区完成，无工具链/Manifest/依赖/版本变更；本批未提交或构建，旧run44883517881不覆盖。正式入口和ADB-P01—P18验证需求见[任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)。并行T003的界面文案以其独立记录为准。

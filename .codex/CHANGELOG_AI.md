@@ -1,5 +1,7 @@
 # OpenWorld AI Changelog
 
+2026-11-27 / T002：T001源码已提交推送test/e1526fa，远端一致；23:21:49 Asia/Tokyo单次Both/常规编译HTTP204。按要求不监控、未查新运行，最终结果unknown。回执仅文档补交、不二次编排；main/版本保持，设备NOT_RUN。STATE/WORK-20261127-002-r2 / CE-01/02 / complete T8（Git与编排），[任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。
+
 2026-11-27 / T001：test/e3fd784工作区修复内置ADB按安装ProviderInfo/component/authority解析、实际类入口、private Binder v2双向验证；generation限定未ready取消，避免激活刚完成时PC断线误停；补配对/激活/组件/服务停止提示与apiVersion7原因码。7Java、4Dart、local-adb.pro及相关文档，V0通过，正式构建/改包/蜂窝真机NOT_RUN。未提交推送/编译/监控，main/版本不变。STATE/WORK-20261127-001-r2 / CE-01/02 / D-038、ADR0030 / complete T8（源码）。[任务](../docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)。
 
 2026-11-21 / T005：按用户要求将test完整合入main并推送；main/956ecf4快进到e82f8df，保留内置ADB、保活恢复和界面文案全部4提交，无冲突/产品增改。远端main/test均e82f8df，本地0/0、完整tree一致；回执纯文档补交两支，主工作区保留test。版本不变，无本轮构建/监控或设备操作，b12cbdb构建结果unknown。STATE/WORK-T005-r2 / CE-01/02 / complete T8，N/A — no decision delta。[任务](../docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。

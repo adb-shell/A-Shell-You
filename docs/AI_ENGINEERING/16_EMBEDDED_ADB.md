@@ -1,5 +1,7 @@
 # OpenWorld 内置 ADB 权限服务 / Embedded Privileged Backend
 
+2026-11-27 T002交付：下述改包与切网取消修复已提交推送test/e1526fa，23:21:49 Asia/Tokyo单次Both/常规编译HTTP204。按要求不监控，最终结果unknown；回执仅文档，不二次触发。设备/OEM边界保持，见[交付任务](../tasks/T-2026-11-27-002-adb-package-build.md)。下方未提交描述为源码阶段。
+
 2026-11-27 / [T001修复](../tasks/T-2026-11-27-001-adb-package-reconnect.md)：基于已对齐 main 的 test/e3fd784，在工作区修复成品 APK 改包后的组件解析、激活完成与 PC 断线取消竞态、分阶段错误提示。源码/V0 范围，未提交/编译/真机；以下旧 CI 不覆盖本批。实际蜂窝失效反馈尚无现场复现。
 
 ## 实际安装组件与切网取消修复（2026-11-27）

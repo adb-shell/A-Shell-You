@@ -1,5 +1,7 @@
 # T-2026-11-27-001 — 改包兼容与内置 ADB 切网恢复
 
+2026-11-27交付回执：源码已作为test/e1526fa2a6fa2b688d965bb56ba6b422f5ac9a07提交推送；23:21:49 Asia/Tokyo单次Both/常规编译HTTP204受理，按要求不监控，最终结果unknown。详见[T002交付任务](T-2026-11-27-002-adb-package-build.md)。以下未提交/未触发描述为原源码阶段；设备验收仍NOT_RUN。
+
 ## 0. Task Metadata
 
 按 `TASK_TEMPLATE.md` 建立；2026-11-27 Asia/Tokyo。Requester / Product Owner：用户；Principal：Codex / openworld-master；Android、Flutter、Network 与 Security 按对应 skill 自审，无委派。Release Owner：用户（本任务无发布）。Status：complete / T8（仅源码与V0交付）。

@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261127-002-r1`
+Registry Revision：`WORK-20261127-002-r2`
 Last Updated：2026-11-27
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-T-2026-11-27-002 / active T5：按当前授权提交推送T001到origin/test，随后单次Both/常规编译；沿用不监控要求。STATE/WORK-20261127-002-r1 / CE-20261127-T002-01，[任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。
+none。T002已提交推送test/e1526fa并单次触发Both/常规编译HTTP204；不监控、最终结果unknown。回执仅文档补交，不二次编排。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,8 @@ T-2026-11-27-002 / active T5：按当前授权提交推送T001到origin/test，�
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+2026-11-27 / T-2026-11-27-002 / complete T8（Git交付与单次编排）：T001源码提交推送test/e1526fa，远端SHA一致；23:21:49 Asia/Tokyo单次Build-Clients-BT / Both / 常规编译HTTP204。不监控、未查询run/jobs/logs/artifacts，最终结果unknown；回执仅Markdown补交，不二次触发。main/版本保持、设备NOT_RUN。STATE/WORK-20261127-002-r2 / CE-01/02 / N/A — no decision delta。[任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。
 
 2026-11-27 / T-2026-11-27-001 / complete T8（源码/V0）：实际ProviderInfo/component/authority及类入口、private Binder v2双向校验；同generation未ready才取消，已ready不随PC断线误停；分阶段错误与双端停止/重启说明。7Java、4Dart与local-adb.pro，源码安全/生命周期、词法、diff及新链接V0检查通过。未提交推送、未编译/真机/监控；现场最终根因仍待验，main/版本保持。STATE/WORK-20261127-001-r2 / CE-01/02 / D-038、ADR0030，[任务](../docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)。
 

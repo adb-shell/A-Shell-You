@@ -1,5 +1,7 @@
 # OpenWorld Commercial Test Matrix
 
+2026-11-27 T002交付更新：下述改包/切网修复已推送test/e1526fa，并于23:21:49 Asia/Tokyo单次触发Both/常规编译HTTP204。按要求不监控，V2结果unknown；ADB-P19—P22及旧设备/视觉用例NOT_RUN，旧成功CI不能覆盖本批。[交付回执](docs/tasks/T-2026-11-27-002-adb-package-build.md)。下方未触发/未提交为原检查时点。
+
 ## 2026-11-27 改包与切网取消修复 / T001
 
 test/e3fd784 工作区修复，仅 V0 源码、Java 词法与 diff 检查；正式构建/设备 NOT_RUN。旧 CI 不覆盖，未查询其结果。[任务](docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)。回归 ADB-P01—P18、ADB-R/M/A 与 NET-04/DSP-09，新增：

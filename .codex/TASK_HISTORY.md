@@ -1,5 +1,7 @@
 # OpenWorld Task History
 
+2026-11-27 / T-2026-11-27-002 / complete T8：按用户“提交并推送，然后执行双编译”，T001既有改动及交付任务提交e1526fa2a6fa2b688d965bb56ba6b422f5ac9a07、push origin/test并核实远端一致。28文件403增/63删，精确范围/diff/22链接检查通过。23:21:49 Asia/Tokyo单次Build-Clients-BT/Both/常规编译HTTP204，沿用不监控，未查询run/jobs/logs/artifacts，最终结果unknown。回执文档补交、不二次编排；main/版本保持、设备待验。STATE/WORK-20261127-002-r2 / CE-01/02，[任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。
+
 2026-11-27 / T-2026-11-27-001 / complete T8（源码/V0）：用户授权在test修复成品APK改包兼容、阶段错误与切网问题。e3fd784起点clean且与main对齐；完成ProviderInfo真实路由、private Binder v2的组件/安装身份验证、ready提交后的请求取消免误停与代际隔离，双端显示停止/重启并提示等待已激活。7Java、4Dart、local-adb.pro，V0源码/词法/diff/链接检查；现场最终根因与ADB-P19—P22设备验收待证。未Git写入/编译/监控/设备/版本/发布。STATE/WORK-20261127-001-r2 / CE-01/02，D-038/ADR0030补实现约束，Baseline/外部资产保持。[任务](../docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)。
 
 2026-11-21 / T-2026-11-21-005 / complete T8（合并推送）：用户要求“合并到mian，推送到github”，识别为既有main，并执行本会话合并后test对齐要求。main/956ecf4无独有提交，test/e82f8df领先4；使用既有main worktree快进合入、tree精确一致并push main，远端两支同为e82f8dfdc0a743c51e15be49ccd89ae38fc3ad05、本地0/0。回执仅Markdown提交并同步两支，主工作区保留test；版本/产品无新变更，不触发/监控编译，既有b12cbdb结果unknown。V0关系/diff/远端核对通过，运行验收未新增；STATE/WORK-T005-r2 / CE-01/02，Decision/ADR/Baseline/External Registry reviewed-no-change。[任务](../docs/tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。

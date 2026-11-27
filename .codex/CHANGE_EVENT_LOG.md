@@ -1,5 +1,11 @@
 # OpenWorld Change Event Log
 
+## CE-20261127-T002-02：test源码推送与单次双编译受理回执
+
+提交e1526fa2a6fa2b688d965bb56ba6b422f5ac9a07（修复内置ADB改包兼容和激活后断线误停），28文件403增/63删，push origin/test成功；触发前clean，ls-remote与API核实准确SHA。2026-11-27 14:21:49 UTC / 23:21:49 Asia/Tokyo单次POST workflow394791509，test/Both/常规编译，HTTP204；未查询新run/jobs/logs/artifacts、不监控，最终结果unknown。
+
+本批仅回执Markdown：T001/T002任务、CURRENT_WORK/PROJECT_STATE/CHANGE_EVENT/TASK_HISTORY/CHANGELOG_AI/PROJECT_MEMORY、AGENTS/PROJECT_START_HERE、08_BUILD_SYSTEM/09_DEBUG_SYSTEM/16_EMBEDDED_ADB、BUILD_CLIENTS_ACTIONS与TEST_MATRIX。STATE/WORK-20261127-002-r2，complete T8仅Git交付与编排请求；补交test，不再次触发CI，main/版本不变、设备NOT_RUN。Decision/ADR/Baseline/External Registry reviewed-no-change，无新资产或发布。
+
 ## CE-20261127-T002-01：改包修复提交推送与双编译启动
 
 当前用户要求“提交并推送，然后执行双编译”，授权T001既有27文件stage/commit/push origin/test与单次Both/常规编译；同会话不监控要求保持。初始test/e3fd784、远端main/test均同SHA、index空，无额外用户变更/活动任务/hooks。新增docs/tasks/T-2026-11-27-002-adb-package-build.md并更新STATE/WORK为20261127-002-r1、active T5；diff检查通过。源码/版本/CI不扩改，不main合并或发布，结果待回填。
