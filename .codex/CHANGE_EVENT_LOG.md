@@ -1,5 +1,11 @@
 # OpenWorld Change Event Log
 
+## CE-20261128-T001-02：main合并推送与test对齐回执
+
+main/e3fd784完整合入test/a736146，no-ff无冲突，产品tree与test来源一致；新增合并提交3c520c71c484a5e4e7ebdfc8f85286b600ade8de，标题“修复ADB的包名问题”，parents e3fd784/a736146。主工作区test快进main并git push --atomic origin main test成功；ls-remote两支同3c520c7、本地0/0、完整tree一致、两工作区clean。
+
+本批只补docs/tasks/T-2026-11-28-001-adb-package-main-merge.md、docs/AI_ENGINEERING/16_EMBEDDED_ADB.md、AGENTS.md、PROJECT_START_HERE.md及.codex的PROJECT_STATE/CURRENT_WORK/PROJECT_MEMORY/TASK_HISTORY/CHANGELOG_AI/CHANGE_EVENT_LOG；STATE/WORK-20261128-001-r2，complete T8。回执纯Markdown补交test、main快进同提交并原子推送，主工作区保持test。无版本/产品/CI/设备/发布动作，旧构建结果unknown；Decision/ADR/Baseline/External Registry/Build/Debug/TEST_MATRIX reviewed-no-change。
+
 ## CE-20261128-T001-01：ADB包名修复合并main启动
 
 用户要求合并main并推送，提交说明“修复ADB的包名问题”，完成后回test等待；本会话每次合并后test对齐要求保持。两个工作区初始clean，本地远端main/e3fd784、test/a736146，独有0/2，净31文件436增/62删，无版本/CI差异。新建docs/tasks/T-2026-11-28-001-adb-package-main-merge.md，现有main worktree执行no-ff/no-commit合并无冲突后登记STATE/WORK-20261128-001-r1、active T5。后续仅提交/推送/对齐与文档回执，无新产品、编译/监控、发布动作。

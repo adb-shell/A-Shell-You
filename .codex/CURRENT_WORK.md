@@ -1,15 +1,15 @@
 # OpenWorld Current Work Registry
 
 Schema Version：`1.0`
-Registry Revision：`WORK-20261128-001-r1`
+Registry Revision：`WORK-20261128-001-r2`
 Last Updated：2026-11-28
-Active Task Count：1
+Active Task Count：0
 
 本文件只维护当前工作指针。已关闭任务保存在 TASK_HISTORY、CHANGELOG_AI 与各任务文件；历史授权不自动续用。
 
 ## 1. Active Tasks
 
-T-2026-11-28-001 / active T5：main/e3fd784合入test/a736146，no-ff合并无冲突，按用户指定“修复ADB的包名问题”提交推送，再对齐两支。主工作区保留test；无编译/监控。[任务](../docs/tasks/T-2026-11-28-001-adb-package-main-merge.md)，STATE/WORK-20261128-001-r1 / CE-01。
+none。T-2026-11-28-001已完成“修复ADB的包名问题”合并推送，main/test同步对齐；回执纯文档补交两支，主工作区保留test等待工作。无编译/监控。
 
 ## 2. Concurrent Session Rules
 
@@ -24,6 +24,8 @@ T-2026-11-28-001 / active T5：main/e3fd784合入test/a736146，no-ff合并无�
 `active / awaiting-confirmation / blocked / paused / handoff / stale-review-required / conflict / complete / cancelled / none`
 
 ## 4. Last Closed Task
+
+2026-11-28 / T-2026-11-28-001 / complete T8：main/e3fd784完整合入test/a736146，no-ff提交3c520c7，说明“修复ADB的包名问题”；无冲突，产品tree与test输入一致。test快进main并原子push两支，远端同3c520c7、本地0/0、两工作区clean；回执仅Markdown补交两支并保持对齐，主工作区test。版本不变，不编译/监控；STATE/WORK-20261128-001-r2 / CE-01/02，N/A — no decision delta，[任务](../docs/tasks/T-2026-11-28-001-adb-package-main-merge.md)。
 
 2026-11-27 / T-2026-11-27-002 / complete T8（Git交付与单次编排）：T001源码提交推送test/e1526fa，远端SHA一致；23:21:49 Asia/Tokyo单次Build-Clients-BT / Both / 常规编译HTTP204。不监控、未查询run/jobs/logs/artifacts，最终结果unknown；回执仅Markdown补交，不二次触发。main/版本保持、设备NOT_RUN。STATE/WORK-20261127-002-r2 / CE-01/02 / N/A — no decision delta。[任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。
 

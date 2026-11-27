@@ -1,6 +1,6 @@
 # OpenWorld Project State
 
-2026-11-28 / STATE-20261128-001-r1：T001 active/T5，当前授权test/a736146完整合入main/e3fd784，生成说明“修复ADB的包名问题”的no-ff合并提交并推送，再同步本地/远端test。两个工作区初始clean、本地远端一致、0/2；合并无冲突，版本/CI不变，无编译或监控。CE-20261128-T001-01 / [任务](../docs/tasks/T-2026-11-28-001-adb-package-main-merge.md)。
+2026-11-28 / STATE-20261128-001-r2：T001 complete/T8。main/e3fd784合入test/a736146，no-ff提交3c520c71c484a5e4e7ebdfc8f85286b600ade8de，说明“修复ADB的包名问题”。test快进对齐并原子推送两支；首轮远端main/test同3c520c7、本地0/0、完整tree一致、两工作区clean。回执仅Markdown补交并保持两支同SHA，主工作区test等待工作。无版本/产品增改，不触发或监控CI，e1526fa编译结果unknown。CE-20261128-T001-01/02 / [任务](../docs/tasks/T-2026-11-28-001-adb-package-main-merge.md)。
 
 2026-11-27 / STATE-20261127-002-r2：T001改包/切网取消修复已提交推送test/e1526fa2a6fa2b688d965bb56ba6b422f5ac9a07，远端SHA一致；23:21:49 Asia/Tokyo单次Build-Clients-BT/Both/常规编译HTTP204。按要求不监控、未查询新运行，最终结果unknown；回执仅文档补交、不二次编排。T002 complete/T8仅Git交付与编排请求，main/e3fd784、版本保持，设备NOT_RUN。CE-20261127-T002-01/02 / [任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。
 

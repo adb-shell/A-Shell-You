@@ -1,5 +1,7 @@
 # OpenWorld Project Start Here
 
+2026-11-28 T001：ADB包名修复已随test完整合main，合并提交3c520c7、说明“修复ADB的包名问题”；两支已推送并对齐，首轮同SHA/0-0，回执仅文档补交并保持相同SHA。主工作区test等待工作；无版本变化、编译或监控。[合并任务](docs/tasks/T-2026-11-28-001-adb-package-main-merge.md)。下方为历史观察时点。
+
 2026-11-27 T002：改包兼容、激活断线误停与错误提示修复已推送test/e1526fa；23:21:49 Asia/Tokyo单次Both/常规编译HTTP204，不监控、最终结果unknown。回执仅文档补交，不再次编排；main/版本保持。[交付任务](docs/tasks/T-2026-11-27-002-adb-package-build.md)。下方未提交说明为源码阶段。
 
 2026-11-27 T001：在已与main对齐的test/e3fd784上完成工作区内置ADB改包组件解析、激活完成与断线取消竞态、阶段错误及双端提示修复。源码/V0交付，未提交/推送/编译/监控；改包APK与蜂窝真机仍待验，版本2.0.26保持。[任务](docs/tasks/T-2026-11-27-001-adb-package-reconnect.md) / [当前执行合同](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)。下方为历史观察时点。

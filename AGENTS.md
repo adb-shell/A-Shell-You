@@ -1,5 +1,7 @@
 # AGENTS.md — 开放世界 / OpenWorld v2.0.26
 
+2026-11-28 T001：test的ADB包名/取消竞态修复已完整合入main，合并提交3c520c7，说明“修复ADB的包名问题”。main/test已原子推送并对齐，首轮同SHA/0-0；回执纯文档补交两支保持同步，主工作区test等待工作。版本不变，不编译/监控，设备待验。见[合并任务](docs/tasks/T-2026-11-28-001-adb-package-main-merge.md)。以下为历史时点。
+
 2026-11-27 T002：T001改包/切网取消修复已提交推送test/e1526fa；23:21:49 Asia/Tokyo单次Both/常规编译HTTP204，按要求不监控，最终结果unknown。回执仅文档补交，不二次编排；main/版本不变，真机待验。见[交付任务](docs/tasks/T-2026-11-27-002-adb-package-build.md)。以下为历史观察时点。
 
 2026-11-27 T001：test/e3fd784工作区完成内置ADB真实ProviderInfo/component/authority及类入口适配、激活ready后取消免误停、分阶段错误与双端提示。private Binder v2 / status apiVersion7；源码/V0，未提交/编译/监控，改包/蜂窝/OEM待真机。main/版本保持，详见[修复任务](docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)与[执行合同](docs/AI_ENGINEERING/16_EMBEDDED_ADB.md)。以下为历史回执。

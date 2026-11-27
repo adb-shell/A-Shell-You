@@ -1,5 +1,7 @@
 # OpenWorld AI Changelog
 
+2026-11-28 T001：按“修复ADB的包名问题”创建合并提交3c520c7，main/e3fd784完整合入test/a736146，无冲突、产品与test一致；test快进main并原子推送，两支本地远端同SHA、0/0。回执纯文档补交两支保持对齐，主工作区test等待工作；无版本变化、编译或监控，e1526fa结果unknown。STATE/WORK-20261128-001-r2 / CE-01/02 / complete T8，[任务](../docs/tasks/T-2026-11-28-001-adb-package-main-merge.md)。
+
 2026-11-27 / T002：T001源码已提交推送test/e1526fa，远端一致；23:21:49 Asia/Tokyo单次Both/常规编译HTTP204。按要求不监控、未查新运行，最终结果unknown。回执仅文档补交、不二次编排；main/版本保持，设备NOT_RUN。STATE/WORK-20261127-002-r2 / CE-01/02 / complete T8（Git与编排），[任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。
 
 2026-11-27 / T001：test/e3fd784工作区修复内置ADB按安装ProviderInfo/component/authority解析、实际类入口、private Binder v2双向验证；generation限定未ready取消，避免激活刚完成时PC断线误停；补配对/激活/组件/服务停止提示与apiVersion7原因码。7Java、4Dart、local-adb.pro及相关文档，V0通过，正式构建/改包/蜂窝真机NOT_RUN。未提交推送/编译/监控，main/版本不变。STATE/WORK-20261127-001-r2 / CE-01/02 / D-038、ADR0030 / complete T8（源码）。[任务](../docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)。

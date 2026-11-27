@@ -1,5 +1,7 @@
 # OpenWorld Project Memory
 
+2026-11-28 T001：ADB包名兼容、断线取消与提示修复已合入main并推送，合并提交3c520c7、说明“修复ADB的包名问题”。main/test本地远端同步，首轮同SHA/0-0；回执纯文档补交两支保持对齐，主工作区test等待工作。版本不变，不编译/监控。[合并任务](../docs/tasks/T-2026-11-28-001-adb-package-main-merge.md)。
+
 2026-11-27 T002：改包与切网取消修复已推送test/e1526fa；23:21:49 Asia/Tokyo触发Both/常规编译HTTP204。不监控，最终编译结果unknown；回执纯文档补交、不再次dispatch，main/版本保持。[交付任务](../docs/tasks/T-2026-11-27-002-adb-package-build.md)。下方未提交说明为源码阶段。
 
 2026-11-27 T001：test/e3fd784工作区完成内置ADB改包组件解析、ready后PC取消免误停与阶段错误修复；私有Binder v2，状态apiVersion7，实际安装package/ProviderInfo为准，不批量替换Java/JNI名称。源码/V0 complete，未提交/构建/设备/监控，main/版本保持；现场切蜂窝与任意APK工具兼容仍待验。[任务](../docs/tasks/T-2026-11-27-001-adb-package-reconnect.md) / STATE/WORK-20261127-001-r2 / CE-01/02。
