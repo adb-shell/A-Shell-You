@@ -1,5 +1,18 @@
 # OpenWorld 内置 ADB 权限服务 / Embedded Privileged Backend
 
+2026-11-27 / [T001修复](../tasks/T-2026-11-27-001-adb-package-reconnect.md)：基于已对齐 main 的 test/e3fd784，在工作区修复成品 APK 改包后的组件解析、激活完成与 PC 断线取消竞态、分阶段错误提示。源码/V0 范围，未提交/编译/真机；以下旧 CI 不覆盖本批。实际蜂窝失效反馈尚无现场复现。
+
+## 实际安装组件与切网取消修复（2026-11-27）
+
+- `PrivilegedTarget.resolve` 用当前 `Context.getPackageName()` 和 `PrivilegedProvider.class` 查询安装后的 ProviderInfo，读取其实际 authority（支持声明多个值，选可解析回同一组件的一项）。不再推断为 package + `.openworld.privileged`；`${applicationId}` 是编译期占位符，成品 APK 改包后不能重新求值。
+- Provider 必须属于当前完整 UID、package、APK、组件和应用主进程，且已启用/可供 shell 回传；缺失或错配给出配置错误，不要求用户反复输入配对码。启动入口从 `OpenWorldPrivilegedService.class.getName()` 获取，`local-adb.pro` 保留两处查询方法，防止 Release 优化将类查询折叠为固定字符串。实际 R8 产物仍待正式构建检查。
+- app_process 接收 package/UID/APK/generation/component/authority 六个参数；daemon 通过 IPackageManager 在 owner 对应 Android user 解析 authority，并于维护、INFO/OPEN 时核对归属。App 端也在真实 shell 验证之前校验 component/authority。private Binder SERVICE/INFO 升为 v2；持久配对身份与 peer 字段40/41不变，更新 APK 后若原服务不兼容需重新激活。
+- `cancelActivation` 在与 verifier 提交 ready 相同的锁中，按本次 generation 处理：尚未 ready 才撤销，已 ready 的能力属于应用；worker finally、PC 断线、请求超时和迟到清理均不能停用它，也不能影响后续 generation。设备级 `disconnect/revoke` 仍立即 block，再落盘停用。
+- `activationErrorCode` 区分组件缺失/无效/不可解析/查询暂不可用、引导启动中断、未回传、验证超时/身份拒绝、记录失败、设备重启和已确认服务死亡。配对成功后的激活失败保留配对记录，不再被包装成普通配对码错误。取消后的验证提示不再声称仍在等待恢复；已 ready 的取消竞态回执按真实状态成功。
+- PC 已有 watch 的缓存状态重发、15s重订阅与 session epoch 隔离；本批核对后保持。正常执行仍为 Binder/FD，没有蜂窝切换触发无线重配的逻辑。未发现证据需增加自动激活或用户命令重放。
+
+支持安装 package、实际组件与 authority 改写；不会修复任意工具损坏的 DEX、JNI 导出符号、资源或缺失组件。Java namespace、MethodChannel 和 Binder descriptor 是技术协议标识，不按安装包名批量替换。若切网前只出现系统“配对成功”，需先完成应用内“ADB 已激活”；若已激活且 Shell 可用后才失效，仍须区分本次修复的取消竞态与 OEM 杀 shell，不能仅凭改包现象推断根因。保持开发者选项/USB调试；不承诺所有 ROM 只重启才失效。
+
 2026-11-21 T005：本文实现及保活/文案已随test/e82f8df完整快进合入main并推送，两支同步对齐；回执只改文档，产品源码仍对应b12cbdb。无本轮编译/监控/设备操作，构建与运行证据边界保持，[合并任务](../tasks/T-2026-11-21-005-embedded-adb-main-merge.md)。
 
 2026-11-21 T002保活与T003文案已合为test/b12cbdb并推送：新增App重建恢复窗口、验证退避、应用进程lease/授权检查、双observer及独立维护线程，修正暂时异常误停；界面精简且恢复语义保持。Both/常规编译run44890553076已启动，用户随后要求不监控，最终结果未知；[续修任务](../tasks/T-2026-11-21-002-embedded-adb-resilience.md)/[交付回执](../tasks/T-2026-11-21-004-adb-resilience-build.md)。下方T001成功编译仅覆盖输入版本，设备验收仍待证。
@@ -49,7 +62,7 @@
 - UID/process observer与每5s维护回退只向已经运行、未force-stop的App递送Binder；不启动停止的App、不自动发现adbd。App重建先进入20s恢复窗口，窗口内收到的8s验证可延长到该次探测结束；超时显示暂不可用，晚到合法服务仍可验证恢复。恢复期间暂不允许重复配对/激活，PC菜单的停用仍可执行。
 - 验证成功才返回App进程lease。daemon保存death recipient；App死亡后重新递送，正常存活时每5s用仅shell/root可调用的lease核对generation及实际ready，避免反复获取Provider。lease存活不替代授权：明确拒绝即停止，暂时Binder错误则重试递送；直接STOP失败后也可通过lease/Provider拒绝结束服务。
 - 系统查询、Provider和lease调用在单独维护线程，观察事件合并、最多一个维护任务在途，不占用daemon主Looper。observer仅在一次性注册线程中安装，注册阻塞不影响周期维护。PackageManager暂时异常保留daemon，但INFO/OPEN仍拒绝未经确认的安装身份；确认卸载/UID或APK变化才退出。STOP只要求原完整owner UID，在安装查询不可用时也能停用；它不执行特权命令。
-- 延迟connect在恢复窗口等待原服务，并在发现/启动阶段再次检查ready。最终begin在同一锁内决定复用或新建；只有真正新激活才标记请求拥有该生命周期，取消复用请求不能停掉恢复好的服务。
+- 延迟connect在恢复窗口等待原服务，并在发现/启动阶段再次检查ready。最终begin在同一锁内决定复用或新建；新激活仅在未提交ready之前归请求所有，取消复用请求或已ready的新激活请求均不停止服务，清理严格匹配generation。
 - 本应用电池豁免仍是原包名限定的幂等命令，失败最多三次、间隔5s/30s；不重放用户Shell、不永久持有WakeLock、不调整全局进程限制。独立shell进程被强制终止后，普通App不能自行重建权限。
 - 单例 abstract socket `openworld.privileged.<uid>` 仅占名防重，无 accept/命令处理。旧实例退出等待上限 6s；它不是对外端口。安装身份变化或 App 拒绝 generation 时服务停止。
 
@@ -72,7 +85,7 @@
 
 ## 状态与版本兼容
 
-状态JSON `apiVersion=6`，字段40/41、FRB、JNI签名及`pair/pairConnect/connect/disconnect/revoke`名称不变。`connected`表示已验证且存活的Binder；`connectPort`只表示最后激活端口。字段：
+状态JSON `apiVersion=7`，字段40/41、FRB、JNI签名及`pair/pairConnect/connect/disconnect/revoke`名称不变。`connected`表示已验证且存活的Binder；`connectPort`只表示最后激活端口。字段：
 
 | 字段 | 含义 |
 |---|---|
@@ -80,6 +93,7 @@
 | executionBackend | embedded |
 | activationState | inactive / starting / reconnecting / ready / activation_required；后者表示未恢复或已知失效，不笼统断言进程已停止 |
 | activationError | 验证、死亡或记录错误；不含配对码/命令/身份密钥 |
+| activationErrorCode | 可选固定原因码；旧端缺失时保持原展示，只有已确认死亡/重启显示停止/重启标题 |
 | serviceUid | ready 时实际 shell/root UID，否则 null |
 | wirelessConnected | 激活临时 adbd 状态；不能作为业务可用判断 |
 | recovering | 仅已有权限服务的重新绑定窗口为true，不是无线端口恢复 |

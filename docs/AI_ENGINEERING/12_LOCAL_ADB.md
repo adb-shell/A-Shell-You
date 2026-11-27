@@ -1,5 +1,7 @@
 # OpenWorld 本机 ADB / Local ADB
 
+2026-11-27：test/e3fd784工作区增加安装ProviderInfo真实组件/authority解析、generation限定的未完成激活取消、分阶段错误码与停止/重启标题。status apiVersion7，手机提示等待“ADB已激活”再切网；不恢复手机停用按钮。源码/V0，正式改包与切网待验，详见[内置服务](16_EMBEDDED_ADB.md)及[任务](../tasks/T-2026-11-27-001-adb-package-reconnect.md)。以下为历史时点。
+
 2026-11-21 T003界面：`local_adb_page.dart`移除独立ADB标题/图标，刷新位于状态卡片右上角；三张卡片圆角与主页`PaddingCard`统一为13。配对说明、按钮及状态文字精简，重复状态只显示一次；移除Android底部停用按钮与Shell时间/输出上限常驻说明，实际执行限制和错误回执保持，PC仍可显式停用。保留T002恢复状态与操作条件。仅V0，未编译/真机视觉验证，见[任务](../tasks/T-2026-11-21-003-adb-ui-copy.md)。下方历史按钮名称不代表当前界面。
 
 2026-11-21当前执行合同：[内置权限服务](16_EMBEDDED_ADB.md)。无线调试只用于显式配对/激活；`connected` 表示经验证且存活的本应用专属Binder服务，普通执行无无线端口参数。App重建重绑定，停止/重启需重新激活；下文持续adbd连接和自动恢复描述为旧实现。test工作区V0，尚未构建/真机验证。

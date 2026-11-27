@@ -61,6 +61,8 @@ class RemoteAdbController extends ChangeNotifier {
       ? connected ? 'ADB 已激活'
           : state['activationState'] == 'starting' ? '正在激活 ADB…'
           : reconnecting ? '正在恢复 ADB…'
+          : state['activationErrorCode'] == 'service_stopped' ? 'ADB 服务已停止 · 需重新激活'
+          : state['activationErrorCode'] == 'device_rebooted' ? '手机已重启 · 需重新激活'
           : state['activationState'] == 'activation_required' ? '服务暂不可用 · 可重新激活'
           : paired ? '已配对 · 尚未激活' : '尚未配对'
       : connected

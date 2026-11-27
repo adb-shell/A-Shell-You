@@ -154,6 +154,8 @@ class _RemoteAdbDialogState extends State<_RemoteAdbDialog> {
     Text('首次配对', style: Theme.of(context).textTheme.titleSmall),
     const SizedBox(height: 6),
     _hint('手机打开“无线调试 → 使用配对码配对设备”，保持窗口打开。'),
+    if (adb.activationSupported)
+      _hint('请等此处显示“ADB 已激活”后再关闭 Wi-Fi 或无线调试；系统提示配对成功时，激活可能尚未完成。'),
     const SizedBox(height: 10),
     Wrap(spacing: 8, runSpacing: 8, children: [
       for (final item in const {'auto': '只填配对码', 'manual': '手动端口'}.entries)

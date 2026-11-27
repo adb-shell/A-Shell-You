@@ -24,6 +24,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Process-owned Binder capability, independently recoverable from a still-running shell server. */
 final class PrivilegedBridge {
+    static final class ActivationFailure extends IOException {
+        final String code;
+        ActivationFailure(String code, String message) { super(message); this.code = code; }
+    }
     private static final long RECOVERY_WINDOW_MS = 20000;
     private static final long VERIFY_TIMEOUT_MS = 8000;
     private static PrivilegedBridge instance;
@@ -75,10 +79,11 @@ final class PrivilegedBridge {
     private Check checking;
     private IBinder pendingService;
     private volatile boolean allowed, starting;
-    private boolean restartRequired, identityRejected;
+    private boolean restartRequired, identityRejected, handoffReceived;
     private long recoveryUntil, retryAfter;
     private int verificationFailures;
     private volatile String generation, error = "";
+    private String errorCode = "";
     private volatile Runnable listener = () -> { };
 
     private PrivilegedBridge(Context context) {
@@ -90,7 +95,10 @@ final class PrivilegedBridge {
         int activatedBoot = records.getInt("bootCount", -1);
         if (allowed) {
             restartRequired = activatedBoot >= 0 && bootCount >= 0 && activatedBoot != bootCount;
-            if (restartRequired) error = "手机已重启，需要重新激活；已有配对记录仍可复用。";
+            if (restartRequired) {
+                errorCode = "device_rebooted";
+                error = "手机已重启，ADB 服务已结束。请开启无线调试后点击“激活 ADB”；系统仍保留配对时无需重新配对。";
+            }
             else recoveryUntil = SystemClock.elapsedRealtime() + RECOVERY_WINDOW_MS;
         }
     }
@@ -136,6 +144,7 @@ final class PrivilegedBridge {
         state.put("recovering", reconnecting());
         state.put("serviceUid", value == null ? null : value.uid);
         state.put("activationError", error);
+        state.put("activationErrorCode", errorCode);
     }
 
     synchronized Bundle accept(IBinder service, String candidateGeneration, int sourceUid) {
@@ -147,6 +156,7 @@ final class PrivilegedBridge {
         if (pendingService != null && pendingService.isBinderAlive() && !pendingService.equals(service))
             return handoff(false, false);
         pendingService = service;
+        handoffReceived = true;
         long now = SystemClock.elapsedRealtime();
         // A temporary verification failure is not revocation. Keep the server alive and retry
         // at a bounded rate, including after the initial visible recovery window has elapsed.
@@ -181,10 +191,13 @@ final class PrivilegedBridge {
             reply.readException();
             int version = reply.readInt(), uid = reply.readInt(), owner = reply.readInt();
             String packageName = reply.readString(), apk = reply.readString(), actualGeneration = reply.readString();
+            String component = reply.readString(), authority = reply.readString();
+            PrivilegedTarget target = PrivilegedTarget.resolve(context);
             if (version != PrivilegedProtocol.VERSION || uid != check.sourceUid
                     || owner != Process.myUid() || !context.getPackageName().equals(packageName)
                     || !context.getApplicationInfo().sourceDir.equals(apk)
-                    || !check.generation.equals(actualGeneration)) throw new SecurityException();
+                    || !check.generation.equals(actualGeneration) || !target.component.equals(component)
+                    || !target.authority.equals(authority)) throw new SecurityException();
             if (check.cancelled.get()) return;
             check.stream = PrivilegedProtocol.open(check.service, check.lease, "shell,v2,raw:id -u");
             if (check.cancelled.get()) { check.stream.close(); return; }
@@ -198,14 +211,16 @@ final class PrivilegedBridge {
             synchronized (this) {
                 if (checking != check || check.cancelled.get() || !allowed || !generation.equals(check.generation)) return;
                 if (!check.service.isBinderAlive()) throw new IOException("Service died during verification");
-                binding = verified; pendingService = null; checking = null; starting = false; error = "";
+                binding = verified; pendingService = null; checking = null; starting = false; error = ""; errorCode = "";
                 recoveryUntil = 0; retryAfter = 0; verificationFailures = 0;
                 installed = true;
                 notifyAll();
             }
             changed();
+        } catch (ActivationFailure invalidTarget) {
+            failed(check, invalidTarget.getMessage(), !"component_unavailable".equals(invalidTarget.code));
         } catch (SecurityException rejected) {
-            failed(check, "内置服务身份验证被拒绝，请重新激活。", true);
+            failed(check, "ADB 服务身份或组件验证不一致，已拒绝授权。请检查安装包是否完整，再重新激活。", true);
         } catch (Exception | LinkageError failure) {
             failed(check, "暂未完成内置服务验证，正在等待恢复。", false);
         }
@@ -222,6 +237,7 @@ final class PrivilegedBridge {
         if (check.stream != null) try { check.stream.close(); } catch (IOException ignored) { }
         if (checking != check) return;
         checking = null; error = message;
+        errorCode = fatal ? "identity_rejected" : "verification_pending";
         if (fatal) {
             identityRejected = true; starting = false; recoveryUntil = 0;
             pendingService = null;
@@ -239,11 +255,12 @@ final class PrivilegedBridge {
         if (binding != expected) return;
         binding = null; starting = false;
         restartRequired = true; recoveryUntil = 0;
-        error = "特权服务已停止，需要重新激活；已有配对记录仍可复用。";
+        errorCode = "service_stopped";
+        error = "ADB 服务进程已停止，原因尚未确认。请开启无线调试后点击“激活 ADB”；配对仍有效时无需重新配对。";
         notifyAll(); changed();
     }
 
-    private synchronized String begin(AtomicBoolean cancelled, Runnable onStarting) throws IOException {
+    private synchronized String begin(AtomicBoolean cancelled, java.util.function.Consumer<String> onStarting) throws IOException {
         if (cancelled.get() || Thread.currentThread().isInterrupted())
             throw new java.io.InterruptedIOException("Activation cancelled");
         // A delayed connect/discovery request must not replace a service that has just rebound.
@@ -251,10 +268,10 @@ final class PrivilegedBridge {
         disable();
         String next = UUID.randomUUID().toString();
         if (!records.edit().putBoolean("enabled", true).putString("generation", next).putInt("bootCount", bootCount).commit())
-            throw new IOException("Activation record unavailable");
-        generation = next; allowed = true; starting = true; error = "";
+            throw new ActivationFailure("record_failed", "无法保存 ADB 激活授权，请检查应用存储后重试。");
+        generation = next; allowed = true; starting = true; error = ""; errorCode = ""; handoffReceived = false;
         restartRequired = false; identityRejected = false; verificationFailures = 0; retryAfter = 0;
-        onStarting.run();
+        onStarting.accept(next);
         if (cancelled.get() || Thread.currentThread().isInterrupted()) {
             disable();
             throw new java.io.InterruptedIOException("Activation cancelled");
@@ -289,24 +306,61 @@ final class PrivilegedBridge {
         generation = "";
         if (!records.edit().putBoolean("enabled", false).remove("generation").remove("bootCount").commit()) {
             error = "停用记录保存失败，请保持应用打开并重试停用。";
-            throw new IOException("Revocation record unavailable");
+            errorCode = "stop_record_failed";
+            throw new ActivationFailure(errorCode, error);
         }
-        error = "";
+        error = ""; errorCode = "";
     }
 
-    void activate(LocalAdbClient bootstrap, AtomicBoolean cancelled, long deadline, Runnable onStarting) throws Exception {
-        String activation = begin(cancelled, onStarting);
+    // Serialize cancellation against the verifier's ready commit. Once verified, the capability
+    // belongs to the app, not to the PC request that happened to activate it. Explicit STOP uses disable().
+    synchronized void cancelActivation(String activation, boolean persist) throws IOException {
+        if (activation == null || !generation.equals(activation) || ready()) return;
+        String detail = error.isEmpty() ? "激活尚未完成，请求已取消或超时。配对记录保留，可再次点击“激活 ADB”。" : error;
+        String code = errorCode.isEmpty() ? "activation_cancelled" : errorCode;
+        if ("verification_pending".equals(code)) {
+            code = "activation_cancelled";
+            detail = "权限验证尚未完成，本次激活已取消或超时。配对记录保留，请保持无线调试开启后重试激活。";
+        }
+        if (persist) disable(); else block();
+        error = detail; errorCode = code;
+        changed();
+    }
+
+    synchronized boolean activatedBy(String activation) {
+        return activation != null && generation.equals(activation) && ready();
+    }
+
+    void activate(LocalAdbClient bootstrap, AtomicBoolean cancelled, long deadline,
+                  java.util.function.Consumer<String> onStarting) throws Exception {
+        PrivilegedTarget target;
+        try { target = PrivilegedTarget.resolve(context); }
+        catch (ActivationFailure invalidTarget) {
+            synchronized (this) {
+                if (!ready()) { error = invalidTarget.getMessage(); errorCode = invalidTarget.code; changed(); }
+            }
+            throw invalidTarget;
+        }
+        String activation;
+        try { activation = begin(cancelled, onStarting); }
+        catch (ActivationFailure recordFailure) {
+            synchronized (this) {
+                if (!ready()) { error = recordFailure.getMessage(); errorCode = recordFailure.code; changed(); }
+            }
+            throw recordFailure;
+        }
         if (activation == null) return;
-        boolean success = false;
         try {
             String apk = context.getApplicationInfo().sourceDir;
             String command = "trap '' HUP; CLASSPATH=" + quote(apk)
                     + " /system/bin/app_process /system/bin --nice-name=openworld_privileged_" + Process.myUid()
-                    + " com.openworld.me.localadb.OpenWorldPrivilegedService " + quote(context.getPackageName())
+                    + " " + quote(OpenWorldPrivilegedService.class.getName()) + " " + quote(context.getPackageName())
                     + " " + Process.myUid() + " " + quote(apk) + " " + quote(activation)
+                    + " " + quote(target.component) + " " + quote(target.authority)
                     + " </dev/null >/dev/null 2>&1 &";
             Map<String, Object> result = bootstrap.runShell(command, cancelled);
-            if (!Integer.valueOf(0).equals(result.get("exitCode"))) throw new IOException("Starter failed");
+            if (!Integer.valueOf(0).equals(result.get("exitCode")))
+                throw new ActivationFailure("starter_failed", "无线调试已连接，但 ADB 服务启动命令未完成。请保持无线调试开启后重试激活。");
             synchronized (this) {
                 while (!cancelled.get() && !Thread.currentThread().isInterrupted() && allowed
                         && generation.equals(activation) && !ready()) {
@@ -314,19 +368,29 @@ final class PrivilegedBridge {
                     if (remaining <= 0 || (!starting && !error.isEmpty())) break;
                     wait(Math.min(remaining, 100));
                 }
-                success = !cancelled.get() && !Thread.currentThread().isInterrupted()
-                        && generation.equals(activation) && ready();
+                if (activatedBy(activation)) return;
+                if (!error.isEmpty() && !"verification_pending".equals(errorCode))
+                    throw new ActivationFailure(errorCode, error);
+                if (cancelled.get() || Thread.currentThread().isInterrupted())
+                    throw new ActivationFailure("activation_cancelled", "激活尚未完成，请求已取消或超时。请保持连接后重试激活。");
+                errorCode = handoffReceived ? "verification_timeout" : "handoff_timeout";
+                error = handoffReceived ? "ADB 服务已回传，但未在时限内通过权限验证，本次激活已结束。请保持无线调试开启后重试激活。"
+                                : "无线调试已连接，但未收到内置 ADB 服务回传。服务可能未启动或回传被系统阻止；请检查安装包组件，并保持开发者选项和 USB 调试开启后重试。";
+                throw new ActivationFailure(errorCode, error);
             }
-            if (!success) throw new IOException("内置服务未激活。请保持开发者选项和 USB 调试开启后重试；部分系统会终止 Shell 服务。");
-        } finally {
+        } catch (Exception | LinkageError failure) {
             synchronized (this) {
-                if (!success && generation.equals(activation)) {
-                    String detail = error;
-                    disable();
-                    error = detail.isEmpty() ? "内置服务未激活，请重试。" : detail;
-                    changed();
+                if (activatedBy(activation)) return;
+                if (generation.equals(activation) && error.isEmpty()) {
+                    errorCode = failure instanceof ActivationFailure ? ((ActivationFailure) failure).code : "starter_interrupted";
+                    error = failure instanceof ActivationFailure ? failure.getMessage()
+                            : "ADB 服务启动未完成，启动连接已中断或不可用。配对记录保留，请保持无线调试开启后重试激活。";
                 }
             }
+            if (failure instanceof ActivationFailure) throw (ActivationFailure) failure;
+            throw new ActivationFailure("starter_interrupted", "ADB 服务启动未完成，请保持无线调试开启后重试激活；配对记录保留。");
+        } finally {
+            cancelActivation(activation, true);
         }
     }
 

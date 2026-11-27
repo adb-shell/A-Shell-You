@@ -1,5 +1,19 @@
 # OpenWorld Change Event Log
 
+## CE-20261127-T002-01：改包修复提交推送与双编译启动
+
+当前用户要求“提交并推送，然后执行双编译”，授权T001既有27文件stage/commit/push origin/test与单次Both/常规编译；同会话不监控要求保持。初始test/e3fd784、远端main/test均同SHA、index空，无额外用户变更/活动任务/hooks。新增docs/tasks/T-2026-11-27-002-adb-package-build.md并更新STATE/WORK为20261127-002-r1、active T5；diff检查通过。源码/版本/CI不扩改，不main合并或发布，结果待回填。
+
+## CE-20261127-T001-02：实际组件解析与激活取消边界修复交付
+
+test/e3fd784工作区完成7Java（含新增PrivilegedTarget）、4Dart与local-adb.pro：从已安装ProviderInfo读取真实组件/authority，App与daemon校验package/full UID/APK/component，入口类引用，private Binder SERVICE/INFO v2；取消仅撤销同generation未ready激活，ready后请求断线/超时不误停；明确停用仍全局生效。补组件/握手/回传/验证/记录/停止错误与apiVersion7原因码，双端等待已激活再切网提示。PC watch缓存重发/重订阅和epoch源码核对后保持；无用户命令重放。
+
+V0 Java词法、源码安全/生命周期/协议配对、Dart差异、git diff和新文档链接检查完成。无现场设备，改包/蜂窝/OEM最终验收NOT_RUN，不将包名缺陷或取消竞态视为已复现的唯一根因。12/13/16领域文档、TEST_MATRIX新增P19—P22、ADR0030/D-038、任务及STATE/WORK/History/Changelog/Memory/AGENTS/Start同步；STATE/WORK-20261127-001-r2、complete T8仅源码。未Git写入/编译/CI监控/版本/发布；Baseline/外部资产/Build/Debug reviewed-no-change，无新增依赖。
+
+## CE-20261127-T001-01：改包与切网恢复修复启动
+
+用户明确授权在 test 修复实际 package/component、配对/激活/停止错误和蜂窝切网问题。初始 test/e3fd784 clean，已与 main 对齐，无并行任务。新建 docs/tasks/T-2026-11-27-001-adb-package-reconnect.md，更新 CURRENT_WORK 与 PROJECT_STATE 为 STATE/WORK-20261127-001-r1、active T5。C2 源码与配套文档/V0；不继承旧 Git/构建授权，不监控 CI，不改版本。
+
 ## CE-20261121-T005-02：main快进推送与两支对齐回执
 
 现有main worktree从956ecf4快进合入test/e82f8df，无冲突且完整tree与test一致；push main成功，远端main/test均e82f8dfdc0a743c51e15be49ccd89ae38fc3ad05，本地0/0。主工作区保留test，64文件既有源码/文档合入；版本/CI保持，不触发或查询编译。

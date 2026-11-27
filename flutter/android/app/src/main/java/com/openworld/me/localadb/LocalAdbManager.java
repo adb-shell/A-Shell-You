@@ -9,6 +9,7 @@ import android.os.SystemClock;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -131,7 +132,7 @@ public final class LocalAdbManager {
     Map<String, Object> status() {
         Map<String, Object> value = new HashMap<>();
         value.put("supported", Build.VERSION.SDK_INT >= 30);
-        value.put("apiVersion", 6);
+        value.put("apiVersion", 7);
         value.put("textInputSupported", true);
         value.put("clipboardSyncSupported", true);
         value.put("mirrorVersion", 2);
@@ -333,9 +334,11 @@ public final class LocalAdbManager {
                             try { value = connect(operation, operation.connectPort); }
                             catch (Exception | LinkageError e) {
                                 String detail = e instanceof LocalAdbClient.ConnectionFailure || e instanceof AdbFailure
-                                        ? e.getMessage() : "连接或 Shell 验证未完成。";
-                                throw new AdbFailure("配对已成功，记录已保留。" + detail
-                                        + "可点击“我已配对，激活”重试，或手填无线调试首页的连接端口。");
+                                        || e instanceof PrivilegedBridge.ActivationFailure
+                                        ? e.getMessage() : e instanceof LinkageError
+                                        ? "APK 的 ADB 原生组件无法加载或不兼容，请检查改包结果与 CPU 架构。"
+                                        : "引导连接或 Shell 验证未完成。";
+                                throw new AdbFailure("配对已成功，但 ADB 尚未激活；配对记录已保留。" + detail);
                             }
                         }
                         break;
@@ -358,16 +361,17 @@ public final class LocalAdbManager {
                 }
             } catch (Exception | LinkageError error) {
                 failed = true;
-                if (error instanceof AdbFailure || error instanceof LocalAdbClient.ConnectionFailure)
+                if (error instanceof LinkageError)
+                    operation.failure = "当前 APK 的 ADB 原生组件无法加载或不兼容，请检查改包结果与 CPU 架构；重新输入配对码不能修复此问题。";
+                if (error instanceof AdbFailure || error instanceof LocalAdbClient.ConnectionFailure
+                        || error instanceof PrivilegedBridge.ActivationFailure)
                     operation.failure = error.getMessage();
                 if (operation.usesTransport) client.disconnect();
             } finally {
                 operation.text = "";
                 operation.thread = null;
                 if (operation.cancelled.get() && operation.usesTransport) client.disconnect();
-                if (operation.cancelled.get() && operation.activating) {
-                    try { privileged.disable(); } catch (Exception ignored) { }
-                }
+                if (operation.cancelled.get()) cancelActivation(operation, true);
                 Thread.interrupted();
             }
             Object result = value;
@@ -379,9 +383,11 @@ public final class LocalAdbManager {
                 reconcileConnection();
                 changed();
                 if (!privileged.ready()) touch.stop();
-                if (operation.cancelled.get()) operation.reply.failure(operation.cancelReason,
-                        operation.pairCompleted ? "配对已成功，后续连接已取消或超时。可点击“我已配对”重新连接。"
-                                : "timeout".equals(operation.cancelReason) ? "ADB 操作超时，请查看当前配对/连接状态后重试。" : "ADB 操作已取消。");
+                if (privileged.activatedBy(operation.activation))
+                    operation.reply.success("ADB 已激活；请求结束或 PC 断线不会停用已激活的服务。");
+                else if (operation.cancelled.get()) operation.reply.failure(operation.cancelReason,
+                        operation.pairCompleted ? "配对已成功，但激活未完成。配对记录保留，请保持无线调试开启后点击“激活 ADB”。"
+                                : "timeout".equals(operation.cancelReason) ? "ADB 操作超时，请刷新状态确认是否已激活，再决定是否重试。" : "ADB 操作已取消，请以当前激活状态为准。");
                 else if (error) operation.reply.failure("adb_failed", operation.failure.isEmpty()
                         ? failureMessage(operation.kind) : operation.failure);
                 else if (("connect".equals(operation.kind) || "pairConnect".equals(operation.kind)) && !privileged.ready())
@@ -436,11 +442,12 @@ public final class LocalAdbManager {
                     if (!operation.cancelled.get()) records.edit().putInt("connectPort", port).putBoolean("paired", true).apply();
                     operation.phase = "正在激活内置服务并验证权限";
                     try { privileged.activate(client, operation.cancelled, operation.deadline - 250,
-                            () -> operation.activating = true); }
+                            activation -> operation.activation = activation); }
                     finally { client.disconnect(); }
                     return "内置 ADB 能力已激活，后续执行无需无线调试连接。";
                 } catch (Exception error) {
-                    if (operation.activating) throw new AdbFailure(error.getMessage() == null
+                    if (error instanceof PrivilegedBridge.ActivationFailure) throw error;
+                    if (operation.activation != null) throw new AdbFailure(error.getMessage() == null
                             ? "内置服务激活失败，请重试。" : error.getMessage());
                     last = error;
                     if (operation.cancelled.get() || Thread.currentThread().isInterrupted()) throw error;
@@ -476,16 +483,17 @@ public final class LocalAdbManager {
     private String failureMessage(String kind) {
         if ("pair".equals(kind) || "pairConnect".equals(kind)) return "配对失败，请保持系统配对窗口打开并核对配对端口与配对码。";
         if ("discover".equals(kind)) return "未能扫描端口，请保持无线调试开启，或手动填写端口。";
-        if ("connect".equals(kind)) return "连接或 shell 验证失败，请填写无线调试首页的连接端口；若已在系统忘记配对，请重新配对。";
+        if ("connect".equals(kind)) return "无线调试引导连接或 Shell 验证失败，尚未激活 ADB。请保持无线调试开启并核对连接端口；系统已忘记此配对时才需重新配对。";
         if ("revoke".equals(kind)) return "撤销未完整完成；ADB 已断开，请在系统无线调试中忘记对应配对后重试。";
-        return "ADB 操作失败，连接已断开，请重新连接。";
+        if ("disconnect".equals(kind)) return "ADB 停用未完整完成，请保持应用打开并重试停用；配对记录保留。";
+        return "ADB 操作失败，请刷新激活状态后重试。";
     }
 
     private void cancelCurrent(String reason) {
         Operation operation = current;
         if (operation == null || !operation.cancelled.compareAndSet(false, true)) return;
         operation.cancelReason = reason;
-        if (operation.activating) privileged.block();
+        cancelActivation(operation, false);
         if (operation.usesTransport) client.abort();
         Thread thread = operation.thread;
         if (thread != null) thread.interrupt();
@@ -493,8 +501,13 @@ public final class LocalAdbManager {
         // its main-looper result. This is queued before startNext can submit another job.
         if (operation.usesTransport) worker.execute(() -> {
             client.disconnect();
-            if (operation.activating) try { privileged.disable(); } catch (Exception ignored) { }
+            cancelActivation(operation, true);
         });
+    }
+
+    private void cancelActivation(Operation operation, boolean persist) {
+        try { privileged.cancelActivation(operation.activation, persist); }
+        catch (IOException failed) { operation.failure = "激活取消记录未保存，请保持应用打开并重试停用。"; }
     }
 
     void cancelOwner(String owner) {
@@ -566,7 +579,7 @@ public final class LocalAdbManager {
         final int connectPort;
         volatile boolean usesTransport;
         boolean pairCompleted;
-        volatile boolean activating;
+        volatile String activation;
         volatile String phase = "";
         String failure = "";
         volatile String text;

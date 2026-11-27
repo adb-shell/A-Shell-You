@@ -2,6 +2,7 @@ package com.openworld.me.localadb;
 
 import android.content.AttributionSource;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.ProviderInfo;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,7 +24,8 @@ final class PrivilegedSystem {
     private final Class<?> managerInterface;
     private final Object packageManager;
     private final Method getApplicationInfo;
-    private final String packageName, authority;
+    private final Method resolveContentProvider;
+    private final String packageName, authority, component;
     private final int ownerUid;
     private final String apk;
     private IBinder observer;
@@ -33,8 +35,8 @@ final class PrivilegedSystem {
         InstallationChanged() { super("Application installation changed"); }
     }
 
-    PrivilegedSystem(String packageName, int ownerUid, String apk) throws Exception {
-        this.packageName = packageName; this.authority = packageName + PrivilegedProtocol.PROVIDER_SUFFIX;
+    PrivilegedSystem(String packageName, int ownerUid, String apk, String component, String authority) throws Exception {
+        this.packageName = packageName; this.authority = authority; this.component = component;
         this.ownerUid = ownerUid; this.apk = apk;
         // Use the shell's framework Binder APIs directly. ActivityThread.systemMain() would
         // initialize system-server HWUI/font state in this standalone VM on some ROMs.
@@ -44,6 +46,9 @@ final class PrivilegedSystem {
                 .getMethod("asInterface", IBinder.class).invoke(null, packageBinder);
         getApplicationInfo = Class.forName("android.content.pm.IPackageManager")
                 .getMethod("getApplicationInfo", String.class,
+                        Build.VERSION.SDK_INT >= 33 ? long.class : int.class, int.class);
+        resolveContentProvider = Class.forName("android.content.pm.IPackageManager")
+                .getMethod("resolveContentProvider", String.class,
                         Build.VERSION.SDK_INT >= 33 ? long.class : int.class, int.class);
         Class<?> manager = Class.forName("android.app.ActivityManager");
         activityManager = manager.getDeclaredMethod("getService").invoke(null);
@@ -63,6 +68,12 @@ final class PrivilegedSystem {
         if (info == null || ownerUid % 100000 < 10000 || ownerUid % 100000 >= 20000
                 || info.uid != ownerUid || !apk.equals(info.sourceDir))
             throw new InstallationChanged();
+        ProviderInfo provider;
+        if (Build.VERSION.SDK_INT >= 33)
+            provider = (ProviderInfo) resolveContentProvider.invoke(packageManager, authority, 0L, ownerUid / 100000);
+        else provider = (ProviderInfo) resolveContentProvider.invoke(packageManager, authority, 0, ownerUid / 100000);
+        if (!PrivilegedTarget.matches(provider, packageName, ownerUid, apk, component)
+                || !info.processName.equals(provider.processName)) throw new InstallationChanged();
     }
 
     boolean isRunning() {

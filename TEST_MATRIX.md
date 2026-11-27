@@ -1,5 +1,18 @@
 # OpenWorld Commercial Test Matrix
 
+## 2026-11-27 改包与切网取消修复 / T001
+
+test/e3fd784 工作区修复，仅 V0 源码、Java 词法与 diff 检查；正式构建/设备 NOT_RUN。旧 CI 不覆盖，未查询其结果。[任务](docs/tasks/T-2026-11-27-001-adb-package-reconnect.md)。回归 ADB-P01—P18、ADB-R/M/A 与 NET-04/DSP-09，新增：
+
+| ID | 验收场景与通过条件 | 等级 | 结果 |
+|---|---|---|---|
+| ADB-P19 | 原包、仅改安装package但保留authority、同时改authority、多authority、合法组件类改写；根据安装信息激活。缺失/禁用/外包/其他UID/进程/错误APK组件拒绝；已有配对不能绕过；Release保留运行时类查询 | V2/V3/V4 | NOT_RUN |
+| ADB-P20 | verifier提交ready之前与之后分别取消/超时/断开PC/关闭页面；前者停止未完成激活，后者保留同一daemon。worker迟到清理不撤销新generation；显式disconnect/revoke始终停用 | V3/V4 | NOT_RUN |
+| ADB-P21 | 错码、错端口、原生组件损坏、Provider缺失、启动失败/无回传、验证超时、记录失败、服务死亡、重启：阶段提示准确；配对已成功不得误报配对失败；未验证不能ready；取消后不显示仍在恢复 | V3 | NOT_RUN |
+| ADB-P22 | 改包与原包均先显示ready并执行id -u，再关闭无线调试/Wi-Fi→蜂窝→PC重连→App退出重开；重复Shell及媒体/输入验收。记录daemon是否同一进程；不自动配对/激活、不重放命令，单纯远控网络未连通不得当服务死亡 | V3/V4 | NOT_RUN |
+
+ADB-P17 中“真正新激活的取消仍撤销”自本批细化为：仅尚未提交 ready 的新激活才撤销，详见 ADB-P20。
+
 ## 2026-11-21 内置 ADB 保活续修 / T002
 
 输入test/e137d44，本批与T003文案已固化为test/b12cbdb并推送。V0源码与词法结构检查完成；T004已启动Both/常规编译run44890553076，用户随后要求不监控，V2最终结果unknown，设备与FLT-07视觉验收NOT_RUN。前轮run44883517881不覆盖本批；见[交付回执](docs/tasks/T-2026-11-21-004-adb-resilience-build.md)。除回归ADB-P01—P12、ADB-R/M/A、NET-04/DSP-09外，新增：

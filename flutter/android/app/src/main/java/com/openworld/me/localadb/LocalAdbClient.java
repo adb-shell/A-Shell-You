@@ -23,8 +23,8 @@ final class LocalAdbClient {
     static final class ConnectionFailure extends IOException {
         ConnectionFailure(boolean handshakeComplete) {
             super(handshakeComplete
-                    ? "ADB 连接握手成功，但 Shell 通道或 UID 验证未完成，请重新连接。"
-                    : "无线调试连接握手未完成，请确认连接端口有效，且系统仍保留本应用配对记录。");
+                    ? "无线调试已连接，但 Shell 通道或 UID 验证未通过，尚未激活 ADB。请保持无线调试开启后重试激活。"
+                    : "无线调试握手未完成，尚未激活 ADB。请确认连接端口有效且系统仍保留本应用配对；仅在系统已忘记此配对时重新配对。");
         }
     }
     private static final ScheduledExecutorService DEADLINES = Executors.newSingleThreadScheduledExecutor(task -> {

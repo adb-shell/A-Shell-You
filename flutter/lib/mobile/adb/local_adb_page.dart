@@ -234,6 +234,7 @@ class _LocalAdbPageState extends State<LocalAdbPage>
         const Text('连接 Wi-Fi，打开“无线调试 → 使用配对码配对设备”。'),
         const SizedBox(height: 4),
         _hint('用分屏或小窗保持配对码窗口打开。'),
+        _hint('请等本页显示“ADB 已激活”后再关闭 Wi-Fi 或无线调试；系统提示配对成功时，激活可能尚未完成。'),
         Align(alignment: Alignment.centerLeft, child: TextButton.icon(
             onPressed: _openSettings, icon: const Icon(Icons.settings), label: const Text('打开开发者选项'))),
         Wrap(spacing: 8, runSpacing: 8, children: [
